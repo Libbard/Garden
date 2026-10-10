@@ -210,8 +210,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>الرسم البياني لتدفق التحكم (CFG) هو رسم بياني موجه (Directed Graph) تم تطويره في الأصل بواسطة Frances E. Allen.</p><p>يتكون من:</p><ul><li><strong>العقد (Nodes)</strong> — تمثل <span class="smart-term" data-term-en="Basic Block" data-ar="الكتلة الأساسية" data-en-def="A sequence of consecutive statements with a single entry and a single exit point.">الكتل الأساسية (Basic Blocks)<span class="smart-term-tooltip"></span></span>.</li><li><strong>الحواف (Edges)</strong> — تمثل مسارات تدفق التحكم بين الكتل.</li><li><strong>كتلة الدخول (Entry Block)</strong> — تسمح للتحكم بالدخول إلى CFG.</li><li><strong>كتلة الخروج (Exit Block)</strong> — يغادر التحكم من خلالها.</li></ul><p>يُستخدم بشكل أساسي في التحليل الثابت وتطبيقات المترجمات لأنه يمثل التدفق داخل وحدة البرنامج بدقة.</p></template>
-    <template class="content-en"><p>A Control Flow Graph (CFG) is a directed graph originally developed by Frances E. Allen.</p><p>It consists of:</p><ul><li><strong>Nodes</strong> — Represent <span class="smart-term" data-term-en="Basic Block" data-ar="الكتلة الأساسية" data-en-def="A sequence of consecutive statements with a single entry and a single exit point.">basic blocks<span class="smart-term-tooltip"></span></span>.</li><li><strong>Edges</strong> — Portray control flow paths between blocks.</li><li><strong>Entry Block</strong> — Allows control to enter the CFG.</li><li><strong>Exit Block</strong> — Control leaves through this block.</li></ul><p>It is mostly used in static analysis and compiler applications as it accurately represents the flow inside a program unit.</p></template>
+    <template class="content-ar"><p>الرسم البياني لتدفق التحكم (CFG) هو رسم بياني موجه (Directed Graph) تم تطويره في الأصل بواسطة Frances E. Allen.</p><p>يتكون من:</p><ul><li><strong>العقد (Nodes)</strong> — تمثل <span class="smart-term" data-term-en="Basic Block" data-ar="الكتلة الأساسية" data-en-def="A sequence of consecutive statements with a single entry and a single exit point.">الكتل الأساسية (Basic Blocks)<span class="smart-term-tooltip"></span></span>.</li><li><strong>الحواف (Edges)</strong> — تمثل مسارات تدفق التحكم بين الكتل.</li><li><strong>كتلة الدخول (Entry Block)</strong> — تسمح للتحكم بالدخول إلى CFG.</li><li><strong>كتلة الخروج (Exit Block)</strong> — يغادر التحكم من خلالها.</li></ul><p>يُستخدم بشكل أساسي في التحليل الثابت وتطبيقات المترجمات لأنه يمثل التدفق داخل وحدة البرنامج بدقة.</p><p>دعونا نتتبع كيف يترجم المقطع البرمجي السابق إلى رسم بياني لتدفق التحكم (CFG):</p><ol><li><b>التهيئة:</b> تبدأ الحلقة بـ <code>i=0;</code>، مما يشكل الكتلة الأساسية الأولى.</li><li><b>شرط الحلقة:</b> ينتقل التحكم إلى الشرط <code>if(i&lt;10)</code>. تحتوي هذه الكتلة على حافتين خارجتين: <i>صواب</i> (يدخل الحلقة) و <i>خطأ</i> (يخرج من الحلقة).</li><li><b>الشرط الداخلي:</b> يؤدي مسار <i>الصواب</i> إلى <code>if(i%2==0)</code>، والذي يتفرع مرة أخرى إلى <i>صواب</i> (<code>print "even";</code>) و <i>خطأ</i> (<code>print "odd";</code>).</li><li><b>التقاء المسارات:</b> يندمج كلا فرعي الشرط الداخلي عند <code>print "\n";</code>.</li><li><b>تحديث الحلقة و<span class="smart-term" data-term-en="Reverse Edge" data-ar="الحافة العكسية" data-en-def="An edge in a control flow graph that points back to a previously visited node, typically representing a loop.">الحافة العكسية<span class="smart-term-tooltip"></span></span>:</b> ينتقل التحكم إلى <code>i++;</code>، والذي يمتلك حافة عكسية تعود إلى شرط الحلقة <code>if(i&lt;10)</code>.</li><li><b>الخروج:</b> يؤدي مسار <i>الخطأ</i> من شرط الحلقة إلى الكتلة النهائية <code>return;</code>.</li></ol><p>يوضح هذا الهيكل بوضوح جميع مسارات التنفيذ الممكنة، التفرعات، والحافة العكسية للحلقة.</p></template>
+    <template class="content-en"><p>A Control Flow Graph (CFG) is a directed graph originally developed by Frances E. Allen.</p><p>It consists of:</p><ul><li><strong>Nodes</strong> — Represent <span class="smart-term" data-term-en="Basic Block" data-ar="الكتلة الأساسية" data-en-def="A sequence of consecutive statements with a single entry and a single exit point.">basic blocks<span class="smart-term-tooltip"></span></span>.</li><li><strong>Edges</strong> — Portray control flow paths between blocks.</li><li><strong>Entry Block</strong> — Allows control to enter the CFG.</li><li><strong>Exit Block</strong> — Control leaves through this block.</li></ul><p>It is mostly used in static analysis and compiler applications as it accurately represents the flow inside a program unit.</p><p>Let's trace how the previous code snippet translates into a Control Flow Graph (CFG):</p><ol><li><b>Initialization:</b> The loop starts with <code>i=0;</code>, forming the first basic block.</li><li><b>Loop Condition:</b> Control flows to the condition <code>if(i&lt;10)</code>. This block has two outgoing edges: <i>true</i> (enters the loop) and <i>false</i> (exits the loop).</li><li><b>Inner Conditional:</b> The <i>true</i> path leads to <code>if(i%2==0)</code>, which splits again into <i>true</i> (<code>print "even";</code>) and <i>false</i> (<code>print "odd";</code>).</li><li><b>Convergence:</b> Both branches of the inner conditional merge at <code>print "\n";</code>.</li><li><b>Loop Update & Back-edge:</b> Control flows to <code>i++;</code>, which then has a <span class="smart-term" data-term-en="Reverse Edge" data-ar="الحافة العكسية" data-en-def="An edge in a control flow graph that points back to a previously visited node, typically representing a loop.">reverse edge<span class="smart-term-tooltip"></span></span> back to the loop condition <code>if(i&lt;10)</code>.</li><li><b>Exit:</b> The <i>false</i> path from the loop condition leads to the final block <code>return;</code>.</li></ol><p>This structure clearly shows all possible execution paths, branches, and the reverse edge of the loop.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -227,6 +227,22 @@
       <div class="content-target"></div>
     </div>
     <div class="math-block">$$G = (N, E)$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>c</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>for(i=0; i&lt;10; i++) {
+    if(i%2==0) {
+        print "even";
+    } else {
+        print "odd";
+    }
+    print "\n";
+}
+return;</code></pre>
   </div>
 
   <!-- DIAGRAM[1]: Detailed SVG generation prompt: A directed graph showing a Control Flow Graph for a simple for-loop with an if-else statement inside. Nodes are rectangular boxes representing basic blocks. Arrows connect nodes showing execution flow. Include a loop back edge (reverse edge) and a conditional branch splitting into two paths and merging back. Style: educational, dark background #0d1117, accent color #007bff, viewBox 0 0 800 600. -->
@@ -560,8 +576,8 @@ x_4 = phi(x_2, x_3);</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>التمثيل الخطي هو تسلسل من التعليمات يقترب من شكل لغة التجميع النهائية.</p><p>الميزات الرئيسية:</p><ul><li>يفقد بعض مرونة DAG (الذي لا يلتزم بترتيب معين) ولكنه يدمج التعبيرات والجمل وتدفق التحكم في هيكل بيانات واحد.</li><li>يشبه لغة تجميع مثالية مع عدد كبير (أو لا نهائي) من السجلات الافتراضية (Virtual Registers).</li><li>يستخدم تعليمات LOAD و STOR لنقل القيم، وعمليات حسابية ثلاثية العناوين (تقرأ سجلين وتكتب في الثالث).</li><li>سهل التخزين بكفاءة لأن كل تعليمة يمكن أن تكون مجموعة ثابتة الحجم (4-tuple).</li></ul></template>
-    <template class="content-en"><p>A linear IR is an ordered sequence of instructions that is closer to the final goal of an assembly language.</p><p>Key Features:</p><ul><li>It loses some flexibility of a DAG but captures expressions, statements, and control flow within one data structure.</li><li>Looks like an idealized assembly language with an infinite number of <span class="smart-term" data-term-en="Virtual Registers" data-ar="السجلات الافتراضية" data-en-def="An unbounded set of temporary storage locations used in intermediate representations before mapping to physical CPU registers.">virtual registers<span class="smart-term-tooltip"></span></span>.</li><li>Uses LOAD and STOR to move values, and three-address arithmetic operations (reads two registers, writes to a third).</li><li>Easy to store efficiently as fixed-size 4-tuples.</li></ul></template>
+    <template class="content-ar"><p>التمثيل الخطي هو تسلسل من التعليمات يقترب من شكل لغة التجميع النهائية.</p><p>الميزات الرئيسية:</p><ul><li>يفقد بعض مرونة DAG (الذي لا يلتزم بترتيب معين) ولكنه يدمج التعبيرات والجمل وتدفق التحكم في هيكل بيانات واحد.</li><li>يشبه لغة تجميع مثالية مع عدد كبير (أو لا نهائي) من السجلات الافتراضية (Virtual Registers).</li><li>يستخدم تعليمات LOAD و STOR لنقل القيم، وعمليات حسابية ثلاثية العناوين (تقرأ سجلين وتكتب في الثالث).</li><li>سهل التخزين بكفاءة لأن كل تعليمة يمكن أن تكون مجموعة ثابتة الحجم (4-tuple).</li></ul><p>لتوضيح كيفية تتبع دورة حياة المتغيرات، دعونا نتتبع <span class="smart-term" data-term-en="Live Registers" data-ar="السجلات الحية" data-en-def="Virtual registers that currently hold a value which will be read by a subsequent instruction.">السجلات الحية<span class="smart-term-tooltip"></span></span> في كل خطوة من مثالنا السابق:</p><ol><li>التعليمة <code>LOAD a -&gt; %r1</code>: السجل الحي هو <code>%r1</code>.</li><li>التعليمة <code>LOAD $10 -&gt; %r2</code>: <span class="smart-term" data-term-en="Live Registers" data-ar="السجلات الحية" data-en-def="Virtual registers that currently hold a value which will be read by a subsequent instruction.">السجلات الحية<span class="smart-term-tooltip"></span></span> هي <code>%r1, %r2</code>.</li><li>التعليمة <code>ITOF %r2 -&gt; %r3</code>: السجلات الحية هي <code>%r1, %r2, %r3</code>.</li><li>التعليمة <code>FADD %r1, %r3 -&gt; %r4</code>: السجلات الحية هي <code>%r1, %r3, %r4</code> (لاحظ أن %r2 لم يعد حياً لأنه لن يُستخدم لاحقاً).</li><li>التعليمة <code>FMUL %r4, %r4 -&gt; %r5</code>: السجلات الحية هي <code>%r4, %r5</code> (انتهت دورة حياة %r1 و %r3).</li><li>التعليمة <code>STOR %r5 -&gt; x</code>: السجل الحي هو <code>%r5</code>.</li></ol><p>من خلال هذا التتبع، يمكن للمترجم معرفة متى يمكن إعادة استخدام السجلات الفعلية بأمان.</p></template>
+    <template class="content-en"><p>A linear IR is an ordered sequence of instructions that is closer to the final goal of an assembly language.</p><p>Key Features:</p><ul><li>It loses some flexibility of a DAG but captures expressions, statements, and control flow within one data structure.</li><li>Looks like an idealized assembly language with an infinite number of <span class="smart-term" data-term-en="Virtual Registers" data-ar="السجلات الافتراضية" data-en-def="An unbounded set of temporary storage locations used in intermediate representations before mapping to physical CPU registers.">virtual registers<span class="smart-term-tooltip"></span></span>.</li><li>Uses LOAD and STOR to move values, and three-address arithmetic operations (reads two registers, writes to a third).</li><li>Easy to store efficiently as fixed-size 4-tuples.</li></ul><p>To illustrate how variable lifetimes are tracked, let's trace the <span class="smart-term" data-term-en="Live Registers" data-ar="السجلات الحية" data-en-def="Virtual registers that currently hold a value which will be read by a subsequent instruction.">live registers<span class="smart-term-tooltip"></span></span> at each step of our previous example:</p><ol><li>Instruction <code>LOAD a -&gt; %r1</code>: Live register is <code>%r1</code>.</li><li>Instruction <code>LOAD $10 -&gt; %r2</code>: <span class="smart-term" data-term-en="Live Registers" data-ar="السجلات الحية" data-en-def="Virtual registers that currently hold a value which will be read by a subsequent instruction.">Live registers<span class="smart-term-tooltip"></span></span> are <code>%r1, %r2</code>.</li><li>Instruction <code>ITOF %r2 -&gt; %r3</code>: Live registers are <code>%r1, %r2, %r3</code>.</li><li>Instruction <code>FADD %r1, %r3 -&gt; %r4</code>: Live registers are <code>%r1, %r3, %r4</code> (notice %r2 is no longer live as it won't be used again).</li><li>Instruction <code>FMUL %r4, %r4 -&gt; %r5</code>: Live registers are <code>%r4, %r5</code> (%r1 and %r3 lifetimes have ended).</li><li>Instruction <code>STOR %r5 -&gt; x</code>: Live register is <code>%r5</code>.</li></ol><p>Through this trace, the compiler knows exactly when physical registers can be safely reused.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -657,8 +673,8 @@ x_4 = phi(x_2, x_3);</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تم تصميم هذا التمثيل للتنفيذ على آلة مكدس افتراضية.</p><p>التعليمات الأساسية:</p><ul><li><strong>PUSH</strong> — يدفع متغيراً أو قيمة حرفية إلى المكدس.</li><li><strong>POP</strong> — يزيل عنصراً من المكدس ويخزنه في الذاكرة.</li><li><strong>العمليات الثنائية (مثل FADD)</strong> — تسحب قيمتين من المكدس ضمنياً وتدفع النتيجة.</li><li><strong>العمليات الأحادية (مثل ITOF)</strong> — تسحب قيمة واحدة وتدفع النتيجة.</li><li><strong>COPY</strong> — تدفع نسخة مكررة من القيمة العلوية إلى المكدس.</li></ul></template>
-    <template class="content-en"><p>This representation is designed to execute on a virtual stack machine.</p><p>Basic Instructions:</p><ul><li><strong>PUSH</strong> — Pushes a variable or literal value onto the stack.</li><li><strong>POP</strong> — Removes an item and stores it in memory.</li><li><strong>Binary operators (FADD, FMUL)</strong> — Implicitly pop two values off the stack and push the result.</li><li><strong>Unary operators (ITOF)</strong> — Pop one value and push one value.</li><li><strong>COPY</strong> — Pushes a duplicate value onto the stack.</li></ul></template>
+    <template class="content-ar"><p>تم تصميم هذا التمثيل للتنفيذ على آلة مكدس افتراضية.</p><p>التعليمات الأساسية:</p><ul><li><strong>PUSH</strong> — يدفع متغيراً أو قيمة حرفية إلى المكدس.</li><li><strong>POP</strong> — يزيل عنصراً من المكدس ويخزنه في الذاكرة.</li><li><strong>العمليات الثنائية (مثل FADD)</strong> — تسحب قيمتين من المكدس ضمنياً وتدفع النتيجة.</li><li><strong>العمليات الأحادية (مثل ITOF)</strong> — تسحب قيمة واحدة وتدفع النتيجة.</li><li><strong>COPY</strong> — تدفع نسخة مكررة من القيمة العلوية إلى المكدس.</li></ul><p>دعونا نتتبع <span class="smart-term" data-term-en="Stack State" data-ar="حالة المكدس" data-en-def="The exact sequence of values currently held in the stack at a specific point during execution.">حالة المكدس<span class="smart-term-tooltip"></span></span> خطوة بخطوة أثناء تنفيذ المثال السابق، بافتراض أن قيمة <code>a</code> هي 5.0:</p><ol><li>التعليمة <code>PUSH a</code>: <span class="smart-term" data-term-en="Stack State" data-ar="حالة المكدس" data-en-def="The exact sequence of values currently held in the stack at a specific point during execution.">حالة المكدس<span class="smart-term-tooltip"></span></span> تصبح <code>[5.0]</code>.</li><li>التعليمة <code>PUSH 10</code>: يتم دفع 10، وتصبح الحالة <code>[10, 5.0]</code> (حيث 10 في القمة).</li><li>التعليمة <code>ITOF</code>: تحول 10 إلى عدد عشري، وتصبح الحالة <code>[10.0, 5.0]</code>.</li><li>التعليمة <code>FADD</code>: تسحب القيمتين وتجمعهما، وتدفع النتيجة لتصبح الحالة <code>[15.0]</code>.</li><li>التعليمة <code>COPY</code>: تكرر القيمة العلوية، وتصبح الحالة <code>[15.0, 15.0]</code>.</li><li>التعليمة <code>FMUL</code>: تسحب القيمتين وتضربهما، وتدفع النتيجة لتصبح الحالة <code>[225.0]</code>.</li><li>التعليمة <code>POP x</code>: تسحب النتيجة النهائية وتخزنها في المتغير x، ويصبح المكدس فارغاً <code>[-]</code>.</li></ol><p>يوضح هذا التتبع كيف تتغير حالة المكدس ديناميكياً مع كل تعليمة دون الحاجة إلى سجلات صريحة.</p></template>
+    <template class="content-en"><p>This representation is designed to execute on a virtual stack machine.</p><p>Basic Instructions:</p><ul><li><strong>PUSH</strong> — Pushes a variable or literal value onto the stack.</li><li><strong>POP</strong> — Removes an item and stores it in memory.</li><li><strong>Binary operators (FADD, FMUL)</strong> — Implicitly pop two values off the stack and push the result.</li><li><strong>Unary operators (ITOF)</strong> — Pop one value and push one value.</li><li><strong>COPY</strong> — Pushes a duplicate value onto the stack.</li></ul><p>Let's trace the <span class="smart-term" data-term-en="Stack State" data-ar="حالة المكدس" data-en-def="The exact sequence of values currently held in the stack at a specific point during execution.">stack state<span class="smart-term-tooltip"></span></span> step-by-step during the execution of the previous example, assuming the value of <code>a</code> is 5.0:</p><ol><li>Instruction <code>PUSH a</code>: <span class="smart-term" data-term-en="Stack State" data-ar="حالة المكدس" data-en-def="The exact sequence of values currently held in the stack at a specific point during execution.">Stack state<span class="smart-term-tooltip"></span></span> becomes <code>[5.0]</code>.</li><li>Instruction <code>PUSH 10</code>: Pushes 10, state becomes <code>[10, 5.0]</code> (with 10 at the top).</li><li>Instruction <code>ITOF</code>: Converts 10 to float, state becomes <code>[10.0, 5.0]</code>.</li><li>Instruction <code>FADD</code>: Pops both values, adds them, and pushes the result, state becomes <code>[15.0]</code>.</li><li>Instruction <code>COPY</code>: Duplicates the top value, state becomes <code>[15.0, 15.0]</code>.</li><li>Instruction <code>FMUL</code>: Pops both values, multiplies them, and pushes the result, state becomes <code>[225.0]</code>.</li><li>Instruction <code>POP x</code>: Pops the final result and stores it in variable x, stack becomes empty <code>[-]</code>.</li></ol><p>This trace demonstrates how the stack state changes dynamically with each instruction without needing explicit registers.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -702,8 +718,8 @@ POP x</code></pre>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب المترجمات! اليوم ننتقل من مرحلة فهم الكود إلى مرحلة 'كيف يرى المترجم الكود'. التمثيل الوسيط (IR) هو اللغة السرية التي يتحدث بها المترجم مع نفسه قبل أن يولد لغة الآلة. ركزوا جيداً على الرسم البياني لتدفق التحكم (CFG)؛ فهو خريطة الطريق التي توضح كيف ينتقل التنفيذ من كتلة أساسية لأخرى. تذكروا دائماً: الكتلة الأساسية هي طريق باتجاه واحد، لا تفرعات بداخلها! في الامتحان، غالباً ما أسأل عن نموذج SSA ولماذا نستخدم دالة فاي (Phi) — تذكروا أنها تحل مشكلة تقاطع المسارات. وأخيراً، قارنوا دائماً بين التمثيل الخطي (الذي يشبه التجميع ويستخدم سجلات افتراضية) وتمثيل المكدس (المدمج جداً ولكن الصعب في التحسين). فهم هذه الفروق هو مفتاح التفوق في هذا المقرر.</template>
-    <template class="content-en">Welcome, future engineers, to the heart of compilers! Today we transition from understanding code to 'how the compiler sees code'. Intermediate Representation (IR) is the secret language the compiler uses to talk to itself before generating machine code. Pay close attention to the Control Flow Graph (CFG); it's the roadmap showing how execution flows between basic blocks. Always remember: a basic block is a one-way street with no branches inside! On the exam, I frequently ask about SSA form and why we use the Phi function—remember it solves the problem of converging paths. Finally, always contrast Linear IR (assembly-like, virtual registers) with Stack IR (highly compact but hard to optimize). Mastering these trade-offs is your key to acing this module.</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب المترجمات! اليوم ننتقل من مرحلة فهم الكود إلى مرحلة 'كيف يرى المترجم الكود'. التمثيل الوسيط (IR) هو اللغة السرية التي يتحدث بها المترجم مع نفسه قبل أن يولد لغة الآلة. ركزوا جيداً على الرسم البياني لتدفق التحكم (CFG)؛ فهو خريطة الطريق التي توضح كيف ينتقل التنفيذ من كتلة أساسية لأخرى. تذكروا دائماً: الكتلة الأساسية هي طريق باتجاه واحد، لا تفرعات بداخلها! في الامتحان، غالباً ما أسأل عن نموذج SSA ولماذا نستخدم دالة فاي (Phi) — تذكروا أنها تحل مشكلة تقاطع المسارات. وأخيراً، قارنوا دائماً بين التمثيل الخطي (الذي يشبه التجميع ويستخدم سجلات افتراضية) وتمثيل المكدس (المدمج جداً ولكن الصعب في التحسين). فهم هذه الفروق هو مفتاح التفوق في هذا المقرر.<p>يعد فهم كيفية تعيين الكود المصدري إلى رسم بياني لتدفق التحكم (CFG) مهارة أساسية في تصميم المترجمات. من خلال تتبع الحلقات والجمل الشرطية خطوة بخطوة، يمكنك تصور مسارات التنفيذ الدقيقة، وهو أمر بالغ الأهمية لمراحل التحسين اللاحقة التي سنستكشفها.</p><p>لقد أضفنا أمثلة تتبعية مفصلة لكل من التمثيل الخطي وتمثيل المكدس. في الاختبار، غالباً ما يُطلب منك تتبع حالة السجلات الحية أو محتويات المكدس خطوة بخطوة بعد كل تعليمة، لذا تأكد من فهمك العميق لكيفية تغير الحالة الديناميكية للبرنامج أثناء التنفيذ.</p></template>
+    <template class="content-en">Welcome, future engineers, to the heart of compilers! Today we transition from understanding code to 'how the compiler sees code'. Intermediate Representation (IR) is the secret language the compiler uses to talk to itself before generating machine code. Pay close attention to the Control Flow Graph (CFG); it's the roadmap showing how execution flows between basic blocks. Always remember: a basic block is a one-way street with no branches inside! On the exam, I frequently ask about SSA form and why we use the Phi function—remember it solves the problem of converging paths. Finally, always contrast Linear IR (assembly-like, virtual registers) with Stack IR (highly compact but hard to optimize). Mastering these trade-offs is your key to acing this module.<p>Understanding how to map source code to a Control Flow Graph is a foundational skill in compiler design. By tracing loops and conditionals step-by-step, you can visualize the exact execution paths, which is crucial for the subsequent optimization phases we will explore.</p><p>We have added detailed trace examples for both Linear and Stack Machine IRs. In the exam, you will often be asked to trace the state of live registers or stack contents step-by-step after each instruction, so ensure you deeply understand how the dynamic state of the program changes during execution.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -877,6 +893,42 @@ POP x</code></pre>
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">المسار الكامل يبدأ من عقدة الدخول وينتهي عند عقدة الخروج. المسار الفرعي هو أي جزء مقتطع من هذا المسار الكامل.</template>
           <template class="content-en">A complete path starts from the entry node and ends at the exit node. A sub-path is any subsequence of a complete path.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تشير كل من كتلتي <code>print "even"</code> و <code>print "odd"</code> إلى كتلة <code>print "\n"</code> في الرسم البياني لتدفق التحكم (CFG)؟</template>
+          <template class="content-en">Why do the <code>print "even"</code> and <code>print "odd"</code> blocks both point to the <code>print "\n"</code> block in the CFG?</template>
+          <span class="content-target">لماذا تشير كل من كتلتي <code>print "even"</code> و <code>print "odd"</code> إلى كتلة <code>print "\n"</code> في الرسم البياني لتدفق التحكم (CFG)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنه بغض النظر عن الفرع الذي تتخذه جملة <code>if</code> الداخلية، يجب أن يندمج تدفق التنفيذ لتنفيذ التعليمة المتتالية التالية في جسم الحلقة، وهي <code>print "\n"</code>. هذا يوضح كيف تمثل رسومات CFG التقاء مسارات تدفق التحكم بعد التفرعات.</p></template>
+          <template class="content-en"><p>Because regardless of which branch the inner <code>if</code> statement takes, the execution flow must converge to execute the next sequential statement in the loop body, which is <code>print "\n"</code>. This demonstrates how CFGs represent the merging of control flow paths after branches.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا من الضروري جداً تتبع السجلات "الحية" بدقة في التمثيل الخطي (Linear IR)؟</template>
+          <template class="content-en">Why is it absolutely crucial to accurately track "live" registers in Linear IR?</template>
+          <span class="content-target">لماذا من الضروري جداً تتبع السجلات "الحية" بدقة في التمثيل الخطي (Linear IR)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>تتبع السجلات الحية يسمح لمخصص السجلات (Register Allocator) في المترجم بمعرفة متى لم تعد قيمة السجل الافتراضي مطلوبة. بمجرد انتهاء دورة حياة السجل الافتراضي، يمكن للمترجم إعادة استخدام السجل الفعلي (Hardware Register) المقابل له لتخزين متغير جديد، وهو أمر حيوي لأن السجلات الفعلية محدودة جداً.</p></template>
+          <template class="content-en"><p>Tracking live registers allows the compiler's Register Allocator to know exactly when a virtual register's value is no longer needed. Once a virtual register's lifetime ends, the compiler can safely reuse the corresponding physical hardware register for a new variable, which is vital since physical registers are highly limited.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1161,6 +1213,57 @@ POP x</code></pre>
         "en": null
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في الرسم البياني لتدفق التحكم (CFG) لحلقة <code>for<\/code>، من أين تنطلق الحافة العكسية (Reverse Edge) وإلى أين تتجه؟",
+      "en": "In the CFG for a <code>for<\/code> loop, where does the reverse edge originate and point to?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنطلق من كتلة تحديث الحلقة (مثل <code>i++<\/code>) وتتجه عائدة إلى كتلة شرط الحلقة (مثل <code>if(i&lt;10)<\/code>).",
+        "en": "It originates from the loop update block (e.g., <code>i++<\/code>) and points back to the loop condition block (e.g., <code>if(i&lt;10)<\/code>)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "في التمثيل الخطي (Linear IR)، ماذا يعني أن يكون السجل الافتراضي \"حياً\" (Live)؟",
+      "en": "In Linear IR, what does it mean for a virtual register to be \"live\"?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعني أن السجل يحتوي على قيمة تمت كتابتها مسبقاً وسيتم قراءتها بواسطة تعليمة لاحقة في البرنامج.",
+        "en": "It means the register holds a value that has been written and will be read by a subsequent instruction in the program."
+      },
+      "example": {
+        "ar": "إذا تم حساب %r1 في الخطوة 1 وسيُستخدم في الخطوة 4، فهو \"حي\" خلال الخطوتين 2 و 3.",
+        "en": "If %r1 is computed in step 1 and used in step 4, it is \"live\" during steps 2 and 3."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "ماذا يحدث لحالة المكدس عند تنفيذ تعليمة <code>COPY<\/code> في تمثيل آلة المكدس؟",
+      "en": "What happens to the stack state when the <code>COPY<\/code> instruction is executed in Stack Machine IR?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تكرار (نسخ) القيمة الموجودة حالياً في قمة المكدس ودفعها مرة أخرى، مما يزيد من حجم المكدس بمقدار عنصر واحد.",
+        "en": "The value currently at the top of the stack is duplicated and pushed back onto the stack, increasing the stack size by one."
+      },
+      "example": {
+        "ar": "إذا كان المكدس [15.0]، بعد COPY يصبح [15.0, 15.0].",
+        "en": "If the stack is [15.0], after COPY it becomes [15.0, 15.0]."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1170,7 +1273,7 @@ POP x</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1186,7 +1289,7 @@ POP x</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1511,6 +1614,70 @@ POP x</code></pre>
     },
     "difficulty": "medium",
     "conceptId": "linear-ir"
+  },
+  {
+    "conceptId": "control-flow-graph",
+    "question": {
+      "ar": "في مثال CFG لحلقة <code>for(i=0; i&lt;10; i++)<\/code>، أي كتلة تعمل كنقطة التقاء (Convergence Point) لفرعي الشرط الداخلي <code>if(i%2==0)<\/code>؟",
+      "en": "In the provided CFG example for the loop <code>for(i=0; i&lt;10; i++)<\/code>, which block serves as the convergence point for the inner <code>if(i%2==0)<\/code> branches?"
+    },
+    "options": {
+      "ar": [
+        "<code>i=0;<\/code>",
+        "<code>if(i&lt;10)<\/code>",
+        "<code>print \"\\n\";<\/code>",
+        "<code>i++;<\/code>"
+      ],
+      "en": [
+        "<code>i=0;<\/code>",
+        "<code>if(i&lt;10)<\/code>",
+        "<code>print \"\\n\";<\/code>",
+        "<code>i++;<\/code>"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بغض النظر عما إذا كان الرقم زوجياً أم فردياً، يجب أن يندمج مسار التنفيذ لطباعة سطر جديد قبل الانتقال إلى تحديث الحلقة.",
+      "en": "Regardless of whether the number is even or odd, the execution path must merge to print a newline before proceeding to the loop update."
+    },
+    "hint": {
+      "ar": "ابحث عن التعليمة التي يتم تنفيذها دائماً بعد انتهاء جملة if-else الداخلية مباشرة.",
+      "en": "Look for the statement that is always executed immediately after the inner if-else statement finishes."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "linear-ir",
+    "question": {
+      "ar": "بالنظر إلى تعليمات التمثيل الخطي <code>LOAD a -&gt; %r1<\/code> متبوعة بـ <code>LOAD $10 -&gt; %r2<\/code>، أي السجلات الافتراضية تُعتبر \"حية\" (Live) مباشرة بعد التعليمة الثانية؟ (بافتراض أنه سيتم استخدامها لاحقاً)",
+      "en": "Given the Linear IR instructions <code>LOAD a -&gt; %r1<\/code> followed by <code>LOAD $10 -&gt; %r2<\/code>, which virtual registers are considered \"live\" immediately after the second instruction? (Assuming both will be used later)"
+    },
+    "options": {
+      "ar": [
+        "%r1 فقط",
+        "%r2 فقط",
+        "%r1 و %r2 معاً",
+        "لا يوجد سجلات حية"
+      ],
+      "en": [
+        "Only %r1",
+        "Only %r2",
+        "Both %r1 and %r2",
+        "No live registers"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بما أن كلا السجلين قد تم تعيين قيم لهما وسيتم استخدامهما في تعليمات لاحقة، فكلاهما يعتبر حياً ويجب الحفاظ على قيمهما في هذه النقطة.",
+      "en": "Since both registers have been assigned values and will be used in subsequent instructions, both are considered live and their values must be preserved at this point."
+    },
+    "hint": {
+      "ar": "تذكر أن دورة حياة المتغير تمتد من أول كتابة حتى آخر قراءة.",
+      "en": "Remember that a variable's lifetime spans from its first write to its last read."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>

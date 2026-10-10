@@ -118,6 +118,16 @@
         <template class="content-en">Fallacies of Distributed Computing (Pitfalls)</template>
         <span class="content-target">مغالطات الحوسبة الموزعة (المزالق)</span>
       </a>
+      <a href="#overall-design-goals" class="toc-link" data-bilingual>
+        <template class="content-ar">الأهداف العامة لتصميم النظم الموزعة</template>
+        <template class="content-en">Overall Design Goals of Distributed Systems</template>
+        <span class="content-target">الأهداف العامة لتصميم النظم الموزعة</span>
+      </a>
+      <a href="#distributed-systems-perspectives" class="toc-link" data-bilingual>
+        <template class="content-ar">وجهات النظر في النظم الموزعة</template>
+        <template class="content-en">Perspectives on Distributed Systems</template>
+        <span class="content-target">وجهات النظر في النظم الموزعة</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -734,8 +744,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>مكونات قابلية التوسع:</p><ul><li><b>الحجم (Size):</b> عدد المستخدمين أو العمليات.</li><li><b>الجغرافي (Geographical):</b> أقصى مسافة بين العقد.</li><li><b>الإداري (Administrative):</b> عدد النطاقات الإدارية.</li></ul><p>التحليل الرسمي (نظام طابور بسيط):</p><ul><li>معدل وصول الطلبات: $\lambda$</li><li>قدرة المعالجة: $\mu$ طلب في الثانية</li><li><span class="smart-term" data-term-en="Utilization (U)" data-ar="الاستخدام" data-en-def="The fraction of time that a service or server is busy processing requests.">الاستخدام<span class="smart-term-tooltip"></span></span> (Utilization): $U = \frac{\lambda}{\mu}$</li><li>متوسط عدد الطلبات في النظام: $\bar{N} = \frac{U}{1-U}$</li><li>وقت الاستجابة (Response time): $R = \frac{S}{1-U}$ (حيث $S = \frac{1}{\mu}$ هو وقت الخدمة)</li></ul></template>
-    <template class="content-en"><p>Components of scalability:</p><ul><li><b>Size scalability:</b> Number of users or processes.</li><li><b>Geographical scalability:</b> Maximum distance between nodes.</li><li><b>Administrative scalability:</b> Number of administrative domains.</li></ul><p>Formal analysis (Simple queuing system):</p><ul><li>Arrival rate of requests: $\lambda$</li><li>Processing capacity: $\mu$ requests per second</li><li>Utilization: $U = \frac{\lambda}{\mu}$</li><li>Average number of requests in system: $\bar{N} = \frac{U}{1-U}$</li><li>Response time: $R = \frac{S}{1-U}$ (with $S = \frac{1}{\mu}$ being the service time)</li></ul></template>
+    <template class="content-ar"><p>مكونات قابلية التوسع:</p><ul><li><b>الحجم (Size):</b> عدد المستخدمين أو العمليات.</li><li><b>الجغرافي (Geographical):</b> أقصى مسافة بين العقد.</li><li><b>الإداري (Administrative):</b> عدد النطاقات الإدارية.</li></ul><p>التحليل الرسمي (نظام طابور بسيط):</p><ul><li>معدل وصول الطلبات: $\lambda$</li><li>قدرة المعالجة: $\mu$ طلب في الثانية</li><li><span class="smart-term" data-term-en="Utilization (U)" data-ar="الاستخدام" data-en-def="The fraction of time that a service or server is busy processing requests.">الاستخدام<span class="smart-term-tooltip"></span></span> (Utilization): $U = \frac{\lambda}{\mu}$</li><li>متوسط عدد الطلبات في النظام: $\bar{N} = \frac{U}{1-U}$</li><li>وقت الاستجابة (Response time): $R = \frac{S}{1-U}$ (حيث $S = \frac{1}{\mu}$ هو وقت الخدمة)</li></ul><p>لاستكمال التحليل الرسمي لنظام الطابور، نحتاج إلى حساب مقياسين إضافيين:</p><ol><li><b>نسبة الوقت التي يوجد فيها $k$ من الطلبات في النظام ($p_k$):</b> تُحسب بالمعادلة $p_k = (1 - \frac{\lambda}{\mu})(\frac{\lambda}{\mu})^k$. هذا يوضح احتمالية وجود عدد معين من الطلبات قيد الانتظار أو المعالجة.</li><li><b>متوسط الإنتاجية (Average throughput $X$):</b> يمثل معدل إنجاز الطلبات. يُحسب بجمع الإنتاجية عندما يكون الخادم مشغولاً والإنتاجية عندما يكون خاملاً: $X = U \cdot \mu + (1 - U) \cdot 0 = \frac{\lambda}{\mu} \cdot \mu = \lambda$. هذا يثبت أن متوسط الإنتاجية في نظام مستقر يساوي معدل وصول الطلبات.</li></ol></template>
+    <template class="content-en"><p>Components of scalability:</p><ul><li><b>Size scalability:</b> Number of users or processes.</li><li><b>Geographical scalability:</b> Maximum distance between nodes.</li><li><b>Administrative scalability:</b> Number of administrative domains.</li></ul><p>Formal analysis (Simple queuing system):</p><ul><li>Arrival rate of requests: $\lambda$</li><li>Processing capacity: $\mu$ requests per second</li><li>Utilization: $U = \frac{\lambda}{\mu}$</li><li>Average number of requests in system: $\bar{N} = \frac{U}{1-U}$</li><li>Response time: $R = \frac{S}{1-U}$ (with $S = \frac{1}{\mu}$ being the service time)</li></ul><p>To complete the formal analysis of the queuing system, we need to calculate two additional metrics:</p><ol><li><b>Fraction of time having $k$ requests in the system ($p_k$):</b> Calculated by the formula $p_k = (1 - \frac{\lambda}{\mu})(\frac{\lambda}{\mu})^k$. This shows the probability of having a specific number of requests waiting or being processed.</li><li><b>Average throughput ($X$):</b> Represents the rate of completed requests. It is calculated by summing the throughput when the server is at work and when it is idle: $X = U \cdot \mu + (1 - U) \cdot 0 = \frac{\lambda}{\mu} \cdot \mu = \lambda$. This proves that the average throughput in a stable system equals the arrival rate.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1493,14 +1503,100 @@
   </details>
 </section>
 
+<section id="overall-design-goals" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> الأهداف العامة لتصميم النظم الموزعة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Overall Design Goals of Distributed Systems</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتمثل الأهداف الأربعة الرئيسية لتصميم النظم الموزعة في: دعم مشاركة الموارد، شفافية التوزيع، الانفتاح، وقابلية التوسع.</p></template>
+    <template class="content-en"><p>The four main design goals of distributed systems are: Support sharing of resources, Distribution transparency, Openness, and Scalability.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند بناء نظام موزع، يسعى المصممون لتحقيق أربعة أهداف عامة:</p><ol><li><b>دعم <span class="smart-term" data-term-en="Resource Sharing" data-ar="مشاركة الموارد" data-en-def="The ability of a system to make hardware, software, or data available to multiple users or processes across a network.">مشاركة الموارد<span class="smart-term-tooltip"></span></span> (Support sharing of resources):</b> السماح للمستخدمين والتطبيقات بالوصول إلى الموارد البعيدة ومشاركتها. أمثلة تقليدية: التخزين السحابي المشترك، البث المساعد من نظير إلى نظير (P2P)، خدمات البريد المشتركة، واستضافة الويب المشتركة.</li><li><b>شفافية التوزيع (Distribution transparency):</b> إخفاء حقيقة أن الموارد موزعة مادياً.</li><li><b><span class="smart-term" data-term-en="Openness" data-ar="الانفتاح" data-en-def="A characteristic of distributed systems that determines whether the system can be extended and re-implemented in various ways.">الانفتاح<span class="smart-term-tooltip"></span></span> (Openness):</b> قدرة النظام على التفاعل مع أنظمة أخرى وتوسيع وظائفه بسهولة.</li><li><b>قابلية التوسع (Scalability):</b> قدرة النظام على التعامل مع زيادة الحجم، التوزيع الجغرافي، والتعقيد الإداري.</li></ol><p>يلخص جون جيج (John Gage) من صن ميكروسيستمز أهمية مشاركة الموارد بمقولته الشهيرة: <i>"الشبكة هي الحاسوب" (The network is the computer)</i>.</p></template>
+    <template class="content-en"><p>When building a distributed system, designers strive to achieve four overall goals:</p><ol><li><b>Support sharing of resources:</b> Allowing users and applications to access and share remote resources. Canonical examples: Cloud-based shared storage, Peer-to-peer assisted multimedia streaming, Shared mail services, and Shared Web hosting.</li><li><b>Distribution transparency:</b> Hiding the fact that resources are physically distributed.</li><li><b><span class="smart-term" data-term-en="Openness" data-ar="الانفتاح" data-en-def="A characteristic of distributed systems that determines whether the system can be extended and re-implemented in various ways.">Openness<span class="smart-term-tooltip"></span></span>:</b> The system's ability to interact with other systems and easily extend its functionality.</li><li><b>Scalability:</b> The system's ability to handle growth in size, geographical distribution, and administrative complexity.</li></ol><p>John Gage from Sun Microsystems summarized the importance of <span class="smart-term" data-term-en="Resource Sharing" data-ar="مشاركة الموارد" data-en-def="The ability of a system to make hardware, software, or data available to multiple users or processes across a network.">resource sharing<span class="smart-term-tooltip"></span></span> with his famous quote: <i>"The network is the computer"</i>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذه الأهداف غالباً ما تتعارض مع بعضها البعض. على سبيل المثال، السعي لتحقيق شفافية توزيع كاملة (مثل إخفاء زمن الوصول تماماً) يمكن أن يعيق قابلية التوسع الجغرافي، لأن إخفاء التأخيرات عبر مسافات شاسعة أمر مستحيل فيزيائياً.</p><p>لذلك، تصميم النظم الموزعة هو دائماً عملية موازنة (Trade-off) بين هذه الأهداف الأربعة بناءً على متطلبات التطبيق المحددة.</p></template>
+    <template class="content-en"><p>These goals often conflict with one another. For example, striving for complete distribution transparency (like completely hiding latency) can hinder geographical scalability, because hiding delays over vast distances is physically impossible.</p><p>Therefore, designing distributed systems is always a trade-off process among these four goals based on specific application requirements.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا كان يقصد جون جيج بمقولة 'الشبكة هي الحاسوب'؟</template>
+      <template class="content-en">What did John Gage mean by the quote 'The network is the computer'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>كان يقصد أنه مع النظم الموزعة ومشاركة الموارد، تصبح الشبكة بأكملها (بما تحتويه من خوادم وموارد) تعمل وكأنها جهاز حاسوب واحد ضخم وقوي يخدم المستخدم، بدلاً من الاعتماد على قدرات الجهاز المحلي فقط.</p></template>
+      <template class="content-en"><p>He meant that with distributed systems and resource sharing, the entire network (with all its servers and resources) acts as one massive, powerful computer serving the user, rather than relying solely on the local machine's capabilities.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="distributed-systems-perspectives" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> وجهات النظر في النظم الموزعة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Perspectives on Distributed Systems</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نظراً لتعقيد النظم الموزعة، يتم دراستها من وجهات نظر متعددة تشمل: المعمارية، العمليات، الاتصال، التسمية، التنسيق، التناسق، التسامح مع الأخطاء، والأمان.</p></template>
+    <template class="content-en"><p>Due to their complexity, distributed systems are studied from multiple perspectives including: Architecture, Process, Communication, Naming, Coordination, Consistency, Fault tolerance, and Security.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>النظم الموزعة معقدة للغاية، ولفهمها وتصميمها بشكل صحيح، يجب أخذ عدة وجهات نظر (Perspectives) في الاعتبار:</p><ul><li><b>المعمارية (Architecture):</b> التنظيمات والهياكل الشائعة للنظام.</li><li><b>العمليات (Process):</b> ما هي أنواع العمليات والعلاقات بينها.</li><li><b>الاتصال (Communication):</b> المرافق والبروتوكولات لتبادل البيانات.</li><li><b><span class="smart-term" data-term-en="Coordination" data-ar="التنسيق" data-en-def="The act of managing dependencies between activities in a distributed system to achieve a shared goal.">التنسيق<span class="smart-term-tooltip"></span></span> (Coordination):</b> الخوارزميات المستقلة عن التطبيق لتنظيم العمل.</li><li><b><span class="smart-term" data-term-en="Naming" data-ar="التسمية" data-en-def="The process of assigning identifiers to entities (like files, devices, or users) so they can be located and accessed.">التسمية<span class="smart-term-tooltip"></span></span> (Naming):</b> كيف يتم تحديد الموارد والوصول إليها.</li><li><b>التناسق والنسخ المتماثل (Consistency and replication):</b> الأداء يتطلب نسخ البيانات، والتي يجب أن تكون متطابقة.</li><li><b>التسامح مع الأخطاء (Fault tolerance):</b> الحفاظ على تشغيل النظام في ظل وجود أعطال جزئية.</li><li><b>الأمان (Security):</b> ضمان الوصول المصرح به للموارد.</li></ul></template>
+    <template class="content-en"><p>Distributed systems are highly complex. To understand and design them properly, several perspectives must be considered:</p><ul><li><b>Architecture:</b> Common organizations and structures of the system.</li><li><b>Process:</b> What kind of processes exist, and their relationships.</li><li><b>Communication:</b> Facilities and protocols for exchanging data.</li><li><b><span class="smart-term" data-term-en="Coordination" data-ar="التنسيق" data-en-def="The act of managing dependencies between activities in a distributed system to achieve a shared goal.">Coordination<span class="smart-term-tooltip"></span></span>:</b> Application-independent algorithms to organize work.</li><li><b><span class="smart-term" data-term-en="Naming" data-ar="التسمية" data-en-def="The process of assigning identifiers to entities (like files, devices, or users) so they can be located and accessed.">Naming<span class="smart-term-tooltip"></span></span>:</b> How you identify and access resources.</li><li><b>Consistency and replication:</b> Performance requires copies of data, which need to be the same.</li><li><b>Fault tolerance:</b> Keeping the system running in the presence of partial failures.</li><li><b>Security:</b> Ensuring authorized access to resources.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>كل وجهة نظر من هذه الوجهات لا تعمل بمعزل عن الأخرى. على سبيل المثال، طريقة <b>الاتصال</b> تؤثر بشكل مباشر على خوارزميات <b>التنسيق</b>، وكيفية تنفيذ <b>النسخ المتماثل</b> تؤثر على <b>التسامح مع الأخطاء</b>.</p><p>فهم هذه الأبعاد المختلفة يساعد المهندسين على عزل المشاكل المعقدة وحلها بشكل منهجي بدلاً من محاولة معالجة النظام ككتلة واحدة غامضة.</p></template>
+    <template class="content-en"><p>Each of these perspectives does not operate in isolation. For example, the method of <b>Communication</b> directly affects <b>Coordination</b> algorithms, and how <b>Replication</b> is implemented impacts <b>Fault tolerance</b>.</p><p>Understanding these different dimensions helps engineers isolate complex problems and solve them systematically rather than trying to tackle the system as a single opaque monolith.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف ترتبط وجهة نظر 'التسمية' (Naming) بقابلية التوسع الجغرافي؟</template>
+      <template class="content-en">How does the 'Naming' perspective relate to geographical scalability?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في الشبكات الواسعة (WAN)، لا يمكننا استخدام البث (Broadcast) للبحث عن الموارد. لذلك، نحتاج إلى خدمات تسمية وأدلة (Directory services) متطورة وموزعة لتحديد مواقع الموارد بكفاءة عبر مسافات كبيرة.</p></template>
+      <template class="content-en"><p>In Wide Area Networks (WANs), we cannot use simple broadcasts to search for resources. Therefore, we need sophisticated, distributed naming and directory services to efficiently locate resources across large distances.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا شباب في الوحدة الثانية. إذا أردتم فهم النظم الموزعة حقاً، تخيلوا أنكم تديرون مطعماً ضخماً. في البداية، كان لديكم طباخ واحد (نظام مركزي). عندما زاد الزبائن، أحضرتم عدة طباخين (نظام موزع). التحدي الأول هو 'الشفافية': الزبون لا يجب أن يعرف أي طباخ أعد وجبته، هو فقط يريد طعامه (شفافية الوصول والموقع). التحدي الثاني هو 'الاعتمادية': ماذا لو مرض طباخ (Fault)؟ يجب أن يكون هناك طباخ بديل (Fault Tolerance) لكي لا يتأخر الطلب (Failure). التحدي الثالث هو 'قابلية التوسع': استخدمنا نظرية الطوابير لنثبت رياضياً أنه إذا كان الطباخون يعملون بنسبة 100% من طاقتهم (U=1)، فإن المطعم سينهار ووقت الانتظار سيصبح لا نهائياً. أخيراً، تذكروا 'مغالطات الحوسبة الموزعة'؛ لا تفترضوا أبداً أن الشبكة مثالية أو أن زمن الوصول صفر. في الامتحان، ركزوا بشدة على التفريق بين أنواع الشفافية، ومصطلحات الأعطال (Fault vs Error vs Failure)، ومعادلة الطوابير.</template>
-    <template class="content-en">Welcome to Module 2. To truly understand distributed systems, imagine running a massive restaurant. Initially, you had one chef (centralized). As customers grew, you hired multiple chefs (distributed). The first challenge is 'Transparency': the customer shouldn't know which chef cooked their meal; they just want their food (Access and Location transparency). The second is 'Dependability': what if a chef gets sick (Fault)? You need a backup (Fault Tolerance) so the order isn't delayed (Failure). The third is 'Scalability': we used queuing theory to mathematically prove that if chefs work at 100% capacity (U=1), the restaurant collapses and wait times become infinite. Finally, remember the 'Fallacies of Distributed Computing'; never assume the network is perfect or latency is zero. For the exam, focus heavily on differentiating transparency types, fault terminology (Fault vs Error vs Failure), and the queuing equation.</template>
+    <template class="content-ar">أهلاً بكم يا شباب في الوحدة الثانية. إذا أردتم فهم النظم الموزعة حقاً، تخيلوا أنكم تديرون مطعماً ضخماً. في البداية، كان لديكم طباخ واحد (نظام مركزي). عندما زاد الزبائن، أحضرتم عدة طباخين (نظام موزع). التحدي الأول هو 'الشفافية': الزبون لا يجب أن يعرف أي طباخ أعد وجبته، هو فقط يريد طعامه (شفافية الوصول والموقع). التحدي الثاني هو 'الاعتمادية': ماذا لو مرض طباخ (Fault)؟ يجب أن يكون هناك طباخ بديل (Fault Tolerance) لكي لا يتأخر الطلب (Failure). التحدي الثالث هو 'قابلية التوسع': استخدمنا نظرية الطوابير لنثبت رياضياً أنه إذا كان الطباخون يعملون بنسبة 100% من طاقتهم (U=1)، فإن المطعم سينهار ووقت الانتظار سيصبح لا نهائياً. أخيراً، تذكروا 'مغالطات الحوسبة الموزعة'؛ لا تفترضوا أبداً أن الشبكة مثالية أو أن زمن الوصول صفر. في الامتحان، ركزوا بشدة على التفريق بين أنواع الشفافية، ومصطلحات الأعطال (Fault vs Error vs Failure)، ومعادلة الطوابير.<p>لقد أضفنا للتو الأهداف الأساسية التي تحرك تصميم أي نظام موزع، بالإضافة إلى نظرة تاريخية هامة حول أنظمة الذاكرة المشتركة الموزعة (DSM). فهم سبب فشل DSM يعلمنا درساً حاسماً للامتحان: لا يمكنك إخفاء فيزياء الشبكة (زمن الوصول) بالكامل خلف طبقات برمجية دون دفع ثمن باهظ في الأداء. تذكروا دائماً الموازنة بين الشفافية وقابلية التوسع.</p></template>
+    <template class="content-en">Welcome to Module 2. To truly understand distributed systems, imagine running a massive restaurant. Initially, you had one chef (centralized). As customers grew, you hired multiple chefs (distributed). The first challenge is 'Transparency': the customer shouldn't know which chef cooked their meal; they just want their food (Access and Location transparency). The second is 'Dependability': what if a chef gets sick (Fault)? You need a backup (Fault Tolerance) so the order isn't delayed (Failure). The third is 'Scalability': we used queuing theory to mathematically prove that if chefs work at 100% capacity (U=1), the restaurant collapses and wait times become infinite. Finally, remember the 'Fallacies of Distributed Computing'; never assume the network is perfect or latency is zero. For the exam, focus heavily on differentiating transparency types, fault terminology (Fault vs Error vs Failure), and the queuing equation.<p>We just added the foundational goals that drive any distributed system design, along with a crucial historical look at Distributed Shared Memory (DSM) systems. Understanding why DSM failed teaches a vital exam lesson: you cannot completely hide network physics (latency) behind software layers without paying a massive performance price. Always remember the trade-off between transparency and scalability.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1674,6 +1770,58 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">الأنظمة المحيطة تركز على التواجد المستمر والتفاعل غير الملحوظ والوعي بالسياق (مثل المنزل الذكي). الأنظمة المتنقلة تركز على الأجهزة التي تتحرك بطبيعتها وتحتاج لآليات اكتشاف الشبكات.</template>
           <template class="content-en">Ubiquitous systems focus on continuous presence, unobtrusive interaction, and context awareness (like a smart home). Mobile systems focus on inherently moving devices that need network discovery mechanisms.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا فشلت أنظمة الذاكرة المشتركة الموزعة (DSM) بالرغم من أنها تجعل البرمجة أسهل؟</template>
+          <template class="content-en">Why did Distributed Shared Memory (DSM) systems fail even though they make programming easier?</template>
+          <span class="content-target">لماذا فشلت أنظمة الذاكرة المشتركة الموزعة (DSM) بالرغم من أنها تجعل البرمجة أسهل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>فشلت بسبب الأداء. إخفاء الشبكة خلف نموذج ذاكرة افتراضية يعني أن المبرمج قد يكتب كوداً يقرأ متغيراً، ولا يدرك أن هذا المتغير يتطلب رحلة كاملة عبر الشبكة لجلبه. هذا التأخير (Latency) الخفي جعل البرامج بطيئة جداً مقارنة بالمعالجات المتعددة الحقيقية.</p></template>
+          <template class="content-en"><p>They failed due to performance. Hiding the network behind a virtual memory model meant a programmer might write code that reads a variable, not realizing it requires a full network round-trip to fetch. This hidden latency made programs unacceptably slow compared to true multiprocessors.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين المصادقة (Authentication) والثقة (Trust) في النظم الموزعة؟</template>
+          <template class="content-en">What is the difference between Authentication and Trust in distributed systems?</template>
+          <span class="content-target">ما هو الفرق بين المصادقة (Authentication) والثقة (Trust) في النظم الموزعة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>المصادقة هي آلية تقنية للتحقق من هوية المستخدم (مثلاً باستخدام كلمة مرور). أما الثقة فهي مفهوم أوسع؛ فهي التوقع بأن هذا الكيان (حتى لو تمت مصادقته) سيتصرف بشكل صحيح ولن يسيء استخدام النظام. يمكنك مصادقة مستخدم، لكن قد لا تثق به للوصول إلى بيانات حساسة.</p></template>
+          <template class="content-en"><p>Authentication is a technical mechanism to verify a user's identity (e.g., using a password). Trust is a broader concept; it's the expectation that this entity (even if authenticated) will behave correctly and not abuse the system. You can authenticate a user, but you might not trust them with sensitive data.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تتعارض 'شفافية التوزيع' مع 'قابلية التوسع'؟</template>
+          <template class="content-en">How does 'Distribution transparency' conflict with 'Scalability'?</template>
+          <span class="content-target">كيف تتعارض 'شفافية التوزيع' مع 'قابلية التوسع'؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الشفافية الكاملة تحاول إخفاء كل تفاصيل التوزيع، بما في ذلك زمن الوصول (Latency) وفشل الشبكة. لكن عند توسيع النظام جغرافياً، يصبح زمن الوصول حقيقة فيزيائية لا يمكن إخفاؤها. محاولة إخفائها (مثلاً عبر استدعاءات متزامنة) ستؤدي إلى تجميد النظام، مما يدمر قابلية التوسع.</p></template>
+          <template class="content-en"><p>Full transparency tries to hide all distribution details, including latency and network failures. But when scaling geographically, latency becomes a physical reality that cannot be hidden. Attempting to hide it (e.g., via synchronous calls) will cause the system to freeze, destroying scalability.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1941,6 +2089,57 @@
         "en": "A server receiving requests exactly as fast as it processes them will build an infinite queue."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هي الأهداف الأربعة العامة لتصميم النظم الموزعة؟",
+      "en": "What are the four overall design goals of distributed systems?"
+    },
+    "back": {
+      "definition": {
+        "ar": "دعم مشاركة الموارد، شفافية التوزيع، الانفتاح، وقابلية التوسع.",
+        "en": "Support sharing of resources, Distribution transparency, Openness, and Scalability."
+      },
+      "example": {
+        "ar": "تصميم نظام يسمح بمشاركة الملفات (مورد) مع إخفاء مكان تخزينها (شفافية).",
+        "en": "Designing a system that allows sharing files (resource) while hiding where they are stored (transparency)."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ما هو تعريف 'الثقة' (Trust) في سياق أمان النظم الموزعة؟",
+      "en": "What is the definition of 'Trust' in the context of distributed systems security?"
+    },
+    "back": {
+      "definition": {
+        "ar": "اطمئنان كيان ما إلى أن كياناً آخر سيقوم بتنفيذ إجراءات معينة وفقاً لتوقع محدد.",
+        "en": "One entity can be assured that another will perform particular actions according to a specific expectation."
+      },
+      "example": {
+        "ar": "ثقة العميل بأن خادم البنك سيقوم بتشفير بيانات بطاقته الائتمانية.",
+        "en": "A client trusting that the bank's server will encrypt their credit card data."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "في تحليل الطوابير، ما هي معادلة متوسط الإنتاجية (Average throughput X)؟",
+      "en": "In queuing analysis, what is the equation for average throughput (X)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "X = λ (متوسط الإنتاجية يساوي معدل وصول الطلبات في النظام المستقر).",
+        "en": "X = λ (Average throughput equals the arrival rate of requests in a stable system)."
+      },
+      "example": {
+        "ar": "إذا كان يصل 50 طلباً في الثانية، فإن النظام المستقر سينجز 50 طلباً في الثانية.",
+        "en": "If 50 requests arrive per second, a stable system will complete 50 requests per second."
+      }
+    },
+    "id": 18
   }
 ]
 </script>
@@ -1950,7 +2149,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1966,7 +2165,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2291,6 +2490,70 @@
     },
     "difficulty": "medium",
     "conceptId": "pervasive-and-mobile-systems"
+  },
+  {
+    "conceptId": "overall-design-goals",
+    "question": {
+      "ar": "أي من الأهداف التالية يركز على قدرة النظام الموزع على التفاعل مع أنظمة أخرى وتوسيع وظائفه؟",
+      "en": "Which of the following goals focuses on a distributed system's ability to interact with other systems and extend its functionality?"
+    },
+    "options": {
+      "ar": [
+        "شفافية التوزيع",
+        "الانفتاح (Openness)",
+        "قابلية التوسع",
+        "مشاركة الموارد"
+      ],
+      "en": [
+        "Distribution transparency",
+        "Openness",
+        "Scalability",
+        "Sharing of resources"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الانفتاح (Openness) هو الهدف الذي يضمن أن النظام غير مغلق ويمكنه التفاعل والتكامل مع مكونات وأنظمة أخرى بسهولة.",
+      "en": "Openness is the goal that ensures the system is not closed and can easily interact and integrate with other components and systems."
+    },
+    "hint": {
+      "ar": "فكر في نظام 'مفتوح' للتعديل والإضافة.",
+      "en": "Think of a system that is 'open' to modification and addition."
+    },
+    "difficulty": "easy",
+    "id": 11
+  },
+  {
+    "conceptId": "scalability-and-queuing",
+    "question": {
+      "ar": "في نظام طابور مستقر، إذا كان معدل وصول الطلبات (λ) هو 100 طلب في الثانية، وقدرة المعالجة (μ) هي 150 طلباً في الثانية. ما هو متوسط الإنتاجية (Throughput X)؟",
+      "en": "In a stable queuing system, if the arrival rate (λ) is 100 requests/sec, and processing capacity (μ) is 150 requests/sec. What is the average throughput (X)?"
+    },
+    "options": {
+      "ar": [
+        "150 طلب/ثانية",
+        "100 طلب/ثانية",
+        "50 طلب/ثانية",
+        "250 طلب/ثانية"
+      ],
+      "en": [
+        "150 requests/sec",
+        "100 requests/sec",
+        "50 requests/sec",
+        "250 requests/sec"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في النظام المستقر، متوسط الإنتاجية (X) يساوي دائماً معدل وصول الطلبات (λ). الخادم لا يمكنه إنتاج أكثر مما يصله. لذلك X = 100.",
+      "en": "In a stable system, the average throughput (X) always equals the arrival rate (λ). The server cannot output more than what arrives. Thus X = 100."
+    },
+    "hint": {
+      "ar": "تذكر المعادلة X = λ.",
+      "en": "Remember the equation X = λ."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -2334,6 +2597,22 @@
     <div data-bilingual>
     <template class="content-ar">النسخ المتماثل (Replication) يحل مشكلة التوسع والأداء، ولكنه يخلق مشكلة التناسق (Consistency). التزامن العالمي لحل هذه المشكلة يقتل قابلية التوسع. الحل العملي غالباً هو 'التسامح مع عدم التناسق'.</template>
     <template class="content-en">Replication solves scaling and performance but creates a Consistency problem. Global synchronization to fix this kills scalability. The practical solution is often 'tolerating inconsistencies'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">لا تخلط بين 'المصادقة' (Authentication) و 'التفويض' (Authorization). المصادقة هي إثبات هويتك (من أنت)، بينما التفويض هو التحقق مما إذا كان مسموحاً لك بالقيام بفعل معين (ماذا يمكنك أن تفعل).</template>
+    <template class="content-en">Do not confuse 'Authentication' with 'Authorization'. Authentication is proving your identity (who you are), while Authorization is checking if you are allowed to perform a specific action (what you can do).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الإنتاجية (Throughput) في نظام طابور مستقر تساوي دائماً معدل وصول الطلبات (λ). إذا كان النظام يعالج الطلبات أبطأ من وصولها، فإنه غير مستقر وسينهار.</template>
+    <template class="content-en">Throughput in a stable queuing system always equals the arrival rate of requests (λ). If the system processes requests slower than they arrive, it is unstable and will collapse.</template>
     <div class="content-target"></div>
     </div>
   </div>

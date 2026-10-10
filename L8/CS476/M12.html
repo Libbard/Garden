@@ -138,6 +138,11 @@
         <template class="content-en">Public-Key Encryption with Keyword Search (PEKS)</template>
         <span class="content-target">التشفير بالمفتاح العام مع البحث بالكلمات المفتاحية (PEKS)</span>
       </a>
+      <a href="#lamport-mutual-exclusion" class="toc-link" data-bilingual>
+        <template class="content-ar">الاستبعاد المتبادل باستخدام ساعات لامبورت</template>
+        <template class="content-en">Lamport's Mutual Exclusion</template>
+        <span class="content-target">الاستبعاد المتبادل باستخدام ساعات لامبورت</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -735,8 +740,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>للحفاظ على رؤية عالمية متسقة، نرفق طابعاً زمنياً <code>C(e)</code> بكل حدث <code>e</code>، بحيث يحقق:</p><ol><li>إذا كان <code>a → b</code> في نفس العملية، فإن <code>C(a) < C(b)</code>.</li><li>إذا كان <code>a</code> إرسال رسالة و <code>b</code> استلامها، فإن <code>C(a) < C(b)</code>.</li></ol><p><strong>آلية العمل (يتم تنفيذها في طبقة <span class="smart-term" data-term-en="Middleware" data-ar="البرمجيات الوسيطة" data-en-def="Software that acts as a bridge between an operating system or database and applications.">البرمجيات الوسيطة Middleware</span>)</strong>:</p><ul><li>كل عملية تزيد عدادها المحلي قبل أي حدث: <code>C = C + 1</code>.</li><li>عند إرسال رسالة، تُرفق العملية قيمة ساعتها الحالية بالرسالة.</li><li>عند استلام رسالة، تقوم العملية بتحديث ساعتها: <code>C = max(C, C_msg)</code> ثم تزيدها بمقدار 1.</li></ul></template>
-    <template class="content-en"><p>To maintain a consistent global view, we attach a timestamp <code>C(e)</code> to each event <code>e</code>, satisfying:</p><ol><li>If <code>a → b</code> in the same process, then <code>C(a) < C(b)</code>.</li><li>If <code>a</code> is sending a message and <code>b</code> is receiving it, then <code>C(a) < C(b)</code>.</li></ol><p><strong>Mechanism (implemented in <span class="smart-term" data-term-en="Middleware" data-ar="البرمجيات الوسيطة" data-en-def="Software that acts as a bridge between an operating system or database and applications.">middleware</span>)</strong>:</p><ul><li>Each process increments its local counter before any event: <code>C = C + 1</code>.</li><li>When sending a message, the process attaches its current clock value.</li><li>When receiving a message, the process updates its clock: <code>C = max(C, C_msg)</code>, then increments by 1.</li></ul></template>
+    <template class="content-ar"><p>للحفاظ على رؤية عالمية متسقة، نرفق طابعاً زمنياً <code>C(e)</code> بكل حدث <code>e</code>، بحيث يحقق:</p><ol><li>إذا كان <code>a → b</code> في نفس العملية، فإن <code>C(a) < C(b)</code>.</li><li>إذا كان <code>a</code> إرسال رسالة و <code>b</code> استلامها، فإن <code>C(a) < C(b)</code>.</li></ol><p><strong>آلية العمل (يتم تنفيذها في طبقة <span class="smart-term" data-term-en="Middleware" data-ar="البرمجيات الوسيطة" data-en-def="Software that acts as a bridge between an operating system or database and applications.">البرمجيات الوسيطة Middleware</span>)</strong>:</p><ul><li>كل عملية تزيد عدادها المحلي قبل أي حدث: <code>C = C + 1</code>.</li><li>عند إرسال رسالة، تُرفق العملية قيمة ساعتها الحالية بالرسالة.</li><li>عند استلام رسالة، تقوم العملية بتحديث ساعتها: <code>C = max(C, C_msg)</code> ثم تزيدها بمقدار 1.</li></ul><p><b>مثال عملي لتعديل الساعات:</b> لنفترض ثلاث عمليات تعمل بمعدلات مختلفة (العملية الأولى تزيد 6، الثانية تزيد 8، الثالثة تزيد 10):</p><ol><li>ترسل العملية الثالثة رسالة $m_3$ عند طابعها الزمني 60 إلى العملية الثانية التي طابعها الحالي 56.</li><li>بما أن 56 ليس أكبر من 60، تقوم العملية الثانية بتعديل ساعتها إلى $\max(56, 60) + 1 = 61$.</li><li>لاحقاً، ترسل العملية الثانية رسالة $m_4$ عند طابعها 69 إلى العملية الأولى التي طابعها الحالي 54.</li><li>تقوم العملية الأولى بتعديل ساعتها إلى $\max(54, 69) + 1 = 70$.</li></ol><p>هذا يضمن أن استلام الرسالة يحمل دائماً طابعاً زمنياً أكبر من إرسالها.</p></template>
+    <template class="content-en"><p>To maintain a consistent global view, we attach a timestamp <code>C(e)</code> to each event <code>e</code>, satisfying:</p><ol><li>If <code>a → b</code> in the same process, then <code>C(a) < C(b)</code>.</li><li>If <code>a</code> is sending a message and <code>b</code> is receiving it, then <code>C(a) < C(b)</code>.</li></ol><p><strong>Mechanism (implemented in <span class="smart-term" data-term-en="Middleware" data-ar="البرمجيات الوسيطة" data-en-def="Software that acts as a bridge between an operating system or database and applications.">middleware</span>)</strong>:</p><ul><li>Each process increments its local counter before any event: <code>C = C + 1</code>.</li><li>When sending a message, the process attaches its current clock value.</li><li>When receiving a message, the process updates its clock: <code>C = max(C, C_msg)</code>, then increments by 1.</li></ul><p><b>Worked Example of Clock Adjustment:</b> Consider three processes operating at different rates (P1 adds 6, P2 adds 8, P3 adds 10):</p><ol><li>P3 sends message $m_3$ at its timestamp 60 to P2, whose current timestamp is 56.</li><li>Since 56 is not greater than 60, P2 adjusts its clock to $\max(56, 60) + 1 = 61$.</li><li>Later, P2 sends message $m_4$ at its timestamp 69 to P1, whose current timestamp is 54.</li><li>P1 adjusts its clock to $\max(54, 69) + 1 = 70$.</li></ol><p>This ensures the receipt of a message always has a higher timestamp than its sending.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -923,7 +928,7 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p><strong>المشكلة</strong> — تحديثات متزامنة على <span class="smart-term" data-term-en="Replicated Database" data-ar="قاعدة بيانات منسوخة" data-en-def="A database that is copied and maintained in multiple locations to improve availability and reliability.">قاعدة بيانات منسوخة (Replicated DB)</span> قد تؤدي إلى حالات غير متسقة إذا نُفذت بترتيب مختلف في كل نسخة (مثلاً: إضافة 100$ ثم زيادة 1% مقابل العكس).</p><p><strong>الحل باستخدام البث المرتب كلياً</strong>:</p><ol><li>ترسل العملية <code>Pi</code> رسالة مختومة زمنياً <code>mi</code> إلى جميع العمليات الأخرى وتضعها في طابورها المحلي.</li><li>أي رسالة واردة إلى <code>Pj</code> توضع في طابورها المحلي مرتبة حسب طابعها الزمني.</li><li>يتم إرسال إشعار (ACK) لكل رسالة مستلمة إلى جميع العمليات.</li><li>تُعالج الرسالة فقط عندما تكون في رأس الطابور وتم استلام إشعارات من جميع العمليات الأخرى.</li></ol></template>
+    <template class="content-ar"><p><strong>المشكلة</strong> — تحديثات متزامنة على <span class="smart-term" data-term-en="Replicated Database" data-ar="قاعدة بيانات منسوخة" data-en-def="A database that is copied and maintained in multiple locations to improve availability and reliability.">قاعدة بيانات منسوخة (Replicated DB)</span> قد تؤدي إلى حالات غير متسقة إذا نُفذت بترتيب مختلف في كل نسخة (مثلاً: إضافة 100﹩ ثم زيادة 1% مقابل العكس).</p><p><strong>الحل باستخدام البث المرتب كلياً</strong>:</p><ol><li>ترسل العملية <code>Pi</code> رسالة مختومة زمنياً <code>mi</code> إلى جميع العمليات الأخرى وتضعها في طابورها المحلي.</li><li>أي رسالة واردة إلى <code>Pj</code> توضع في طابورها المحلي مرتبة حسب طابعها الزمني.</li><li>يتم إرسال إشعار (ACK) لكل رسالة مستلمة إلى جميع العمليات.</li><li>تُعالج الرسالة فقط عندما تكون في رأس الطابور وتم استلام إشعارات من جميع العمليات الأخرى.</li></ol></template>
     <template class="content-en"><p><strong>Problem</strong> — Concurrent updates on a <span class="smart-term" data-term-en="Replicated Database" data-ar="قاعدة بيانات منسوخة" data-en-def="A database that is copied and maintained in multiple locations to improve availability and reliability.">replicated database</span> can lead to inconsistent states if applied in different orders (e.g., add $100 then add 1% vs vice versa).</p><p><strong>Solution using Totally Ordered Multicast</strong>:</p><ol><li>Process <code>Pi</code> sends a timestamped message <code>mi</code> to all others and puts it in its local queue.</li><li>Any incoming message at <code>Pj</code> is queued according to its timestamp.</li><li>An acknowledgment (ACK) is sent to every other process for the received message.</li><li>A message is processed only when it is at the head of the queue and ACKs have been received from all other processes.</li></ol></template>
     <div class="content-target"></div>
   </div>
@@ -966,8 +971,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p><strong>الملاحظة</strong> — ساعات لامبورت لا تضمن أنه إذا كان <code>C(a) < C(b)</code> فإن <code>a</code> يسبق <code>b</code> سببياً.</p><p><strong>الحل: الساعات المتجهة.</strong> تحتفظ كل عملية بمصفوفة (Vector) من الساعات. نقول أن <code>b</code> <span class="smart-term" data-term-en="Causal Dependency" data-ar="التبعية السببية" data-en-def="A relationship where one event directly influences or causes another.">يعتمد سببياً</span> على <code>a</code> إذا كان <code>ts(a) < ts(b)</code>، وهذا يتحقق بشروط صارمة:</p><ul><li>لجميع المؤشرات <code>k</code>: <code>ts(a)[k] ≤ ts(b)[k]</code></li><li>يوجد على الأقل مؤشر واحد <code>k'</code> حيث: <code>ts(a)[k'] < ts(b)[k']</code></li></ul><p>إذا لم يتحقق هذا الشرط في أي من الاتجاهين، فإن الحدثين متزامنان (Concurrent) وقد يتعارضان.</p></template>
-    <template class="content-en"><p><strong>Observation</strong> — Lamport’s clocks do not guarantee that if <code>C(a) < C(b)</code> that <code>a</code> causally preceded <code>b</code>.</p><p><strong>Solution: Vector Clocks.</strong> Each process maintains an array (vector) of clocks. We say <code>b</code> may <span class="smart-term" data-term-en="Causal Dependency" data-ar="التبعية السببية" data-en-def="A relationship where one event directly influences or causes another.">causally depend</span> on <code>a</code> if <code>ts(a) < ts(b)</code>, which means:</p><ul><li>For all indices <code>k</code>: <code>ts(a)[k] ≤ ts(b)[k]</code></li><li>There exists at least one index <code>k'</code> for which: <code>ts(a)[k'] < ts(b)[k']</code></li></ul><p>If neither <code>ts(a) < ts(b)</code> nor <code>ts(b) < ts(a)</code> is true, the events are concurrent and may conflict.</p></template>
+    <template class="content-ar"><p><strong>الملاحظة</strong> — ساعات لامبورت لا تضمن أنه إذا كان <code>C(a) < C(b)</code> فإن <code>a</code> يسبق <code>b</code> سببياً.</p><p><strong>الحل: الساعات المتجهة.</strong> تحتفظ كل عملية بمصفوفة (Vector) من الساعات. نقول أن <code>b</code> <span class="smart-term" data-term-en="Causal Dependency" data-ar="التبعية السببية" data-en-def="A relationship where one event directly influences or causes another.">يعتمد سببياً</span> على <code>a</code> إذا كان <code>ts(a) < ts(b)</code>، وهذا يتحقق بشروط صارمة:</p><ul><li>لجميع المؤشرات <code>k</code>: <code>ts(a)[k] ≤ ts(b)[k]</code></li><li>يوجد على الأقل مؤشر واحد <code>k'</code> حيث: <code>ts(a)[k'] < ts(b)[k']</code></li></ul><p>إذا لم يتحقق هذا الشرط في أي من الاتجاهين، فإن الحدثين متزامنان (Concurrent) وقد يتعارضان.</p><p><b>مثال عملي لتحليل السببية:</b></p><p>لنفترض أن لدينا رسالتين $m_2$ و $m_4$ ونريد تحديد علاقتهما:</p><ol><li><b>الحالة الأولى:</b> $ts(m_2) = (2, 1, 0)$ و $ts(m_4) = (4, 3, 0)$. بمقارنة المتجهين، نجد أن $ts(m_2) < ts(m_4)$ في جميع المؤشرات (2 < 4، و 1 < 3، و 0 = 0). النتيجة: $m_2$ قد تسبق $m_4$ سببياً.</li><li><b>الحالة الثانية:</b> $ts(m_2) = (4, 1, 0)$ و $ts(m_4) = (2, 3, 0)$. هنا $m_2$ أكبر في المؤشر الأول (4 > 2)، بينما $m_4$ أكبر في المؤشر الثاني (3 > 1). النتيجة: لا توجد علاقة سببية، الرسالتان متزامنتان (Concurrent) وقد تتعارضان.</li></ol></template>
+    <template class="content-en"><p><strong>Observation</strong> — Lamport’s clocks do not guarantee that if <code>C(a) < C(b)</code> that <code>a</code> causally preceded <code>b</code>.</p><p><strong>Solution: Vector Clocks.</strong> Each process maintains an array (vector) of clocks. We say <code>b</code> may <span class="smart-term" data-term-en="Causal Dependency" data-ar="التبعية السببية" data-en-def="A relationship where one event directly influences or causes another.">causally depend</span> on <code>a</code> if <code>ts(a) < ts(b)</code>, which means:</p><ul><li>For all indices <code>k</code>: <code>ts(a)[k] ≤ ts(b)[k]</code></li><li>There exists at least one index <code>k'</code> for which: <code>ts(a)[k'] < ts(b)[k']</code></li></ul><p>If neither <code>ts(a) < ts(b)</code> nor <code>ts(b) < ts(a)</code> is true, the events are concurrent and may conflict.</p><p><b>Worked Example for Causality Analysis:</b></p><p>Suppose we have two messages $m_2$ and $m_4$ and want to determine their relationship:</p><ol><li><b>Situation (a):</b> $ts(m_2) = (2, 1, 0)$ and $ts(m_4) = (4, 3, 0)$. Comparing the vectors, $ts(m_2) < ts(m_4)$ holds for all indices (2 < 4, 1 < 3, 0 = 0). Result: $m_2$ may causally precede $m_4$.</li><li><b>Situation (b):</b> $ts(m_2) = (4, 1, 0)$ and $ts(m_4) = (2, 3, 0)$. Here, $m_2$ is greater in the first index (4 > 2), while $m_4$ is greater in the second (3 > 1). Result: No causal relationship; the messages are concurrent and may conflict.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1399,8 +1404,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تشبه خوارزمية لامبورت للاستبعاد المتبادل ولكن بدون إرسال إشعارات (ACKs) منفصلة. ترد العملية على الطلب فقط في الحالات التالية:</p><ul><li>العملية المستقبلة ليس لديها اهتمام بالمورد المشترك.</li><li>العملية المستقبلة تنتظر المورد أيضاً، ولكن طلبها له <b>أولوية أقل</b> (طابع زمني أكبر من طابع المرسل).</li></ul><p>في جميع الحالات الأخرى (العملية تستخدم المورد حالياً، أو لديها أولوية أعلى)، يتم <b>تأجيل (Deferred)</b> الرد حتى تنتهي من استخدام المورد.</p></template>
-    <template class="content-en"><p>Similar to Lamport's mutual exclusion but acknowledgments are not sent separately. A process returns a response (OK) to a request only when:</p><ul><li>The receiving process has no interest in the shared resource; or</li><li>The receiving process is waiting for the resource, but has <b>lower priority</b> (higher timestamp than the requester).</li></ul><p>In all other cases (it is using the resource, or has higher priority), the reply is <b>deferred</b> until it finishes using the resource.</p></template>
+    <template class="content-ar"><p>تشبه خوارزمية لامبورت للاستبعاد المتبادل ولكن بدون إرسال إشعارات (ACKs) منفصلة. ترد العملية على الطلب فقط في الحالات التالية:</p><ul><li>العملية المستقبلة ليس لديها اهتمام بالمورد المشترك.</li><li>العملية المستقبلة تنتظر المورد أيضاً، ولكن طلبها له <b>أولوية أقل</b> (طابع زمني أكبر من طابع المرسل).</li></ul><p>في جميع الحالات الأخرى (العملية تستخدم المورد حالياً، أو لديها أولوية أعلى)، يتم <b>تأجيل (Deferred)</b> الرد حتى تنتهي من استخدام المورد.</p><p><b>مثال عملي (3 عمليات):</b></p><ol><li>ترغب عمليتان $P_0$ و $P_2$ في الوصول إلى المورد المشترك في نفس اللحظة.</li><li>ترسل كل منهما طلباً للجميع. طلب $P_0$ يحمل الطابع الزمني 8، وطلب $P_2$ يحمل الطابع الزمني 12.</li><li>بما أن $P_0$ تمتلك الطابع الزمني الأقل (8 < 12)، فإنها تفوز وتدخل المنطقة الحرجة، بينما تؤجل الرد على $P_2$.</li><li>عندما تنتهي $P_0$، ترسل رسالة الموافقة (OK) المؤجلة إلى $P_2$، مما يسمح لـ $P_2$ بالدخول الآن.</li></ol></template>
+    <template class="content-en"><p>Similar to Lamport's mutual exclusion but acknowledgments are not sent separately. A process returns a response (OK) to a request only when:</p><ul><li>The receiving process has no interest in the shared resource; or</li><li>The receiving process is waiting for the resource, but has <b>lower priority</b> (higher timestamp than the requester).</li></ul><p>In all other cases (it is using the resource, or has higher priority), the reply is <b>deferred</b> until it finishes using the resource.</p><p><b>Worked Example (3 processes):</b></p><ol><li>Two processes $P_0$ and $P_2$ want to access a shared resource at the same moment.</li><li>They broadcast their requests. $P_0$'s request has timestamp 8, and $P_2$'s has timestamp 12.</li><li>Since $P_0$ has the lowest timestamp (8 < 12), it wins and enters the critical section, deferring its reply to $P_2$.</li><li>When $P_0$ is done, it sends the deferred OK to $P_2$, so $P_2$ can now go ahead.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1803,6 +1808,96 @@
   </details>
 </section>
 
+<section id="lamport-mutual-exclusion" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">14</span> الاستبعاد المتبادل باستخدام ساعات لامبورت</h2></template>
+    <template class="content-en"><h2><span class="concept-number">14</span> Lamport's Mutual Exclusion</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية موزعة تستخدم ساعات لامبورت وطوابير محلية لضمان الاستبعاد المتبادل، حيث تتطلب العملية موافقة (ACK) من جميع العمليات الأخرى.</p></template>
+    <template class="content-en"><p>A distributed algorithm using Lamport clocks and local queues to ensure mutual exclusion, requiring an ACK from all other processes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد هذه الخوارزمية على مبدأ البث المرتب كلياً لضمان العدالة:</p><ol><li><b>الطلب:</b> ترسل العملية طلب <code>ENTER</code> مع طابعها الزمني لجميع العمليات وتضعه في طابورها المحلي.</li><li><b>الاستلام:</b> عند استلام طلب، ترد العملية بإشعار <code>ACK</code> فوراً وتضع الطلب في طابورها مرتباً حسب الطابع الزمني.</li><li><b>الدخول:</b> يُسمح للعملية بالدخول فقط إذا كان طلبها في رأس الطابور واستلمت رسائل (إشعارات أو طلبات أحدث) من جميع العمليات الأخرى.</li><li><b>ال<span class="smart-term" data-term-en="RELEASE" data-ar="تحرير" data-en-def="A message indicating that a process has finished using the shared resource.">تحرير<span class="smart-term-tooltip"></span></span>:</b> عند الخروج، ترسل رسالة <code>RELEASE</code> ليتم إزالة طلبها من طوابير الجميع.</li></ol></template>
+    <template class="content-en"><p>This algorithm relies on totally ordered multicast to ensure fairness:</p><ol><li><b>Request:</b> A process sends an <code>ENTER</code> request with its timestamp to all processes and appends it to its local queue.</li><li><b>Receive:</b> Upon receiving a request, a process immediately replies with an <code>ACK</code> and places the request in its sorted queue.</li><li><b>Enter:</b> A process is allowed to enter only if its request is at the head of the queue and it has received messages (ACKs or newer requests) from all other processes.</li><li><b><span class="smart-term" data-term-en="RELEASE" data-ar="تحرير" data-en-def="A message indicating that a process has finished using the shared resource.">Release<span class="smart-term-tooltip"></span></span>:</b> Upon exiting, it sends a <code>RELEASE</code> message to remove its request from everyone's queues.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تضمن هذه الخوارزمية ترتيباً كلياً للطلبات، مما يمنع المجاعة (Starvation) تماماً. ومع ذلك، فهي مكلفة من حيث عدد الرسائل: تتطلب $3(N-1)$ رسالة لكل عملية دخول (طلبات، إشعارات، تحرير).</p><p>العيب الأكبر هو افتقارها لتحمل الأخطاء؛ إذا تعطلت عملية واحدة فقط، فلن ترسل <code>ACK</code> أبداً، وسيتوقف النظام بأكمله.</p></template>
+    <template class="content-en"><p>This algorithm guarantees a total ordering of requests, completely preventing starvation. However, it is expensive in terms of messages: requiring $3(N-1)$ messages per entry (requests, ACKs, releases).</p><p>The biggest flaw is its lack of fault tolerance; if just one process crashes, it will never send an <code>ACK</code>, halting the entire system.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class Process:
+    def __init__(self, chanID, procID, procIDSet):
+        self.chan.join(procID)
+        self.procID = int(procID)
+        self.otherProcs.remove(self.procID)
+        self.queue = [] # The request queue
+        self.clock = 0  # The current logical clock
+
+    def requestToEnter(self):
+        self.clock = self.clock + 1 # Increment clock value
+        self.queue.append((self.clock, self.procID, 'ENTER')) # Append request to q
+        self.cleanupQ() # Sort the queue
+        self.chan.sendTo(self.otherProcs, (self.clock, self.procID, 'ENTER')) # Send request
+
+    def ackToEnter(self, requester):
+        self.clock = self.clock + 1 # Increment clock value
+        self.chan.sendTo(requester, (self.clock, self.procID, 'ACK')) # Permit other
+
+    def release(self):
+        tmp = [r for r in self.queue[1:] if r[2] == 'ENTER'] # Remove all ACKs
+        self.queue = tmp # and copy to new queue
+        self.clock = self.clock + 1 # Increment clock value
+        self.chan.sendTo(self.otherProcs, (self.clock, self.procID, 'RELEASE')) # Release
+
+    def allowedToEnter(self):
+        commProcs = set([req[1] for req in self.queue[1:]]) # See who has sent a message
+        return (self.queue[0][1] == self.procID and len(self.otherProcs) == len(commProcs))
+
+    def receive(self):
+        msg = self.chan.recvFrom(self.otherProcs)[1]
+        self.clock = max(self.clock, msg[0])
+        self.clock = self.clock + 1 # Adjust clock value and increment
+        if msg[2] == 'ENTER':
+            self.queue.append(msg) # Append an ENTER request
+            self.ackToEnter(msg[1]) # and unconditionally allow
+        elif msg[2] == 'ACK':
+            self.queue.append(msg) # Append a received ACK
+        elif msg[2] == 'RELEASE':
+            del(self.queue[0]) # Just remove first message
+            self.cleanupQ() # And sort and cleanup</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في كود بايثون، لماذا تقوم الدالة <code>receive</code> بتحديث الساعة باستخدام <code>max(self.clock, msg[0])</code>؟</template>
+      <template class="content-en">In the Python code, why does the <code>receive</code> function update the clock using <code>max(self.clock, msg[0])</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لضمان التوافق مع خوارزمية ساعات لامبورت، حيث يجب أن تكون ساعة المستلم دائماً أكبر من ساعة المرسل وقت إرسال الرسالة للحفاظ على الترتيب السببي.</p></template>
+      <template class="content-en"><p>To comply with Lamport's logical clocks algorithm, ensuring the receiver's clock is always strictly greater than the sender's clock at the time of sending, maintaining causal ordering.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <div class="toc-divider"></div>
 
 <section id="professor" class="professor-card glass-card fade-up">
@@ -1811,8 +1906,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة حول 'التنسيق'. تخيلوا أن لدينا أوركسترا ضخمة، كل عازف فيها يجلس في مدينة مختلفة. كيف نجعلهم يعزفون معاً؟ هذا هو التنسيق في الأنظمة الموزعة! نبدأ بمزامنة الساعات الفيزيائية؛ حيث نستخدم NTP لضبط الوقت عبر الشبكة، وRBS لتقليل التأخير بجعل المستقبلين يتزامنون مع بعضهم. لكن في كثير من الأحيان، لا يهمنا الوقت الفعلي بقدر ما يهمنا 'من حدث قبل من؟' هنا تتدخل الساعات المنطقية (لامبورت) لترتيب الأحداث. ولأن لامبورت لا يكتشف التزامن بدقة، قمنا بترقيته إلى الساعات المتجهة. بعد ذلك، ننتقل إلى الاستبعاد المتبادل: كيف نمنع عمليتين من الكتابة في نفس الملف؟ درسنا الطريقة المركزية (سهلة لكنها نقطة فشل مفردة)، وطريقة ريكارت وأجراوالا (موزعة لكنها هشة)، والطريقة اللامركزية (تعتمد على تصويت الأغلبية وهي الأقوى). وأخيراً، لمسة من الأمان مع PEKS للبحث في البيانات المشفرة. ركزوا في الامتحان على الفرق بين لامبورت والمتجهة، ولماذا ريكارت وأجراوالا أسوأ في تحمل الأخطاء من المركزية. بالتوفيق!</template>
-    <template class="content-en">Welcome, my friends, to this critical module on 'Coordination'. Imagine a massive orchestra where every musician is in a different city. How do we get them to play together? That's coordination in distributed systems! We start with physical clocks; using NTP to adjust time over the network, and RBS to minimize delay by syncing receivers together. But often, exact time matters less than 'what happened before what?' Enter logical clocks (Lamport) to order events. Because Lamport can't perfectly detect concurrency, we upgraded to Vector Clocks. Next, we tackle Mutual Exclusion: preventing two processes from writing to the same file. We explored the Centralized approach (simple but a single point of failure), Ricart & Agrawala (distributed but fragile), and Decentralized (majority voting, highly robust). Finally, a touch of security with PEKS for searching encrypted data. For the exam, focus heavily on the difference between Lamport and Vector clocks, and why Ricart & Agrawala is actually worse for fault tolerance than the centralized approach. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة حول 'التنسيق'. تخيلوا أن لدينا أوركسترا ضخمة، كل عازف فيها يجلس في مدينة مختلفة. كيف نجعلهم يعزفون معاً؟ هذا هو التنسيق في الأنظمة الموزعة! نبدأ بمزامنة الساعات الفيزيائية؛ حيث نستخدم NTP لضبط الوقت عبر الشبكة، وRBS لتقليل التأخير بجعل المستقبلين يتزامنون مع بعضهم. لكن في كثير من الأحيان، لا يهمنا الوقت الفعلي بقدر ما يهمنا 'من حدث قبل من؟' هنا تتدخل الساعات المنطقية (لامبورت) لترتيب الأحداث. ولأن لامبورت لا يكتشف التزامن بدقة، قمنا بترقيته إلى الساعات المتجهة. بعد ذلك، ننتقل إلى الاستبعاد المتبادل: كيف نمنع عمليتين من الكتابة في نفس الملف؟ درسنا الطريقة المركزية (سهلة لكنها نقطة فشل مفردة)، وطريقة ريكارت وأجراوالا (موزعة لكنها هشة)، والطريقة اللامركزية (تعتمد على تصويت الأغلبية وهي الأقوى). وأخيراً، لمسة من الأمان مع PEKS للبحث في البيانات المشفرة. ركزوا في الامتحان على الفرق بين لامبورت والمتجهة، ولماذا ريكارت وأجراوالا أسوأ في تحمل الأخطاء من المركزية. بالتوفيق!<p>لقد رأينا كيف تطورت الساعات المنطقية من لامبورت إلى المتجهات لحل مشكلة السببية. الآن، نطبق هذه الساعات مباشرة لحل مشكلة الاستبعاد المتبادل. لاحظ كيف تستخدم خوارزميات لامبورت وريكارت وأجراوالا الطوابع الزمنية لترتيب الطلبات، وكيف يختلف النهج القائم على الإذن عن تمرير الرمز في إدارة الموارد المشتركة.</p><p>قبل الغوص في تعقيدات خوارزميات لامبورت وريكارت وأجراوالا، من الضروري فهم أن جميع هذه الخوارزميات تندرج تحت مظلة 'الحلول القائمة على الإذن'. فهمك للبديل الآخر، وهو 'الحلول القائمة على الرمز'، يمنحك منظوراً أوسع لتقييم تكلفة الرسائل مقابل تعقيد تحمل الأخطاء في الأنظمة الموزعة.</p></template>
+    <template class="content-en">Welcome, my friends, to this critical module on 'Coordination'. Imagine a massive orchestra where every musician is in a different city. How do we get them to play together? That's coordination in distributed systems! We start with physical clocks; using NTP to adjust time over the network, and RBS to minimize delay by syncing receivers together. But often, exact time matters less than 'what happened before what?' Enter logical clocks (Lamport) to order events. Because Lamport can't perfectly detect concurrency, we upgraded to Vector Clocks. Next, we tackle Mutual Exclusion: preventing two processes from writing to the same file. We explored the Centralized approach (simple but a single point of failure), Ricart & Agrawala (distributed but fragile), and Decentralized (majority voting, highly robust). Finally, a touch of security with PEKS for searching encrypted data. For the exam, focus heavily on the difference between Lamport and Vector clocks, and why Ricart & Agrawala is actually worse for fault tolerance than the centralized approach. Good luck!<p>We have seen how logical clocks evolved from Lamport to Vectors to solve causality. Now, we apply these clocks directly to solve mutual exclusion. Notice how Lamport and Ricart & Agrawala use timestamps to order requests, and how permission-based approaches differ fundamentally from token-passing in managing shared resources.</p><p>Before diving into the complexities of Lamport and Ricart & Agrawala algorithms, it is crucial to understand that these fall under the umbrella of 'Permission-based solutions'. Grasping the alternative, 'Token-based solutions', gives you a broader perspective to evaluate message overhead versus fault-tolerance complexity in distributed systems.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1986,6 +2081,42 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لتأجيل العملية الطالبة ضمنياً. لكن هذا عيب تصميمي لأنه يجعل العملية غير قادرة على التمييز بين 'المنسق مشغول' و 'المنسق معطل'.</template>
           <template class="content-en">To implicitly make the requesting process wait. However, this is a design flaw because it makes the process unable to distinguish between 'coordinator is busy' and 'coordinator crashed'.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تُعتبر خوارزمية لامبورت للاستبعاد المتبادل غير عملية في الأنظمة الكبيرة رغم عدالتها؟</template>
+          <template class="content-en">Why is Lamport's mutual exclusion algorithm considered impractical in large systems despite its fairness?</template>
+          <span class="content-target">لماذا تُعتبر خوارزمية لامبورت للاستبعاد المتبادل غير عملية في الأنظمة الكبيرة رغم عدالتها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها تتطلب $3(N-1)$ رسالة لكل عملية دخول، مما يولد ضغطاً هائلاً على الشبكة. الأهم من ذلك، أنها هشة جداً؛ تعطل عقدة واحدة فقط يوقف النظام بأكمله لأن العقد الأخرى ستنتظر إشعارها (ACK) إلى الأبد.</p></template>
+          <template class="content-en"><p>Because it requires $3(N-1)$ messages per entry, generating massive network traffic. More importantly, it is highly fragile; a single node crash halts the entire system because other nodes will wait for its ACK forever.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في نظام استبعاد متبادل قائم على الرمز (Token-based)، ماذا يحدث إذا تعطلت العملية التي تحمل الرمز حالياً؟</template>
+          <template class="content-en">In a Token-based mutual exclusion system, what happens if the process currently holding the token crashes?</template>
+          <span class="content-target">في نظام استبعاد متبادل قائم على الرمز (Token-based)، ماذا يحدث إذا تعطلت العملية التي تحمل الرمز حالياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يُفقد الرمز تماماً، وسيتوقف النظام (Deadlock) لأن أي عملية أخرى لن تستلم الرمز أبداً. لحل ذلك، يجب أن يمتلك النظام آلية لاكتشاف فقدان الرمز (عبر انقضاء وقت الانتظار Timeout) وخوارزمية لتوليد رمز جديد بأمان دون خلق نسخ متعددة.</p></template>
+          <template class="content-en"><p>The token is completely lost, and the system will deadlock because no other process will ever receive it. To resolve this, the system must have a mechanism to detect the loss (via timeouts) and an algorithm to safely regenerate a new token without creating duplicates.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -2304,6 +2435,23 @@
         "en": "Losing the quorum prevents any process from getting a majority."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هي الشروط لكي تدخل عملية منطقتها الحرجة في خوارزمية لامبورت؟",
+      "en": "What are the conditions for a process to enter its critical section in Lamport's algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب أن يكون طلبها في رأس طابورها المحلي، وأن تكون قد استلمت رسالة (ACK أو طلب أحدث) من جميع العمليات الأخرى.",
+        "en": "Its request must be at the head of its local queue, and it must have received a message (ACK or newer request) from all other processes."
+      },
+      "example": {
+        "ar": "العملية P1 تنتظر حتى يصبح طلبها الأقدم، وتستلم ACK من P2 و P3.",
+        "en": "Process P1 waits until its request is the oldest, and it receives ACKs from P2 and P3."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -2313,7 +2461,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -2329,7 +2477,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2654,6 +2802,38 @@
     },
     "difficulty": "medium",
     "conceptId": "peks-encryption"
+  },
+  {
+    "conceptId": "lamport-mutual-exclusion",
+    "question": {
+      "ar": "في خوارزمية لامبورت للاستبعاد المتبادل، ماذا تفعل العملية فور استلامها لطلب ENTER من عملية أخرى؟",
+      "en": "In Lamport's mutual exclusion algorithm, what does a process do immediately upon receiving an ENTER request from another process?"
+    },
+    "options": {
+      "ar": [
+        "تؤجل الرد إذا كانت تستخدم المورد",
+        "ترسل إشعار ACK بشكل غير مشروط وتضع الطلب في طابورها",
+        "ترفض الطلب إذا كان طابعها الزمني أصغر",
+        "تمرر الرمز (Token) للعملية الطالبة"
+      ],
+      "en": [
+        "Defers the reply if it is using the resource",
+        "Sends an ACK unconditionally and queues the request",
+        "Denies the request if its own timestamp is smaller",
+        "Passes the token to the requesting process"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "على عكس خوارزمية ريكارت وأجراوالا التي تؤجل الرد، خوارزمية لامبورت ترسل ACK دائماً وتعتمد على ترتيب الطوابير المحلية لتحديد من يدخل أولاً.",
+      "en": "Unlike Ricart & Agrawala which defers replies, Lamport's algorithm always sends an ACK and relies on the sorting of local queues to determine who enters first."
+    },
+    "hint": {
+      "ar": "تذكر أن خوارزمية لامبورت لا تستخدم التأجيل (Deferring).",
+      "en": "Remember that Lamport's algorithm does not use deferring."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -2698,6 +2878,22 @@
       <template class="content-ar">البث المرتب سببياً يمنع 'السفر عبر الزمن' في التطبيقات الموزعة، حيث يضمن عدم تسليم رد فعل قبل تسليم الفعل الأصلي الذي تسبب فيه.</template>
       <template class="content-en">Causally Ordered Multicasting prevents 'time travel' in distributed apps, ensuring a reaction is never delivered before the original action that caused it.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في خوارزمية لامبورت للاستبعاد المتبادل، الإشعار (ACK) يُرسل دائماً وبشكل غير مشروط عند استلام طلب، والترتيب يُدار محلياً في طوابير كل عملية.</template>
+    <template class="content-en">In Lamport's mutual exclusion, an ACK is sent unconditionally upon receiving a request, and the ordering is managed locally in each process's queue.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من افتراض أن الأنظمة القائمة على الرمز خالية من المشاكل. رغم أنها تقلل الرسائل، إلا أن 'فقدان الرمز' يمثل كابوساً في الأنظمة الموزعة ويتطلب خوارزميات انتخاب معقدة لحله.</template>
+    <template class="content-en">Beware of assuming token-based systems are problem-free. While they reduce messages, a 'lost token' is a nightmare in distributed systems and requires complex election algorithms to resolve.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

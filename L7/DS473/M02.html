@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS473" data-module="2" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>الرؤية البشرية والكاميرات · DS473 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS473" data-page-title-en="DS473">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M01.html" data-gh-next="M03.html" data-gh-card="../../hub/course.html?code=DS473"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#human-vision-system" class="toc-link" data-bilingual>
+        <template class="content-ar">نظام الرؤية البشري</template>
+        <template class="content-en">Human Vision System</template>
+        <span class="content-target">نظام الرؤية البشري</span>
+      </a>
+      <a href="#pinhole-camera-model" class="toc-link" data-bilingual>
+        <template class="content-ar">نموذج الكاميرا ذات الثقب</template>
+        <template class="content-en">Pinhole Camera Model</template>
+        <span class="content-target">نموذج الكاميرا ذات الثقب</span>
+      </a>
+      <a href="#projection-geometry" class="toc-link" data-bilingual>
+        <template class="content-ar">هندسة الإسقاط ونقاط التلاشي</template>
+        <template class="content-en">Projection Geometry and Vanishing Points</template>
+        <span class="content-target">هندسة الإسقاط ونقاط التلاشي</span>
+      </a>
+      <a href="#homogeneous-coordinates" class="toc-link" data-bilingual>
+        <template class="content-ar">الإحداثيات المتجانسة</template>
+        <template class="content-en">Homogeneous Coordinates</template>
+        <span class="content-target">الإحداثيات المتجانسة</span>
+      </a>
+      <a href="#camera-projection-matrix" class="toc-link" data-bilingual>
+        <template class="content-ar">مصفوفة إسقاط الكاميرا</template>
+        <template class="content-en">Camera Projection Matrix</template>
+        <span class="content-target">مصفوفة إسقاط الكاميرا</span>
+      </a>
+      <a href="#orthographic-projection" class="toc-link" data-bilingual>
+        <template class="content-ar">الإسقاط المتعامد والمنظور الضعيف</template>
+        <template class="content-en">Orthographic and Weak Perspective Projection</template>
+        <span class="content-target">الإسقاط المتعامد والمنظور الضعيف</span>
+      </a>
+      <a href="#lenses-and-dof" class="toc-link" data-bilingual>
+        <template class="content-ar">العدسات وعمق المجال</template>
+        <template class="content-en">Lenses and Depth of Field</template>
+        <span class="content-target">العدسات وعمق المجال</span>
+      </a>
+      <a href="#lens-flaws" class="toc-link" data-bilingual>
+        <template class="content-ar">عيوب العدسات (الزيغ)</template>
+        <template class="content-en">Lens Flaws (Aberrations)</template>
+        <span class="content-target">عيوب العدسات (الزيغ)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 2</template>
+      <template class="content-en">Module 2</template>
+      <span class="content-target">الوحدة 2</span>
+    </span> · DS473
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">الرؤية البشرية والكاميرات</h1>
+      <p class="hero-description">دراسة نظام الرؤية البشري، ونموذج الكاميرا ذات الثقب، وهندسة الإسقاط، والإحداثيات المتجانسة، ومصفوفة الكاميرا، والعدسات وعيوبها.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Human Vision and Cameras</h1>
+      <p class="hero-description">Study of the human vision system, pinhole camera model, projection geometry, homogeneous coordinates, camera matrix, lenses, and lens flaws.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">الرؤية البشرية</span>
+      <span class="tag">الكاميرات</span>
+      <span class="tag">هندسة الإسقاط</span>
+      <span class="tag">الإحداثيات المتجانسة</span>
+      <span class="tag">العدسات</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Human Vision</span>
+      <span class="tag">Cameras</span>
+      <span class="tag">Projection Geometry</span>
+      <span class="tag">Homogeneous Coordinates</span>
+      <span class="tag">Lenses</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم كيفية عمل نظام الرؤية البشري كنموذج ملهم للرؤية الحاسوبية.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح كيفية عمل الكاميرا وكيفية تمثيل الصورة رقمياً.</span></li>
+      <li><span class="obj-icon">✦</span><span>وصف هندسة الإسقاط المستخدمة في الكاميرات والعدسات.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق الإحداثيات المتجانسة لحل مشاكل الإسقاط والتقاطع.</span></li>
+      <li><span class="obj-icon">✦</span><span>استنتاج مصفوفة إسقاط الكاميرا باستخدام المعلمات الداخلية والخارجية.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Understand how the human vision system works as an inspiring model for computer vision.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain how a camera works and how to represent an image digitally.</span></li>
+      <li><span class="obj-icon">✦</span><span>Describe the projection geometry used in cameras and lenses.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply homogeneous coordinates to solve projection and intersection problems.</span></li>
+      <li><span class="obj-icon">✦</span><span>Derive the camera projection matrix using intrinsic and extrinsic parameters.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="human-vision-system" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> نظام الرؤية البشري</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Human Vision System</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>العين تلتقط الضوء مثل الكاميرا، لكن الدماغ هو من يقوم بعملية الرؤية والإدراك الفعلي.</p></template>
+    <template class="content-en"><p>The eye captures light like a camera, but the brain is what actually performs the seeing and perception.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتكون نظام الرؤية البشري من العين والدماغ. <b><span class="smart-term" data-term-en="Retina" data-ar="الشبكية" data-en-def="The innermost layer of the eye composed of nerve tissue that senses light.">الشبكية<span class="smart-term-tooltip"></span></span> (Retina)</b> هي الطبقة الداخلية للعين وتعمل كفيلم الكاميرا، وتحتوي على مستقبلات ضوئية.</p><p>هناك نوعان من المستقبلات:</p><ul><li><b>العصي (Rods):</b> حوالي 120 مليون، حساسة جداً للضوء ولكن ليس للألوان.</li><li><b>المخاريط (Cones):</b> من 6 إلى 7 مليون، توفر حساسية الألوان وتتركز في <span class="smart-term" data-term-en="Macula Lutea" data-ar="البقعة الصفراء" data-en-def="The small, yellowish central portion of the retina providing the clearest vision.">البقعة الصفراء<span class="smart-term-tooltip"></span></span> (Macula).</li></ul><p>مركز البقعة يسمى <b>النقرة (Fovea)</b> ولا يحتوي إلا على مخاريط. تتم معالجة الرؤية في الدماغ عبر مسار أمامي (Feedforward) يمر عبر النواة الركبية الجانبية (LGN) ثم القشرة البصرية (V1, V2) وصولاً إلى القشرة الصدغية السفلية (IT).</p></template>
+    <template class="content-en"><p>The human vision system consists of the eye and the brain. The <b><span class="smart-term" data-term-en="Retina" data-ar="الشبكية" data-en-def="The innermost layer of the eye composed of nerve tissue that senses light.">Retina<span class="smart-term-tooltip"></span></span></b> is the innermost layer, comparable to camera film, containing photoreceptors.</p><p>There are two types of photoreceptors:</p><ul><li><b>Rods:</b> ~120 million, highly sensitive to light but not color.</li><li><b>Cones:</b> 6-7 million, provide color sensitivity, concentrated in the macula.</li></ul><p>The center of the macula is the <b>Fovea</b>, containing only cones. Vision is processed in the brain via a feedforward pathway through the LGN, primary visual cortex (V1, V2), and inferior temporal cortex (IT).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا ندرس الرؤية البشرية في الرؤية الحاسوبية؟ لأن الرؤية البشرية تتفوق بكثير على الأنظمة الحالية في التعرف على الأشياء. أي تلميحات من علم الأحياء مفيدة جداً.</p><p>تم بناء نماذج حاسوبية مستوحاة من القشرة الدماغية (Cortex-Like Mechanisms) مثل نموذج Serre et al. الذي يستخدم طبقات (S1, C1, S2, C2) للتعرف القوي على فئات الكائنات، محاكياً التصفية المكانية والتجميع في الدماغ.</p></template>
+    <template class="content-en"><p>Why study human vision for computer vision? Because human vision is vastly better at recognition than current systems. Hints from biology are highly useful.</p><p>Computational models inspired by the cortex (Cortex-Like Mechanisms), such as Serre et al.'s model, use layers (S1, C1, S2, C2) for robust object category recognition, mimicking spatial filtering and pooling in the brain.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG diagram showing the anatomy of the human eye. Include the Cornea, Lens, Retina, Macula, Fovea, and Optic Nerve. Show light rays entering the eye and focusing on the fovea. Style: educational, dark background #0d1117, accent color #00ffcc, viewBox 0 0 800 400, Arabic + English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrowhead for Light Rays -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 2 2 L 8 5 L 2 8 Z" fill="var(--brand-400)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)">Anatomy of the Human Eye</text>
+  <text x="400" y="35" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="20" font-weight="bold" fill="var(--text-primary)">تشريح العين البشرية</text>
+
+  <!-- Light Rays Beam (Background Glow) -->
+  <polygon points="80,120 285,155 330,175 535,200 330,225 285,245 80,280" fill="var(--brand-500)" opacity="0.1"/>
+
+  <!-- Eye Outer Shell (Sclera & Cornea) -->
+  <path d="M 316 140 
+           A 70 70 0 0 0 316 260 
+           A 120 120 0 0 0 517 268 
+           C 540 280, 580 300, 620 310 
+           L 610 275 
+           C 580 265, 550 245, 535 230 
+           A 120 120 0 0 0 316 140 Z" 
+        fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Macula Highlight (Thick background line on Retina) -->
+  <path d="M 515 170 
+           A 112 112 0 0 1 525 190 
+           Q 535 190 535 200 
+           Q 535 210 525 210 
+           A 112 112 0 0 1 515 230" 
+        fill="none" stroke="var(--brand-400)" stroke-width="10" opacity="0.3" stroke-linecap="round"/>
+
+  <!-- Retina (Inner Shell) & Fovea Dip -->
+  <path d="M 330 145 
+           A 112 112 0 0 1 525 190 
+           Q 535 190 535 200 
+           Q 535 210 525 210 
+           A 112 112 0 0 1 520 230 
+           M 505 260 
+           A 112 112 0 0 1 330 255" 
+        fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Fovea Glow -->
+  <circle cx="535" cy="200" r="6" fill="var(--brand-500)" opacity="0.5"/>
+
+  <!-- Optic Nerve Fibers -->
+  <path d="M 520 235 Q 570 250 610 280" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <path d="M 515 245 Q 565 260 605 290" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4"/>
+  <path d="M 510 255 Q 560 270 600 300" fill="none" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4"/>
+
+  <!-- Lens -->
+  <ellipse cx="330" cy="200" rx="14" ry="40" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2"/>
+  <path d="M 330 160 A 10 30 0 0 0 330 240" fill="none" stroke="var(--brand-500)" stroke-width="1" opacity="0.5"/>
+  <path d="M 330 160 A 10 30 0 0 1 330 240" fill="none" stroke="var(--brand-500)" stroke-width="1" opacity="0.5"/>
+
+  <!-- Iris -->
+  <path d="M 316 140 Q 325 150 325 165 Q 315 160 310 148 Z" fill="var(--brand-500)"/>
+  <path d="M 316 260 Q 325 250 325 235 Q 315 240 310 252 Z" fill="var(--brand-500)"/>
+
+  <!-- Light Rays (Paths) -->
+  <path d="M 180 137 L 285 155 L 330 175 L 535 200" fill="none" stroke="var(--brand-400)" stroke-width="2"/>
+  <path d="M 180 200 L 280 200 L 330 200 L 535 200" fill="none" stroke="var(--brand-400)" stroke-width="2"/>
+  <path d="M 180 263 L 285 245 L 330 225 L 535 200" fill="none" stroke="var(--brand-400)" stroke-width="2"/>
+
+  <!-- Light Rays (Arrows) -->
+  <line x1="80" y1="120" x2="180" y2="137" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="80" y1="200" x2="180" y2="200" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="80" y1="280" x2="180" y2="263" stroke="var(--brand-400)" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ================= POINTERS & LABELS ================= -->
+
+  <!-- Cornea -->
+  <circle cx="285" cy="170" r="4" fill="var(--brand-500)"/>
+  <polyline points="285,170 220,100 150,100" fill="none" stroke="var(--border-color)" stroke-width="1.5"/>
+  <text x="150" y="90" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">Cornea</text>
+  <text x="150" y="90" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">القرنية</text>
+
+  <!-- Lens -->
+  <circle cx="330" cy="235" r="4" fill="var(--brand-500)"/>
+  <polyline points="330,235 280,320 210,320" fill="none" stroke="var(--border-color)" stroke-width="1.5"/>
+  <text x="210" y="310" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">Lens</text>
+  <text x="210" y="310" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">العدسة</text>
+
+  <!-- Retina -->
+  <circle cx="420" cy="88" r="4" fill="var(--brand-500)"/>
+  <polyline points="420,88 480,50 550,50" fill="none" stroke="var(--border-color)" stroke-width="1.5"/>
+  <text x="515" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">Retina</text>
+  <text x="515" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">الشبكية</text>
+
+  <!-- Macula -->
+  <circle cx="525" cy="175" r="4" fill="var(--brand-500)"/>
+  <polyline points="525,175 580,120 650,120" fill="none" stroke="var(--border-color)" stroke-width="1.5"/>
+  <text x="615" y="110" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">Macula</text>
+  <text x="615" y="110" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">البقعة الصفراء</text>
+
+  <!-- Fovea -->
+  <circle cx="535" cy="200" r="4" fill="var(--brand-500)"/>
+  <polyline points="535,200 600,180 670,180" fill="none" stroke="var(--border-color)" stroke-width="1.5"/>
+  <text x="635" y="170" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">Fovea</text>
+  <text x="635" y="170" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">النقرة</text>
+
+  <!-- Optic Nerve -->
+  <circle cx="580" cy="300" r="4" fill="var(--brand-500)"/>
+  <polyline points="580,300 630,350 700,350" fill="none" stroke="var(--border-color)" stroke-width="1.5"/>
+  <text x="665" y="340" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">Optic Nerve</text>
+  <text x="665" y="340" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">العصب البصري</text>
+
+  <!-- Light Rays Label -->
+  <text x="130" y="320" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">Light Rays</text>
+  <text x="130" y="320" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)">أشعة الضوء</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Rods</th><th>Cones</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">العدد</template>
+          <template class="content-en">Quantity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">حوالي 120 مليون</template>
+          <template class="content-en">~120 million</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">6 إلى 7 مليون</template>
+          <template class="content-en">6 to 7 million</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حساسية الضوء</template>
+          <template class="content-en">Light Sensitivity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية جداً (رؤية ليلية)</template>
+          <template class="content-en">Very high (night vision)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">منخفضة (تحتاج إضاءة جيدة)</template>
+          <template class="content-en">Low (needs bright light)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حساسية الألوان</template>
+          <template class="content-en">Color Sensitivity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير حساسة للألوان</template>
+          <template class="content-en">Not sensitive to color</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">حساسة للألوان</template>
+          <template class="content-en">Sensitive to color</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نرى الألوان بوضوح في الإضاءة الخافتة جداً؟</template>
+      <template class="content-en">Why can't we see colors clearly in very dim light?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المخاريط (المسؤولة عن رؤية الألوان) تحتاج إلى إضاءة جيدة لتعمل، بينما العصي (الحساسة للضوء الخافت) لا تميز الألوان.</p></template>
+      <template class="content-en"><p>Because cones (responsible for color vision) require bright light to function, whereas rods (sensitive to dim light) do not detect color.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="pinhole-camera-model" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> نموذج الكاميرا ذات الثقب</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Pinhole Camera Model</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نموذج أساسي للكاميرا يستخدم ثقباً صغيراً (فتحة) لتركيز أشعة الضوء من مشهد ثلاثي الأبعاد لتكوين صورة مقلوبة على مستوى ثنائي الأبعاد.</p></template>
+    <template class="content-en"><p>A basic camera model using a tiny hole (aperture) to focus light rays from a 3D scene to form an inverted image on a 2D plane.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتصميم كاميرا من الصفر، إذا وضعنا فيلماً أمام كائن، فلن نحصل على صورة واضحة لأن الأشعة تتشتت. الحل هو إضافة حاجز يحجب معظم الأشعة، مع ترك فتحة صغيرة (Aperture).</p><p>في نموذج الكاميرا ذات الثقب:</p><ul><li>يتم التقاط حزمة من الأشعة تمر عبر نقطة واحدة تسمى <b><span class="smart-term" data-term-en="Center of Projection" data-ar="مركز الإسقاط" data-en-def="The single point through which all light rays pass in a pinhole camera model.">مركز الإسقاط<span class="smart-term-tooltip"></span></span> (Center of Projection)</b>.</li><li>تتكون الصورة على <b>مستوى الصورة (Image Plane)</b>.</li><li>المسافة بين <span class="smart-term" data-term-en="Aperture" data-ar="الفتحة" data-en-def="The opening in a camera barrier that allows light to pass through.">الفتحة<span class="smart-term-tooltip"></span></span> ومستوى الصورة هي <b>البعد البؤري (focal length - f)</b>.</li></ul></template>
+    <template class="content-en"><p>To design a camera from scratch, putting film in front of an object won't work as rays scatter. The solution is adding a barrier to block most rays, leaving a small opening (<span class="smart-term" data-term-en="Aperture" data-ar="الفتحة" data-en-def="The opening in a camera barrier that allows light to pass through.">Aperture<span class="smart-term-tooltip"></span></span>).</p><p>In the Pinhole model:</p><ul><li>It captures a pencil of rays passing through a single point called the <b><span class="smart-term" data-term-en="Center of Projection" data-ar="مركز الإسقاط" data-en-def="The single point through which all light rays pass in a pinhole camera model.">Center of Projection<span class="smart-term-tooltip"></span></span> (focal point)</b>.</li><li>The image is formed on the <b>Image Plane</b>.</li><li>The distance between the pinhole and the image plane is the <b>focal length (f)</b>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا لا نجعل الفتحة صغيرة قدر الإمكان للحصول على أقصى وضوح؟</p><p>تصغير الفتحة يقلل من التمويه، ولكن له عيبان رئيسيان:</p><ol><li><strong>أولاً</strong>، يقلل كمية الضوء التي تمر، مما يتطلب وقت تعريض أطول.</li><li><strong>ثانياً</strong>، إذا أصبحت الفتحة صغيرة جداً، تبدأ تأثيرات <b>الحيود (Diffraction)</b> في الظهور، مما يؤدي إلى تشويش الصورة بدلاً من توضيحها.</li></ol></template>
+    <template class="content-en"><p>Why not make the aperture as small as possible for maximum sharpness?</p><p>Shrinking the aperture reduces blurring, but has two main drawbacks:</p><ol><li><strong>First</strong>, less light gets through, requiring longer exposure.</li><li><strong>Second</strong>, if the aperture becomes too small, <b>Diffraction</b> effects occur, which actually blurs the image instead of sharpening it.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[2]: SVG diagram of a pinhole camera. Show a 3D object (e.g., a tree), a barrier with a small pinhole (labeled 'c' for center of projection), and the inverted virtual image on the image plane. Label the focal length 'f'. Style: educational, dark background #0d1117, accent color #ff0055, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead for main rays -->
+        <marker id="ray-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 2 L 8 5 L 0 8 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Optical Axis -->
+    <line x1="20" y1="200" x2="780" y2="200" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="6,6" />
+
+    <!-- Scattered Rays (Blocked by Barrier) -->
+    <g stroke="var(--brand-400)" stroke-width="1.5" opacity="0.3" stroke-dasharray="4,4">
+        <!-- From Top of Object -->
+        <line x1="100" y1="100" x2="346" y2="60" />
+        <line x1="100" y1="100" x2="346" y2="130" />
+        <line x1="100" y1="100" x2="346" y2="270" />
+        <line x1="100" y1="100" x2="346" y2="340" />
+        <!-- From Bottom of Object -->
+        <line x1="100" y1="300" x2="346" y2="60" />
+        <line x1="100" y1="300" x2="346" y2="130" />
+        <line x1="100" y1="300" x2="346" y2="270" />
+        <line x1="100" y1="300" x2="346" y2="340" />
+    </g>
+
+    <!-- Main Rays (Passing through Pinhole) -->
+    <g stroke="var(--brand-500)" stroke-width="2">
+        <!-- Top Ray -->
+        <line x1="100" y1="100" x2="350" y2="200" marker-end="url(#ray-arrow)" />
+        <line x1="350" y1="200" x2="600" y2="300" marker-end="url(#ray-arrow)" />
+        <!-- Bottom Ray -->
+        <line x1="100" y1="300" x2="350" y2="200" marker-end="url(#ray-arrow)" />
+        <line x1="350" y1="200" x2="600" y2="100" marker-end="url(#ray-arrow)" />
+    </g>
+
+    <!-- Barrier with Pinhole -->
+    <!-- Top Half -->
+    <rect x="346" y="40" width="8" height="155" rx="3" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <!-- Bottom Half -->
+    <rect x="346" y="205" width="8" height="155" rx="3" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <!-- Center of Projection (Pinhole Dot) -->
+    <circle cx="350" cy="200" r="3" fill="var(--brand-500)" />
+
+    <!-- Image Plane -->
+    <rect x="596" y="40" width="8" height="320" rx="3" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+
+    <!-- Object (Upright Tree) -->
+    <g>
+        <!-- Trunk -->
+        <rect x="92" y="270" width="16" height="30" rx="2" fill="var(--bg-elevated)" stroke="var(--text-primary)" stroke-width="2" />
+        <!-- Leaves (Bottom to Top) -->
+        <polygon points="100,180 50,270 150,270" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+        <polygon points="100,140 60,220 140,220" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+        <polygon points="100,100 70,170 130,170" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" stroke-linejoin="round" />
+    </g>
+
+    <!-- Inverted Image (Upside-down Tree) -->
+    <g>
+        <!-- Trunk -->
+        <rect x="592" y="100" width="16" height="30" rx="2" fill="var(--brand-500)" />
+        <!-- Leaves (Top to Bottom visually, drawn inverted) -->
+        <polygon points="600,220 550,130 650,130" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" stroke-linejoin="round" />
+        <polygon points="600,260 560,180 640,180" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" stroke-linejoin="round" />
+        <polygon points="600,300 570,230 630,230" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" stroke-linejoin="round" />
+    </g>
+
+    <!-- Focal Length Dimension -->
+    <g stroke="var(--text-secondary)" stroke-width="1.5">
+        <line x1="350" y1="360" x2="600" y2="360" />
+        <line x1="350" y1="355" x2="350" y2="365" stroke-width="2" />
+        <line x1="600" y1="355" x2="600" y2="365" stroke-width="2" />
+    </g>
+
+    <!-- Labels -->
+    <!-- Object -->
+    <text x="100" y="60" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-weight="bold" font-size="16">Object</text>
+    <text x="100" y="60" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-weight="bold" font-size="16">الكائن</text>
+
+    <!-- Barrier -->
+    <text x="350" y="25" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-weight="bold" font-size="16">Barrier</text>
+    <text x="350" y="25" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-weight="bold" font-size="16">حاجز</text>
+
+    <!-- Image Plane -->
+    <text x="600" y="25" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-weight="bold" font-size="16">Image Plane</text>
+    <text x="600" y="25" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-weight="bold" font-size="16">مستوى الصورة</text>
+
+    <!-- Inverted Image -->
+    <text x="720" y="205" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-weight="bold" font-size="16">Inverted Image</text>
+    <text x="720" y="205" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-weight="bold" font-size="16">صورة مقلوبة</text>
+
+    <!-- Aperture (Pinhole) -->
+    <text x="350" y="245" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14">Aperture (Pinhole)</text>
+    <text x="350" y="245" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14">ثقب (فتحة)</text>
+
+    <!-- Center of Projection -->
+    <text x="350" y="175" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="14" font-weight="bold">Center of Projection (c)</text>
+    <text x="350" y="175" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="14" font-weight="bold">مركز الإسقاط (c)</text>
+
+    <!-- Focal Length (f) -->
+    <text x="475" y="350" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="14" font-weight="bold">Focal Length (f)</text>
+    <text x="475" y="350" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="14" font-weight="bold">البعد البؤري (f)</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو التأثير المباشر لزيادة البعد البؤري (f) في كاميرا ذات ثقب على الصورة المتكونة؟</template>
+      <template class="content-en">What is the direct effect of increasing the focal length (f) in a pinhole camera on the formed image?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>زيادة البعد البؤري تؤدي إلى تكبير الصورة (Zoom in) وتضييق مجال الرؤية (FOV).</p></template>
+      <template class="content-en"><p>Increasing the focal length magnifies the image (Zoom in) and narrows the Field of View (FOV).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="projection-geometry" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> هندسة الإسقاط ونقاط التلاشي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Projection Geometry and Vanishing Points</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عملية تحويل العالم ثلاثي الأبعاد إلى صورة ثنائية الأبعاد تفقدنا معلومات العمق والزوايا، وتجعل الخطوط المتوازية تبدو وكأنها تلتقي في نقطة بعيدة.</p></template>
+    <template class="content-en"><p>Converting a 3D world into a 2D image loses depth and angle information, causing parallel lines to appear to meet at a distant point.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الإسقاط هو آلة لتقليل الأبعاد (من 3D إلى 2D). في هذه العملية، نفقد الزوايا والمسافات (الأطوال). الحجم يصبح متناسباً عكسياً مع المسافة (الأشياء البعيدة تبدو أصغر).</p><p><b>خصائص الإسقاط:</b></p><ul><li>علاقة متعدد إلى واحد (Many-to-one): أي نقاط على نفس الشعاع تسقط على نفس النقطة في الصورة.</li><li>النقاط تسقط كنقاط، والخطوط كخطوط (يتم الحفاظ على الاستقامة).</li><li>المستويات تسقط كمستويات أو أنصاف مستويات.</li></ul><p><b>نقاط التلاشي (Vanishing Points):</b> الخطوط المتوازية في العالم الحقيقي تتقاطع في الصورة عند <span class="smart-term" data-term-en="Vanishing Point" data-ar="نقطة التلاشي" data-en-def="The point in the image plane where parallel lines in 3D space appear to intersect.">نقطة التلاشي<span class="smart-term-tooltip"></span></span>. كل اتجاه في الفضاء له نقطة تلاشي خاصة به. مجموعة الخطوط المتوازية على نفس المستوى تؤدي إلى نقاط تلاشي تقع على خط واحد يسمى <b><span class="smart-term" data-term-en="Vanishing Line" data-ar="خط التلاشي" data-en-def="The line formed by collinear vanishing points of parallel lines on the same plane (e.g., the horizon).">خط التلاشي<span class="smart-term-tooltip"></span></span> (Vanishing Line)</b> أو الأفق.</p></template>
+    <template class="content-en"><p>Projection is a dimensionality reduction machine (3D to 2D). We lose angles and distances (lengths). Size is inversely proportional to distance (distant objects are smaller).</p><p><b>Projection Properties:</b></p><ul><li>Many-to-one: any points along the same ray map to the same point in the image.</li><li>Points project to points, lines to lines (collinearity is preserved).</li><li>Planes project to planes (or half-planes).</li></ul><p><b><span class="smart-term" data-term-en="Vanishing Point" data-ar="نقطة التلاشي" data-en-def="The point in the image plane where parallel lines in 3D space appear to intersect.">Vanishing Point<span class="smart-term-tooltip"></span></span>s:</b> Parallel lines in the world intersect in the image at a vanishing point. Each direction in space has its own vanishing point. Sets of parallel lines on the same plane lead to collinear vanishing points, forming the <b><span class="smart-term" data-term-en="Vanishing Line" data-ar="خط التلاشي" data-en-def="The line formed by collinear vanishing points of parallel lines on the same plane (e.g., the horizon).">Vanishing Line<span class="smart-term-tooltip"></span></span> (horizon)</b>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الاستثناء الوحيد لقاعدة تقاطع الخطوط المتوازية هو الخطوط الموازية لمستوى الصورة؛ فهذه الخطوط تظل متوازية حتى بعد الإسقاط.</p><p>تُستخدم نقاط التلاشي بشكل فعال في التحليل الجنائي للصور لاكتشاف الصور المزيفة، حيث أن التلاعب بالصورة غالباً ما يفسد التوافق الهندسي لنقاط التلاشي والمنظور.</p></template>
+    <template class="content-en"><p>The only exception to the converging parallel lines rule is parallels that are parallel to the image plane; these remain parallel after projection.</p><p>Vanishing points are effectively used in image forensics to spot faked images, as manipulation often breaks the geometric consistency of perspective and vanishing points.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: SVG diagram showing perspective projection. Draw a 3D cube projecting onto a 2D image plane. Show parallel lines of the cube converging to a single vanishing point on the horizon line in the 2D plane. Style: educational, dark background #0d1117, accent colors #00ffcc and #ff0055, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+  <defs>
+    <!-- Arrowhead for standard pointers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-secondary)" />
+    </marker>
+    <!-- Arrowhead for brand-colored pointers -->
+    <marker id="arrow-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Perspective Projection</text>
+  <text x="400" y="35" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الإسقاط المنظوري</text>
+  
+  <text x="400" y="60" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-en">3D to 2D Dimensionality Reduction</text>
+  <text x="400" y="60" text-anchor="middle" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">تقليل الأبعاد من ثلاثي إلى ثنائي الأبعاد</text>
+
+  <!-- ========================================== -->
+  <!-- PROJECTION RAYS (Eye to 3D Cube)           -->
+  <!-- ========================================== -->
+  <line x1="80" y1="250" x2="680" y2="250" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.6" />
+  <line x1="80" y1="250" x2="755" y2="225" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.6" />
+  <line x1="80" y1="250" x2="755" y2="325" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.6" />
+  <line x1="80" y1="250" x2="680" y2="350" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="5 5" opacity="0.6" />
+
+  <!-- ========================================== -->
+  <!-- 3D CUBE (In the World)                     -->
+  <!-- ========================================== -->
+  <!-- Back Face (Dashed) -->
+  <polygon points="750,190 795,175 795,235 750,250" fill="none" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="4 4" />
+  <!-- Connecting Edges -->
+  <line x1="680" y1="250" x2="750" y2="190" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="4 4" />
+  <line x1="755" y1="225" x2="795" y2="175" stroke="var(--text-secondary)" stroke-width="1.5" stroke-dasharray="4 4" />
+  <line x1="755" y1="325" x2="795" y2="235" stroke="var(--text-secondary)" stroke-width="1.5" />
+  <line x1="680" y1="350" x2="750" y2="250" stroke="var(--text-secondary)" stroke-width="1.5" />
+  <!-- Front Face -->
+  <polygon points="680,250 755,225 755,325 680,350" fill="var(--bg-surface)" opacity="0.9" stroke="var(--text-primary)" stroke-width="2" />
+
+  <!-- ========================================== -->
+  <!-- IMAGE PLANE                                -->
+  <!-- ========================================== -->
+  <!-- Plane Polygon -->
+  <polygon points="300,100 450,50 450,350 300,400" fill="var(--bg-elevated)" opacity="0.85" stroke="var(--brand-400)" stroke-width="2" />
+  
+  <!-- Horizon Line -->
+  <line x1="300" y1="220" x2="450" y2="170" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="8 4" />
+  
+  <!-- ========================================== -->
+  <!-- PROJECTED 2D CUBE (On Image Plane)         -->
+  <!-- ========================================== -->
+  <!-- Back Face -->
+  <polygon points="348,226 366,220 366,244 348,250" fill="none" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="3 3" />
+  <!-- Connecting Edges -->
+  <line x1="320" y1="250" x2="348" y2="226" stroke="var(--brand-500)" stroke-width="1.5" />
+  <line x1="350" y1="240" x2="366" y2="220" stroke="var(--brand-500)" stroke-width="1.5" />
+  <line x1="350" y1="280" x2="366" y2="244" stroke="var(--brand-500)" stroke-width="1.5" />
+  <line x1="320" y1="290" x2="348" y2="250" stroke="var(--brand-500)" stroke-width="1.5" />
+  <!-- Front Face -->
+  <polygon points="320,250 350,240 350,280 320,290" fill="var(--brand-500)" fill-opacity="0.15" stroke="var(--brand-500)" stroke-width="2" />
+
+  <!-- Receding Lines to Vanishing Point -->
+  <line x1="348" y1="226" x2="390" y2="190" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="3 3" />
+  <line x1="366" y1="220" x2="390" y2="190" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="3 3" />
+  <line x1="366" y1="244" x2="390" y2="190" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="3 3" />
+  <line x1="348" y1="250" x2="390" y2="190" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="3 3" />
+
+  <!-- Vanishing Point -->
+  <circle cx="390" cy="190" r="5" fill="var(--brand-500)" />
+  <circle cx="390" cy="190" r="10" fill="none" stroke="var(--brand-500)" stroke-width="1.5" opacity="0.6" />
+
+  <!-- ========================================== -->
+  <!-- EYE (Center of Projection)                 -->
+  <!-- ========================================== -->
+  <path d="M 50 250 Q 80 220 110 250 Q 80 280 50 250 Z" fill="var(--bg-surface)" stroke="var(--text-primary)" stroke-width="2" />
+  <circle cx="80" cy="250" r="5" fill="var(--text-primary)" />
+
+  <!-- ========================================== -->
+  <!-- MANY-TO-ONE CONCEPT POINTS                 -->
+  <!-- ========================================== -->
+  <circle cx="500" cy="250" r="4" fill="var(--text-primary)" />
+  <circle cx="680" cy="250" r="4" fill="var(--text-primary)" />
+  <circle cx="320" cy="250" r="4" fill="var(--brand-500)" />
+  
+  <text x="500" y="240" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-primary)">P1</text>
+  <text x="695" y="240" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-primary)">P2</text>
+  
+  <path d="M 590 275 L 500 260" stroke="var(--text-secondary)" stroke-width="1" marker-end="url(#arrow)" />
+  <path d="M 590 275 L 675 260" stroke="var(--text-secondary)" stroke-width="1" marker-end="url(#arrow)" />
+  
+  <text x="590" y="295" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Many-to-one: P1 &amp; P2 map to same point</text>
+  <text x="590" y="295" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">علاقة متعدد إلى واحد: P1 و P2 يُسقطان على نفس النقطة</text>
+
+  <!-- ========================================== -->
+  <!-- LABELS & ANNOTATIONS                       -->
+  <!-- ========================================== -->
+  
+  <!-- Eye Label -->
+  <text x="80" y="300" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Center of Projection</text>
+  <text x="80" y="300" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مركز الإسقاط</text>
+  <text x="80" y="320" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Camera / Eye)</text>
+  <text x="80" y="320" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(الكاميرا / العين)</text>
+
+  <!-- Image Plane Label -->
+  <text x="375" y="80" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Image Plane (2D)</text>
+  <text x="375" y="80" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مستوى الصورة (ثنائي الأبعاد)</text>
+
+  <!-- 3D Object Label -->
+  <text x="717" y="385" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">3D Object in World</text>
+  <text x="717" y="385" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">كائن ثلاثي الأبعاد في العالم</text>
+
+  <!-- Projected Object Label -->
+  <text x="335" y="335" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Projected 2D Shape</text>
+  <text x="335" y="335" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">الشكل ثنائي الأبعاد المُسقط</text>
+
+  <!-- Horizon Line Label -->
+  <text x="210" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Horizon Line</text>
+  <text x="210" y="185" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">خط الأفق</text>
+  <path d="M 260 180 L 310 196" stroke="var(--text-secondary)" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <!-- Vanishing Point Label -->
+  <text x="560" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Vanishing Point</text>
+  <text x="560" y="120" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">نقطة التلاشي</text>
+  <text x="560" y="140" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Parallel lines in 3D converge here</text>
+  <text x="560" y="140" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">الخطوط المتوازية في البعد الثالث تتلاقى هنا</text>
+  <path d="M 460 135 Q 420 140 398 175" fill="none" stroke="var(--brand-500)" stroke-width="1.5" marker-end="url(#arrow-brand)" />
+
+  <!-- Projection Rays Label -->
+  <text x="200" y="360" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Projection Rays</text>
+  <text x="200" y="360" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">أشعة الإسقاط</text>
+  <path d="M 200 340 L 200 290" stroke="var(--text-secondary)" stroke-width="1" marker-end="url(#arrow)" />
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا التقطت صورة لجدار قرميد وكنت تقف موازياً تماماً للجدار، أين ستكون نقاط التلاشي لخطوط القرميد الأفقية والعمودية؟</template>
+      <template class="content-en">If you take a picture of a brick wall standing perfectly parallel to it, where will the vanishing points for the horizontal and vertical brick lines be?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لن تتقاطع في الصورة؛ ستكون نقاط التلاشي في اللانهاية لأن الخطوط موازية لمستوى الصورة.</p></template>
+      <template class="content-en"><p>They will not intersect in the image; the vanishing points will be at infinity because the lines are parallel to the image plane.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="homogeneous-coordinates" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> الإحداثيات المتجانسة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Homogeneous Coordinates</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>حيلة رياضية تضيف بُعداً إضافياً للإحداثيات، مما يسمح بتمثيل النقاط في اللانهاية وإجراء عمليات الإزاحة كعمليات ضرب مصفوفات.</p></template>
+    <template class="content-en"><p>A mathematical trick adding an extra dimension to coordinates, allowing representation of points at infinity and performing translations as matrix multiplications.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحويل إحداثيات ديكارتية (Cartesian) إلى متجانسة، نضيف 1 كبُعد أخير:</p><ul><li>الصورة (2D): $(x, y) \rightarrow (x, y, 1)$</li><li>المشهد (3D): $(x, y, z) \rightarrow (x, y, z, 1)$</li></ul><p>للتحويل العكسي من متجانسة إلى ديكارتية، نقسم على البُعد الأخير (w):</p><ul><li>$(x, y, w) \rightarrow (x/w, y/w)$</li></ul><p><b>الخصائص:</b></p><ul><li><b>ثبات المقياس (Invariant to scaling):</b> النقطة $(x, y, w)$ هي نفسها $(kx, ky, kw)$. النقطة في النظام الديكارتي تمثل شعاعاً في النظام المتجانس.</li><li><b>تقاطع الخطوط المتوازية:</b> في النظام المتجانس، تتقاطع الخطوط المتوازية عند <span class="smart-term" data-term-en="Point at Infinity" data-ar="نقطة في اللانهاية" data-en-def="A point represented in homogeneous coordinates with the last element as zero (w=0), indicating a direction.">نقطة في اللانهاية<span class="smart-term-tooltip"></span></span>، والتي تُمثل بجعل الإحداثي الأخير $w=0$ (مثال: $(1, 1, 0)$).</li></ul></template>
+    <template class="content-en"><p>To convert Cartesian coordinates to homogeneous, append a 1 as the last dimension:</p><ul><li>Image (2D): $(x, y) \rightarrow (x, y, 1)$</li><li>Scene (3D): $(x, y, z) \rightarrow (x, y, z, 1)$</li></ul><p>To convert back from homogeneous to Cartesian, divide by the last coordinate (w):</p><ul><li>$(x, y, w) \rightarrow (x/w, y/w)$</li></ul><p><b>Properties:</b></p><ul><li><b>Invariant to scaling:</b> $(x, y, w)$ is the same point as $(kx, ky, kw)$. A point in Cartesian is a ray in Homogeneous.</li><li><b>Intersection of parallel lines:</b> In <span class="smart-term" data-term-en="Homogeneous Coordinates" data-ar="الإحداثيات المتجانسة" data-en-def="A coordinate system used in projective geometry that represents N-dimensional points with N+1 coordinates.">homogeneous coordinates<span class="smart-term-tooltip"></span></span>, parallel lines intersect at a <span class="smart-term" data-term-en="Point at Infinity" data-ar="نقطة في اللانهاية" data-en-def="A point represented in homogeneous coordinates with the last element as zero (w=0), indicating a direction.">point at infinity<span class="smart-term-tooltip"></span></span>, represented by setting the last coordinate $w=0$ (e.g., $(1, 1, 0)$).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الهندسة الأساسية تصبح أنيقة جداً باستخدام <span class="smart-term" data-term-en="Homogeneous Coordinates" data-ar="الإحداثيات المتجانسة" data-en-def="A coordinate system used in projective geometry that represents N-dimensional points with N+1 coordinates.">الإحداثيات المتجانسة<span class="smart-term-tooltip"></span></span>. معادلة الخط $ax + by + c = 0$ يمكن تمثيلها كمتجه $l = [a, b, c]^T$.</p><p>يُعطى الخط المار بنقطتين من خلال حاصل الضرب الاتجاهي (Cross Product) للنقطتين: $line = p_i \times p_j$. وبالمثل، يُعطى تقاطع خطين من خلال حاصل الضرب الاتجاهي للخطين: $point = l_i \times l_j$.</p></template>
+    <template class="content-en"><p>Basic geometry becomes very elegant using homogeneous coordinates. The line equation $ax + by + c = 0$ can be represented as a vector $l = [a, b, c]^T$.</p><p>A line given by two points is their cross product: $line = p_i \times p_j$. Similarly, the intersection of two lines is given by their cross product: $point = l_i \times l_j$.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>التحويل من الإحداثيات المتجانسة إلى الديكارتية.</strong></template>
+      <template class="content-en"><strong>Conversion from homogeneous to Cartesian coordinates.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\begin{bmatrix} x \\ y \\ w \end{bmatrix} \Rightarrow (x/w, y/w)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا تمثل النقطة المتجانسة (0, 0, 0)؟</template>
+      <template class="content-en">What does the homogeneous point (0, 0, 0) represent?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا تمثل أي نقطة صالحة في الفضاء الإسقاطي؛ الإحداثيات المتجانسة لا يمكن أن تكون كلها أصفاراً.</p></template>
+      <template class="content-en"><p>It does not represent any valid point in projective space; homogeneous coordinates cannot be all zeros.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="camera-projection-matrix" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> مصفوفة إسقاط الكاميرا</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Camera Projection Matrix</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مصفوفة رياضية تربط إحداثيات العالم ثلاثي الأبعاد بإحداثيات البكسل ثنائية الأبعاد في الصورة، وتتكون من معلمات داخلية وخارجية.</p></template>
+    <template class="content-en"><p>A mathematical matrix linking 3D world coordinates to 2D pixel coordinates in the image, consisting of intrinsic and extrinsic parameters.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>المعادلة الأساسية هي: $x = K[R | t]X$</p><ul><li><b>$X$:</b> إحداثيات العالم (3D المتجانسة).</li><li><b>$x$:</b> إحداثيات الصورة (2D المتجانسة).</li><li><b>$K$ (<span class="smart-term" data-term-en="Intrinsic Matrix" data-ar="المصفوفة الداخلية" data-en-def="Matrix K containing internal camera parameters like focal length and principal point.">المصفوفة الداخلية<span class="smart-term-tooltip"></span></span> - Intrinsic Matrix):</b> مصفوفة $3 \times 3$ تحتوي على معلمات الكاميرا الداخلية (البعد البؤري $f_x, f_y$، نقطة المركز $u_0, v_0$، ومعامل الانحراف $s$). لها 5 درجات حرية.</li><li><b>$[R | t]$ (<span class="smart-term" data-term-en="Extrinsic Parameters" data-ar="المعلمات الخارجية" data-en-def="Rotation and translation matrices defining the camera&#x27;s pose in the world.">المعلمات الخارجية<span class="smart-term-tooltip"></span></span> - Extrinsic Parameters):</b> تصف موقع الكاميرا واتجاهها في العالم. $R$ هي مصفوفة دوران $3 \times 3$، و $t$ هو متجه إزاحة $3 \times 1$. لها 6 درجات حرية.</li></ul></template>
+    <template class="content-en"><p>The fundamental equation is: $x = K[R | t]X$</p><ul><li><b>$X$:</b> World coordinates (3D homogeneous).</li><li><b>$x$:</b> Image coordinates (2D homogeneous).</li><li><b>$K$ (<span class="smart-term" data-term-en="Intrinsic Matrix" data-ar="المصفوفة الداخلية" data-en-def="Matrix K containing internal camera parameters like focal length and principal point.">Intrinsic Matrix<span class="smart-term-tooltip"></span></span>):</b> A $3 \times 3$ matrix containing internal camera parameters (focal lengths $f_x, f_y$, principal point $u_0, v_0$, and skew $s$). It has 5 degrees of freedom.</li><li><b>$[R | t]$ (<span class="smart-term" data-term-en="Extrinsic Parameters" data-ar="المعلمات الخارجية" data-en-def="Rotation and translation matrices defining the camera&#x27;s pose in the world.">Extrinsic Parameters<span class="smart-term-tooltip"></span></span>):</b> Describes the camera's position and orientation in the world. $R$ is a $3 \times 3$ rotation matrix, and $t$ is a $3 \times 1$ translation vector. It has 6 degrees of freedom.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في البداية، نفترض افتراضات مبسطة: بكسلات مربعة (نسبة العرض إلى الارتفاع 1)، المركز البصري عند (0,0)، ولا يوجد انحراف (No skew). ثم نقوم بإزالة هذه الافتراضات تدريجياً لنمذجة الكاميرات الحقيقية.</p><p>نقطة التلاشي هي نتيجة إسقاط اتجاه (نقطة في اللانهاية $w=0$) على مستوى الصورة. بضرب المصفوفة $K R$ في متجه الاتجاه، نحصل على إحداثيات نقطة التلاشي في الصورة.</p></template>
+    <template class="content-en"><p>Initially, we make simplifying assumptions:</p><ul><li>square pixels (unit aspect ratio),</li><li>optical center at (0,0), and</li><li>no skew.</li></ul><p>We progressively remove these assumptions to model real-world cameras.</p><p>A vanishing point is the result of projecting a direction (a point at infinity $w=0$) onto the image plane. Multiplying the matrix $K R$ by the direction vector gives the vanishing point coordinates in the image.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة إسقاط الكاميرا الكاملة.</strong></template>
+      <template class="content-en"><strong>The full camera projection equation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$x = K [R | t] X$$</div>
+  </div>
+
+  <!-- DIAGRAM[4]: SVG diagram illustrating the Camera Projection Matrix components. Show a World Coordinate System (Ow), a Camera Coordinate System (Oc), and an Image Plane. Draw an arrow labeled [R|t] (Extrinsics) from World to Camera, and an arrow labeled K (Intrinsics) from Camera to Image Plane. Style: educational, dark background #0d1117, accent colors #00ffcc and #ffaa00, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+  <defs>
+    <!-- Arrowhead for axes -->
+    <marker id="arrow-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+    <!-- Arrowhead for transformation arrows -->
+    <marker id="arrow-brand" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Title -->
+  <text x="400" y="30" class="gsvg-en" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)">Camera Projection Matrix</text>
+  <text x="400" y="30" class="gsvg-ar" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)">مصفوفة الإسقاط للكاميرا</text>
+
+  <!-- Main Diagram Group (Translated down to make room for title) -->
+  <g transform="translate(0, 20)">
+    
+    <!-- Fundamental Equation Box -->
+    <rect x="250" y="15" width="300" height="45" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="400" y="45" text-anchor="middle" font-size="22" font-family="math, 'Times New Roman', serif" font-style="italic">
+      <tspan fill="var(--text-primary)">x = </tspan>
+      <tspan fill="var(--brand-ink)">K</tspan>
+      <tspan fill="var(--text-primary)"> </tspan>
+      <tspan fill="var(--brand-ink-strong)">[R | t]</tspan>
+      <tspan fill="var(--text-primary)"> X</tspan>
+    </text>
+
+    <!-- ========================================== -->
+    <!-- TRANSFORMATION ARROWS                      -->
+    <!-- ========================================== -->
+    
+    <!-- World to Camera (Extrinsics) -->
+    <path d="M 140 140 Q 260 80 380 140" fill="none" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow-brand)" />
+    <text x="260" y="65" class="gsvg-en" text-anchor="middle" fill="var(--brand-ink-strong)" font-weight="bold" font-size="15">Extrinsics [R | t]</text>
+    <text x="260" y="65" class="gsvg-ar" text-anchor="middle" fill="var(--brand-ink-strong)" font-weight="bold" font-size="15">المعلمات الخارجية [R | t]</text>
+    <text x="260" y="85" class="gsvg-en" text-anchor="middle" fill="var(--text-secondary)" font-size="13">6 Degrees of Freedom</text>
+    <text x="260" y="85" class="gsvg-ar" text-anchor="middle" fill="var(--text-secondary)" font-size="13">6 درجات حرية</text>
+
+    <!-- Camera to Image Plane (Intrinsics) -->
+    <path d="M 420 140 Q 535 80 650 140" fill="none" stroke="var(--brand-500)" stroke-width="2.5" marker-end="url(#arrow-brand)" />
+    <text x="535" y="65" class="gsvg-en" text-anchor="middle" fill="var(--brand-ink)" font-weight="bold" font-size="15">Intrinsics K</text>
+    <text x="535" y="65" class="gsvg-ar" text-anchor="middle" fill="var(--brand-ink)" font-weight="bold" font-size="15">المعلمات الداخلية K</text>
+    <text x="535" y="85" class="gsvg-en" text-anchor="middle" fill="var(--text-secondary)" font-size="13">5 Degrees of Freedom</text>
+    <text x="535" y="85" class="gsvg-ar" text-anchor="middle" fill="var(--text-secondary)" font-size="13">5 درجات حرية</text>
+
+
+    <!-- ========================================== -->
+    <!-- WORLD COORDINATE SYSTEM (Left)             -->
+    <!-- ========================================== -->
+    <g id="world-system">
+      <!-- Axes -->
+      <line x1="120" y1="320" x2="120" y2="220" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+      <line x1="120" y1="320" x2="220" y2="320" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+      <line x1="120" y1="320" x2="60" y2="380" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+      
+      <!-- Axis Labels -->
+      <text x="110" y="215" fill="var(--text-muted)" font-size="14" font-family="math, serif" font-style="italic">Z<tspan baseline-shift="sub" font-size="10">w</tspan></text>
+      <text x="225" y="325" fill="var(--text-muted)" font-size="14" font-family="math, serif" font-style="italic">Y<tspan baseline-shift="sub" font-size="10">w</tspan></text>
+      <text x="45" y="390" fill="var(--text-muted)" font-size="14" font-family="math, serif" font-style="italic">X<tspan baseline-shift="sub" font-size="10">w</tspan></text>
+      
+      <!-- Origin Label -->
+      <text x="105" y="335" fill="var(--text-secondary)" font-size="14" font-family="math, serif" font-style="italic">O<tspan baseline-shift="sub" font-size="10">w</tspan></text>
+
+      <!-- 3D Point X -->
+      <path d="M 160 190 L 160 290 L 120 320" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4,4" opacity="0.6" />
+      <circle cx="160" cy="190" r="6" fill="var(--brand-500)" />
+      <text x="175" y="185" fill="var(--text-primary)" font-size="18" font-family="math, serif" font-style="italic" font-weight="bold">X</text>
+
+      <!-- Bottom Label -->
+      <text x="120" y="430" class="gsvg-en" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="15">World Coordinates (3D)</text>
+      <text x="120" y="430" class="gsvg-ar" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="15">إحداثيات العالم (3D)</text>
+    </g>
+
+
+    <!-- ========================================== -->
+    <!-- CAMERA COORDINATE SYSTEM (Middle)          -->
+    <!-- ========================================== -->
+    <g id="camera-system">
+      <!-- Camera Icon -->
+      <rect x="380" y="300" width="40" height="40" rx="4" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" />
+      <path d="M 420 310 L 440 300 L 440 340 L 420 330 Z" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" />
+
+      <!-- Axes -->
+      <!-- Z-axis (Principal Axis) passing through image plane -->
+      <line x1="440" y1="320" x2="750" y2="216" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+      <!-- X-axis -->
+      <line x1="400" y1="320" x2="480" y2="296" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+      <!-- Y-axis -->
+      <line x1="400" y1="320" x2="400" y2="400" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+      
+      <!-- Axis Labels -->
+      <text x="760" y="210" fill="var(--text-muted)" font-size="14" font-family="math, serif" font-style="italic">Z<tspan baseline-shift="sub" font-size="10">c</tspan></text>
+      <text x="490" y="305" fill="var(--text-muted)" font-size="14" font-family="math, serif" font-style="italic">X<tspan baseline-shift="sub" font-size="10">c</tspan></text>
+      <text x="410" y="410" fill="var(--text-muted)" font-size="14" font-family="math, serif" font-style="italic">Y<tspan baseline-shift="sub" font-size="10">c</tspan></text>
+
+      <!-- Origin Label -->
+      <text x="385" y="355" fill="var(--text-secondary)" font-size="14" font-family="math, serif" font-style="italic">O<tspan baseline-shift="sub" font-size="10">c</tspan></text>
+
+      <!-- Bottom Label -->
+      <text x="400" y="430" class="gsvg-en" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="15">Camera Coordinates (3D)</text>
+      <text x="400" y="430" class="gsvg-ar" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="15">إحداثيات الكاميرا (3D)</text>
+    </g>
+
+
+    <!-- ========================================== -->
+    <!-- IMAGE PLANE (Right)                        -->
+    <!-- ========================================== -->
+    <g id="image-plane">
+      <!-- Projection Line (Ray of light) -->
+      <line x1="440" y1="320" x2="650" y2="180" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="5,5" />
+
+      <!-- The 2D Plane -->
+      <polygon points="620,140 720,110 720,320 620,350" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" opacity="0.85" />
+
+      <!-- 2D Image Axes (u, v) -->
+      <line x1="620" y1="140" x2="680" y2="122" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-muted)" />
+      <line x1="620" y1="140" x2="620" y2="200" stroke="var(--text-muted)" stroke-width="1.5" marker-end="url(#arrow-muted)" />
+      <text x="685" y="115" fill="var(--text-muted)" font-size="14" font-family="math, serif" font-style="italic">u</text>
+      <text x="605" y="205" fill="var(--text-muted)" font-size="14" font-family="math, serif" font-style="italic">v</text>
+
+      <!-- Principal Point c -->
+      <circle cx="670" cy="243" r="3" fill="var(--text-muted)" />
+      <text x="670" y="260" text-anchor="middle" fill="var(--text-muted)" font-size="13" font-family="math, serif" font-style="italic">c (u₀, v₀)</text>
+
+      <!-- Projected 2D Point x -->
+      <circle cx="650" cy="180" r="5" fill="var(--brand-500)" />
+      <text x="635" y="175" fill="var(--text-primary)" font-size="18" font-family="math, serif" font-style="italic" font-weight="bold">x</text>
+
+      <!-- Bottom Label -->
+      <text x="670" y="430" class="gsvg-en" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="15">Image Plane (2D)</text>
+      <text x="670" y="430" class="gsvg-ar" text-anchor="middle" fill="var(--text-primary)" font-weight="bold" font-size="15">مستوى الصورة (2D)</text>
+    </g>
+
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمت بتدوير الكاميرا حول محورها البصري فقط، أي المعلمات ستتغير؟</template>
+      <template class="content-en">If you rotate the camera only around its optical axis, which parameters will change?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستتغير المصفوفة الخارجية (تحديداً مصفوفة الدوران R). المعلمات الداخلية K ستبقى ثابتة.</p></template>
+      <template class="content-en"><p>The extrinsic matrix (specifically the rotation matrix R) will change. Intrinsic parameters K remain constant.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="orthographic-projection" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> الإسقاط المتعامد والمنظور الضعيف</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Orthographic and Weak Perspective Projection</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>حالات خاصة من الإسقاط تفترض أن الكاميرا بعيدة جداً، مما يلغي تأثير تشوه المنظور ويحافظ على أحجام الأشياء بغض النظر عن عمقها.</p></template>
+    <template class="content-en"><p>Special cases of projection assuming the camera is infinitely far away, eliminating perspective distortion and preserving object sizes regardless of depth.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b><span class="smart-term" data-term-en="Orthographic Projection" data-ar="الإسقاط المتعامد" data-en-def="A form of parallel projection where projection lines are orthogonal to the projection plane.">الإسقاط المتعامد<span class="smart-term-tooltip"></span></span> (Orthographic Projection):</b></p><ul><li>حالة خاصة حيث تكون المسافة من مركز الإسقاط إلى مستوى الصورة لانهائية.</li><li>يُسمى أيضاً "الإسقاط الموازي".</li><li>لا يوجد تشوه منظوري: الأشياء تحتفظ بحجمها بغض النظر عن المسافة. الخطوط المتوازية تظل متوازية.</li><li>المصفوفة تسقط البُعد Z تماماً (الصف الثالث في المصفوفة هو أصفار باستثناء العنصر الأخير).</li></ul><p><b>الإسقاط المتعامد المصغر (Scaled Orthographic / Weak Perspective):</b></p><ul><li>يُستخدم عندما تكون أبعاد الكائن صغيرة مقارنة بمسافته عن الكاميرا.</li><li>يتم تطبيق عامل تحجيم (Scale factor) موحد على الصورة بدلاً من القسمة على عمق كل نقطة (Z).</li></ul></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Orthographic Projection" data-ar="الإسقاط المتعامد" data-en-def="A form of parallel projection where projection lines are orthogonal to the projection plane.">Orthographic Projection<span class="smart-term-tooltip"></span></span>:</b></p><ul><li>A special case where the distance from the Center of Projection to the image plane is infinite.</li><li>Also called "parallel projection".</li><li>No Perspective Distortion: Objects retain their size regardless of distance. Parallel lines remain parallel.</li><li>The matrix simply drops the Z dimension.</li></ul><p><b>Scaled Orthographic (<span class="smart-term" data-term-en="Weak Perspective" data-ar="المنظور الضعيف" data-en-def="Scaled orthographic projection used when depth variation of an object is small compared to its distance from the camera.">Weak Perspective<span class="smart-term-tooltip"></span></span>):</b></p><ul><li>Used when object dimensions are small compared to the distance to the camera.</li><li>Applies a uniform scale factor to the image instead of dividing by the depth (Z) of each point.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُستخدم الإسقاط المتعامد بشكل شائع في الرسومات الفنية والهندسية والخطط المعمارية حيث يكون الحفاظ على الأطوال النسبية والتوازي أهم من الواقعية البصرية.</p><p>في <span class="smart-term" data-term-en="Weak Perspective" data-ar="المنظور الضعيف" data-en-def="Scaled orthographic projection used when depth variation of an object is small compared to its distance from the camera.">المنظور الضعيف<span class="smart-term-tooltip"></span></span>، نفترض أن جميع نقاط الكائن تقع تقريباً على نفس العمق $Z_0$، لذا نستبدل القسمة على $Z$ المتغير بالضرب في مقياس ثابت $s = f / Z_0$.</p></template>
+    <template class="content-en"><p>Orthographic projection is commonly used in technical/engineering drawings and architectural plans where preserving relative lengths and parallelism is more important than visual realism.</p><p>In weak perspective, we assume all points of the object are at roughly the same depth $Z_0$, so we replace division by variable $Z$ with multiplication by a constant scale $s = f / Z_0$.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل تمتلك الصور الملتقطة بإسقاط متعامد نقاط تلاشي؟</template>
+      <template class="content-en">Do images captured with orthographic projection have vanishing points?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لأن الخطوط المتوازية في 3D تظل متوازية في 2D ولا تتقاطع أبداً في الصورة المتعامدة.</p></template>
+      <template class="content-en"><p>No, because parallel lines in 3D remain parallel in 2D and never intersect in an orthographic image.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="lenses-and-dof" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> العدسات وعمق المجال</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Lenses and Depth of Field</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم العدسات لجمع المزيد من الضوء مقارنة بالثقب الصغير، ولكنها تجعل التركيز مقتصراً على مسافة معينة تُعرف بعمق المجال.</p></template>
+    <template class="content-en"><p>Lenses are used to gather more light than a pinhole, but they restrict sharp focus to a specific distance range known as Depth of Field.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>معادلة العدسة الرقيقة (Thin Lens Equation):</b> $\frac{1}{d_o} + \frac{1}{d_i} = \frac{1}{f}$ حيث $d_o$ مسافة الكائن، $d_i$ مسافة الصورة، و $f$ البعد البؤري. أي نقطة تحقق هذه المعادلة تكون "في التركيز" (In focus).</p><p><b><span class="smart-term" data-term-en="Depth of Field" data-ar="عمق المجال" data-en-def="The distance between the nearest and farthest objects in a scene that appear acceptably sharp in an image.">عمق المجال<span class="smart-term-tooltip"></span></span> (Depth of Field - DOF):</b> هو نطاق المسافة داخل المشهد الذي يظهر حاداً ومقبولاً. النقاط خارج هذا النطاق تسقط كـ "دائرة تشوش" (Circle of confusion).</p><p><b>التحكم في عمق المجال:</b></p><ul><li><b>فتحة صغيرة (Small Aperture):</b> تزيد من عمق المجال (DOF كبير)، لكنها تقلل الضوء.</li><li><b>فتحة كبيرة (Large Aperture):</b> تقلل من عمق المجال (DOF صغير)، وتسمح بدخول ضوء أكثر.</li></ul><p><b><span class="smart-term" data-term-en="Field of View" data-ar="مجال الرؤية" data-en-def="The extent of the observable world that is seen at any given moment through the camera.">مجال الرؤية<span class="smart-term-tooltip"></span></span> (Field of View - FOV):</b> يعتمد على البعد البؤري وحجم مستشعر الكاميرا. البعد البؤري الأكبر (Zoom) يعطي مجال رؤية أصغر.</p></template>
+    <template class="content-en"><p><b>Thin Lens Equation:</b> $\frac{1}{d_o} + \frac{1}{d_i} = \frac{1}{f}$ where $d_o$ is object distance, $d_i$ is image distance, and $f$ is focal length. Any point satisfying this is "in focus".</p><p><b><span class="smart-term" data-term-en="Depth of Field" data-ar="عمق المجال" data-en-def="The distance between the nearest and farthest objects in a scene that appear acceptably sharp in an image.">Depth of Field<span class="smart-term-tooltip"></span></span> (DOF):</b> The range of distance within a scene that appears acceptably sharp. Points outside this project to a "<span class="smart-term" data-term-en="Circle of Confusion" data-ar="دائرة التشوش" data-en-def="An optical spot caused by a cone of light rays from a lens not coming to a perfect focus.">circle of confusion<span class="smart-term-tooltip"></span></span>".</p><p><b>Controlling DOF:</b></p><ul><li><b>Small Aperture:</b> Increases the range in focus (Large DOF), but reduces light.</li><li><b>Large Aperture:</b> Decreases the range in focus (Small DOF), allows more light.</li></ul><p><b><span class="smart-term" data-term-en="Field of View" data-ar="مجال الرؤية" data-en-def="The extent of the observable world that is seen at any given moment through the camera.">Field of View<span class="smart-term-tooltip"></span></span> (FOV):</b> Depends on focal length and camera retina size. A larger focal length (Zoom) results in a smaller FOV.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>العدسات هي حل هندسي لمشكلة الكاميرا ذات الثقب: نحن بحاجة إلى فتحة كبيرة لجمع الضوء، ولكن الفتحة الكبيرة تسبب التمويه. العدسة تأخذ الأشعة المشتتة من نقطة واحدة وتعيد تجميعها في نقطة واحدة على المستشعر.</p><p>العلاقة بين التكبير (Magnification) والمسافات تُعطى من خلال تشابه المثلثات: $y'/y = D'/D = (D'-f)/f$.</p></template>
+    <template class="content-en"><p>Lenses are an engineering solution to the pinhole problem: we need a large aperture to gather light, but a large aperture causes blur. A lens takes diverging rays from a single point and converges them back to a single point on the sensor.</p><p>The relationship for magnification is given by similar triangles: $y'/y = D'/D = (D'-f)/f$.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة العدسة الرقيقة.</strong></template>
+      <template class="content-en"><strong>Thin lens equation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\frac{1}{d_o} + \frac{1}{d_i} = \frac{1}{f}$$</div>
+  </div>
+
+  <!-- DIAGRAM[5]: SVG diagram showing the Thin Lens model. Draw a convex lens, an optical axis, an object at distance d_o, and its focused image at distance d_i. Show three key rays: one parallel to axis passing through focal point f, one through the optical center, and one through the front focal point emerging parallel. Label d_o, d_i, and f. Style: educational, dark background #0d1117, accent colors #00ffcc and #ff0055, viewBox 0 0 800 400. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Arrow for Object -->
+    <marker id="arrow-obj" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 2 8 L 5 2 L 8 8 Z" fill="var(--text-primary)" />
+    </marker>
+    
+    <!-- Arrow for Image -->
+    <marker id="arrow-img" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 2 8 L 5 2 L 8 8 Z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Arrow for Rays -->
+    <marker id="arrow-ray" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 2 2 L 8 5 L 2 8 Z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Arrows for Dimension Lines -->
+    <marker id="dim-arrow-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 8 2 L 2 5 L 8 8 Z" fill="var(--text-muted)" />
+    </marker>
+    <marker id="dim-arrow-end" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 2 2 L 8 5 L 2 8 Z" fill="var(--text-muted)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Optical Axis -->
+  <line x1="40" y1="200" x2="760" y2="200" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="6,4" />
+  <text x="740" y="190" text-anchor="end" class="gsvg-en" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">Optical Axis</text>
+  <text x="740" y="190" text-anchor="end" class="gsvg-ar" fill="var(--text-muted)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13">المحور البصري</text>
+
+  <!-- Lens -->
+  <path d="M 400 40 Q 430 200 400 360 Q 370 200 400 40 Z" fill="var(--brand-500)" opacity="0.15" stroke="var(--brand-500)" stroke-width="2" />
+  <line x1="400" y1="40" x2="400" y2="360" stroke="var(--brand-500)" stroke-width="1" stroke-dasharray="4,4" opacity="0.5" />
+  <text x="400" y="25" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold">Convex Lens</text>
+  <text x="400" y="25" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold">عدسة محدبة</text>
+
+  <!-- Rays (Split at lens to place marker-mid correctly) -->
+  <!-- Ray 1: Parallel to axis, then through F2 -->
+  <path d="M 100 110 L 250 110 L 400 110" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-mid="url(#arrow-ray)" />
+  <path d="M 400 110 L 500 185 L 650 297.5" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-mid="url(#arrow-ray)" />
+
+  <!-- Ray 2: Through optical center -->
+  <path d="M 100 110 L 250 155 L 400 200" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-mid="url(#arrow-ray)" />
+  <path d="M 400 200 L 500 230 L 650 275" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-mid="url(#arrow-ray)" />
+
+  <!-- Ray 3: Through F1, then parallel to axis -->
+  <path d="M 100 110 L 250 185 L 400 260" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-mid="url(#arrow-ray)" />
+  <path d="M 400 260 L 525 260 L 650 260" stroke="var(--brand-500)" stroke-width="2" fill="none" marker-mid="url(#arrow-ray)" />
+
+  <!-- Object -->
+  <line x1="100" y1="200" x2="100" y2="110" stroke="var(--text-primary)" stroke-width="4" marker-end="url(#arrow-obj)" />
+  <text x="100" y="95" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Object</text>
+  <text x="100" y="95" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">الجسم</text>
+
+  <!-- Image -->
+  <line x1="600" y1="200" x2="600" y2="260" stroke="var(--brand-500)" stroke-width="4" marker-end="url(#arrow-img)" />
+  <text x="600" y="285" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">Image</text>
+  <text x="600" y="285" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold">الصورة</text>
+
+  <!-- Focal Points -->
+  <!-- F1 (Front) -->
+  <circle cx="280" cy="200" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <circle cx="280" cy="200" r="2" fill="var(--brand-500)" />
+  <text x="280" y="225" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">F</text>
+  <text x="280" y="225" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">البؤرة (F)</text>
+
+  <!-- F2 (Back) -->
+  <circle cx="520" cy="200" r="5" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+  <circle cx="520" cy="200" r="2" fill="var(--brand-500)" />
+  <text x="520" y="225" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">F</text>
+  <text x="520" y="225" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">البؤرة (F)</text>
+
+  <!-- Optical Center -->
+  <circle cx="400" cy="200" r="3" fill="var(--text-muted)" />
+
+  <!-- Dimensions -->
+  <!-- Object Distance (d_o) -->
+  <line x1="100" y1="330" x2="100" y2="350" stroke="var(--text-muted)" stroke-width="1.5" />
+  <line x1="400" y1="330" x2="400" y2="350" stroke="var(--text-muted)" stroke-width="1.5" />
+  <line x1="100" y1="340" x2="400" y2="340" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#dim-arrow-start)" marker-end="url(#dim-arrow-end)" />
+  <text x="250" y="365" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Object Distance (dₒ)</text>
+  <text x="250" y="365" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">مسافة الجسم (dₒ)</text>
+
+  <!-- Image Distance (d_i) -->
+  <line x1="600" y1="330" x2="600" y2="350" stroke="var(--text-muted)" stroke-width="1.5" />
+  <line x1="400" y1="340" x2="600" y2="340" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#dim-arrow-start)" marker-end="url(#dim-arrow-end)" />
+  <text x="500" y="365" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Image Distance (dᵢ)</text>
+  <text x="500" y="365" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">مسافة الصورة (dᵢ)</text>
+
+  <!-- Focal Length (f) -->
+  <line x1="400" y1="160" x2="400" y2="180" stroke="var(--text-muted)" stroke-width="1.5" />
+  <line x1="520" y1="160" x2="520" y2="180" stroke="var(--text-muted)" stroke-width="1.5" />
+  <line x1="400" y1="170" x2="520" y2="170" stroke="var(--text-muted)" stroke-width="1.5" marker-start="url(#dim-arrow-start)" marker-end="url(#dim-arrow-end)" />
+  <text x="460" y="155" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">Focal Length (f)</text>
+  <text x="460" y="155" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15">البعد البؤري (f)</text>
+
+  <!-- Equation Box -->
+  <rect x="560" y="20" width="220" height="75" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+  <text x="670" y="45" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">Thin Lens Equation</text>
+  <text x="670" y="45" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold">معادلة العدسة الرقيقة</text>
+  <text x="670" y="75" text-anchor="middle" fill="var(--brand-ink)" font-family="monospace" font-size="16" font-weight="bold">
+    1/d<tspan dy="4" font-size="12">o</tspan><tspan dy="-4"> + 1/d</tspan><tspan dy="4" font-size="12">i</tspan><tspan dy="-4"> = 1/f</tspan>
+  </text>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Small Aperture</th><th>Large Aperture</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">عمق المجال (DOF)</template>
+          <template class="content-en">Depth of Field (DOF)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كبير (نطاق تركيز واسع)</template>
+          <template class="content-en">Large (wide focus range)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">صغير (خلفية ضبابية)</template>
+          <template class="content-en">Small (blurry background)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">كمية الضوء</template>
+          <template class="content-en">Amount of Light</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">قليلة (تحتاج تعريض أطول)</template>
+          <template class="content-en">Less (needs longer exposure)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">كثيرة</template>
+          <template class="content-en">More</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لتصوير صورة شخصية (بورتريه) بخلفية ضبابية جداً، كيف يجب ضبط الفتحة؟</template>
+      <template class="content-en">To shoot a portrait with a very blurry background, how should you set the aperture?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يجب استخدام فتحة كبيرة (رقم f-stop صغير) لتقليل عمق المجال.</p></template>
+      <template class="content-en"><p>You should use a large aperture (small f-stop number) to decrease the depth of field.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="lens-flaws" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> عيوب العدسات (الزيغ)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Lens Flaws (Aberrations)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>العدسات الحقيقية ليست مثالية وتسبب تشوهات بصرية مثل تشتت الألوان أو انحناء الخطوط المستقيمة.</p></template>
+    <template class="content-en"><p>Real lenses are not perfect and cause optical distortions like color fringing or bending of straight lines.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>العدسات البسيطة تعاني من عيوب فيزيائية تتطلب أنظمة عدسات معقدة (تحتوي أحياناً على 15 عنصراً) لتصحيحها:</p><ul><li><b><span class="smart-term" data-term-en="Chromatic Aberration" data-ar="الزيغ اللوني" data-en-def="Color fringing caused by a lens having different refractive indices for different wavelengths of light.">الزيغ اللوني<span class="smart-term-tooltip"></span></span> (Chromatic Aberration):</b> العدسة لها معاملات انكسار مختلفة للأطوال الموجية (الألوان) المختلفة، مما يسبب ظهور حواف ملونة (Color fringing) حول الأشياء.</li><li><b><span class="smart-term" data-term-en="Spherical Aberration" data-ar="الزيغ الكروي" data-en-def="An optical defect where light rays passing through the edge of a spherical lens focus at a different point than rays passing through the center.">الزيغ الكروي<span class="smart-term-tooltip"></span></span> (Spherical Aberration):</b> العدسات الكروية لا تركز الضوء بشكل مثالي؛ الأشعة الأبعد عن المحور البصري تتركز في نقطة أقرب للعدسة.</li><li><b>التظليل (Vignetting):</b> تعتيم حواف الصورة مقارنة بمركزها.</li><li><b><span class="smart-term" data-term-en="Radial Distortion" data-ar="التشوه الشعاعي" data-en-def="A deviation from rectilinear projection causing straight lines to appear curved (Barrel or Pincushion).">التشوه الشعاعي<span class="smart-term-tooltip"></span></span> (Radial Distortion):</b> ناتج عن عدسات غير مثالية، يظهر بوضوح في حواف العدسة. أنواعه: تشوه وسادة الدبابيس (Pin cushion) والتشوه البرميلي (Barrel).</li></ul></template>
+    <template class="content-en"><p>Simple lenses suffer from physical flaws requiring complex lens systems (sometimes 15 elements) to correct:</p><ul><li><b><span class="smart-term" data-term-en="Chromatic Aberration" data-ar="الزيغ اللوني" data-en-def="Color fringing caused by a lens having different refractive indices for different wavelengths of light.">Chromatic Aberration<span class="smart-term-tooltip"></span></span>:</b> The lens has different refractive indices for different wavelengths (colors), causing color fringing around objects.</li><li><b><span class="smart-term" data-term-en="Spherical Aberration" data-ar="الزيغ الكروي" data-en-def="An optical defect where light rays passing through the edge of a spherical lens focus at a different point than rays passing through the center.">Spherical Aberration<span class="smart-term-tooltip"></span></span>:</b> Spherical lenses don't focus light perfectly; rays farther from the optical axis focus closer to the lens.</li><li><b>Vignetting:</b> Darkening of the image corners compared to the center.</li><li><b><span class="smart-term" data-term-en="Radial Distortion" data-ar="التشوه الشعاعي" data-en-def="A deviation from rectilinear projection causing straight lines to appear curved (Barrel or Pincushion).">Radial Distortion<span class="smart-term-tooltip"></span></span>:</b> Caused by imperfect lenses, most noticeable at the edges. Types include Pin cushion and Barrel distortion.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لحل مشكلة الزيغ الكروي، تستخدم العدسات الحديثة والمكلفة عناصر "لا كروية" (Aspherical elements) مصممة خصيصاً لتوجيه جميع الأشعة إلى نفس النقطة البؤرية.</p><p>التشوه الشعاعي (البرميلي والوسادي) هو تشوه هندسي لا يؤثر على حدة الصورة (التركيز) بل يغير مواقع البكسلات. يمكن تصحيحه برمجياً في مرحلة المعالجة اللاحقة (Post-processing) باستخدام نماذج رياضية.</p></template>
+    <template class="content-en"><p>To solve spherical aberration, modern expensive lenses use "aspherical" elements specifically shaped to direct all rays to the exact same focal point.</p><p>Radial distortion (barrel and pincushion) is a geometric distortion that doesn't affect image sharpness (focus) but shifts pixel locations. It can be corrected in software during post-processing using mathematical models.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[6]: SVG diagram showing Radial Distortion types. Draw three grids side-by-side: 1. 'No distortion' (perfect square grid), 2. 'Pin cushion' (grid lines bowing inwards towards the center), 3. 'Barrel' (grid lines bowing outwards away from the center). Style: educational, dark background #0d1117, accent color #00ffcc, viewBox 0 0 800 300. -->
+<div class="svg-diagram" data-diagram-id="6">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 380" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="background-color: var(--bg-surface); font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0,0 L 10,5 L 0,10 z" fill="var(--text-primary)" />
+        </marker>
+    </defs>
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Types of Radial Distortion</text>
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أنواع التشوه الشعاعي</text>
+
+    <!-- Grid 1: No Distortion -->
+    <g transform="translate(150, 180)">
+        <!-- Lens Background -->
+        <circle cx="0" cy="0" r="125" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        
+        <!-- Perfect Grid -->
+        <g stroke="var(--brand-500)" stroke-width="2" fill="none">
+            <!-- Verticals -->
+            <path d="M -80,-80 L -80,80" />
+            <path d="M -40,-80 L -40,80" />
+            <path d="M 0,-80 L 0,80" />
+            <path d="M 40,-80 L 40,80" />
+            <path d="M 80,-80 L 80,80" />
+            <!-- Horizontals -->
+            <path d="M -80,-80 L 80,-80" />
+            <path d="M -80,-40 L 80,-40" />
+            <path d="M -80,0 L 80,0" />
+            <path d="M -80,40 L 80,40" />
+            <path d="M -80,80 L 80,80" />
+        </g>
+        
+        <!-- Center Dot -->
+        <circle cx="0" cy="0" r="4" fill="var(--brand-500)" />
+    </g>
+
+    <!-- Grid 2: Pincushion Distortion -->
+    <g transform="translate(400, 180)">
+        <!-- Lens Background -->
+        <circle cx="0" cy="0" r="125" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        
+        <!-- Original Shape (Dashed) -->
+        <rect x="-80" y="-80" width="160" height="160" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4 4" />
+
+        <!-- Displacement Arrows -->
+        <g stroke="var(--text-primary)" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+            <line x1="80" y1="80" x2="98" y2="98" />
+            <line x1="-80" y1="-80" x2="-98" y2="-98" />
+            <line x1="80" y1="-80" x2="98" y2="-98" />
+            <line x1="-80" y1="80" x2="-98" y2="98" />
+            <line x1="80" y1="0" x2="90" y2="0" />
+            <line x1="-80" y1="0" x2="-90" y2="0" />
+            <line x1="0" y1="80" x2="0" y2="90" />
+            <line x1="0" y1="-80" x2="0" y2="-90" />
+        </g>
+
+        <!-- Distorted Grid (Bowing Inwards) -->
+        <g stroke="var(--brand-500)" stroke-width="2" fill="none">
+            <!-- Verticals -->
+            <path d="M 105.6,-105.6 Q 80,0 105.6,105.6" />
+            <path d="M 48,-105.6 Q 35.2,0 48,105.6" />
+            <path d="M 0,-92.8 L 0,92.8" />
+            <path d="M -48,-105.6 Q -35.2,0 -48,105.6" />
+            <path d="M -105.6,-105.6 Q -80,0 -105.6,105.6" />
+            <!-- Horizontals -->
+            <path d="M -105.6,105.6 Q 0,80 105.6,105.6" />
+            <path d="M -105.6,48 Q 0,35.2 105.6,48" />
+            <path d="M -92.8,0 L 92.8,0" />
+            <path d="M -105.6,-48 Q 0,-35.2 105.6,-48" />
+            <path d="M -105.6,-105.6 Q 0,-80 105.6,-105.6" />
+        </g>
+
+        <!-- Center Dot -->
+        <circle cx="0" cy="0" r="4" fill="var(--brand-500)" />
+    </g>
+
+    <!-- Grid 3: Barrel Distortion -->
+    <g transform="translate(650, 180)">
+        <!-- Lens Background -->
+        <circle cx="0" cy="0" r="125" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+        
+        <!-- Original Shape (Dashed) -->
+        <rect x="-100" y="-100" width="200" height="200" fill="none" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4 4" />
+
+        <!-- Displacement Arrows -->
+        <g stroke="var(--text-primary)" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+            <line x1="100" y1="100" x2="85" y2="85" />
+            <line x1="-100" y1="-100" x2="-85" y2="-85" />
+            <line x1="100" y1="-100" x2="85" y2="-85" />
+            <line x1="-100" y1="100" x2="-85" y2="85" />
+            <line x1="100" y1="0" x2="92" y2="0" />
+            <line x1="-100" y1="0" x2="-92" y2="0" />
+            <line x1="0" y1="100" x2="0" y2="92" />
+            <line x1="0" y1="-100" x2="0" y2="-92" />
+        </g>
+
+        <!-- Distorted Grid (Bowing Outwards) -->
+        <g stroke="var(--brand-500)" stroke-width="2" fill="none">
+            <!-- Verticals -->
+            <path d="M 80,-80 Q 100,0 80,80" />
+            <path d="M 43.75,-80 Q 53.75,0 43.75,80" />
+            <path d="M 0,-90 L 0,90" />
+            <path d="M -43.75,-80 Q -53.75,0 -43.75,80" />
+            <path d="M -80,-80 Q -100,0 -80,80" />
+            <!-- Horizontals -->
+            <path d="M -80,80 Q 0,100 80,80" />
+            <path d="M -80,43.75 Q 0,53.75 80,43.75" />
+            <path d="M -90,0 L 90,0" />
+            <path d="M -80,-43.75 Q 0,-53.75 80,-43.75" />
+            <path d="M -80,-80 Q 0,-100 80,-80" />
+        </g>
+
+        <!-- Center Dot -->
+        <circle cx="0" cy="0" r="4" fill="var(--brand-500)" />
+    </g>
+
+    <!-- Labels -->
+    <text x="150" y="335" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">No Distortion</text>
+    <text x="150" y="335" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">بدون تشوه</text>
+    <text x="150" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Perfect mapping</text>
+    <text x="150" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">تخطيط مثالي</text>
+
+    <text x="400" y="335" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Pincushion Distortion</text>
+    <text x="400" y="335" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">تشوه وسادي (Pincushion)</text>
+    <text x="400" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Lines bow inwards</text>
+    <text x="400" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">تنحني الخطوط للداخل</text>
+
+    <text x="650" y="335" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Barrel Distortion</text>
+    <text x="650" y="335" text-anchor="middle" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">تشوه برميلي (Barrel)</text>
+    <text x="650" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Lines bow outwards</text>
+    <text x="650" y="355" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">تنحني الخطوط للخارج</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي نوع من التشوه الشعاعي غالباً ما تلاحظه عند استخدام عدسة عين السمكة (Fisheye lens)؟</template>
+      <template class="content-en">Which type of radial distortion do you typically observe when using a Fisheye lens?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>التشوه البرميلي (Barrel Distortion).</p></template>
+      <template class="content-en"><p>Barrel Distortion.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في الوحدة الثانية. تخيلوا أننا نحاول تعليم الحاسوب كيف يرى. للقيام بذلك، يجب أن نفهم أولاً كيف نرى نحن، وكيف تعمل الكاميرات. بدأنا بالعين البشرية، حيث تعمل الشبكية كفيلم الكاميرا، لكن السحر الحقيقي يحدث في الدماغ. ثم انتقلنا إلى أبسط كاميرا: الكاميرا ذات الثقب. إنها رائعة لكنها لا تجمع ضوءاً كافياً، لذا اخترعنا العدسات. العدسات تجلب الضوء لكنها تجلب معها مشاكل مثل 'عمق المجال' المحدود والعيوب البصرية (الزيغ). الجزء الأهم في هذه الوحدة للامتحان هو الرياضيات: كيف نحول نقطة في العالم 3D إلى بكسل 2D؟ هنا يأتي دور 'الإحداثيات المتجانسة' التي تنقذنا من القسمة على الصفر وتسمح لنا باستخدام مصفوفة الإسقاط السحرية $K[R|t]$. ركزوا جيداً على الفرق بين المعلمات الداخلية K (الخاصة بالكاميرا) والخارجية R,t (الخاصة بموقعها). بالتوفيق!</template>
+    <template class="content-en">Welcome to Module 2. Imagine we are trying to teach a computer how to see. To do this, we first must understand how we see, and how cameras work. We started with the human eye, where the retina acts as film, but the real magic happens in the brain. Then we moved to the simplest camera: the pinhole. It's great but doesn't gather enough light, so we invented lenses. Lenses bring light but also bring problems like limited 'Depth of Field' and optical flaws (aberrations). The most critical part of this module for the exam is the math: how do we convert a 3D world point into a 2D pixel? This is where 'Homogeneous Coordinates' save us from dividing by zero and allow us to use the magic projection matrix $K[R|t]$. Focus heavily on the difference between Intrinsic parameters K (the camera itself) and Extrinsic parameters R,t (its location). Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا ندرس نظام الرؤية البشري في مقرر الرؤية الحاسوبية؟</template>
+          <template class="content-en">Why do we study the human vision system in a computer vision course?</template>
+          <span class="content-target">لماذا ندرس نظام الرؤية البشري في مقرر الرؤية الحاسوبية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الرؤية البشرية تتفوق بكثير على أنظمة الكمبيوتر الحالية في التعرف على الأشياء. فهم كيفية عمل الدماغ (مثل المعالجة الهرمية في القشرة البصرية) يوفر إلهاماً قوياً لتصميم خوارزميات رؤية حاسوبية أفضل.</template>
+          <template class="content-en">Because human vision is vastly superior to current computer systems at object recognition. Understanding how the brain works (like hierarchical processing in the visual cortex) provides strong inspiration for designing better computer vision algorithms.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق الأساسي بين العصي والمخاريط في العين؟</template>
+          <template class="content-en">What is the fundamental difference between rods and cones in the eye?</template>
+          <span class="content-target">ما هو الفرق الأساسي بين العصي والمخاريط في العين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">العصي حساسة جداً للضوء وتستخدم للرؤية الليلية ولكنها لا تميز الألوان. المخاريط أقل حساسية للضوء ولكنها مسؤولة عن رؤية الألوان والتفاصيل الدقيقة.</template>
+          <template class="content-en">Rods are highly sensitive to light and used for night vision but do not detect color. Cones are less sensitive to light but are responsible for color vision and fine details.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا نستخدم كاميرات الثقب (Pinhole) في الحياة العملية ونستبدلها بالعدسات؟</template>
+          <template class="content-en">Why don't we use pinhole cameras in practical life and replace them with lenses?</template>
+          <span class="content-target">لماذا لا نستخدم كاميرات الثقب (Pinhole) في الحياة العملية ونستبدلها بالعدسات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الثقب الصغير يسمح بمرور كمية ضوء قليلة جداً، مما يتطلب وقت تعريض طويل جداً. العدسات تحل هذه المشكلة بجمع كمية كبيرة من الضوء وتركيزها في نقطة واحدة.</template>
+          <template class="content-en">Because a small pinhole allows very little light to pass, requiring very long exposure times. Lenses solve this by gathering a large amount of light and focusing it into a single point.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي المعلومات التي نفقدها عند الإسقاط من 3D إلى 2D؟</template>
+          <template class="content-en">What information do we lose when projecting from 3D to 2D?</template>
+          <span class="content-target">ما هي المعلومات التي نفقدها عند الإسقاط من 3D إلى 2D؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نفقد معلومات العمق (المسافة من الكاميرا)، ونفقد الزوايا الحقيقية، والأطوال الحقيقية للأشياء.</template>
+          <template class="content-en">We lose depth information (distance from the camera), true angles, and the true lengths of objects.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تحل الإحداثيات المتجانسة مشكلة الخطوط المتوازية؟</template>
+          <template class="content-en">How do homogeneous coordinates solve the problem of parallel lines?</template>
+          <span class="content-target">كيف تحل الإحداثيات المتجانسة مشكلة الخطوط المتوازية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">في الهندسة الإقليدية، الخطوط المتوازية لا تتقاطع أبداً. في الإحداثيات المتجانسة، بإضافة بُعد إضافي (w)، يمكننا تمثيل نقطة التقاطع في اللانهاية بجعل w=0.</template>
+          <template class="content-en">In Euclidean geometry, parallel lines never intersect. In homogeneous coordinates, by adding an extra dimension (w), we can represent their intersection point at infinity by setting w=0.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين المعلمات الداخلية (Intrinsic) والخارجية (Extrinsic) للكاميرا؟</template>
+          <template class="content-en">What is the difference between Intrinsic and Extrinsic camera parameters?</template>
+          <span class="content-target">ما الفرق بين المعلمات الداخلية (Intrinsic) والخارجية (Extrinsic) للكاميرا؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">المعلمات الداخلية (K) تصف الكاميرا نفسها (البعد البؤري، مركز الصورة). المعلمات الخارجية (R, t) تصف موقع الكاميرا واتجاه دورانها بالنسبة للعالم الخارجي.</template>
+          <template class="content-en">Intrinsic parameters (K) describe the camera itself (focal length, image center). Extrinsic parameters (R, t) describe the camera's position and rotation relative to the outside world.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى نستخدم الإسقاط المتعامد المصغر (Weak Perspective)؟</template>
+          <template class="content-en">When do we use Scaled Orthographic (Weak Perspective) projection?</template>
+          <span class="content-target">متى نستخدم الإسقاط المتعامد المصغر (Weak Perspective)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نستخدمه عندما يكون عمق الكائن (سمكه) صغيراً جداً مقارنة بمسافته عن الكاميرا، بحيث يمكننا افتراض أن جميع نقاط الكائن تقع على نفس المسافة تقريباً.</template>
+          <template class="content-en">We use it when the depth (thickness) of the object is very small compared to its distance from the camera, so we can assume all points of the object are at roughly the same distance.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يؤثر البعد البؤري على مجال الرؤية (FOV)؟</template>
+          <template class="content-en">How does focal length affect the Field of View (FOV)?</template>
+          <span class="content-target">كيف يؤثر البعد البؤري على مجال الرؤية (FOV)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">العلاقة عكسية. البعد البؤري الأكبر (Zoom) يؤدي إلى مجال رؤية أصغر (زاوية أضيق). البعد البؤري الأصغر (Wide angle) يعطي مجال رؤية أكبر.</template>
+          <template class="content-en">The relationship is inverse. A larger focal length (Zoom) leads to a smaller FOV (narrower angle). A smaller focal length (Wide angle) gives a larger FOV.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو عمق المجال (Depth of Field) وكيف نتحكم به؟</template>
+          <template class="content-en">What is Depth of Field and how do we control it?</template>
+          <span class="content-target">ما هو عمق المجال (Depth of Field) وكيف نتحكم به؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو نطاق المسافة الذي تظهر فيه الأشياء واضحة في الصورة. نتحكم به عبر حجم الفتحة (Aperture): الفتحة الصغيرة تعطي عمق مجال كبير، والفتحة الكبيرة تعطي عمق مجال صغير.</template>
+          <template class="content-en">It is the range of distance where objects appear sharp in the image. We control it via the Aperture size: a small aperture gives a large depth of field, and a large aperture gives a small depth of field.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الزيغ اللوني (Chromatic Aberration) ولماذا يحدث؟</template>
+          <template class="content-en">What is Chromatic Aberration and why does it happen?</template>
+          <span class="content-target">ما هو الزيغ اللوني (Chromatic Aberration) ولماذا يحدث؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو ظهور حواف ملونة حول الأشياء في الصورة. يحدث لأن زجاج العدسة يكسر الألوان المختلفة (الأطوال الموجية) بزوايا مختلفة، فلا تتجمع كلها في نفس النقطة البؤرية.</template>
+          <template class="content-en">It is the appearance of color fringes around objects in the image. It happens because the lens glass refracts different colors (wavelengths) at different angles, so they don't all converge at the same focal point.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "الشبكية (Retina)",
+      "en": "Retina"
+    },
+    "back": {
+      "definition": {
+        "ar": "الطبقة الداخلية للعين التي تستشعر الضوء، تشبه فيلم الكاميرا.",
+        "en": "The innermost layer of the eye that senses light, comparable to camera film."
+      },
+      "example": {
+        "ar": "تحتوي على العصي والمخاريط.",
+        "en": "Contains rods and cones."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "العصي (Rods)",
+      "en": "Rods"
+    },
+    "back": {
+      "definition": {
+        "ar": "مستقبلات ضوئية في العين حساسة جداً للضوء ولكن لا تميز الألوان.",
+        "en": "Photoreceptors in the eye highly sensitive to light but not to color."
+      },
+      "example": {
+        "ar": "يوجد منها حوالي 120 مليون في العين.",
+        "en": "There are about 120 million in the eye."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "المخاريط (Cones)",
+      "en": "Cones"
+    },
+    "back": {
+      "definition": {
+        "ar": "مستقبلات ضوئية توفر حساسية الألوان وتتركز في البقعة الصفراء.",
+        "en": "Photoreceptors providing color sensitivity, concentrated in the macula."
+      },
+      "example": {
+        "ar": "يوجد منها 6-7 مليون في العين.",
+        "en": "There are 6-7 million in the eye."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "النقرة المركزية (Fovea Centralis)",
+      "en": "Fovea Centralis"
+    },
+    "back": {
+      "definition": {
+        "ar": "مركز البقعة الصفراء في الشبكية، وتحتوي فقط على مخاريط.",
+        "en": "The center of the macula in the retina, containing only cones."
+      },
+      "example": {
+        "ar": "توفر أوضح رؤية ممكنة.",
+        "en": "Provides the clearest possible vision."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "الفتحة (Aperture)",
+      "en": "Aperture"
+    },
+    "back": {
+      "definition": {
+        "ar": "الثقب الذي يسمح بمرور الضوء في الكاميرا.",
+        "en": "The opening that allows light to pass through in a camera."
+      },
+      "example": {
+        "ar": "تصغير الفتحة يقلل التمويه ولكنه يقلل الضوء.",
+        "en": "Shrinking the aperture reduces blur but decreases light."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "مركز الإسقاط (Center of Projection)",
+      "en": "Center of Projection"
+    },
+    "back": {
+      "definition": {
+        "ar": "النقطة المفردة التي تمر عبرها جميع أشعة الضوء في نموذج الكاميرا ذات الثقب.",
+        "en": "The single point through which all light rays pass in a pinhole camera model."
+      },
+      "example": {
+        "ar": "يُعرف أيضاً بالنقطة البؤرية في هذا النموذج.",
+        "en": "Also known as the focal point in this model."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "نقطة التلاشي (Vanishing Point)",
+      "en": "Vanishing Point"
+    },
+    "back": {
+      "definition": {
+        "ar": "النقطة في الصورة التي تتقاطع عندها الخطوط المتوازية في العالم ثلاثي الأبعاد.",
+        "en": "The point in the image where parallel lines in the 3D world intersect."
+      },
+      "example": {
+        "ar": "قضبان سكة الحديد تبدو وكأنها تلتقي في نقطة التلاشي.",
+        "en": "Railroad tracks appear to meet at a vanishing point."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "الإحداثيات المتجانسة (Homogeneous Coordinates)",
+      "en": "Homogeneous Coordinates"
+    },
+    "back": {
+      "definition": {
+        "ar": "نظام إحداثيات يضيف بُعداً إضافياً (w) لتمثيل النقاط في اللانهاية وإجراء التحويلات الخطية.",
+        "en": "A coordinate system adding an extra dimension (w) to represent points at infinity and perform linear transformations."
+      },
+      "example": {
+        "ar": "(x, y) تصبح (x, y, 1).",
+        "en": "(x, y) becomes (x, y, 1)."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "المصفوفة الداخلية (Intrinsic Matrix K)",
+      "en": "Intrinsic Matrix K"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصفوفة 3x3 تحتوي على المعلمات الداخلية للكاميرا (البعد البؤري، نقطة المركز، الانحراف).",
+        "en": "A 3x3 matrix containing internal camera parameters (focal length, principal point, skew)."
+      },
+      "example": {
+        "ar": "لها 5 درجات حرية.",
+        "en": "It has 5 degrees of freedom."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "المعلمات الخارجية (Extrinsic Parameters)",
+      "en": "Extrinsic Parameters"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصفوفة الدوران (R) ومتجه الإزاحة (t) اللذان يحددان موقع واتجاه الكاميرا في العالم.",
+        "en": "Rotation matrix (R) and translation vector (t) defining the camera's position and orientation in the world."
+      },
+      "example": {
+        "ar": "لها 6 درجات حرية.",
+        "en": "It has 6 degrees of freedom."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "الإسقاط المتعامد (Orthographic Projection)",
+      "en": "Orthographic Projection"
+    },
+    "back": {
+      "definition": {
+        "ar": "إسقاط يفترض أن الكاميرا في اللانهاية، مما يلغي تشوه المنظور ويحافظ على التوازي.",
+        "en": "Projection assuming the camera is at infinity, eliminating perspective distortion and preserving parallelism."
+      },
+      "example": {
+        "ar": "يُسقط البُعد Z تماماً.",
+        "en": "It completely drops the Z dimension."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "عمق المجال (Depth of Field)",
+      "en": "Depth of Field"
+    },
+    "back": {
+      "definition": {
+        "ar": "نطاق المسافة داخل المشهد الذي يظهر حاداً ومقبولاً في الصورة.",
+        "en": "The range of distance within a scene that appears acceptably sharp in the image."
+      },
+      "example": {
+        "ar": "الفتحة الصغيرة تزيد من عمق المجال.",
+        "en": "A small aperture increases the depth of field."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "مجال الرؤية (Field of View - FOV)",
+      "en": "Field of View (FOV)"
+    },
+    "back": {
+      "definition": {
+        "ar": "مدى العالم الملحوظ الذي يمكن رؤيته عبر الكاميرا في لحظة معينة.",
+        "en": "The extent of the observable world seen through the camera at a given moment."
+      },
+      "example": {
+        "ar": "البعد البؤري الأكبر يعطي مجال رؤية أصغر.",
+        "en": "A larger focal length gives a smaller FOV."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "الزيغ اللوني (Chromatic Aberration)",
+      "en": "Chromatic Aberration"
+    },
+    "back": {
+      "definition": {
+        "ar": "عيب في العدسة يسبب حواف ملونة لأن الأطوال الموجية المختلفة تنكسر بشكل مختلف.",
+        "en": "A lens flaw causing color fringing because different wavelengths refract differently."
+      },
+      "example": {
+        "ar": "يظهر كألوان قوس قزح حول حواف الأشياء.",
+        "en": "Appears as rainbow colors around object edges."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "التشوه الشعاعي (Radial Distortion)",
+      "en": "Radial Distortion"
+    },
+    "back": {
+      "definition": {
+        "ar": "تشوه هندسي يجعل الخطوط المستقيمة تبدو منحنية (برميلي أو وسادي).",
+        "en": "Geometric distortion making straight lines appear curved (barrel or pincushion)."
+      },
+      "example": {
+        "ar": "شائع في عدسات عين السمكة.",
+        "en": "Common in fisheye lenses."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من المستقبلات الضوئية التالية مسؤولة عن رؤية الألوان في العين البشرية؟",
+      "en": "Which of the following photoreceptors are responsible for color vision in the human eye?"
+    },
+    "options": {
+      "ar": [
+        "العصي (Rods)",
+        "المخاريط (Cones)",
+        "القرنية (Cornea)",
+        "الشبكية (Retina)"
+      ],
+      "en": [
+        "Rods",
+        "Cones",
+        "Cornea",
+        "Retina"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المخاريط هي المسؤولة عن حساسية الألوان وتتركز في البقعة الصفراء، بينما العصي حساسة للضوء فقط.",
+      "en": "Cones are responsible for color sensitivity and are concentrated in the macula, while rods are only sensitive to light."
+    },
+    "hint": {
+      "ar": "تذكر حرف C في كلمة Color.",
+      "en": "Remember 'C' for Color and Cones."
+    },
+    "difficulty": "easy",
+    "conceptId": "human-vision-system"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ماذا يحدث للخطوط المتوازية في العالم ثلاثي الأبعاد عند إسقاطها باستخدام الإسقاط المنظوري (Perspective Projection)؟",
+      "en": "What happens to parallel lines in the 3D world when projected using Perspective Projection?"
+    },
+    "options": {
+      "ar": [
+        "تظل متوازية دائماً",
+        "تتقاطع عند نقطة التلاشي",
+        "تختفي من الصورة",
+        "تتحول إلى منحنيات"
+      ],
+      "en": [
+        "They always remain parallel",
+        "They intersect at a vanishing point",
+        "They disappear from the image",
+        "They turn into curves"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في الإسقاط المنظوري، الخطوط المتوازية (التي ليست موازية لمستوى الصورة) تتقاطع عند نقطة التلاشي.",
+      "en": "In perspective projection, parallel lines (that are not parallel to the image plane) intersect at a vanishing point."
+    },
+    "hint": {
+      "ar": "فكر في شكل سكة الحديد وهي تمتد بعيداً.",
+      "en": "Think of how railroad tracks look as they stretch into the distance."
+    },
+    "difficulty": "medium",
+    "conceptId": "projection-geometry"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "ما هو الغرض الرئيسي من استخدام الإحداثيات المتجانسة (Homogeneous Coordinates) في الرؤية الحاسوبية؟",
+      "en": "What is the main purpose of using Homogeneous Coordinates in computer vision?"
+    },
+    "options": {
+      "ar": [
+        "لزيادة دقة ألوان الصورة",
+        "لتمثيل النقاط في اللانهاية وإجراء الإزاحة كضرب مصفوفات",
+        "لتقليل حجم ملف الصورة",
+        "لإصلاح الزيغ اللوني في العدسات"
+      ],
+      "en": [
+        "To increase image color accuracy",
+        "To represent points at infinity and perform translation as matrix multiplication",
+        "To reduce image file size",
+        "To fix chromatic aberration in lenses"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الإحداثيات المتجانسة تضيف بُعداً يسمح بتمثيل اللانهاية (عندما w=0) وتوحيد العمليات الهندسية كضرب مصفوفات.",
+      "en": "Homogeneous coordinates add a dimension allowing representation of infinity (when w=0) and unifying geometric operations as matrix multiplications."
+    },
+    "hint": {
+      "ar": "تذكر إضافة الرقم 1 كبُعد أخير.",
+      "en": "Remember appending a 1 as the last dimension."
+    },
+    "difficulty": "medium",
+    "conceptId": "homogeneous-coordinates"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "كم عدد درجات الحرية (Degrees of Freedom) في المصفوفة الداخلية للكاميرا (Intrinsic Matrix K)؟",
+      "en": "How many degrees of freedom are in the camera's Intrinsic Matrix (K)?"
+    },
+    "options": {
+      "ar": [
+        "3",
+        "5",
+        "6",
+        "9"
+      ],
+      "en": [
+        "3",
+        "5",
+        "6",
+        "9"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المصفوفة K لها 5 درجات حرية: البعد البؤري (fx, fy)، نقطة المركز (u0, v0)، ومعامل الانحراف (s).",
+      "en": "Matrix K has 5 degrees of freedom: focal lengths (fx, fy), principal point (u0, v0), and skew (s)."
+    },
+    "hint": {
+      "ar": "المعلمات الخارجية لها 6، كم للداخلية؟",
+      "en": "Extrinsics have 6, how many for intrinsics?"
+    },
+    "difficulty": "hard",
+    "conceptId": "camera-projection-matrix"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو تأثير استخدام فتحة صغيرة (Small Aperture) على عمق المجال (Depth of Field)؟",
+      "en": "What is the effect of using a small aperture on the Depth of Field?"
+    },
+    "options": {
+      "ar": [
+        "يقلل عمق المجال",
+        "يزيد عمق المجال",
+        "لا يؤثر على عمق المجال",
+        "يجعل الصورة بأكملها ضبابية"
+      ],
+      "en": [
+        "Decreases depth of field",
+        "Increases depth of field",
+        "Has no effect on depth of field",
+        "Makes the entire image blurry"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الفتحة الصغيرة تزيد من نطاق المسافة الذي يظهر حاداً في الصورة، مما يعني عمق مجال أكبر.",
+      "en": "A small aperture increases the range of distance that appears sharp in the image, meaning a larger depth of field."
+    },
+    "hint": {
+      "ar": "علاقة عكسية بين حجم الفتحة وعمق المجال.",
+      "en": "Inverse relationship between aperture size and DOF."
+    },
+    "difficulty": "medium",
+    "conceptId": "lenses-and-dof"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "أي نوع من الإسقاط يفترض أن الكاميرا تقع في اللانهاية ولا ينتج عنه تشوه منظوري؟",
+      "en": "Which type of projection assumes the camera is at infinity and produces no perspective distortion?"
+    },
+    "options": {
+      "ar": [
+        "الإسقاط المنظوري (Perspective)",
+        "الإسقاط المتعامد (Orthographic)",
+        "إسقاط عين السمكة (Fisheye)",
+        "الإسقاط الكروي (Spherical)"
+      ],
+      "en": [
+        "Perspective Projection",
+        "Orthographic Projection",
+        "Fisheye Projection",
+        "Spherical Projection"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الإسقاط المتعامد يسقط البُعد Z ويفترض أن الكاميرا بعيدة جداً، مما يحافظ على أحجام الأشياء وتوازيها.",
+      "en": "Orthographic projection drops the Z dimension and assumes the camera is infinitely far, preserving object sizes and parallelism."
+    },
+    "hint": {
+      "ar": "يُستخدم بكثرة في الرسومات الهندسية.",
+      "en": "Heavily used in engineering drawings."
+    },
+    "difficulty": "easy",
+    "conceptId": "orthographic-projection"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "ما هو العيب البصري (Aberration) الذي يسبب ظهور حواف ملونة حول الأشياء بسبب اختلاف انكسار الأطوال الموجية؟",
+      "en": "Which optical aberration causes color fringing around objects due to different wavelengths refracting differently?"
+    },
+    "options": {
+      "ar": [
+        "الزيغ الكروي (Spherical Aberration)",
+        "التشوه الشعاعي (Radial Distortion)",
+        "الزيغ اللوني (Chromatic Aberration)",
+        "التظليل (Vignetting)"
+      ],
+      "en": [
+        "Spherical Aberration",
+        "Radial Distortion",
+        "Chromatic Aberration",
+        "Vignetting"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الزيغ اللوني يحدث لأن العدسة تكسر الألوان المختلفة (الأطوال الموجية) بزوايا مختلفة.",
+      "en": "Chromatic aberration occurs because the lens refracts different colors (wavelengths) at different angles."
+    },
+    "hint": {
+      "ar": "كلمة Chroma تعني لون.",
+      "en": "The word 'Chroma' means color."
+    },
+    "difficulty": "easy",
+    "conceptId": "lens-flaws"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "ماذا يحدث إذا جعلنا فتحة الكاميرا ذات الثقب (Pinhole) صغيرة جداً جداً؟",
+      "en": "What happens if we make the aperture of a pinhole camera extremely small?"
+    },
+    "options": {
+      "ar": [
+        "تصبح الصورة حادة بشكل لا نهائي",
+        "تصبح الصورة مشوشة بسبب تأثيرات الحيود (Diffraction)",
+        "يزداد مجال الرؤية (FOV)",
+        "تتحول الصورة إلى أبيض وأسود"
+      ],
+      "en": [
+        "The image becomes infinitely sharp",
+        "The image becomes blurred due to Diffraction effects",
+        "The Field of View (FOV) increases",
+        "The image turns black and white"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "على الرغم من أن تصغير الفتحة يقلل التمويه الهندسي، إلا أن تصغيرها أكثر من اللازم يؤدي إلى تشتت الضوء بسبب الحيود، مما يفسد الصورة.",
+      "en": "Although shrinking the aperture reduces geometric blur, making it too small causes light to scatter due to diffraction, ruining the image."
+    },
+    "hint": {
+      "ar": "الضوء يتصرف كموجة عند المرور عبر شقوق ضيقة جداً.",
+      "en": "Light behaves as a wave when passing through very narrow slits."
+    },
+    "difficulty": "medium",
+    "conceptId": "pinhole-camera-model"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "كيف يؤثر زيادة البعد البؤري (Focal Length) على مجال الرؤية (FOV)؟",
+      "en": "How does increasing the focal length affect the Field of View (FOV)?"
+    },
+    "options": {
+      "ar": [
+        "يزيد من مجال الرؤية",
+        "يقلل من مجال الرؤية",
+        "لا يؤثر على مجال الرؤية",
+        "يقلب مجال الرؤية"
+      ],
+      "en": [
+        "Increases the FOV",
+        "Decreases the FOV",
+        "Has no effect on FOV",
+        "Inverts the FOV"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "البعد البؤري الأكبر (Zoom in) يعني أن الكاميرا تلتقط زاوية أضيق من المشهد، مما يقلل مجال الرؤية.",
+      "en": "A larger focal length (Zoom in) means the camera captures a narrower angle of the scene, decreasing the FOV."
+    },
+    "hint": {
+      "ar": "فكر في استخدام منظار (Zoom).",
+      "en": "Think about using binoculars (Zoom)."
+    },
+    "difficulty": "medium",
+    "conceptId": "lenses-and-dof"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في الإحداثيات المتجانسة، كيف نمثل نقطة تقاطع خطين متوازيين؟",
+      "en": "In homogeneous coordinates, how do we represent the intersection point of two parallel lines?"
+    },
+    "options": {
+      "ar": [
+        "بجعل الإحداثي x صفراً",
+        "بجعل الإحداثي y صفراً",
+        "بجعل الإحداثي الأخير w صفراً",
+        "لا يمكن تمثيلها"
+      ],
+      "en": [
+        "By setting the x coordinate to zero",
+        "By setting the y coordinate to zero",
+        "By setting the last coordinate w to zero",
+        "It cannot be represented"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الخطوط المتوازية تتقاطع في اللانهاية. في الإحداثيات المتجانسة، تُمثل النقاط في اللانهاية بجعل البُعد الأخير w = 0.",
+      "en": "Parallel lines intersect at infinity. In homogeneous coordinates, points at infinity are represented by setting the last dimension w = 0."
+    },
+    "hint": {
+      "ar": "القسمة على صفر تعطي اللانهاية.",
+      "en": "Division by zero gives infinity."
+    },
+    "difficulty": "hard",
+    "conceptId": "homogeneous-coordinates"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأننا نرى بأعيننا. الحقيقة هي أن العين تلتقط الضوء فقط، بينما الدماغ هو من يقوم بعملية الرؤية والإدراك الفعلي.</template>
+    <template class="content-en">Believing that we see with our eyes. The truth is the eye only captures light, while the brain performs the actual seeing and perception.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الإحداثيات المتجانسة ليست مجرد تعقيد رياضي؛ إنها السر الذي يسمح لنا بتمثيل 'اللانهاية' كأرقام حقيقية داخل مصفوفة، مما يحل مشكلة تقاطع الخطوط المتوازية.</template>
+    <template class="content-en">Homogeneous coordinates aren't just mathematical complication; they are the secret that allows us to represent 'infinity' as real numbers in a matrix, solving the parallel lines intersection problem.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مصفوفة الكاميرا $x = K[R|t]X$ هي قلب الرؤية الحاسوبية الهندسية. K تخبرنا عن الكاميرا نفسها (العدسة والمستشعر)، و [R|t] تخبرنا أين توجد الكاميرا في العالم.</template>
+    <template class="content-en">The camera matrix $x = K[R|t]X$ is the heart of geometric computer vision. K tells us about the camera itself (lens and sensor), and [R|t] tells us where the camera is in the world.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين تأثير الفتحة الكبيرة والصغيرة. تذكر: فتحة كبيرة = رقم f صغير = عمق مجال ضيق (خلفية ضبابية).</template>
+    <template class="content-en">Confusing the effect of large and small apertures. Remember: Large aperture = small f-number = shallow depth of field (blurry background).</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نقطة التلاشي ليست نقطة حقيقية في الفضاء 3D، بل هي إسقاط لـ 'اتجاه' (نقطة في اللانهاية) على مستوى الصورة 2D.</template>
+    <template class="content-en">A vanishing point is not a real point in 3D space; it is the projection of a 'direction' (a point at infinity) onto the 2D image plane.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M01.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M03.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

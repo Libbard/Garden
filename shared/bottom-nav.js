@@ -66,6 +66,8 @@
       { page: 'labs',     icon: 'fa-solid fa-flask',            ar: 'المختبر',   en: 'Labs',     href: basePath + 'hub/labs.html' },
       /*@3.BONJ.4*/
       { page: 'gpa',      icon: 'fa-solid fa-chart-line',       ar: 'المعدل',    en: 'GPA',      href: basePath + 'hub/gpa.html' },
+      { page: 'quiz',     icon: 'fa-solid fa-clipboard-question', ar: 'الاختبارات', en: 'Tests', href: basePath + 'hub/quiz.html' },
+      { page: 'games',    icon: 'fa-solid fa-gamepad',          ar: 'الألعاب',   en: 'Games',    href: basePath + 'hub/games.html' },
       /*@3.BONJ.32*/
       { page: 'ratings',  icon: 'fa-solid fa-star-half-stroke', ar: 'تقييماتي',  en: 'Ratings',  href: basePath + 'hub/ratings.html' },
       { page: 'tour',     icon: 'fa-solid fa-seedling',         ar: 'اكتشف',     en: 'Explore',  href: basePath + 'tour.html' }
@@ -389,6 +391,9 @@
     /*@3.BONJ.26*/
     if (path.indexOf('/hub/faculty') !== -1) return 'faculty';
     if (path.indexOf('/hub/ratings') !== -1) return 'ratings';
+    if (path.indexOf('/hub/notes') !== -1) return 'notes';
+    if (path.indexOf('/hub/quiz') !== -1) return 'quiz';
+    if (path.indexOf('/hub/games') !== -1) return 'games';
     if (path.indexOf('/tour') !== -1) return 'tour';
     if (path.indexOf('/hub/') !== -1) return 'semester';
     /*@3.BONJ.27*/

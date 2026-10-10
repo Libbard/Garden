@@ -1,0 +1,69 @@
+.ghn {
+  --ghn-shade: var(--bg-body);
+  inline-size: min(100%, max(300px, (100dvh - 395px) / var(--h)));
+  display: grid; gap: .5rem;
+}
+[data-theme="light"] .ghn { --ghn-shade: var(--text-primary); }
+.ghn-board {
+  position: relative; direction: ltr; inline-size: 100%; aspect-ratio: var(--ar);
+  border: 1px solid var(--border-color); border-radius: var(--radius-xl); background: var(--bg-card);
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+}
+.ghn-base {
+  position: absolute; inset-inline: 3%; inset-block-end: calc(var(--row) * .2); block-size: calc(var(--row) * .5);
+  border-radius: var(--radius-md); background: var(--bg-elevated); border: 1px solid var(--border-color);
+}
+.ghn-pegs { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.ghn-peg {
+  position: relative; padding: 0; margin: 0; border: 0; border-radius: var(--radius-lg); background: transparent; color: inherit; font: inherit;
+  cursor: pointer; touch-action: none; transition: background-color .2s ease;
+}
+.ghn-peg::before {
+  content: ""; position: absolute; inset-inline-start: 50%; inset-block-end: calc(var(--row) * .6);
+  inline-size: clamp(6px, 4.5%, 11px); block-size: calc(var(--row) * var(--rod));
+  transform: translateX(-50%); border-radius: 999px 999px 0 0;
+  background: color-mix(in oklab, var(--text-muted) 55%, transparent);
+}
+.ghn-peg.ghn-cur { background: color-mix(in oklab, var(--gm-tint) 12%, transparent); }
+.ghn-peg.ghn-cur::before { background: color-mix(in oklab, var(--gm-tint) 70%, transparent); }
+.ghn-peg:focus-visible { outline: 2px solid var(--gm-tint); outline-offset: -3px; }
+.ghn-peg.ghn-badp { background: color-mix(in oklab, var(--gm-bad) 16%, transparent); }
+@media (hover: hover) { .ghn-peg:hover:not(.ghn-cur):not(.ghn-badp) { background: color-mix(in oklab, var(--text-muted) 8%, transparent); } }
+.ghn-discs { position: absolute; inset: 0; pointer-events: none; }
+.ghn-slot {
+  position: absolute; inset-block-start: 0; inset-inline-start: 0; inline-size: calc(100% / 3); aspect-ratio: var(--sar);
+  display: grid; place-items: center;
+  transform: translate(calc(var(--p, 0) * 100%), calc(var(--y, 0) * 100%));
+  transition: transform .24s cubic-bezier(.25, .8, .3, 1); will-change: transform;
+}
+.ghn-slot.ghn-up { z-index: 2; }
+.ghn-slot.ghn-drag { z-index: 3; transition: none; }
+.ghn-disc {
+  --ghn-c: hsl(var(--hue) 70% 60%);
+  display: block; inline-size: var(--w); block-size: 80%; border-radius: 999px;
+  background: var(--ghn-c);
+  box-shadow: inset 0 -3px 0 color-mix(in oklab, var(--ghn-c) 70%, var(--ghn-shade));
+  transition: transform .18s ease;
+}
+[data-theme="light"] .ghn-disc { --ghn-c: hsl(var(--hue) 62% 52%); }
+.ghn-up .ghn-disc { box-shadow: inset 0 -3px 0 color-mix(in oklab, var(--ghn-c) 70%, var(--ghn-shade)), 0 8px 14px -8px rgba(0, 0, 0, .55); }
+.ghn-drag .ghn-disc { transform: scale(1.05); }
+.ghn-disc.ghn-no { animation: ghnNo .34s ease; }
+@keyframes ghnNo { 20% { transform: translateX(-6px); } 40% { transform: translateX(6px); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+.ghn-labels {
+  direction: ltr; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); text-align: center;
+  font-family: 'Inter', 'Cairo', sans-serif; font-weight: 700; font-size: .85rem; font-variant-numeric: tabular-nums; color: var(--text-muted);
+}
+.ghn-labels span { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; transition: color .2s ease; }
+.ghn-labels .ghn-goal { color: var(--gm-tint); }
+.ghn-labels .ghn-on { color: var(--text-primary); }
+.ghn-msg { margin: 0; min-block-size: 3.2em; text-align: center; font-size: .86rem; line-height: 1.6; color: var(--text-secondary); }
+.ghn-msg.ghn-bad { color: var(--gm-bad); }
+.ghn-acts { display: flex; justify-content: center; }
+.ghn-undo { min-block-size: 2.75rem; padding-inline: 1.2rem; touch-action: manipulation; }
+.ghn--still .ghn-slot, .ghn--still .ghn-disc, .ghn--still .ghn-peg { transition: none; }
+.ghn--still .ghn-disc.ghn-no { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ghn-slot, .ghn-disc, .ghn-peg, .ghn-labels span { transition: none; }
+  .ghn-disc.ghn-no { animation: none; }
+}

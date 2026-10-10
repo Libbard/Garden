@@ -26,6 +26,9 @@
   <link rel="stylesheet" href="../../shared/skin.css">
   <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
 
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
 
 
   <!-- data-garden-icons -->
@@ -224,6 +227,35 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Assembly</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Redundant Load Elimination
+// Before:
+MOVQ %R8, x
+MOVQ x, %R8
+
+// After:
+MOVQ %R8, x</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Assembly</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Variation: Load to a different register
+// Before:
+MOVQ %R8, x
+MOVQ x, %R9
+
+// After:
+MOVQ %R8, x
+MOVQ %R8, %R9</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">لماذا لا نقوم بزيادة حجم نافذة التحسين الموضعي (Peephole Window) لتشمل 100 تعليمة مثلاً؟</template>
@@ -257,8 +289,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في البنى المعمارية الغنية مثل <span class="smart-term" data-term-en="CISC" data-ar="حاسوب بمجموعة تعليمات معقدة" data-en-def="Complex Instruction Set Computer; architectures where single instructions can execute several low-level operations.">CISC</span>، يمكن لتعليمة واحدة أن تجمع بين عمليات متعددة (مثل إلغاء مرجعية مؤشر، الوصول للذاكرة، وإجراء عملية حسابية).</p><p>لاستغلال هذه التعليمات القوية، نستخدم <b>تغطية الشجرة (Tree Coverage)</b>.</p><p>الفكرة هي تمثيل كل تعليمة ممكنة في المعمارية كشجرة قالب (Template Tree).</p><p>أوراق هذه الشجرة يمكن أن تكون سجلات، ثوابت، أو عناوين ذاكرة.</p><p>يتم مطابقة أجزاء من شجرة البرنامج (DAG) مع هذه القوالب لإصدار التعليمات المثلى.</p></template>
-    <template class="content-en"><p>In rich <span class="smart-term" data-term-en="CISC" data-ar="حاسوب بمجموعة تعليمات معقدة" data-en-def="Complex Instruction Set Computer; architectures where single instructions can execute several low-level operations.">CISC</span> architectures, a single instruction can easily combine multiple operations (e.g., dereferencing a pointer, accessing memory, and performing arithmetic).</p><p>To exploit these powerful instructions, we use <b>tree coverage</b>.</p><p>The idea is to represent each possible instruction as a template tree, where leaves can be registers, constants, or memory addresses.</p><p>Fragments of the program's DAG are matched against these templates to emit the optimal instructions.</p></template>
+    <template class="content-ar"><p>في البنى المعمارية الغنية مثل <span class="smart-term" data-term-en="CISC" data-ar="حاسوب بمجموعة تعليمات معقدة" data-en-def="Complex Instruction Set Computer; architectures where single instructions can execute several low-level operations.">CISC</span>، يمكن لتعليمة واحدة أن تجمع بين عمليات متعددة (مثل إلغاء مرجعية مؤشر، الوصول للذاكرة، وإجراء عملية حسابية).</p><p>لاستغلال هذه التعليمات القوية، نستخدم <b>تغطية الشجرة (Tree Coverage)</b>.</p><p>الفكرة هي تمثيل كل تعليمة ممكنة في المعمارية كشجرة قالب (Template Tree).</p><p>أوراق هذه الشجرة يمكن أن تكون سجلات، ثوابت، أو عناوين ذاكرة.</p><p>يتم مطابقة أجزاء من شجرة البرنامج (DAG) مع هذه القوالب لإصدار التعليمات المثلى.</p><p><b>أمثلة على قوالب تعليمات X86 (X86 Instruction Templates):</b></p><p>يمكن مطابقة أجزاء مختلفة من شجرة البرنامج مع تعليمات محددة كالتالي:</p><ul><li><b>تحميل ثابت:</b> العقدة <code>C_j</code> التي تشير إلى سجل <code>R_i</code> تطابق التعليمة <code>MOVQ $C_j, R_i</code>.</li><li><b>تحميل من الذاكرة:</b> العقدة <code>M_x</code> التي تشير إلى سجل <code>R_i</code> تطابق التعليمة <code>MOVQ M_x, R_i</code>.</li><li><b>إلغاء المرجعية (Dereference):</b> عقدة <code>DEREF</code> لها ابن <code>R_j</code> تطابق التعليمة <code>MOVQ (R_j), R_i</code>.</li><li><b>الجمع مع ثابت:</b> عقدة <code>IADD</code> لها ابنان <code>R_i</code> و <code>C_j</code> تطابق التعليمة <code>ADDQ C_j, R_i</code>.</li><li><b>إلغاء المرجعية مع إزاحة (Offset):</b> عقدة <code>DEREF</code> لها ابن <code>IADD</code> (والذي بدوره له ابنان <code>R_k</code> و <code>C_j</code>) تطابق التعليمة <code>MOVQ C_j(R_k), R_i</code>.</li><li><b>حساب عنوان فعال:</b> عقدة <code>IADD</code> لها ابنان <code>RBP</code> و <code>C_j</code> تطابق التعليمة <code>LEAQ C_j(RBP), R_i</code>.</li><li><b>تعيين معقد (مثل فهرسة المصفوفات):</b> عقدة <code>ASSIGN</code> تحتوي على عمليات ضرب وجمع وإلغاء مرجعية يمكن أن تطابق تعليمة واحدة معقدة مثل <code>MOVQ R_i, (R_k, R_l, 8)</code>.</li></ul></template>
+    <template class="content-en"><p>In rich <span class="smart-term" data-term-en="CISC" data-ar="حاسوب بمجموعة تعليمات معقدة" data-en-def="Complex Instruction Set Computer; architectures where single instructions can execute several low-level operations.">CISC</span> architectures, a single instruction can easily combine multiple operations (e.g., dereferencing a pointer, accessing memory, and performing arithmetic).</p><p>To exploit these powerful instructions, we use <b>tree coverage</b>.</p><p>The idea is to represent each possible instruction as a template tree, where leaves can be registers, constants, or memory addresses.</p><p>Fragments of the program's DAG are matched against these templates to emit the optimal instructions.</p><p><b>Examples of X86 Instruction Templates:</b></p><p>Different fragments of the program's tree can be matched with specific instructions as follows:</p><ul><li><b>Load Constant:</b> A node <code>C_j</code> pointing to register <code>R_i</code> matches the instruction <code>MOVQ $C_j, R_i</code>.</li><li><b>Load from Memory:</b> A node <code>M_x</code> pointing to register <code>R_i</code> matches the instruction <code>MOVQ M_x, R_i</code>.</li><li><b>Dereference:</b> A <code>DEREF</code> node with child <code>R_j</code> matches the instruction <code>MOVQ (R_j), R_i</code>.</li><li><b>Add Constant:</b> An <code>IADD</code> node with children <code>R_i</code> and <code>C_j</code> matches the instruction <code>ADDQ C_j, R_i</code>.</li><li><b>Dereference with Offset:</b> A <code>DEREF</code> node with an <code>IADD</code> child (which has children <code>R_k</code> and <code>C_j</code>) matches the instruction <code>MOVQ C_j(R_k), R_i</code>.</li><li><b>Load Effective Address:</b> An <code>IADD</code> node with children <code>RBP</code> and <code>C_j</code> matches the instruction <code>LEAQ C_j(RBP), R_i</code>.</li><li><b>Complex Assignment (e.g., array indexing):</b> An <code>ASSIGN</code> node containing multiplication, addition, and dereference can match a single complex instruction like <code>MOVQ R_i, (R_k, R_l, 8)</code>.</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -518,14 +550,29 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لا يحتاج كل متغير إلى سجل مستقل.</p><p>يمكن لمتغيرين مشاركة نفس السجل إذا لم تكن استخداماتهما تتعارض.</p><p>لتحديد ذلك، نحسب <b>النطاقات الحية (Live Ranges)</b>: يكون المتغير حياً من أول تعريف له حتى آخر استخدام له.</p><p>نبني <b>رسم بياني للتعارض (Conflict Graph)</b>: العقد هي المتغيرات، ونضيف حافة بين عقدتين إذا تداخل نطاقهما الحي.</p><p>الهدف هو تعيين لون مختلف (سجل) لكل عقدة بحيث لا تتشارك عقدتان متجاورتان نفس اللون.</p></template>
-    <template class="content-en"><p>Not every variable needs a distinct register.</p><p>Two variables can share the same register if their uses do not conflict.</p><p>To determine this, we compute <b>Live Ranges</b>: a variable is live from its first definition until its final use.</p><p>We construct a <b>Conflict Graph</b>: nodes are variables, and we add an edge between nodes whose live ranges overlap.</p><p>The goal is to assign a different color (register) to each node so no two adjacent nodes have the same color.</p></template>
+    <template class="content-ar"><p>لا يحتاج كل متغير إلى سجل مستقل.</p><p>يمكن لمتغيرين مشاركة نفس السجل إذا لم تكن استخداماتهما تتعارض.</p><p>لتحديد ذلك، نحسب <b>النطاقات الحية (Live Ranges)</b>: يكون المتغير حياً من أول تعريف له حتى آخر استخدام له.</p><p>نبني <b>رسم بياني للتعارض (Conflict Graph)</b>: العقد هي المتغيرات، ونضيف حافة بين عقدتين إذا تداخل نطاقهما الحي.</p><p>الهدف هو تعيين لون مختلف (سجل) لكل عقدة بحيث لا تتشارك عقدتان متجاورتان نفس اللون.</p><p><b>مثال عملي لبناء رسم بياني للتعارض:</b></p><p>لدينا الكود الخطي التالي، وسنتتبع المتغيرات الحية (Live Variables) في كل سطر:</p><ol><li><code>x = 10;</code> (المتغيرات الحية: x)</li><li><code>y = 10;</code> (المتغيرات الحية: x, y)</li><li><code>a = x * y;</code> (المتغيرات الحية: x, y, a)</li><li><code>b = a * a;</code> (المتغيرات الحية: x, a, b)</li><li><code>a = b + 30;</code> (المتغيرات الحية: x, a, b)</li><li><code>x = x + 1;</code> (المتغيرات الحية: x)</li><li><code>z = x * x;</code> (المتغيرات الحية: x, z)</li><li><code>return z;</code> (المتغيرات الحية: z)</li></ol><p><b>النتيجة:</b> بناءً على تداخل المتغيرات الحية في نفس الأسطر، نرسم حواف التعارض. المتغير <code>x</code> يتعارض مع <code>y, a, b, z</code> (لأنه ظهر معها في نفس الأسطر). المتغير <code>a</code> يتعارض مع <code>x, y, b</code>. المتغير <code>b</code> يتعارض مع <code>x, a</code>. المتغير <code>y</code> يتعارض مع <code>x, a</code>. المتغير <code>z</code> يتعارض مع <code>x</code> فقط.</p></template>
+    <template class="content-en"><p>Not every variable needs a distinct register.</p><p>Two variables can share the same register if their uses do not conflict.</p><p>To determine this, we compute <b>Live Ranges</b>: a variable is live from its first definition until its final use.</p><p>We construct a <b>Conflict Graph</b>: nodes are variables, and we add an edge between nodes whose live ranges overlap.</p><p>The goal is to assign a different color (register) to each node so no two adjacent nodes have the same color.</p><p><b>Worked Example: Building a Register Conflict Graph:</b></p><p>Given the following linear code, we track the live variables at each line:</p><ol><li><code>x = 10;</code> (Live: x)</li><li><code>y = 10;</code> (Live: x, y)</li><li><code>a = x * y;</code> (Live: x, y, a)</li><li><code>b = a * a;</code> (Live: x, a, b)</li><li><code>a = b + 30;</code> (Live: x, a, b)</li><li><code>x = x + 1;</code> (Live: x)</li><li><code>z = x * x;</code> (Live: x, z)</li><li><code>return z;</code> (Live: z)</li></ol><p><b>Result:</b> Based on the overlapping live variables on the same lines, we draw conflict edges. Variable <code>x</code> conflicts with <code>y, a, b, z</code> (because it appears with them on the same lines). Variable <code>a</code> conflicts with <code>x, y, b</code>. Variable <code>b</code> conflicts with <code>x, a</code>. Variable <code>y</code> conflicts with <code>x, a</code>. Variable <code>z</code> conflicts with <code>x</code> only.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
     <template class="content-ar"><p>الرسم البياني المستوي (Planar Graph) يمكن تلوينه دائماً بـ 4 ألوان، لكن الرسوم البيانية للتعارض ليست بالضرورة مستوية، وقد تتطلب ألواناً أكثر.</p><p>مشكلة إيجاد الحد الأدنى من الألوان هي مشكلة <b>NP-Complete</b>.</p><p>لذلك نستخدم استدلالات (Heuristics) للحل العملي.</p><p>الاستدلال الشائع: فرز العقد حسب عدد الحواف (التعارضات)، ثم تخصيص السجلات للعقدة الأكثر تعارضاً أولاً.</p><p>إذا نفدت السجلات، يتم تعليم العقدة كمتغير غير مسجل (يتم سكبه للذاكرة)، ونستمر مع العقد الأقل تعارضاً.</p></template>
     <template class="content-en"><p>A planar graph can always be colored with 4 colors, but conflict graphs are not necessarily planar and may require more colors.</p><p>The general problem of finding the minimum number of colors is <b>NP-complete</b>.</p><p>Thus, we use heuristics for practical solutions.</p><p>Common heuristic: sort nodes by the number of edges (conflicts), then assign registers to the most conflicted node first.</p><p>If available registers reach zero, mark that node as non-registerized (spilled), and continue with fewer conflicted nodes.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>x = 10;
+y = 10;
+a = x * y;
+b = a * a;
+a = b + 30;
+x = x + 1;
+z = x * x;
+return z;</code></pre>
   </div>
 
   <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show a Register Conflict Graph. 5 circular nodes labeled x, y, z, a, b. Edges connecting: (x-y), (x-a), (x-b), (x-z), (y-a), (a-b). Color the nodes to represent registers: x is white, y and z are light gray, a is dark gray, b is light gray. Style: educational, dark background #0d1117, accent colors for nodes, viewBox 0 0 600 400. -->
@@ -649,14 +696,28 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لتنفيذ تخصيص السجلات العالمي، يجب أن نحافظ على اتساق التعيينات بغض النظر عن مسار تدفق التحكم.</p><p>الخطوات:</p><ol><li>بناء <strong>الرسم البياني لتدفق التحكم (CFG)</strong> للدالة.</li><li>لكل تعريف متغير، تتبع المسارات الأمامية المحتملة لاستخدامات ذلك المتغير، مع مراعاة الحلقات والفروع.</li><li>إذا كان هناك مسار من التعريف إلى الاستخدام، فإن جميع <span class="smart-term" data-term-en="Live Basic Block" data-ar="الكتلة الأساسية الحية" data-en-def="A basic block in which a specific variable holds a value that will be used in the future.">الكتل الأساسية</span> (Basic Blocks) في ذلك المسار تعتبر ضمن مجموعة الكتل الحية لذلك المتغير.</li><li>بناء رسم بياني للتعارض بناءً على مجموعات الكتل الحية: العقد تمثل المتغيرات، والحواف تمثل تقاطع المجموعات الحية لمتغيرين.</li></ol></template>
-    <template class="content-en"><p>To perform global register allocation, we must keep assignments consistent no matter where the control flow leads.</p><p>Steps:</p><ol><li>Construct the <strong>Control Flow Graph (CFG)</strong> for the function.</li><li>For each variable definition, trace forward paths to uses, accounting for loops and branches.</li><li>If a path exists from definition to use, all <span class="smart-term" data-term-en="Live Basic Block" data-ar="الكتلة الأساسية الحية" data-en-def="A basic block in which a specific variable holds a value that will be used in the future.">basic blocks</span> in that path are members of the set of live basic blocks for that variable.</li><li>Construct a conflict graph based on live sets: nodes represent variables, and edges represent a conflict between two variables whose live sets intersect.</li></ol></template>
+    <template class="content-ar"><p>لتنفيذ تخصيص السجلات العالمي، يجب أن نحافظ على اتساق التعيينات بغض النظر عن مسار تدفق التحكم.</p><p>الخطوات:</p><ol><li>بناء <strong>الرسم البياني لتدفق التحكم (CFG)</strong> للدالة.</li><li>لكل تعريف متغير، تتبع المسارات الأمامية المحتملة لاستخدامات ذلك المتغير، مع مراعاة الحلقات والفروع.</li><li>إذا كان هناك مسار من التعريف إلى الاستخدام، فإن جميع <span class="smart-term" data-term-en="Live Basic Block" data-ar="الكتلة الأساسية الحية" data-en-def="A basic block in which a specific variable holds a value that will be used in the future.">الكتل الأساسية</span> (Basic Blocks) في ذلك المسار تعتبر ضمن مجموعة الكتل الحية لذلك المتغير.</li><li>بناء رسم بياني للتعارض بناءً على مجموعات الكتل الحية: العقد تمثل المتغيرات، والحواف تمثل تقاطع المجموعات الحية لمتغيرين.</li></ol><p><b>مثال عملي لتخصيص السجلات العالمي:</b></p><p>لدينا الكود أعلاه الذي يحتوي على حلقة تكرارية. نقوم بتحليله كالتالي:</p><ol><li><b>الكتل الأساسية (CFG):</b> الكتلة A (التهيئة <code>a=10, i=0</code>)، الكتلة B (الشرط <code>i&lt;10</code>)، الكتلة C (جسم الحلقة <code>a=a*3, i++</code>)، الكتلة D (ما بعد الحلقة <code>x=a*2, print...</code>).</li><li><b>تحديد النطاقات الحية للكتل:</b> المتغير <code>i</code> حي في الكتل {A, B, C}. المتغير <code>a</code> حي في الكتل {A, B, C, D}. المتغير <code>x</code> حي في الكتلة {D} فقط.</li></ol><p><b>النتيجة (الرسم البياني للتعارض):</b> المتغيران <code>i</code> و <code>a</code> يتقاطعان في الكتل A و B و C، لذا توجد حافة تعارض بينهما. المتغيران <code>a</code> و <code>x</code> يتقاطعان في الكتلة D، لذا توجد حافة تعارض بينهما. المتغيران <code>i</code> و <code>x</code> لا يتقاطعان في أي كتلة، لذا لا يوجد تعارض بينهما ويمكنهما نظرياً مشاركة نفس السجل.</p></template>
+    <template class="content-en"><p>To perform global register allocation, we must keep assignments consistent no matter where the control flow leads.</p><p>Steps:</p><ol><li>Construct the <strong>Control Flow Graph (CFG)</strong> for the function.</li><li>For each variable definition, trace forward paths to uses, accounting for loops and branches.</li><li>If a path exists from definition to use, all <span class="smart-term" data-term-en="Live Basic Block" data-ar="الكتلة الأساسية الحية" data-en-def="A basic block in which a specific variable holds a value that will be used in the future.">basic blocks</span> in that path are members of the set of live basic blocks for that variable.</li><li>Construct a conflict graph based on live sets: nodes represent variables, and edges represent a conflict between two variables whose live sets intersect.</li></ol><p><b>Worked Example: Global Register Allocation:</b></p><p>Consider the code above containing a loop. We analyze it as follows:</p><ol><li><b>Basic Blocks (CFG):</b> Block A (init <code>a=10, i=0</code>), Block B (condition <code>i&lt;10</code>), Block C (loop body <code>a=a*3, i++</code>), Block D (after loop <code>x=a*2, print...</code>).</li><li><b>Determine Live Sets per Block:</b> Variable <code>i</code> is live in blocks {A, B, C}. Variable <code>a</code> is live in blocks {A, B, C, D}. Variable <code>x</code> is live only in block {D}.</li></ol><p><b>Result (Conflict Graph):</b> Variables <code>i</code> and <code>a</code> intersect in blocks A, B, and C, so there is a conflict edge between them. Variables <code>a</code> and <code>x</code> intersect in block D, so there is a conflict edge between them. Variables <code>i</code> and <code>x</code> never intersect in any block, so they do not conflict and could theoretically share the same register.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
     <template class="content-ar"><p>الفرق الرئيسي بين التخصيص المحلي والعالمي هو النطاق.</p><p>المحلي يعمل داخل كتلة أساسية واحدة (Basic Block)، بينما العالمي يتعامل مع تعقيدات الفروع (if/else) والحلقات (for/while).</p><p>في التخصيص العالمي، إذا كان المتغير حياً عبر كتلة لا يتم استخدامه فيها (لكنه يُستخدم في كتلة لاحقة)، فإنه لا يزال يحجز السجل في تلك الكتلة الوسطى، مما قد يمنع متغيرات أخرى من استخدام ذلك السجل.</p><p>هذا يجعل الرسم البياني للتعارض العالمي أكثر كثافة وأكثر عرضة للحاجة إلى سكب المتغيرات (Spilling).</p></template>
     <template class="content-en"><p>The main difference between local and global allocation is scope.</p><p>Local works within a single basic block, while global handles the complexities of branches and loops.</p><p>In global allocation, if a variable is live across a block where it isn't used (but used in a subsequent block), it still occupies the register in that middle block, potentially blocking other variables.</p><p>This makes the global conflict graph denser and more prone to requiring variable spilling.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>a = 10;
+for (i = 0; i &lt; 10; i++) {
+    a = a * 3;
+}
+x = a * 2;
+print x;
+print a;</code></pre>
   </div>
 
   <!-- DIAGRAM[1]: Detailed SVG generation prompt: Show a 3-part diagram for Global Register Allocation. Left: Simple code with a loop. Middle: Control Flow Graph (CFG) with 4 blocks (A, B, C, D) showing flow arrows. Right: Conflict graph showing nodes i, a, x with their live block sets (e.g., i{ABC}, a{ABCD}, x{D}) and edges connecting them if sets intersect. Style: educational, dark background #0d1117, accent color #ff00ff, viewBox 0 0 900 400. -->
@@ -889,8 +950,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في المرحلة الأخيرة من رحلة المترجمات. لقد وصلنا إلى النقطة التي يتحول فيها الكود الصحيح إلى كود 'سريع'. في هذه الوحدة، نركز على التحسينات منخفضة المستوى. تخيلوا التحسين الموضعي (Peephole) كمدقق لغوي ينظر إلى كلمتين متجاورتين فقط ليصلح الأخطاء الواضحة، مثل 'تحميل ما تم تخزينه للتو'. ثم ننتقل إلى التحدي الأكبر: تخصيص السجلات. السجلات هي العقارات الأغلى في المعالج. كيف نوزعها؟ نستخدم 'تلوين الرسم البياني'. نرسم المتغيرات كعقد، وإذا عاش متغيران في نفس الوقت، نضع بينهما خطاً (تعارض). هدفنا تلوين العقد بألوان (سجلات) مختلفة دون أن يتشارك جاران نفس اللون. تذكروا للامتحان: مشكلة التلوين هذه NP-Complete، لذا نستخدم استدلالات (Heuristics) مثل البدء بالعقدة الأكثر تعارضاً. وأخيراً، احذروا من مزالق التحسين؛ التحسينات قد تتشاجر مع بعضها (تفاعلات سلبية) وقد تجعل تصحيح الأخطاء كابوساً. ركزوا على فهم 'لماذا' نستخدم الاستدلالات بدلاً من الحلول المثالية البطيئة.</template>
-    <template class="content-en">Welcome, future engineers, to the final stage of our compiler journey. We've reached the point where correct code becomes 'fast' code. In this module, we focus on low-level optimizations. Imagine Peephole optimization as a proofreader looking at just two adjacent words to fix obvious mistakes, like 'loading what was just stored'. Then we tackle the biggest challenge: Register Allocation. Registers are the most expensive real estate in the CPU. How do we distribute them? We use 'Graph Coloring'. We draw variables as nodes, and if two variables live at the same time, we draw a line (conflict) between them. Our goal is to color nodes with different colors (registers) without neighbors sharing a color. Remember for the exam: this coloring problem is NP-Complete, so we use heuristics like starting with the most conflicted node. Finally, beware of optimization pitfalls; optimizations can fight each other (negative interactions) and make debugging a nightmare. Focus on understanding 'why' we use heuristics instead of slow, perfect solutions.</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في المرحلة الأخيرة من رحلة المترجمات. لقد وصلنا إلى النقطة التي يتحول فيها الكود الصحيح إلى كود 'سريع'. في هذه الوحدة، نركز على التحسينات منخفضة المستوى. تخيلوا التحسين الموضعي (Peephole) كمدقق لغوي ينظر إلى كلمتين متجاورتين فقط ليصلح الأخطاء الواضحة، مثل 'تحميل ما تم تخزينه للتو'. ثم ننتقل إلى التحدي الأكبر: تخصيص السجلات. السجلات هي العقارات الأغلى في المعالج. كيف نوزعها؟ نستخدم 'تلوين الرسم البياني'. نرسم المتغيرات كعقد، وإذا عاش متغيران في نفس الوقت، نضع بينهما خطاً (تعارض). هدفنا تلوين العقد بألوان (سجلات) مختلفة دون أن يتشارك جاران نفس اللون. تذكروا للامتحان: مشكلة التلوين هذه NP-Complete، لذا نستخدم استدلالات (Heuristics) مثل البدء بالعقدة الأكثر تعارضاً. وأخيراً، احذروا من مزالق التحسين؛ التحسينات قد تتشاجر مع بعضها (تفاعلات سلبية) وقد تجعل تصحيح الأخطاء كابوساً. ركزوا على فهم 'لماذا' نستخدم الاستدلالات بدلاً من الحلول المثالية البطيئة.<p>فهم النظرية وراء تخصيص السجلات أمر مهم، لكن إتقانها يتطلب تتبع المتغيرات الحية سطراً بسطر أو كتلة بكتلة. في الاختبارات، غالباً ما يُطلب منك رسم الرسم البياني للتعارض انطلاقاً من مقطع برمجي صغير، لذا تدرب جيداً على الأمثلة العملية المضافة هنا لتجنب الأخطاء الشائعة في تحديد التقاطعات.</p><p>إن فهم هذه التحويلات المحددة على مستوى لغة التجميع، مثل تحويل تحميل الذاكرة إلى نقل مباشر بين السجلات، يعد أمراً بالغ الأهمية. فهو يسد الفجوة بين أشجار بناء الجملة المجردة والتنفيذ الفعلي للأجهزة، مما يوضح كيف نتجنب توقف خط الأنابيب (Pipeline Stalls) المكلف في أدنى المستويات.</p><p>لقد أضفنا أمثلة عملية توضح كيف يتم تحويل الهياكل الشجرية المجردة إلى تعليمات تجميع حقيقية لمعالج X86. فهم هذه القوالب ضروري لإدراك كيف يستغل المترجم قوة معماريات CISC لتقليل عدد التعليمات المنفذة.</p></template>
+    <template class="content-en">Welcome, future engineers, to the final stage of our compiler journey. We've reached the point where correct code becomes 'fast' code. In this module, we focus on low-level optimizations. Imagine Peephole optimization as a proofreader looking at just two adjacent words to fix obvious mistakes, like 'loading what was just stored'. Then we tackle the biggest challenge: Register Allocation. Registers are the most expensive real estate in the CPU. How do we distribute them? We use 'Graph Coloring'. We draw variables as nodes, and if two variables live at the same time, we draw a line (conflict) between them. Our goal is to color nodes with different colors (registers) without neighbors sharing a color. Remember for the exam: this coloring problem is NP-Complete, so we use heuristics like starting with the most conflicted node. Finally, beware of optimization pitfalls; optimizations can fight each other (negative interactions) and make debugging a nightmare. Focus on understanding 'why' we use heuristics instead of slow, perfect solutions.<p>Understanding the theory behind register allocation is important, but mastering it requires tracing live variables line-by-line or block-by-block. In exams, you will often be asked to draw a conflict graph from a short code snippet, so practice the worked examples added here carefully to avoid common mistakes in identifying intersections.</p><p>Understanding these specific assembly-level transformations, like converting a memory load into a direct register move, is crucial. It bridges the gap between abstract syntax trees and actual hardware execution, demonstrating how we avoid costly pipeline stalls at the lowest level.</p><p>We have added practical examples showing how abstract tree structures are translated into real X86 assembly instructions. Understanding these templates is essential to grasp how the compiler exploits the power of CISC architectures to minimize the number of executed instructions.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1064,6 +1125,42 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأن المترجمات الحديثة تحتوي على حوالي 50 تقنية تحسين، وترتيب تطبيقها يهم جداً (تطبيق A ثم B يختلف عن B ثم A). ترتيب 50 عنصراً يعطينا 50! تبديل ممكن، مما يجعل إيجاد الترتيب الأمثل مستحيلاً عملياً.</template>
           <template class="content-en">Because modern compilers have about 50 optimization techniques, and the order of their application matters greatly (applying A then B is different from B then A). Ordering 50 items gives 50! possible permutations, making finding the optimal order practically impossible.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في مثال تخصيص السجلات العالمي، لماذا نعتبر المتغير (a) حياً في الكتلة D على الرغم من أنه لم يتم تعديله هناك؟</template>
+          <template class="content-en">In the global register allocation example, why do we consider variable (a) live in block D even though it wasn't modified there?</template>
+          <span class="content-target">في مثال تخصيص السجلات العالمي، لماذا نعتبر المتغير (a) حياً في الكتلة D على الرغم من أنه لم يتم تعديله هناك؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن النطاق الحي يمتد حتى 'آخر استخدام' للمتغير. في الكتلة D، توجد تعليمة (print a) وتعليمة (x=a*2)، مما يعني أن قيمة (a) المحسوبة في الكتل السابقة لا تزال مطلوبة ومستخدمة في الكتلة D، لذا يجب أن يظل (a) حياً (ويحتفظ بسجله) حتى يتم تنفيذ هذه التعليمات.</p></template>
+          <template class="content-en"><p>Because a live range extends until the 'final use' of the variable. In block D, there is a (print a) and an (x=a*2) instruction, meaning the value of (a) computed in previous blocks is still needed and used in block D. Therefore, (a) must remain live (and keep its register) until these instructions are executed.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نحتاج إلى قوالب تعليمات معقدة مثل <code>MOVQ R_i, (R_k, R_l, 8)</code> في معماريات CISC أثناء مرحلة اختيار التعليمات؟</template>
+          <template class="content-en">Why do we need complex instruction templates like <code>MOVQ R_i, (R_k, R_l, 8)</code> in CISC architectures during the instruction selection phase?</template>
+          <span class="content-target">لماذا نحتاج إلى قوالب تعليمات معقدة مثل <code>MOVQ R_i, (R_k, R_l, 8)</code> في معماريات CISC أثناء مرحلة اختيار التعليمات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>تم تصميم معماريات CISC لتنفيذ عمليات معقدة، مثل فهرسة المصفوفات (القاعدة + الفهرس * المقياس)، في تعليمة واحدة. استخدام قوالب معقدة يسمح للمترجم بدمج شجرة فرعية كبيرة من العمليات الأساسية (ضرب، جمع، إلغاء مرجعية) في تعليمة آلة واحدة فعالة، مما يوفر دورات المعالج ويقلل من حجم الكود.</p></template>
+          <template class="content-en"><p>CISC architectures are designed to perform complex operations, such as array indexing (base + index * scale), in a single instruction. Using complex templates allows the compiler to collapse a large subtree of basic operations (multiply, add, dereference) into one efficient machine instruction, saving CPU cycles and reducing code size.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1365,6 +1462,40 @@
         "en": "Applying A then B might speed up the program, while B then A might slow it down."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في تخصيص السجلات العالمي، إذا كان المتغير (i) حياً في الكتل {A, B, C} والمتغير (x) حياً في الكتلة {D} فقط، هل يتعارضان؟",
+      "en": "In global register allocation, if variable (i) is live in blocks {A, B, C} and variable (x) is live only in block {D}, do they conflict?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا يتعارضان، لأنهما لا يتقاطعان في أي كتلة أساسية مشتركة.",
+        "en": "No, they do not conflict because they do not intersect in any common basic block."
+      },
+      "example": {
+        "ar": "يمكن للمترجم تخصيص نفس السجل (مثلاً R1) للمتغير (i) أثناء الحلقة، ثم إعادة استخدامه للمتغير (x) بعد انتهاء الحلقة.",
+        "en": "The compiler can allocate the same register (e.g., R1) to (i) during the loop, and reuse it for (x) after the loop finishes."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "في اختيار التعليمات، كيف يتم تمثيل تعليمة حساب العنوان الفعال (LEAQ) كقالب شجري؟",
+      "en": "In instruction selection, how is the Load Effective Address (LEAQ) instruction represented as a tree template?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتمثل كعقدة جمع (IADD) لها ابنان: سجل القاعدة (مثل RBP) وثابت الإزاحة (C_j).",
+        "en": "It is represented as an addition node (IADD) with two children: a base register (like RBP) and a constant offset (C_j)."
+      },
+      "example": {
+        "ar": "تطابق التعليمة LEAQ C_j(RBP), R_i.",
+        "en": "It matches the instruction LEAQ C_j(RBP), R_i."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1374,7 +1505,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1390,7 +1521,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1715,6 +1846,70 @@
     },
     "difficulty": "medium",
     "conceptId": "optimization-pitfalls-interactions"
+  },
+  {
+    "conceptId": "conflict-graphs-coloring",
+    "question": {
+      "ar": "بناءً على تتبع المتغيرات الحية، إذا كان السطر 4 يحتوي على المتغيرات الحية {x, a, b} والسطر 5 يحتوي على {x, a, b}، فما هي حواف التعارض المؤكدة بين هذه المتغيرات الثلاثة؟",
+      "en": "Based on live variable tracking, if line 4 has live variables {x, a, b} and line 5 has {x, a, b}, what are the guaranteed conflict edges among these three variables?"
+    },
+    "options": {
+      "ar": [
+        "حواف بين (x و a)، (x و b)، (a و b)",
+        "لا توجد حواف تعارض لأنها في نفس السطر",
+        "حافة بين (a و b) فقط",
+        "حافة بين (x و a) فقط"
+      ],
+      "en": [
+        "Edges between (x and a), (x and b), (a and b)",
+        "No conflict edges because they are on the same line",
+        "An edge between (a and b) only",
+        "An edge between (x and a) only"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "بما أن المتغيرات الثلاثة حية في نفس الوقت (في نفس السطر)، فإن كل متغير يتعارض مع المتغيرين الآخرين، مما يشكل مثلثاً من الحواف في الرسم البياني للتعارض.",
+      "en": "Since all three variables are live at the same time (on the same line), each variable conflicts with the other two, forming a triangle of edges in the conflict graph."
+    },
+    "hint": {
+      "ar": "إذا تواجدت مجموعة متغيرات معاً في قائمة المتغيرات الحية لأي سطر، فإنها جميعاً تتعارض مع بعضها البعض.",
+      "en": "If a set of variables appear together in the live variables list of any line, they all conflict with each other."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "instruction-selection",
+    "question": {
+      "ar": "أي قالب من قوالب تعليمات X86 التالية يطابق بشكل أفضل جزءاً من شجرة AST يتكون من عقدة DEREF (إلغاء مرجعية) لها ابن عبارة عن عقدة IADD (جمع) تجمع بين سجل وثابت؟",
+      "en": "Which of the following X86 instruction templates best matches an AST fragment consisting of a DEREF node whose child is an IADD node adding a register and a constant?"
+    },
+    "options": {
+      "ar": [
+        "MOVQ C_j(R_k), R_i",
+        "MOVQ (R_j), R_i",
+        "ADDQ C_j, R_i",
+        "LEAQ C_j(RBP), R_i"
+      ],
+      "en": [
+        "MOVQ C_j(R_k), R_i",
+        "MOVQ (R_j), R_i",
+        "ADDQ C_j, R_i",
+        "LEAQ C_j(RBP), R_i"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "التعليمة MOVQ C_j(R_k), R_i تقوم بجمع الثابت C_j مع السجل R_k لحساب العنوان، ثم تقوم بإلغاء مرجعيته (قراءة الذاكرة) ووضع النتيجة في R_i، وهو ما يطابق بالضبط شجرة DEREF -> IADD.",
+      "en": "The instruction MOVQ C_j(R_k), R_i adds the constant C_j to register R_k to calculate the address, then dereferences it (reads memory) and puts the result in R_i, exactly matching the DEREF -> IADD tree."
+    },
+    "hint": {
+      "ar": "ابحث عن التعليمة التي تجمع بين الإزاحة (الثابت) وإلغاء المرجعية (الأقواس).",
+      "en": "Look for the instruction that combines an offset (constant) and a dereference (parentheses)."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>

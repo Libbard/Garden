@@ -114,6 +114,11 @@
         <template class="content-en">Thrashing and Locality Model</template>
         <span class="content-target">التعثر ونموذج المحلية</span>
       </a>
+      <a href="#worked-examples-page-replacement" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة محلولة: خوارزميات استبدال الصفحات</template>
+        <template class="content-en">Worked Examples: Page Replacement Algorithms</template>
+        <span class="content-target">أمثلة محلولة: خوارزميات استبدال الصفحات</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -1169,14 +1174,73 @@
   </details>
 </section>
 
+<section id="worked-examples-page-replacement" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> أمثلة محلولة: خوارزميات استبدال الصفحات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Worked Examples: Page Replacement Algorithms</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتبع خوارزميات FIFO و OPT و LRU على سلسلة مراجع لحساب عدد أخطاء الصفحة (Page Faults) باستخدام 3 إطارات.</p></template>
+    <template class="content-en"><p>Tracing FIFO, OPT, and LRU algorithms on a reference string to calculate the number of page faults using 3 frames.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بافتراض <span class="smart-term" data-term-en="Reference String" data-ar="سلسلة المراجع" data-en-def="A sequence of memory page accesses used to trace and evaluate page replacement algorithms.">سلسلة المراجع<span class="smart-term-tooltip"></span></span> التالية: 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1، ووجود 3 إطارات (Frames) مخصصة للعملية:</p>
+<ol>
+<li><b>خوارزمية FIFO:</b> يتم تحميل 7, 0, 1 (3 أخطاء). عند طلب 2، تستبدل 7 (لأنها الأقدم). عند طلب 0، هي موجودة (Hit). عند طلب 3، تستبدل 0 (لأنها الأقدم الآن). تستمر العملية هكذا.</li>
+<li><b>الخوارزمية المثلى (OPT):</b> بعد تحميل 7, 0, 1، عند طلب 2 تستبدل 7 (لأن 0 و 1 سيُستخدمان قريباً). عند طلب 3 تستبدل 1 (لأن 0 و 2 سيُستخدمان قبل 1).</li>
+<li><b>خوارزمية LRU:</b> بعد تحميل 7, 0, 1، عند طلب 2 تستبدل 7. ثم يُطلب 0 (تصبح الأحدث استخداماً). عند طلب 3، تستبدل 1 (لأنها الأقل استخداماً مؤخراً).</li>
+</ol>
+<p>النتيجة النهائية: خوارزمية FIFO أنتجت 15 خطأ صفحة، و LRU أنتجت 12 خطأ، بينما OPT (المثلى) أنتجت 9 أخطاء فقط.</p></template>
+    <template class="content-en"><p>Given the <span class="smart-term" data-term-en="Reference String" data-ar="سلسلة المراجع" data-en-def="A sequence of memory page accesses used to trace and evaluate page replacement algorithms.">reference string<span class="smart-term-tooltip"></span></span>: 7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 0, 3, 2, 1, 2, 0, 1, 7, 0, 1, and 3 allocated frames:</p>
+<ol>
+<li><b>FIFO Algorithm:</b> 7, 0, 1 are loaded (3 faults). 2 replaces 7 (oldest). 0 is a <span class="smart-term" data-term-en="Hit" data-ar="إصابة (تطابق)" data-en-def="When a requested page is already present in a memory frame, avoiding a page fault.">hit<span class="smart-term-tooltip"></span></span>. 3 replaces 0 (now the oldest). The process continues.</li>
+<li><b>Optimal Algorithm (OPT):</b> After loading 7, 0, 1, 2 replaces 7 (since 0 and 1 are used sooner). 3 replaces 1 (since 0 and 2 are used before 1).</li>
+<li><b>LRU Algorithm:</b> After loading 7, 0, 1, 2 replaces 7. 0 is accessed (becomes most recently used). 3 replaces 1 (the least recently used).</li>
+</ol>
+<p>Final Result: FIFO produced 15 page faults, LRU produced 12 faults, and OPT (the benchmark) produced only 9 faults.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>توضح هذه الأمثلة كيف أن الوصول المتكرر لنفس الصفحة (مثل تكرار طلب 0 و 3) لا يسبب خطأ صفحة إذا كانت الصفحة لا تزال في الذاكرة.</p>
+<p>نلاحظ أن خوارزمية FIFO أزالت الصفحة 0 رغم الحاجة إليها فوراً بعد ذلك، لأنها لا تهتم بنمط الاستخدام بل بوقت الدخول فقط.</p>
+<p>في المقابل، احتفظت خوارزمية LRU بالصفحات النشطة (مثل 0 و 2) بناءً على استخدامها القريب، مما جعلها تتفوق على FIFO وتقترب من أداء الخوارزمية المثلى.</p></template>
+    <template class="content-en"><p>These examples illustrate that repeated access to the same page (like requesting 0 and 3 multiple times) does not cause a page fault if the page remains in memory.</p>
+<p>Notice that FIFO evicted page 0 even though it was needed immediately after, because it only cares about arrival time, not usage patterns.</p>
+<p>In contrast, LRU kept active pages (like 0 and 2) based on their recent use, allowing it to outperform FIFO and approximate the Optimal algorithm.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في مثال سلسلة المراجع، لماذا تسببت الصفحة '0' في خطأ (Fault) في خوارزمية FIFO عند طلب الصفحة '3'، بينما لم تتسبب في ذلك في خوارزمية LRU؟</template>
+      <template class="content-en">In the reference string example, why did page '0' cause a fault in FIFO when page '3' was requested, but not in LRU?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في FIFO، كانت '0' هي أقدم صفحة في الذاكرة فتم استبدالها بالصفحة '3'. أما في LRU، فقد تم الوصول إلى '0' للتو (أصبحت الأحدث استخداماً)، لذا تم استبدال الصفحة '1' بدلاً منها.</p></template>
+      <template class="content-en"><p>In FIFO, '0' was the oldest page in memory so it was evicted for '3'. In LRU, '0' had just been accessed (becoming the most recently used), so page '1' was evicted instead.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في واحدة من أهم وحدات أنظمة التشغيل: الذاكرة الافتراضية. تخيل أن لديك مكتباً صغيراً (الذاكرة المادية) ومكتبة ضخمة (القرص الصلب). لا يمكنك وضع كل الكتب على مكتبك، لذا تحضر فقط الصفحات التي تقرأها الآن؛ هذا هو 'الجلب عند الطلب' (Demand Paging). عندما تحتاج صفحة غير موجودة، يحدث 'خطأ صفحة' (Page Fault)، فتذهب للمكتبة لإحضارها. ولكن ماذا لو امتلأ مكتبك؟ هنا نحتاج إلى 'استبدال الصفحات' (Page Replacement). نختار 'ضحية' لإزالتها. كيف نختارها؟ إما الأقدم (FIFO) - احذروا من مفارقة بيلادي هنا! - أو الأقل استخداماً مؤخراً (LRU). ولأن LRU مكلفة، نستخدم 'الفرصة الثانية' كحيلة ذكية. تذكروا أيضاً تخصيص الإطارات: هل نعطي الجميع بالتساوي أم حسب حجمهم؟ وهل نسمح لهم بسرقة إطارات بعضهم (Global) أم لا (Local)؟ أخيراً، احذروا من الكابوس: 'التعثر' (Thrashing)، حيث يقضي النظام وقته في تبديل الكتب بدلاً من قراءتها! ركزوا على هذه المفاهيم، فهي جوهر أسئلة الامتحان.</template>
-    <template class="content-en">Welcome, my friends, to one of the most critical OS modules: Virtual Memory. Imagine you have a small desk (physical memory) and a huge library (hard drive). You can't fit all books on your desk, so you only bring the pages you are currently reading; this is 'Demand Paging'. When you need a page that isn't there, a 'Page Fault' occurs, and you fetch it. But what if your desk is full? We need 'Page Replacement'. We pick a 'victim' to remove. How? Either the oldest (FIFO) - beware of Belady's Anomaly! - or the Least Recently Used (LRU). Since strict LRU is expensive, we use 'Second-Chance' as a clever approximation. Also, remember frame allocation: do we give equally or proportionally? Do we let processes steal frames (Global) or not (Local)? Finally, beware the nightmare: 'Thrashing', where the system spends all its time swapping books instead of reading them! Focus on these concepts; they are the core of your exam.</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في واحدة من أهم وحدات أنظمة التشغيل: الذاكرة الافتراضية. تخيل أن لديك مكتباً صغيراً (الذاكرة المادية) ومكتبة ضخمة (القرص الصلب). لا يمكنك وضع كل الكتب على مكتبك، لذا تحضر فقط الصفحات التي تقرأها الآن؛ هذا هو 'الجلب عند الطلب' (Demand Paging). عندما تحتاج صفحة غير موجودة، يحدث 'خطأ صفحة' (Page Fault)، فتذهب للمكتبة لإحضارها. ولكن ماذا لو امتلأ مكتبك؟ هنا نحتاج إلى 'استبدال الصفحات' (Page Replacement). نختار 'ضحية' لإزالتها. كيف نختارها؟ إما الأقدم (FIFO) - احذروا من مفارقة بيلادي هنا! - أو الأقل استخداماً مؤخراً (LRU). ولأن LRU مكلفة، نستخدم 'الفرصة الثانية' كحيلة ذكية. تذكروا أيضاً تخصيص الإطارات: هل نعطي الجميع بالتساوي أم حسب حجمهم؟ وهل نسمح لهم بسرقة إطارات بعضهم (Global) أم لا (Local)؟ أخيراً، احذروا من الكابوس: 'التعثر' (Thrashing)، حيث يقضي النظام وقته في تبديل الكتب بدلاً من قراءتها! ركزوا على هذه المفاهيم، فهي جوهر أسئلة الامتحان.<p>فهم كيفية تتبع خوارزميات استبدال الصفحات خطوة بخطوة أمر بالغ الأهمية لاختباراتك. غالباً ما ستُعطى سلسلة مراجع ويُطلب منك حساب العدد الدقيق لأخطاء الصفحة لخوارزميات FIFO أو LRU أو OPT. تذكر أن كل تحميل أولي في إطار فارغ يُحسب كخطأ صفحة!</p></template>
+    <template class="content-en">Welcome, my friends, to one of the most critical OS modules: Virtual Memory. Imagine you have a small desk (physical memory) and a huge library (hard drive). You can't fit all books on your desk, so you only bring the pages you are currently reading; this is 'Demand Paging'. When you need a page that isn't there, a 'Page Fault' occurs, and you fetch it. But what if your desk is full? We need 'Page Replacement'. We pick a 'victim' to remove. How? Either the oldest (FIFO) - beware of Belady's Anomaly! - or the Least Recently Used (LRU). Since strict LRU is expensive, we use 'Second-Chance' as a clever approximation. Also, remember frame allocation: do we give equally or proportionally? Do we let processes steal frames (Global) or not (Local)? Finally, beware the nightmare: 'Thrashing', where the system spends all its time swapping books instead of reading them! Focus on these concepts; they are the core of your exam.<p>Understanding how to trace page replacement algorithms step-by-step is crucial for your exams. You will often be given a reference string and asked to calculate the exact number of page faults for FIFO, LRU, or OPT. Remember that every initial load into an empty frame counts as a page fault!</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1350,6 +1414,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">البرامج لا تستخدم كل الكود الخاص بها عشوائياً، بل تتركز في 'محليات' (مثل حلقة تكرار معينة). إذا وفرنا إطارات كافية لتغطية هذه المحلية الحالية، فلن تحدث أخطاء صفحة كثيرة.</template>
           <template class="content-en">Programs don't use all their code randomly; they concentrate in 'localities' (like a specific loop). If we provide enough frames to cover the current locality, frequent page faults won't occur.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا كان أداء خوارزمية FIFO سيئاً جداً (15 خطأ) مقارنة بخوارزمية LRU (12 خطأ) في سلسلة المراجع القياسية؟</template>
+          <template class="content-en">Why did FIFO perform so poorly (15 faults) compared to LRU (12 faults) on the standard reference string?</template>
+          <span class="content-target">لماذا كان أداء خوارزمية FIFO سيئاً جداً (15 خطأ) مقارنة بخوارزمية LRU (12 خطأ) في سلسلة المراجع القياسية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>خوارزمية FIFO تستبدل أقدم صفحة بشكل أعمى، حتى لو كانت تُستخدم بكثرة (مثل الصفحة 0 في المثال). بينما تدرك LRU أن الصفحة 0 يتم الوصول إليها بشكل متكرر فتحتفظ بها في الذاكرة، وتستبدل الصفحات غير المستخدمة فعلياً.</p></template>
+          <template class="content-en"><p>FIFO blindly evicts the oldest page, even if it's heavily used (like page 0 in the example). LRU recognizes that page 0 is frequently accessed and keeps it in memory, evicting truly unused pages instead.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1668,6 +1750,23 @@
         "en": "Executing a loop accesses the same set of instructions repeatedly."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "حساب أخطاء الصفحة (Page Faults) عند بدء التشغيل",
+      "en": "Calculating Page Faults at Startup"
+    },
+    "back": {
+      "definition": {
+        "ar": "كل عملية تحميل أولية لصفحة في إطار فارغ تُحسب كخطأ صفحة (Page Fault).",
+        "en": "Every initial load of a page into an empty frame counts as a page fault."
+      },
+      "example": {
+        "ar": "إذا كان لديك 3 إطارات فارغة وطلبت الصفحات 7, 0, 1، سينتج عن ذلك 3 أخطاء صفحة فوراً.",
+        "en": "If you have 3 empty frames and request pages 7, 0, 1, it immediately results in 3 page faults."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1677,7 +1776,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1693,7 +1792,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2018,6 +2117,38 @@
     },
     "difficulty": "medium",
     "conceptId": "allocation-of-frames"
+  },
+  {
+    "conceptId": "worked-examples-page-replacement",
+    "question": {
+      "ar": "في خوارزمية LRU، إذا كانت إطارات الذاكرة تحتوي على الصفحات [2, 0, 1] (حيث 2 هي الأحدث استخداماً و 1 هي الأقدم)، وتم طلب الصفحة 3، أي صفحة سيتم استبدالها؟",
+      "en": "In the LRU algorithm, if the memory frames contain pages [2, 0, 1] (where 2 is the most recently used and 1 is the least), and page 3 is requested, which page is evicted?"
+    },
+    "options": {
+      "ar": [
+        "1",
+        "0",
+        "2",
+        "3"
+      ],
+      "en": [
+        "1",
+        "0",
+        "2",
+        "3"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "خوارزمية LRU تستبدل الصفحة الأقل استخداماً مؤخراً (Least Recently Used). بما أن 1 هي الأقدم من حيث الاستخدام في هذه الحالة، سيتم استبدالها.",
+      "en": "The LRU algorithm evicts the Least Recently Used page. Since 1 is the oldest in terms of usage in this scenario, it will be replaced."
+    },
+    "hint": {
+      "ar": "ابحث عن الصفحة التي مضى أطول وقت على آخر استخدام لها.",
+      "en": "Look for the page that has gone the longest without being accessed."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>

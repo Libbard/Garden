@@ -26,6 +26,9 @@
   <link rel="stylesheet" href="../../shared/skin.css">
   <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
 
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
 
 
   <!-- data-garden-icons -->
@@ -103,6 +106,11 @@
         <template class="content-ar">خطوط الأنابيب للتعليمات (Instruction Pipelining)</template>
         <template class="content-en">Instruction Pipelining</template>
         <span class="content-target">خطوط الأنابيب للتعليمات (Instruction Pipelining)</span>
+      </a>
+      <a href="#isa-formats-evaluation" class="toc-link" data-bilingual>
+        <template class="content-ar">تقييم التعبيرات عبر صيغ بنية مجموعة التعليمات</template>
+        <template class="content-en">Evaluating Expressions across ISA Formats</template>
+        <span class="content-target">تقييم التعبيرات عبر صيغ بنية مجموعة التعليمات</span>
       </a>
 
       <div class="toc-divider"></div>
@@ -575,8 +583,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تستخدم آلات المكدس تعليمات ذات معامل واحد أو بدون معاملات. العمليات الثنائية (مثل ADD) تستخدم العنصرين العلويين في المكدس ضمنياً.</p><p>هذا يتطلب كتابة التعبيرات الرياضية بصيغة <strong><b>Postfix (Reverse Polish Notation)</b></strong> بدلاً من الصيغة المعتادة <span class="smart-term" data-term-en="Infix Notation" data-ar="التدوين الوسطي" data-en-def="The common arithmetic and logical formula notation, in which operators are written infix-style between the operands they act on.">(Infix)<span class="smart-term-tooltip"></span></span>. الميزة الرئيسية للـ Postfix هي عدم الحاجة لاستخدام الأقواس لتحديد أولويات العمليات.</p><p>مثال: التعبير Infix <code>Z = (X + Y) * (W + U)</code> يصبح <code>Z = X Y + W U + *</code> في الـ Postfix.</p></template>
-    <template class="content-en"><p>Stack machines use zero- or one-operand instructions. Binary instructions (e.g., ADD) implicitly use the top two items on the stack.</p><p>This requires arithmetic expressions to be written in <strong><b>postfix notation (Reverse Polish Notation)</b></strong> rather than <span class="smart-term" data-term-en="Infix Notation" data-ar="التدوين الوسطي" data-en-def="The common arithmetic and logical formula notation, in which operators are written infix-style between the operands they act on.">infix notation<span class="smart-term-tooltip"></span></span>. The principal advantage of postfix is that parentheses are not used.</p><p>Example: The infix expression <code>Z = (X + Y) * (W + U)</code> becomes <code>Z = X Y + W U + *</code> in postfix.</p></template>
+    <template class="content-ar"><p>تستخدم آلات المكدس تعليمات ذات معامل واحد أو بدون معاملات. العمليات الثنائية (مثل ADD) تستخدم العنصرين العلويين في المكدس ضمنياً.</p><p>هذا يتطلب كتابة التعبيرات الرياضية بصيغة <strong><b>Postfix (Reverse Polish Notation)</b></strong> بدلاً من الصيغة المعتادة <span class="smart-term" data-term-en="Infix Notation" data-ar="التدوين الوسطي" data-en-def="The common arithmetic and logical formula notation, in which operators are written infix-style between the operands they act on.">(Infix)<span class="smart-term-tooltip"></span></span>. الميزة الرئيسية للـ Postfix هي عدم الحاجة لاستخدام الأقواس لتحديد أولويات العمليات.</p><p>مثال: التعبير Infix <code>Z = (X + Y) * (W + U)</code> يصبح <code>Z = X Y + W U + *</code> في الـ Postfix.</p><p>دعونا نقيّم تعبير Postfix التالي خطوة بخطوة باستخدام المكدس: <code>2 3 + 6 3 / -</code></p><ol><li>قراءة <code>2</code>: ادفع (Push) 2 إلى المكدس.</li><li>قراءة <code>3</code>: ادفع 3 إلى المكدس.</li><li>قراءة <code>+</code>: اسحب (Pop) 3 و 2، احسب 2 + 3 = 5، ثم ادفع 5.</li><li>قراءة <code>6</code>: ادفع 6.</li><li>قراءة <code>3</code>: ادفع 3.</li><li>قراءة <code>/</code>: اسحب 3 و 6، احسب 6 / 3 = 2، ثم ادفع 2.</li><li>قراءة <code>-</code>: اسحب 2 و 5، احسب 5 - 2 = 3، ثم ادفع 3.</li></ol><p>النتيجة النهائية الموجودة في قمة المكدس هي 3.</p></template>
+    <template class="content-en"><p>Stack machines use zero- or one-operand instructions. Binary instructions (e.g., ADD) implicitly use the top two items on the stack.</p><p>This requires arithmetic expressions to be written in <strong><b>postfix notation (Reverse Polish Notation)</b></strong> rather than <span class="smart-term" data-term-en="Infix Notation" data-ar="التدوين الوسطي" data-en-def="The common arithmetic and logical formula notation, in which operators are written infix-style between the operands they act on.">infix notation<span class="smart-term-tooltip"></span></span>. The principal advantage of postfix is that parentheses are not used.</p><p>Example: The infix expression <code>Z = (X + Y) * (W + U)</code> becomes <code>Z = X Y + W U + *</code> in postfix.</p><p>Let's evaluate the postfix expression <code>2 3 + 6 3 / -</code> step-by-step using a stack:</p><ol><li>Scan <code>2</code>: Push 2 onto the stack.</li><li>Scan <code>3</code>: Push 3 onto the stack.</li><li>Scan <code>+</code>: Pop 3 and 2, calculate 2 + 3 = 5, push 5.</li><li>Scan <code>6</code>: Push 6.</li><li>Scan <code>3</code>: Push 3.</li><li>Scan <code>/</code>: Pop 3 and 6, calculate 6 / 3 = 2, push 2.</li><li>Scan <code>-</code>: Pop 2 and 5, calculate 5 - 2 = 3, push 3.</li></ol><p>The final result at the top of the stack is 3.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -814,8 +822,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في أي مجموعة تعليمات، لا تتطلب كل التعليمات نفس العدد من المعاملات. التعليمات التي لا تتطلب معاملات (مثل HALT) تهدر مساحة إذا استخدمنا تعليمات ذات طول ثابت.</p><p>لاستعادة هذه المساحة، نستخدم <strong><b>توسيع رموز العمليات (Expanding Opcodes)</b></strong>. إذا سمحنا لطول الـ opcode بالتغير، يمكننا إنشاء مجموعة تعليمات غنية جداً.</p><p>يتم استخدام <span class="smart-term" data-term-en="Escape Opcode" data-ar="رمز الهروب" data-en-def="A specific opcode pattern used to indicate that the instruction format is changing, typically expanding the opcode into operand fields.">'escape opcodes'<span class="smart-term-tooltip"></span></span> للإشارة إلى أن التعليمة تستخدم عدداً أقل من المعاملات، مما يسمح باستخدام البتات المتبقية كجزء من الـ opcode.</p></template>
-    <template class="content-en"><p>In any instruction set, not all instructions require the same number of operands. Operations requiring no operands (like HALT) waste space in fixed-length instructions.</p><p>To recover this space, we use <strong><b>expanding opcodes</b></strong>. By allowing the opcode length to vary, we can create a rich instruction set.</p><p>'Escape opcodes' are used to indicate that the instruction has fewer operands, allowing the remaining bits to be used as part of the opcode.</p></template>
+    <template class="content-ar"><p>في أي مجموعة تعليمات، لا تتطلب كل التعليمات نفس العدد من المعاملات. التعليمات التي لا تتطلب معاملات (مثل HALT) تهدر مساحة إذا استخدمنا تعليمات ذات طول ثابت.</p><p>لاستعادة هذه المساحة، نستخدم <strong><b>توسيع رموز العمليات (Expanding Opcodes)</b></strong>. إذا سمحنا لطول الـ opcode بالتغير، يمكننا إنشاء مجموعة تعليمات غنية جداً.</p><p>يتم استخدام <span class="smart-term" data-term-en="Escape Opcode" data-ar="رمز الهروب" data-en-def="A specific opcode pattern used to indicate that the instruction format is changing, typically expanding the opcode into operand fields.">'escape opcodes'<span class="smart-term-tooltip"></span></span> للإشارة إلى أن التعليمة تستخدم عدداً أقل من المعاملات، مما يسمح باستخدام البتات المتبقية كجزء من الـ opcode.</p><p>مثال عملي: بفرض أن لدينا تعليمات بطول 8-بت، هل يمكننا ترميز 3 تعليمات بمعاملين (كل منهما 3-بت)، وتعليمتين بمعامل واحد (4-بت)، و 4 تعليمات بمعامل واحد (3-بت)؟</p><ol><li>التعليمات ذات المعاملين (3-بت لكل منهما) تستهلك 6 بتات للمعاملات. نحتاج 3 تعليمات من هذا النوع: $3 \times 2^3 \times 2^3 = 192$ بت من مساحة الترميز.</li><li>التعليمات ذات المعامل الواحد (4-بت) تستهلك 4 بتات. نحتاج تعليمتين: $2 \times 2^4 = 32$ بت.</li><li>التعليمات ذات المعامل الواحد (3-بت) تستهلك 3 بتات. نحتاج 4 تعليمات: $4 \times 2^3 = 32$ بت.</li></ol><p>إجمالي البتات المطلوبة: $192 + 32 + 32 = 256$ بت. بما أن مساحة التعليمة 8-بت توفر بالضبط $2^8 = 256$ نمطاً ممكناً، فإن هذا الترميز ممكن تماماً ولا يهدر أي مساحة!</p></template>
+    <template class="content-en"><p>In any instruction set, not all instructions require the same number of operands. Operations requiring no operands (like HALT) waste space in fixed-length instructions.</p><p>To recover this space, we use <strong><b>expanding opcodes</b></strong>. By allowing the opcode length to vary, we can create a rich instruction set.</p><p>'Escape opcodes' are used to indicate that the instruction has fewer operands, allowing the remaining bits to be used as part of the opcode.</p><p>Worked Example: Given 8-bit instructions, is it possible to encode 3 instructions with two 3-bit operands, 2 instructions with one 4-bit operand, and 4 instructions with one 3-bit operand?</p><ol><li>Two 3-bit operands take 6 bits. We need 3 such instructions: $3 \times 2^3 \times 2^3 = 192$ bits of the encoding space.</li><li>One 4-bit operand takes 4 bits. We need 2 such instructions: $2 \times 2^4 = 32$ bits.</li><li>One 3-bit operand takes 3 bits. We need 4 such instructions: $4 \times 2^3 = 32$ bits.</li></ol><p>Total bits required: $192 + 32 + 32 = 256$ bits. Since an 8-bit instruction space provides exactly $2^8 = 256$ possible bit patterns, this encoding is perfectly possible and wastes no space!</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -858,8 +866,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تحدد طرق العنونة موقع المعامل (ثابت، سجل، أو موقع في الذاكرة). الموقع الفعلي يسمى <strong><b>العنوان الفعال (Effective Address)</b></strong>. الطرق الرئيسية تشمل:</p><ol><li><strong><b>Immediate</b></strong>: البيانات جزء من التعليمة.</li><li><strong><b>Direct</b></strong>: عنوان البيانات موجود في التعليمة.</li><li><strong><b>Register</b></strong>: البيانات موجودة في سجل.</li><li><strong><b>Indirect</b></strong>: التعليمة تحتوي على عنوان يشير إلى عنوان البيانات.</li><li><strong><b>Register Indirect</b></strong>: سجل يحتوي على عنوان البيانات.</li><li><strong><b>Indexed</b></strong>: يستخدم سجل كإزاحة (Offset) تضاف للعنوان في التعليمة.</li><li><strong><b>Based</b></strong>: مشابه للـ Indexed لكن يستخدم سجل أساس (Base Register).</li><li><strong><b>Stack</b></strong>: المعامل موجود في قمة المكدس.</li></ol></template>
-    <template class="content-en"><p>Addressing modes specify where an operand is located (constant, register, or memory). The actual location is the <strong><b>effective address</b></strong>. Main modes include:</p><ol><li><strong><b>Immediate</b></strong>: Data is part of the instruction.</li><li><strong><b>Direct</b></strong>: Address of data is in the instruction.</li><li><strong><b>Register</b></strong>: Data is in a register.</li><li><strong><b>Indirect</b></strong>: Instruction gives the address of the address of the data.</li><li><strong><b>Register Indirect</b></strong>: A register stores the address of the data.</li><li><strong><b>Indexed</b></strong>: Uses a register as an offset added to the instruction's address.</li><li><strong><b>Based</b></strong>: Similar to indexed, but uses a base register.</li><li><strong><b>Stack</b></strong>: Operand is on top of the stack.</li></ol></template>
+    <template class="content-ar"><p>تحدد طرق العنونة موقع المعامل (ثابت، سجل، أو موقع في الذاكرة). الموقع الفعلي يسمى <strong><b>العنوان الفعال (Effective Address)</b></strong>. الطرق الرئيسية تشمل:</p><ol><li><strong><b>Immediate</b></strong>: البيانات جزء من التعليمة.</li><li><strong><b>Direct</b></strong>: عنوان البيانات موجود في التعليمة.</li><li><strong><b>Register</b></strong>: البيانات موجودة في سجل.</li><li><strong><b>Indirect</b></strong>: التعليمة تحتوي على عنوان يشير إلى عنوان البيانات.</li><li><strong><b>Register Indirect</b></strong>: سجل يحتوي على عنوان البيانات.</li><li><strong><b>Indexed</b></strong>: يستخدم سجل كإزاحة (Offset) تضاف للعنوان في التعليمة.</li><li><strong><b>Based</b></strong>: مشابه للـ Indexed لكن يستخدم سجل أساس (Base Register).</li><li><strong><b>Stack</b></strong>: المعامل موجود في قمة المكدس.</li></ol><p>مثال عملي: بفرض أن لدينا التعليمة <code>LOAD 800</code>، ما هي القيمة التي سيتم تحميلها في المجمع (AC) لكل طريقة عنونة، بناءً على حالة الذاكرة التالية: [0x800 = 0x900]، [0x900 = 0x1000]، [0x1000 = 0x500]، [0x1600 = 0x700]، وقيمة السجل R1 = 0x800؟</p><ol><li><b>الفورية (Immediate):</b> المعامل هو البيانات نفسها. القيمة المحملة = 0x800.</li><li><b>المباشرة (Direct):</b> المعامل هو عنوان البيانات. نذهب للعنوان 0x800. القيمة المحملة = 0x900.</li><li><b>غير المباشرة (Indirect):</b> المعامل هو عنوان العنوان. نذهب للعنوان 0x800 لنجد العنوان 0x900، ثم نذهب للعنوان 0x900. القيمة المحملة = 0x1000.</li><li><b>المفهرسة (Indexed):</b> نجمع معامل التعليمة (800) مع قيمة سجل الفهرس R1 (0x800). العنوان الفعال = 0x800 + 0x800 = 0x1600. نذهب للعنوان 0x1600. القيمة المحملة = 0x700.</li></ol><p>يوضح هذا كيف يؤدي نفس المعامل في التعليمة إلى جلب بيانات مختلفة تماماً بناءً على طريقة العنونة المستخدمة.</p></template>
+    <template class="content-en"><p>Addressing modes specify where an operand is located (constant, register, or memory). The actual location is the <strong><b>effective address</b></strong>. Main modes include:</p><ol><li><strong><b>Immediate</b></strong>: Data is part of the instruction.</li><li><strong><b>Direct</b></strong>: Address of data is in the instruction.</li><li><strong><b>Register</b></strong>: Data is in a register.</li><li><strong><b>Indirect</b></strong>: Instruction gives the address of the address of the data.</li><li><strong><b>Register Indirect</b></strong>: A register stores the address of the data.</li><li><strong><b>Indexed</b></strong>: Uses a register as an offset added to the instruction's address.</li><li><strong><b>Based</b></strong>: Similar to indexed, but uses a base register.</li><li><strong><b>Stack</b></strong>: Operand is on top of the stack.</li></ol><p>Worked Example: For the instruction <code>LOAD 800</code>, what value is loaded into the accumulator (AC) for each addressing mode, given the following memory state: [0x800 = 0x900], [0x900 = 0x1000], [0x1000 = 0x500], [0x1600 = 0x700], and register R1 = 0x800?</p><ol><li><b>Immediate:</b> The operand is the data itself. Value loaded = 0x800.</li><li><b>Direct:</b> The operand is the address of the data. Go to address 0x800. Value loaded = 0x900.</li><li><b>Indirect:</b> The operand is the address of the address. Go to 0x800 to find address 0x900, then go to 0x900. Value loaded = 0x1000.</li><li><b>Indexed:</b> Add the instruction operand (800) to the index register R1 (0x800). Effective address = 0x800 + 0x800 = 0x1600. Go to 0x1600. Value loaded = 0x700.</li></ol><p>This demonstrates how the exact same instruction operand yields completely different data based on the active addressing mode.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1252,14 +1260,113 @@
   </details>
 </section>
 
+<section id="isa-formats-evaluation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> تقييم التعبيرات عبر صيغ بنية مجموعة التعليمات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Evaluating Expressions across ISA Formats</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>كيف يغير عدد العناوين المدعومة في بنية مجموعة التعليمات (3، 2، 1، أو 0 عناوين) شكل وطول الكود البرمجي اللازم لتقييم نفس التعبير الرياضي.</p></template>
+    <template class="content-en"><p>How the number of addresses supported in an ISA (3, 2, 1, or 0 addresses) changes the structure and length of the assembly code required to evaluate the same mathematical expression.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لنفترض أننا نريد تقييم التعبير الرياضي <code>Z = X * Y + W * U</code>. يختلف الكود المكتوب بلغة التجميع (Assembly) بشكل جذري بناءً على عدد المعاملات التي تدعمها بنية مجموعة التعليمات (ISA):</p><ol><li><b><span class="smart-term" data-term-en="3-Address ISA" data-ar="بنية 3-عناوين" data-en-def="An instruction set architecture where ALU instructions can specify two source operands and one destination operand explicitly.">بنية 3-عناوين<span class="smart-term-tooltip"></span></span> (3-Address ISA):</b> تتيح تحديد معاملين للمصدر ومعامل للوجهة في تعليمة واحدة. الكود يكون قصيراً جداً.</li><li><b>بنية 2-عناوين (2-Address ISA):</b> أحد المعاملات يعمل كمصدر ووجهة في نفس الوقت، مما يتطلب تعليمات إضافية لنقل البيانات.</li><li><b><span class="smart-term" data-term-en="1-Address ISA" data-ar="بنية 1-عنوان" data-en-def="An instruction set architecture that implicitly uses an accumulator register for one source operand and the destination.">بنية 1-عنوان<span class="smart-term-tooltip"></span></span> (1-Address ISA):</b> تعتمد على المجمع (Accumulator) كمعامل ضمني، مما يتطلب تعليمات <code>LOAD</code> و <code>STORE</code> متكررة.</li><li><b>بنية المكدس (0-Address ISA):</b> لا تستخدم أي عناوين في العمليات الحسابية، بل تعتمد على دفع (Push) وسحب (Pop) البيانات من المكدس باستخدام التدوين اللاحق (Postfix).</li></ol></template>
+    <template class="content-en"><p>Suppose we want to evaluate the mathematical expression <code>Z = X * Y + W * U</code>. The assembly code differs drastically based on the number of operands supported by the ISA:</p><ol><li><b><span class="smart-term" data-term-en="3-Address ISA" data-ar="بنية 3-عناوين" data-en-def="An instruction set architecture where ALU instructions can specify two source operands and one destination operand explicitly.">3-Address ISA<span class="smart-term-tooltip"></span></span>:</b> Allows specifying two source operands and one destination operand in a single instruction. The code is very short.</li><li><b>2-Address ISA:</b> One operand acts as both a source and the destination, requiring extra instructions to move data around.</li><li><b><span class="smart-term" data-term-en="1-Address ISA" data-ar="بنية 1-عنوان" data-en-def="An instruction set architecture that implicitly uses an accumulator register for one source operand and the destination.">1-Address ISA<span class="smart-term-tooltip"></span></span>:</b> Relies on an implicit Accumulator for one operand and the destination, requiring frequent <code>LOAD</code> and <code>STORE</code> instructions.</li><li><b>Stack (0-Address) ISA:</b> Uses no addresses for ALU operations, relying entirely on pushing and popping data from a stack using Postfix notation.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هناك مقايضة (Trade-off) واضحة بين هذه البنى. بنية الـ 3-عناوين تنتج أقل عدد من التعليمات، لكن كل تعليمة تكون طويلة جداً (تستهلك بتات كثيرة لترميز 3 عناوين). في المقابل، بنية المكدس تنتج عدداً كبيراً من التعليمات، لكن كل تعليمة تكون قصيرة جداً (تحتوي على رمز العملية فقط).</p><p>تؤثر هذه المقايضة على حجم البرنامج في الذاكرة، وعرض النطاق الترددي اللازم لجلب التعليمات، وتعقيد وحدة فك التشفير (Decoder) داخل المعالج.</p></template>
+    <template class="content-en"><p>There is a clear trade-off between these architectures. A 3-address ISA results in the fewest instructions, but each instruction is very long (consuming many bits to encode 3 addresses). Conversely, a stack ISA results in a large number of instructions, but each instruction is very short (often just the opcode).</p><p>This trade-off impacts the program's memory footprint, the instruction fetch bandwidth, and the complexity of the CPU's instruction decoder.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Assembly</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// 3-Address ISA
+MULT R1, X, Y
+MULT R2, W, U
+ADD Z, R1, R2</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Assembly</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// 2-Address ISA
+LOAD R1, X
+MULT R1, Y
+LOAD R2, W
+MULT R2, U
+ADD R1, R2
+STORE Z, R1</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Assembly</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// 1-Address ISA (Accumulator)
+LOAD X
+MULT Y
+STORE TEMP
+LOAD W
+MULT U
+ADD TEMP
+STORE Z</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Assembly</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Stack ISA (0-Address)
+PUSH X
+PUSH Y
+MULT
+PUSH W
+PUSH U
+MULT
+ADD
+POP Z</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي صيغة من صيغ بنية مجموعة التعليمات (ISA) تتطلب عادةً أطول كود برمجي (من حيث عدد التعليمات) لتنفيذ عملية حسابية معقدة؟</template>
+      <template class="content-en">Which ISA format typically requires the longest code (in terms of the number of instructions) to execute a complex arithmetic operation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>بنية المكدس (0-Address ISA) تتطلب عادةً أكبر عدد من التعليمات لأن كل عملية دفع (Push) أو سحب (Pop) أو عملية حسابية تتطلب تعليمة منفصلة.</p></template>
+      <template class="content-en"><p>The Stack (0-Address ISA) typically requires the most instructions because every push, pop, and arithmetic operation requires a separate instruction.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في الوحدة السادسة. هنا نغوص تحت الغطاء لنرى كيف تتحدث البرمجيات مع الأجهزة. بنية مجموعة التعليمات (ISA) هي لغة المعالج. تخيل أنك تصمم لغة: هل ستجعل الكلمات (التعليمات) طويلة أم قصيرة؟ أين ستحتفظ بالمعلومات المؤقتة؟ في مكدس (Stack) أم مجمع (Accumulator) أم سجلات (GPR)؟ لقد رأينا كيف أن السجلات هي الخيار الأفضل اليوم لسرعتها. ركزوا جيداً في الامتحان على 'طرق العنونة' (Addressing Modes)؛ فهي مثل طرق إعطاء العناوين في مدينة، بعضها مباشر وبعضها يعطيك خريطة لعنوان آخر (Indirect). ولا تنسوا التدوين اللاحق (Postfix) وكيف يحل مشكلة الأقواس في المكدس. أخيراً، تذكروا أن خطوط الأنابيب (Pipelining) هي مثل خط تجميع السيارات: لا تسرع صنع سيارة واحدة، بل تزيد عدد السيارات المنتجة في اليوم!</template>
-    <template class="content-en">Welcome to Chapter 5. Here we dive under the hood to see how software talks to hardware. The ISA is the CPU's language. Imagine designing a language: will words (instructions) be long or short? Where will you keep temporary info? A Stack, an Accumulator, or GPRs? We saw GPRs win today for speed. For the exam, focus heavily on 'Addressing Modes'; they are like giving directions in a city—some are direct, some give you a map to another address (Indirect). Don't forget Postfix notation and how it solves the parentheses problem for Stacks. Finally, remember Pipelining is like a car assembly line: it doesn't build one car faster, it builds MORE cars per day!</template>
+    <template class="content-ar">أهلاً بكم في الوحدة السادسة. هنا نغوص تحت الغطاء لنرى كيف تتحدث البرمجيات مع الأجهزة. بنية مجموعة التعليمات (ISA) هي لغة المعالج. تخيل أنك تصمم لغة: هل ستجعل الكلمات (التعليمات) طويلة أم قصيرة؟ أين ستحتفظ بالمعلومات المؤقتة؟ في مكدس (Stack) أم مجمع (Accumulator) أم سجلات (GPR)؟ لقد رأينا كيف أن السجلات هي الخيار الأفضل اليوم لسرعتها. ركزوا جيداً في الامتحان على 'طرق العنونة' (Addressing Modes)؛ فهي مثل طرق إعطاء العناوين في مدينة، بعضها مباشر وبعضها يعطيك خريطة لعنوان آخر (Indirect). ولا تنسوا التدوين اللاحق (Postfix) وكيف يحل مشكلة الأقواس في المكدس. أخيراً، تذكروا أن خطوط الأنابيب (Pipelining) هي مثل خط تجميع السيارات: لا تسرع صنع سيارة واحدة، بل تزيد عدد السيارات المنتجة في اليوم!<p>لقد أضفنا أمثلة عملية توضح كيف تترجم النظريات إلى واقع ملموس. من خلال تتبع تقييم التعبيرات باستخدام المكدس، ومقارنة صيغ التعليمات المختلفة، وحساب مساحة رموز العمليات الموسعة، وتحديد العناوين الفعالة خطوة بخطوة، ستتمكن من فهم الآليات الدقيقة التي يعتمد عليها المعالج لتنفيذ برامجك بكفاءة.</p></template>
+    <template class="content-en">Welcome to Chapter 5. Here we dive under the hood to see how software talks to hardware. The ISA is the CPU's language. Imagine designing a language: will words (instructions) be long or short? Where will you keep temporary info? A Stack, an Accumulator, or GPRs? We saw GPRs win today for speed. For the exam, focus heavily on 'Addressing Modes'; they are like giving directions in a city—some are direct, some give you a map to another address (Indirect). Don't forget Postfix notation and how it solves the parentheses problem for Stacks. Finally, remember Pipelining is like a car assembly line: it doesn't build one car faster, it builds MORE cars per day!<p>We have added practical worked examples to show how theory translates into reality. By tracing stack evaluations, comparing instruction formats, calculating expanding opcode spaces, and determining effective addresses step-by-step, you will grasp the exact mechanisms the CPU relies on to execute your programs efficiently.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1433,6 +1540,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأنها توفر مساحة تخزين سريعة ومرنة للمتغيرات المحلية والنتائج المؤقتة، مما يسهل على المترجم تحسين الكود وتقليل الوصول للذاكرة البطيئة.</template>
           <template class="content-en">Because it provides fast, flexible storage for local variables and temporary results, making it easier for the compiler to optimize code and reduce slow memory access.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تؤثر بنية 3-عناوين (3-Address ISA) على حجم البرنامج مقارنة ببنية المكدس؟</template>
+          <template class="content-en">How does a 3-Address ISA affect program size compared to a Stack ISA?</template>
+          <span class="content-target">كيف تؤثر بنية 3-عناوين (3-Address ISA) على حجم البرنامج مقارنة ببنية المكدس؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>بنية 3-عناوين تقلل بشكل كبير من عدد التعليمات المطلوبة، لكن كل تعليمة تكون أطول (تستهلك بتات أكثر). بنية المكدس تزيد من عدد التعليمات، لكن كل تعليمة تكون قصيرة جداً. الحجم الإجمالي يعتمد على طبيعة البرنامج، لكن المترجمات الحديثة تفضل السجلات (GPR) لمرونتها.</p></template>
+          <template class="content-en"><p>A 3-Address ISA significantly reduces the number of instructions, but each instruction is longer (consumes more bits). A Stack ISA increases the number of instructions, but each is very short. Total size depends on the program, but modern compilers prefer GPRs for flexibility.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1700,6 +1825,40 @@
         "en": "Achieved primarily through pipelining."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "بنية 3-عناوين (3-Address ISA)",
+      "en": "3-Address ISA"
+    },
+    "back": {
+      "definition": {
+        "ar": "صيغة تعليمات تسمح بتحديد معاملين للمصدر ومعامل للوجهة صراحةً في تعليمة واحدة.",
+        "en": "An instruction format that allows specifying two source operands and one destination operand explicitly in a single instruction."
+      },
+      "example": {
+        "ar": "ADD Z, X, Y (اجمع X و Y وضع النتيجة في Z)",
+        "en": "ADD Z, X, Y (Add X and Y, store result in Z)"
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "بنية 1-عنوان (1-Address ISA)",
+      "en": "1-Address ISA"
+    },
+    "back": {
+      "definition": {
+        "ar": "صيغة تعليمات تعتمد على المجمع (Accumulator) كمعامل ضمني، وتتطلب عنواناً واحداً فقط في التعليمة.",
+        "en": "An instruction format that relies on an implicit Accumulator, requiring only one explicit address in the instruction."
+      },
+      "example": {
+        "ar": "ADD X (اجمع X مع المجمع وضع النتيجة في المجمع)",
+        "en": "ADD X (Add X to the Accumulator, store result in Accumulator)"
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1709,7 +1868,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1725,7 +1884,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2050,6 +2209,38 @@
     },
     "difficulty": "medium",
     "conceptId": "stack-postfix-notation"
+  },
+  {
+    "conceptId": "isa-formats-evaluation",
+    "question": {
+      "ar": "عند كتابة كود لتقييم التعبير <code>Z = X + Y</code>، أي بنية تعليمات (ISA) ستنتج كوداً يحتوي على تعليمة واحدة فقط للجمع؟",
+      "en": "When writing code to evaluate the expression <code>Z = X + Y</code>, which ISA will produce code containing exactly one instruction for the addition?"
+    },
+    "options": {
+      "ar": [
+        "بنية 3-عناوين فقط",
+        "بنية 3-عناوين وبنية 2-عناوين",
+        "بنية 1-عنوان فقط",
+        "بنية المكدس (0-عنوان) فقط"
+      ],
+      "en": [
+        "3-Address ISA only",
+        "3-Address ISA and 2-Address ISA",
+        "1-Address ISA only",
+        "Stack (0-Address) ISA only"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "في بنية 3-عناوين، يمكننا كتابة <code>ADD Z, X, Y</code> في تعليمة واحدة. في البنى الأخرى، نحتاج إلى تعليمات إضافية مثل LOAD أو PUSH لجلب البيانات قبل جمعها، ثم STORE أو POP لحفظها.",
+      "en": "In a 3-address ISA, we can write <code>ADD Z, X, Y</code> in a single instruction. In other ISAs, we need additional instructions like LOAD or PUSH to stage the data before adding, and STORE or POP to save it."
+    },
+    "hint": {
+      "ar": "ابحث عن البنية التي يمكنها تحديد المصدرين والوجهة في نفس السطر.",
+      "en": "Look for the architecture that can specify both sources and the destination on the same line."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>

@@ -26,6 +26,9 @@
   <link rel="stylesheet" href="../../shared/skin.css">
   <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
 
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
 
 
   <!-- data-garden-icons -->
@@ -108,6 +111,16 @@
         <template class="content-ar">تحليل SLR (Simple LR Parsing)</template>
         <template class="content-en">SLR Parsing</template>
         <span class="content-target">تحليل SLR (Simple LR Parsing)</span>
+      </a>
+      <a href="#computing-first-and-follow" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزميات حساب FIRST و FOLLOW</template>
+        <template class="content-en">Algorithms for Computing FIRST and FOLLOW</template>
+        <span class="content-target">خوارزميات حساب FIRST و FOLLOW</span>
+      </a>
+      <a href="#slr-parsing-algorithm" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزمية تحليل SLR وإنشاء الجداول</template>
+        <template class="content-en">SLR Parsing Algorithm &amp; Table Creation</template>
+        <span class="content-target">خوارزمية تحليل SLR وإنشاء الجداول</span>
       </a>
 
       <div class="toc-divider"></div>
@@ -1112,14 +1125,100 @@
   </details>
 </section>
 
+<section id="computing-first-and-follow" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> خوارزميات حساب FIRST و FOLLOW</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Algorithms for Computing FIRST and FOLLOW</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُحسب مجموعات FIRST بالنظر إلى ما يمكن أن تبدأ به القاعدة، بينما تُحسب مجموعات FOLLOW بالبحث عن الرموز التي تظهر مباشرة بعد الرمز غير الطرفي في الجانب الأيمن من الإنتاجات.</p></template>
+    <template class="content-en"><p>FIRST sets are computed by looking at what a rule can start with, while FOLLOW sets are computed by finding tokens that appear immediately after a non-terminal on the right-hand side of productions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>قواعد حساب FIRST:</b></p><ol><li>إذا كان $a$ رمزاً طرفياً، فإن $FIRST(a) = \{a\}$.</li><li>إذا كان هناك إنتاج $X \rightarrow \epsilon$، أضف $\epsilon$ إلى $FIRST(X)$.</li><li>إذا كان $X \rightarrow Y_1 Y_2 \dots Y_k$، أضف $FIRST(Y_1)$ إلى $FIRST(X)$. إذا كان $FIRST(Y_1)$ يحتوي على $\epsilon$، أضف أيضاً $FIRST(Y_2)$، وهكذا.</li></ol><p><b>قواعد حساب FOLLOW للرمز $A$:</b></p><ol><li>أضف <code>$</code> إلى $FOLLOW(S)$ حيث $S$ هو رمز البداية.</li><li>إذا كان هناك إنتاج $A \rightarrow \alpha B \beta$، أضف كل شيء في $FIRST(\beta)$ (باستثناء $\epsilon$) إلى $FOLLOW(B)$.</li><li>إذا كان $A \rightarrow \alpha B$ أو كان $FIRST(\beta)$ يحتوي على $\epsilon$، أضف $FOLLOW(A)$ إلى $FOLLOW(B)$.</li></ol><p>تُكرر هذه الخطوات حتى لا يحدث أي تغيير في المجموعات.</p></template>
+    <template class="content-en"><p><b>Rules for computing FIRST:</b></p><ol><li>If $a$ is a terminal, $FIRST(a) = \{a\}$.</li><li>If $X \rightarrow \epsilon$ is a production, add $\epsilon$ to $FIRST(X)$.</li><li>If $X \rightarrow Y_1 Y_2 \dots Y_k$, add $FIRST(Y_1)$ to $FIRST(X)$. If $FIRST(Y_1)$ contains $\epsilon$, also add $FIRST(Y_2)$, and so on.</li></ol><p><b>Rules for computing FOLLOW of $A$:</b></p><ol><li>Add <code>$</code> to $FOLLOW(S)$ where $S$ is the start symbol.</li><li>If there is a production $A \rightarrow \alpha B \beta$, add everything in $FIRST(\beta)$ (except $\epsilon$) to $FOLLOW(B)$.</li><li>If $A \rightarrow \alpha B$ or if $FIRST(\beta)$ contains $\epsilon$, add $FOLLOW(A)$ to $FOLLOW(B)$.</li></ol><p>Repeat these steps until no more changes occur to the sets.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مثال عملي للقواعد: <code>E -> T E'</code> و <code>E' -> + T E' | \epsilon</code> و <code>T -> F T'</code> و <code>T' -> * F T' | \epsilon</code> و <code>F -> ( E ) | int</code>.</p><p>لحساب $FIRST(E)$، ننظر إلى $T$، ثم إلى $F$. نجد أن $F$ يبدأ بـ <code>(</code> أو <code>int</code>. إذن $FIRST(E) = \{ (, int \}$.</p><p>لحساب $FOLLOW(E)$، نضع أولاً <code>$</code> لأنه رمز البداية. ثم نبحث عن <code>E</code> في الجانب الأيمن. نجده في <code>F -> ( E )</code>، وما يتبعه هو <code>)</code>. إذن $FOLLOW(E) = \{ \$, ) \}$.</p></template>
+    <template class="content-en"><p>Worked example for grammar: <code>E -> T E'</code>, <code>E' -> + T E' | \epsilon</code>, <code>T -> F T'</code>, <code>T' -> * F T' | \epsilon</code>, <code>F -> ( E ) | int</code>.</p><p>To compute $FIRST(E)$, we look at $T$, then $F$. $F$ starts with <code>(</code> or <code>int</code>. Thus, $FIRST(E) = \{ (, int \}$.</p><p>To compute $FOLLOW(E)$, we first add <code>$</code> as it's the start symbol. Then we look for <code>E</code> on the right-hand side. We find it in <code>F -> ( E )</code>, followed by <code>)</code>. Thus, $FOLLOW(E) = \{ \$, ) \}$.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نضيف $\epsilon$ أبداً إلى مجموعة FOLLOW؟</template>
+      <template class="content-en">Why do we never add $\epsilon$ to a FOLLOW set?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مجموعة FOLLOW تمثل الرموز الطرفية الفعلية (Tokens) التي يمكن أن تظهر في تيار الإدخال بعد الرمز، و $\epsilon$ ليس رمزاً فعلياً في الإدخال بل يمثل الفراغ.</p></template>
+      <template class="content-en"><p>Because the FOLLOW set represents actual terminal tokens that can appear in the input stream after a symbol, and $\epsilon$ is not an actual input token but represents emptiness.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="slr-parsing-algorithm" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> خوارزمية تحليل SLR وإنشاء الجداول</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> SLR Parsing Algorithm &amp; Table Creation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تعتمد خوارزمية SLR على مكدس (Stack) للحالات وجدولي ACTION و GOTO. تقرأ الرموز وتتخذ قرارات ال<span class="smart-term" data-term-en="Shift" data-ar="إزاحة" data-en-def="An action where the parser pushes the current state onto the stack and advances to the next input token.">إزاحة<span class="smart-term-tooltip"></span></span> (Shift) أو ال<span class="smart-term" data-term-en="Reduce" data-ar="تقليص" data-en-def="An action where the parser replaces a matched right-hand side of a rule on the stack with its corresponding left-hand side non-terminal.">تقليص<span class="smart-term-tooltip"></span></span> (Reduce) بناءً على قمة المكدس والرمز الحالي.</p></template>
+    <template class="content-en"><p>The SLR algorithm relies on a state stack and ACTION/GOTO tables. It reads tokens and makes Shift or Reduce decisions based on the top of the stack and the current lookahead token.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>إنشاء جدول SLR:</b></p><ol><li>إذا كان العنصر <code>A -> \alpha . a \beta</code> موجوداً في الحالة $s$، فإن <code>ACTION[s, a] = shift t</code> (حيث $t$ هي الحالة التالية).</li><li>إذا كان العنصر <code>A -> \alpha .</code> موجوداً في الحالة $s$، فإن <code>ACTION[s, a] = reduce A -> \alpha</code> <b>لكل $a$ في $FOLLOW(A)$</b>.</li><li>يتم تعبئة جدول <code>GOTO[s, A]</code> بناءً على انتقالات الرموز غير الطرفية في آلة LR(0).</li></ol><p><b>خوارزمية التحليل:</b> لتكن $s$ هي قمة المكدس و $a$ هو الرمز الحالي. إذا كان الإجراء <b>Shift $t$</b>، ادفع $t$ للمكدس واقرأ الرمز التالي. إذا كان <b>Reduce $A \rightarrow \beta$</b>، اسحب حالات من المكدس بعدد رموز $\beta$، ثم ادفع <code>GOTO[قمة المكدس الجديدة, A]</code>.</p></template>
+    <template class="content-en"><p><b>SLR Table Creation:</b></p><ol><li>If item <code>A -> \alpha . a \beta</code> is in state $s$, then <code>ACTION[s, a] = shift t</code> (where $t$ is the next state).</li><li>If item <code>A -> \alpha .</code> is in state $s$, then <code>ACTION[s, a] = reduce A -> \alpha</code> <b>for each $a$ in $FOLLOW(A)$</b>.</li><li>The <code>GOTO[s, A]</code> table is populated based on non-terminal transitions in the LR(0) automaton.</li></ol><p><b>Parsing Algorithm:</b> Let $s$ be the stack top and $a$ the current token. If ACTION is <b><span class="smart-term" data-term-en="Shift" data-ar="إزاحة" data-en-def="An action where the parser pushes the current state onto the stack and advances to the next input token.">Shift<span class="smart-term-tooltip"></span></span> $t$</b>, push $t$ and get next token. If <b><span class="smart-term" data-term-en="Reduce" data-ar="تقليص" data-en-def="An action where the parser replaces a matched right-hand side of a rule on the stack with its corresponding left-hand side non-terminal.">Reduce<span class="smart-term-tooltip"></span></span> $A \rightarrow \beta$</b>, pop states equal to the length of $\beta$, then push <code>GOTO[new stack top, A]</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مثال تتبع للجملة <code>id(id+id)</code>:</p><ol><li>نبدأ بالمكدس يحتوي على الحالة 0. الإدخال الحالي هو <code>id</code>.</li><li>بالرجوع للجدول، <code>ACTION[0, id]</code> هو Shift 4. ندفع 4 للمكدس.</li><li>الإدخال التالي هو <code>(</code>. <code>ACTION[4, (]</code> هو Reduce بالقاعدة <code>T -> id</code>.</li><li>نسحب حالة واحدة (لأن id طوله 1)، نعود للحالة 0. <code>GOTO[0, T]</code> هو 8. ندفع 8 للمكدس.</li><li>تستمر العملية حتى نصل إلى إجراء <b>Accept</b> عند قراءة الرمز <code>$</code>.</li></ol><p>إذا واجه المحلل خانة فارغة في جدول ACTION، فإنه يتوقف فوراً ويبلغ عن خطأ نحوي (Parse Error).</p></template>
+    <template class="content-en"><p>Trace example for <code>id(id+id)</code>:</p><ol><li>Start with stack containing state 0. Current input is <code>id</code>.</li><li>From the table, <code>ACTION[0, id]</code> is Shift 4. Push 4.</li><li>Next input is <code>(</code>. <code>ACTION[4, (]</code> is Reduce by <code>T -> id</code>.</li><li>Pop 1 state (since id has length 1), exposing state 0. <code>GOTO[0, T]</code> is 8. Push 8.</li><li>The process continues until an <b>Accept</b> action is reached upon reading <code>$</code>.</li></ol><p>If the parser encounters an empty cell in the ACTION table, it halts immediately and reports a syntax error.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما الذي يحدد عدد الحالات التي يتم سحبها (Pop) من المكدس أثناء عملية التقليص (Reduce)؟</template>
+      <template class="content-en">What determines the number of states popped from the stack during a Reduce operation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>عدد الحالات المسحوبة يساوي عدد الرموز في الجانب الأيمن (RHS) من قاعدة الإنتاج التي يتم التقليص بناءً عليها.</p></template>
+      <template class="content-en"><p>The number of popped states equals the number of symbols on the right-hand side (RHS) of the production rule being used for the reduction.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب المترجم: المحلل النحوي (Parser). تخيلوا أن المحلل اللفظي أعطانا كلمات متناثرة، ومهمتنا الآن هي بناء جمل مفيدة منها. نستخدم القواعد الخالية من السياق (CFG) لأنها قوية وتسمح بالتداخل (Recursion). لكن احذروا من 'الغموض'؛ المترجم يكره التردد ويحتاج لشجرة تحليل واحدة فقط لكل جملة. درسنا طريقتين: من أعلى لأسفل (LL) وهي بسيطة لكنها تتطلب قواعد صارمة (لا استدعاء أيسر، لا بادئات مشتركة)، ومن أسفل لأعلى (LR) وهي الأقوى والمستخدمة في الواقع. السر في بناء هذه المحللات يكمن في مجموعات FIRST و FOLLOW، فهي التي تخبر المحلل بالخطوة التالية. ركزوا جيداً على كيفية حل تعارضات Shift-Reduce باستخدام FOLLOW في تحليل SLR، فهذا سؤال كلاسيكي في الامتحانات. بالتوفيق!</template>
-    <template class="content-en">Welcome, future engineers, to the heart of the compiler: the Parser. Imagine the lexical analyzer gave us scattered words; our job is to build meaningful sentences. We use Context Free Grammars (CFG) because they are powerful and allow recursion. But beware of 'ambiguity'; a compiler hates indecision and needs exactly one parse tree per sentence. We studied two approaches: Top-down (LL), which is simple but strict (no left recursion, no common prefixes), and Bottom-up (LR), which is powerful and used in reality. The secret to building these parsers lies in FIRST and FOLLOW sets—they tell the parser what to do next. Focus heavily on how SLR parsing resolves Shift-Reduce conflicts using the FOLLOW set; it's a classic exam topic. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب المترجم: المحلل النحوي (Parser). تخيلوا أن المحلل اللفظي أعطانا كلمات متناثرة، ومهمتنا الآن هي بناء جمل مفيدة منها. نستخدم القواعد الخالية من السياق (CFG) لأنها قوية وتسمح بالتداخل (Recursion). لكن احذروا من 'الغموض'؛ المترجم يكره التردد ويحتاج لشجرة تحليل واحدة فقط لكل جملة. درسنا طريقتين: من أعلى لأسفل (LL) وهي بسيطة لكنها تتطلب قواعد صارمة (لا استدعاء أيسر، لا بادئات مشتركة)، ومن أسفل لأعلى (LR) وهي الأقوى والمستخدمة في الواقع. السر في بناء هذه المحللات يكمن في مجموعات FIRST و FOLLOW، فهي التي تخبر المحلل بالخطوة التالية. ركزوا جيداً على كيفية حل تعارضات Shift-Reduce باستخدام FOLLOW في تحليل SLR، فهذا سؤال كلاسيكي في الامتحانات. بالتوفيق!<p>الآن بعد أن فهمنا المفاهيم النظرية للقواعد النحوية، قمنا بتسليح أنفسنا بالخوارزميات الفعلية التي تحول هذه النظريات إلى كود برمجي. إتقانك لقواعد إزالة الاستدعاء الأيسر وحساب مجموعات FIRST و FOLLOW هو المفتاح السري لفهم كيف تُبنى جداول التحليل (ACTION و GOTO) التي تقود آلة المترجم خطوة بخطوة.</p></template>
+    <template class="content-en">Welcome, future engineers, to the heart of the compiler: the Parser. Imagine the lexical analyzer gave us scattered words; our job is to build meaningful sentences. We use Context Free Grammars (CFG) because they are powerful and allow recursion. But beware of 'ambiguity'; a compiler hates indecision and needs exactly one parse tree per sentence. We studied two approaches: Top-down (LL), which is simple but strict (no left recursion, no common prefixes), and Bottom-up (LR), which is powerful and used in reality. The secret to building these parsers lies in FIRST and FOLLOW sets—they tell the parser what to do next. Focus heavily on how SLR parsing resolves Shift-Reduce conflicts using the FOLLOW set; it's a classic exam topic. Good luck!<p>Now that we understand the theoretical concepts of grammars, we have armed ourselves with the actual algorithms that turn these theories into code. Mastering left recursion elimination and the computation of FIRST and FOLLOW sets is the secret key to understanding how parse tables (ACTION and GOTO) are built to drive the compiler's machinery step by step.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1293,6 +1392,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">تتحقق من الرمز التالي في الإدخال؛ إذا كان هذا الرمز موجوداً في مجموعة FOLLOW للرمز غير الطرفي، تقوم بالتقليص، وإلا تقوم بالإزاحة.</template>
           <template class="content-en">It checks the next input token; if this token is in the FOLLOW set of the non-terminal, it Reduces, otherwise it Shifts.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر حساب مجموعة FIRST خطوة تمهيدية حتمية قبل حساب مجموعة FOLLOW؟</template>
+          <template class="content-en">Why is computing the FIRST set an absolute prerequisite before computing the FOLLOW set?</template>
+          <span class="content-target">لماذا نعتبر حساب مجموعة FIRST خطوة تمهيدية حتمية قبل حساب مجموعة FOLLOW؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن قاعدة حساب FOLLOW تعتمد بشكل مباشر على FIRST. عندما نرى إنتاجاً مثل A -> αBβ، لمعرفة ما يتبع B، يجب أن نعرف ما هي الرموز الطرفية التي يمكن أن تبدأ بها السلسلة β، وهذا هو بالضبط تعريف FIRST(β).</p></template>
+          <template class="content-en"><p>Because the rule for computing FOLLOW directly depends on FIRST. When we see a production like A -> αBβ, to know what follows B, we must know which terminals can start the string β, which is exactly the definition of FIRST(β).</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في خوارزمية SLR، ماذا يحدث لحالة المكدس (Stack) بعد تنفيذ إجراء التقليص (Reduce)؟</template>
+          <template class="content-en">In the SLR algorithm, what happens to the stack state immediately after a Reduce action is performed?</template>
+          <span class="content-target">في خوارزمية SLR، ماذا يحدث لحالة المكدس (Stack) بعد تنفيذ إجراء التقليص (Reduce)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>بعد سحب الحالات المطابقة للجانب الأيمن من القاعدة، ينكشف رقم حالة جديد على قمة المكدس. المحلل يأخذ هذه الحالة المكشوفة والرمز غير الطرفي الذي تم التقليص إليه (الجانب الأيسر)، ويبحث في جدول GOTO لتحديد الحالة الجديدة التي يجب دفعها إلى المكدس.</p></template>
+          <template class="content-en"><p>After popping the states corresponding to the right-hand side of the rule, a new state is exposed on the stack top. The parser takes this exposed state and the non-terminal just reduced to (the left-hand side), and looks up the GOTO table to determine the new state to push.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1560,6 +1694,40 @@
         "en": "Reduce A -> α if next token ∈ FOLLOW(A)."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هي القاعدة الأساسية لإضافة عناصر إلى FOLLOW(B) من الإنتاج A -> αBβ؟",
+      "en": "What is the primary rule for adding elements to FOLLOW(B) from the production A -> αBβ?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نضيف كل الرموز في FIRST(β) باستثناء ε إلى FOLLOW(B).",
+        "en": "Add all symbols in FIRST(β) except ε to FOLLOW(B)."
+      },
+      "example": {
+        "ar": "إذا كان FIRST(β) = {+, ε}، نضيف '+' فقط إلى FOLLOW(B).",
+        "en": "If FIRST(β) = {+, ε}, we add only '+' to FOLLOW(B)."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "في جدول ACTION الخاص بـ SLR، متى نضع إجراء التقليص (Reduce)؟",
+      "en": "In the SLR ACTION table, when do we place a Reduce action?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نضعه عندما نصل إلى نهاية القاعدة (A -> α.)، ونضعه فقط في الأعمدة التي تمثل الرموز الموجودة في FOLLOW(A).",
+        "en": "We place it when we reach the end of a rule (A -> α.), and ONLY in the columns for tokens present in FOLLOW(A)."
+      },
+      "example": {
+        "ar": "إذا كان FOLLOW(T) = {+, )، $}، نضع Reduce T في هذه الأعمدة الثلاثة فقط.",
+        "en": "If FOLLOW(T) = {+, ), $}, we place Reduce T only in those three columns."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1569,7 +1737,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1585,7 +1753,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1910,6 +2078,70 @@
     },
     "difficulty": "medium",
     "conceptId": "ll1-grammars"
+  },
+  {
+    "conceptId": "computing-first-and-follow",
+    "question": {
+      "ar": "في القاعدة <code>A -&gt; X Y Z</code>، إذا كان <code>FIRST(X)</code> يحتوي على ε و <code>FIRST(Y)</code> يحتوي على ε، فما الذي يجب إضافته إلى <code>FIRST(A)</code>؟",
+      "en": "In the rule <code>A -&gt; X Y Z</code>, if <code>FIRST(X)</code> contains ε and <code>FIRST(Y)</code> contains ε, what must be added to <code>FIRST(A)</code>?"
+    },
+    "options": {
+      "ar": [
+        "FIRST(X) فقط",
+        "FIRST(X) و FIRST(Y) فقط",
+        "FIRST(X) و FIRST(Y) و FIRST(Z)",
+        "ε فقط"
+      ],
+      "en": [
+        "Only FIRST(X)",
+        "Only FIRST(X) and FIRST(Y)",
+        "FIRST(X), FIRST(Y), and FIRST(Z)",
+        "Only ε"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بما أن X يمكن أن يختفي (ε)، فإن A يمكن أن يبدأ بما يبدأ به Y. وبما أن Y يمكن أن يختفي أيضاً، فإن A يمكن أن يبدأ بما يبدأ به Z.",
+      "en": "Since X can derive ε, A can start with whatever Y starts with. Since Y can also derive ε, A can start with whatever Z starts with."
+    },
+    "hint": {
+      "ar": "إذا كان الرمز الأول يمكن أن يكون فارغاً، انظر إلى الرمز الذي يليه.",
+      "en": "If the first symbol can be empty, look at the symbol after it."
+    },
+    "difficulty": "hard",
+    "id": 11
+  },
+  {
+    "conceptId": "slr-parsing-algorithm",
+    "question": {
+      "ar": "أثناء تنفيذ خوارزمية SLR، إذا كان الإجراء هو <code>Reduce A -&gt; X Y</code>، كم عدد الحالات التي سيتم سحبها (Pop) من المكدس؟",
+      "en": "During SLR parsing, if the action is <code>Reduce A -&gt; X Y</code>, how many states will be popped from the stack?"
+    },
+    "options": {
+      "ar": [
+        "حالة واحدة",
+        "حالتان",
+        "ثلاث حالات",
+        "لا يتم سحب أي حالة"
+      ],
+      "en": [
+        "One state",
+        "Two states",
+        "Three states",
+        "No states are popped"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يتم سحب حالات بعدد الرموز الموجودة في الجانب الأيمن من القاعدة. هنا لدينا رمزان (X و Y)، لذا نسحب حالتين.",
+      "en": "States are popped equal to the number of symbols on the right-hand side of the rule. Here we have two symbols (X and Y), so we pop two states."
+    },
+    "hint": {
+      "ar": "عد الرموز الموجودة بعد السهم.",
+      "en": "Count the symbols after the arrow."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1954,6 +2186,22 @@
       <template class="content-ar">في تحليل SLR، يتم حل تعارض Shift-Reduce بالنظر إلى مجموعة FOLLOW. إذا كان الرمز التالي في FOLLOW(A)، نقوم بالتقليص (Reduce)، وإلا نقوم بالإزاحة (Shift).</template>
       <template class="content-en">In SLR parsing, a Shift-Reduce conflict is resolved by looking at the FOLLOW set. If the next token is in FOLLOW(A), we Reduce; otherwise, we Shift.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند حساب مجموعة FOLLOW، لا تنسَ إضافة مجموعة FOLLOW للجانب الأيسر (A) إلى الجانب الأيمن (B) إذا كانت القاعدة تنتهي بـ B أو إذا كان ما يتبع B يمكن أن يؤول إلى إبسيلون (ε). نسيان هذه الخطوة هو خطأ شائع جداً.</template>
+    <template class="content-en">When computing FOLLOW sets, do not forget to add FOLLOW(A) to FOLLOW(B) if the rule ends with B or if what follows B can derive epsilon (ε). Missing this step is a very common mistake.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في خوارزمية SLR، عملية التقليص (Reduce) لا تستهلك الرمز الحالي من الإدخال. الرمز يبقى كما هو ليتم فحصه مرة أخرى في الحالة الجديدة بعد التقليص.</template>
+    <template class="content-en">In the SLR algorithm, a Reduce operation does NOT consume the current input token. The token remains the lookahead to be evaluated again in the new state after the reduction.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

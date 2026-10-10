@@ -103,6 +103,16 @@
         <template class="content-en">Advanced Cache Concepts</template>
         <span class="content-target">مفاهيم متقدمة في الكاش</span>
       </a>
+      <a href="#cache-access-outcomes" class="toc-link" data-bilingual>
+        <template class="content-ar">نتائج الوصول للكاش ومقاييس الأداء</template>
+        <template class="content-en">Cache Access Outcomes and Metrics</template>
+        <span class="content-target">نتائج الوصول للكاش ومقاييس الأداء</span>
+      </a>
+      <a href="#worked-examples-cache-mapping" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة عملية: تعيين الكاش</template>
+        <template class="content-en">Worked Examples: Cache Mapping</template>
+        <span class="content-target">أمثلة عملية: تعيين الكاش</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -954,14 +964,100 @@
   </details>
 </section>
 
+<section id="cache-access-outcomes" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> نتائج الوصول للكاش ومقاييس الأداء</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Cache Access Outcomes and Metrics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عند طلب بيانات، إما أن نجدها (Hit) أو لا نجدها (Miss). تُقاس كفاءة الذاكرة بنسبة الإصابة (Hit Rate) ووقت الإصابة (Hit Time) وغرامة الإخفاق (Miss Penalty).</p></template>
+    <template class="content-en"><p>When requesting data, we either find it (Hit) or don't (Miss). Memory efficiency is measured by Hit Rate, Hit Time, and Miss Penalty.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عندما يطلب المعالج بيانات معينة، فإنه يبحث أولاً في أقرب ذاكرة (عادة الكاش). هذا يقودنا إلى تعريفات أساسية مجمعة تحدد أداء النظام:</p><ul><li><strong>الإصابة (Hit):</strong> تحدث عندما يتم العثور على البيانات المطلوبة في مستوى الذاكرة الحالي.</li><li><strong>الإخفاق (Miss):</strong> يحدث عندما لا يتم العثور على البيانات في مستوى الذاكرة الحالي، مما يستدعي البحث في المستوى الأبطأ.</li><li><strong><span class="smart-term" data-term-en="Hit Time" data-ar="وقت الإصابة" data-en-def="The time required to access data at a given memory level.">وقت الإصابة<span class="smart-term-tooltip"></span></span> (Hit Time):</strong> هو الوقت اللازم للوصول إلى البيانات في مستوى الذاكرة الحالي عند حدوث إصابة.</li><li><strong>نسبة الإصابة (Hit Rate):</strong> هي النسبة المئوية للمرات التي يتم فيها العثور على البيانات في مستوى ذاكرة معين.</li><li><strong>نسبة الإخفاق (Miss Rate):</strong> هي النسبة المئوية للمرات التي لا يتم فيها العثور على البيانات (تساوي 1 - نسبة الإصابة).</li><li><strong><span class="smart-term" data-term-en="Miss Penalty" data-ar="غرامة الإخفاق" data-en-def="The time required to process a miss, including replacing a block and delivering data.">غرامة الإخفاق<span class="smart-term-tooltip"></span></span> (Miss Penalty):</strong> هي الوقت الإضافي المطلوب لمعالجة الإخفاق، ويشمل وقت استبدال كتلة الذاكرة ووقت توصيل البيانات للمعالج.</li></ul></template>
+    <template class="content-en"><p>When the CPU requests specific data, it first searches the nearest memory (usually cache). This leads to grouped fundamental definitions that determine system performance:</p><ul><li><strong>Hit:</strong> Occurs when the requested data is found at a given memory level.</li><li><strong>Miss:</strong> Occurs when it is not found at the current level, requiring a search in a slower level.</li><li><strong><span class="smart-term" data-term-en="Hit Time" data-ar="وقت الإصابة" data-en-def="The time required to access data at a given memory level.">Hit Time<span class="smart-term-tooltip"></span></span>:</strong> The time required to access data at a given memory level upon a hit.</li><li><strong>Hit Rate:</strong> The percentage of time data is found at a given memory level.</li><li><strong>Miss Rate:</strong> The percentage of time it is not found (equals 1 - hit rate).</li><li><strong><span class="smart-term" data-term-en="Miss Penalty" data-ar="غرامة الإخفاق" data-en-def="The time required to process a miss, including replacing a block and delivering data.">Miss Penalty<span class="smart-term-tooltip"></span></span>:</strong> The additional time required to process a miss, including the time to replace a memory block and deliver data to the processor.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>فهم هذه المقاييس ضروري لتحليل أداء النظام بدقة. غرامة الإخفاق (Miss Penalty) عادة ما تكون أكبر بكثير من وقت الإصابة (Hit Time) بسبب الفجوة الكبيرة في السرعة بين الكاش والذاكرة الرئيسية.</p><p>لهذا السبب، فإن تحسين نسبة الإصابة (Hit Rate) حتى بنسبة ضئيلة جداً (مثل 1%) يمكن أن يكون له تأثير هائل وإيجابي على الأداء الكلي للنظام.</p></template>
+    <template class="content-en"><p>Understanding these metrics is essential for accurate system performance analysis. The Miss Penalty is usually much larger than the Hit Time due to the massive speed gap between cache and main memory.</p><p>For this reason, improving the Hit Rate even by a tiny fraction (like 1%) can have a massive, positive impact on overall system performance.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر غرامة الإخفاق (Miss Penalty) مكلفة جداً من حيث الوقت مقارنة بوقت الإصابة؟</template>
+      <template class="content-en">Why is the Miss Penalty so costly in terms of time compared to Hit Time?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تتضمن جلب البيانات من ذاكرة أبطأ بكثير (الذاكرة الرئيسية أو القرص)، بالإضافة إلى الوقت المستغرق في اختيار وطرد كتلة أخرى من الكاش لإفساح المجال.</p></template>
+      <template class="content-en"><p>Because it involves fetching data from a much slower memory (main memory or disk), plus the time taken to select and evict another block from the cache to make room.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="worked-examples-cache-mapping" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> أمثلة عملية: تعيين الكاش</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Worked Examples: Cache Mapping</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أمثلة حسابية توضح كيفية تقسيم عناوين الذاكرة إلى حقول (Tag, Block, Offset) في التعيين المباشر والترابطي بالكامل بناءً على حجم الذاكرة والكاش.</p></template>
+    <template class="content-en"><p>Computational examples showing how memory addresses are partitioned into fields (Tag, Block, Offset) in Direct Mapped and Fully Associative caches based on memory and cache sizes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><strong>المثال الأول (التعيين المباشر - Direct Mapped):</strong> افترض ذاكرة رئيسية مكونة من 4 كتل، وكاش مكون من كتلتين، حيث حجم الكتلة 4 بايت. أين تذهب الكتلة 3 (العنوان 0x0011)؟</p><ol><li>بما أن الكاش يحتوي على كتلتين، نحتاج بت واحد لحقل Block (لأن $2^1 = 2$).</li><li>حجم الكتلة 4 بايت، لذا نحتاج 2 بت لحقل Offset (لأن $2^2 = 4$).</li><li>العنوان 0x0011 بالثنائي هو 00010001.</li><li>البتان الأخيران (01) يمثلان الـ Offset. البت الثالث من اليمين (0) يمثل الـ Block. ما تبقى هو الـ Tag.</li><li>بما أن حقل Block قيمته 0، فإن هذا العنوان يذهب إلى كتلة الكاش رقم 0.</li></ol><p><strong>المثال الثاني (الترابطي بالكامل - Fully Associative):</strong> افترض عنوان ذاكرة بحجم 14 بت، وكاش يحتوي على 16 كتلة، وحجم الكتلة 8 بايت.</p><ol><li>في هذا النوع، لا يوجد حقل Block لأن الكتلة يمكن أن توضع في أي مكان.</li><li>حجم الكتلة 8 بايت، لذا نحتاج 3 بت لحقل Offset (لأن $2^3 = 8$).</li><li>باقي البتات تخصص لحقل Tag بالكامل: 14 - 3 = 11 بت.</li><li>إذن، يُقسم العنوان إلى حقلين فقط: Tag (11 بت) و Offset (3 بت).</li></ol></template>
+    <template class="content-en"><p><strong>Example 1 (Direct Mapped):</strong> Consider a main memory of 4 blocks, a cache of 2 blocks, where block size is 4 bytes. Where does block 3 (address 0x0011) go?</p><ol><li>Since cache has 2 blocks, we need 1 bit for the <span class="smart-term" data-term-en="Block Field" data-ar="حقل الكتلة" data-en-def="Selects a unique block (line) of cache in direct mapped and set associative caches.">Block field<span class="smart-term-tooltip"></span></span> ($2^1 = 2$).</li><li>Block size is 4 bytes, so we need 2 bits for the <span class="smart-term" data-term-en="Offset Field" data-ar="حقل الإزاحة" data-en-def="Uniquely identifies an address (byte or word) within a specific block.">Offset field<span class="smart-term-tooltip"></span></span> ($2^2 = 4$).</li><li>Address 0x0011 in binary is 00010001.</li><li>The last two bits (01) are the Offset. The third bit from the right (0) is the Block. The rest is the Tag.</li><li>Since the Block field is 0, this address maps to cache block 0.</li></ol><p><strong>Example 2 (Fully Associative):</strong> Suppose a 14-bit memory address, a cache with 16 blocks, and a block size of 8 bytes.</p><ol><li>In this type, there is no Block field because a block can go anywhere.</li><li>Block size is 8 bytes, so we need 3 bits for the Offset field ($2^3 = 8$).</li><li>The remaining bits are allocated entirely to the <span class="smart-term" data-term-en="Tag Field" data-ar="حقل العلامة" data-en-def="The remaining bits of the address used to verify if the cache block contains the requested data.">Tag field<span class="smart-term-tooltip"></span></span>: 14 - 3 = 11 bits.</li><li>Thus, the address is partitioned into only two fields: Tag (11 bits) and Offset (3 bits).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>توضح هذه الأمثلة كيف يحدد تصميم العتاد (حجم الكاش وحجم الكتلة) طريقة تفسير المعالج لعناوين الذاكرة بشكل صارم.</p><p>في التعيين المباشر، يفرض حقل Block مكاناً وحيداً للبيانات، مما يبسط العتاد ولكنه يزيد من احتمالية التعارض. بينما في الترابطي بالكامل، يندمج حقل Block مع Tag ليسمح بوضع البيانات في أي مكان، مما يتطلب مقارنات متوازية مكلفة لجميع الـ Tags في الكاش.</p></template>
+    <template class="content-en"><p>These examples illustrate how hardware design (cache size and block size) strictly dictates how the processor interprets memory addresses.</p><p>In direct mapping, the Block field forces a single location for data, simplifying hardware but increasing conflict probability. In fully associative, the Block field merges with the Tag to allow data placement anywhere, requiring expensive parallel comparisons of all Tags in the cache.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في المثال الثاني (الترابطي بالكامل)، إذا قمنا بتغيير حجم الكتلة إلى 16 بايت بدلاً من 8، كم سيصبح حجم حقل Tag؟</template>
+      <template class="content-en">In the second example (Fully Associative), if we change the block size to 16 bytes instead of 8, what will be the size of the Tag field?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيصبح 10 بت. لأن حجم الكتلة 16 بايت يتطلب 4 بت لحقل الإزاحة (Offset) (لأن 2^4 = 16). وبالتالي، يتبقى للـ Tag: 14 - 4 = 10 بت.</p></template>
+      <template class="content-en"><p>It will be 10 bits. Because a 16-byte block requires 4 bits for the Offset field (since 2^4 = 16). Therefore, the Tag field gets the remainder: 14 - 4 = 10 bits.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب الحاسوب: الذاكرة. تخيلوا المعالج كطاهٍ سريع جداً، والذاكرة هي مطبخه. لا يمكن للطاهي أن يذهب للسوق (القرص الصلب) كلما احتاج لملح! لذا نضع الملح في متناول يده (الكاش - SRAM)، والمكونات الأساسية في الثلاجة (الذاكرة الرئيسية - DRAM). في هذا الفصل، ركزنا على كيفية تنظيم هذا المطبخ الهرمي. تذكروا جيداً مبدأ المحلية (Locality)؛ فهو السر وراء كفاءة الكاش. في الامتحان، توقعوا أسئلة حسابية حول وقت الوصول الفعال (EAT) باستخدام معادلة الوصول المتزامن، وتأكدوا من فهمكم لكيفية تقسيم عنوان الذاكرة في التعيين المباشر (Tag, Block, Offset). لا تنسوا التفرقة بين سياسات الاستبدال، خاصة LRU و FIFO. ركزوا، فالذاكرة هي ما يفصل بين حاسوب سريع وآخر بطيء!</template>
-    <template class="content-en">Welcome, future engineers, to the heart of the computer: Memory. Imagine the CPU as a blazing-fast chef, and memory as the kitchen. The chef can't go to the supermarket (Hard Drive) every time they need salt! So, we keep salt right on the counter (Cache - SRAM), and main ingredients in the fridge (Main Memory - DRAM). In this chapter, we focused on how this hierarchical kitchen is organized. Remember the Principle of Locality; it's the secret behind cache efficiency. For the exam, expect calculation questions on Effective Access Time (EAT) using the concurrent access formula, and make sure you understand how a memory address is partitioned in Direct Mapping (Tag, Block, Offset). Don't forget the differences between replacement policies, especially LRU and FIFO. Stay focused; memory is what separates a fast computer from a slow one!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب الحاسوب: الذاكرة. تخيلوا المعالج كطاهٍ سريع جداً، والذاكرة هي مطبخه. لا يمكن للطاهي أن يذهب للسوق (القرص الصلب) كلما احتاج لملح! لذا نضع الملح في متناول يده (الكاش - SRAM)، والمكونات الأساسية في الثلاجة (الذاكرة الرئيسية - DRAM). في هذا الفصل، ركزنا على كيفية تنظيم هذا المطبخ الهرمي. تذكروا جيداً مبدأ المحلية (Locality)؛ فهو السر وراء كفاءة الكاش. في الامتحان، توقعوا أسئلة حسابية حول وقت الوصول الفعال (EAT) باستخدام معادلة الوصول المتزامن، وتأكدوا من فهمكم لكيفية تقسيم عنوان الذاكرة في التعيين المباشر (Tag, Block, Offset). لا تنسوا التفرقة بين سياسات الاستبدال، خاصة LRU و FIFO. ركزوا، فالذاكرة هي ما يفصل بين حاسوب سريع وآخر بطيء!<p>لفهم هرمية الذاكرة بشكل كامل، لا يكفي معرفة أنواعها نظرياً، بل يجب إتقان لغة الأداء: الإصابة والإخفاق وأوقاتهما. علاوة على ذلك، فإن القدرة على تشريح عنوان الذاكرة حسابياً إلى حقول (Tag, Block, Offset) هي المهارة العملية التي تميز المهندس القادر على تحليل وتصميم أنظمة الكاش بدقة.</p></template>
+    <template class="content-en">Welcome, future engineers, to the heart of the computer: Memory. Imagine the CPU as a blazing-fast chef, and memory as the kitchen. The chef can't go to the supermarket (Hard Drive) every time they need salt! So, we keep salt right on the counter (Cache - SRAM), and main ingredients in the fridge (Main Memory - DRAM). In this chapter, we focused on how this hierarchical kitchen is organized. Remember the Principle of Locality; it's the secret behind cache efficiency. For the exam, expect calculation questions on Effective Access Time (EAT) using the concurrent access formula, and make sure you understand how a memory address is partitioned in Direct Mapping (Tag, Block, Offset). Don't forget the differences between replacement policies, especially LRU and FIFO. Stay focused; memory is what separates a fast computer from a slow one!<p>To fully understand the memory hierarchy, knowing its types theoretically is not enough; one must master the language of performance: hit, miss, and their times. Furthermore, the ability to computationally dissect a memory address into fields (Tag, Block, Offset) is the practical skill that distinguishes an engineer capable of accurately analyzing and designing cache systems.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1135,6 +1231,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأنها تتطلب معرفة المستقبل (أي الكتل لن تُستخدم لأطول فترة)، وهو أمر مستحيل. تُستخدم فقط كمعيار نظري لقياس أداء السياسات الأخرى.</template>
           <template class="content-en">Because it requires knowing the future (which blocks won't be used for the longest time), which is impossible. It's only used as a theoretical benchmark.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا يحتوي عنوان الذاكرة في الكاش الترابطي بالكامل (Fully Associative) على حقل Block؟</template>
+          <template class="content-en">Why does the memory address in a Fully Associative cache not contain a Block field?</template>
+          <span class="content-target">لماذا لا يحتوي عنوان الذاكرة في الكاش الترابطي بالكامل (Fully Associative) على حقل Block؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن البيانات في هذا النوع يمكن أن توضع في أي كتلة داخل الكاش، فلا يوجد موقع محدد (Index) يجب استخراجه من العنوان لتوجيهنا. بدلاً من ذلك، يُستخدم حقل Tag للبحث في جميع الكتل بالتوازي للعثور على البيانات.</p></template>
+          <template class="content-en"><p>Because data in this type can be placed in any block within the cache, there is no specific location (Index) to extract from the address to guide us. Instead, the Tag field is used to search all blocks in parallel to find the data.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يؤثر حجم الكتلة (Block Size) على حجم حقل الإزاحة (Offset) وحقل العلامة (Tag)؟</template>
+          <template class="content-en">How does the Block Size affect the size of the Offset field and the Tag field?</template>
+          <span class="content-target">كيف يؤثر حجم الكتلة (Block Size) على حجم حقل الإزاحة (Offset) وحقل العلامة (Tag)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>كلما زاد حجم الكتلة، زاد عدد البتات المطلوبة لحقل الإزاحة (Offset) لتمثيل جميع البايتات داخل تلك الكتلة. وبما أن طول عنوان الذاكرة ثابت، فإن زيادة بتات الإزاحة تؤدي بالضرورة إلى تقليل عدد البتات المتاحة لحقل العلامة (Tag).</p></template>
+          <template class="content-en"><p>As the block size increases, more bits are required for the Offset field to represent all bytes within that block. Since the memory address length is fixed, increasing the offset bits necessarily decreases the number of bits available for the Tag field.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1487,6 +1618,40 @@
         "en": "Saves total space but complicates data movement."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو تعريف وقت الإصابة (Hit Time)؟",
+      "en": "What is the definition of Hit Time?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هو الوقت اللازم للوصول إلى البيانات في مستوى الذاكرة الحالي عند العثور عليها (حدوث إصابة).",
+        "en": "The time required to access data at a given memory level upon a hit."
+      },
+      "example": {
+        "ar": "الوقت المستغرق لقراءة البيانات من L1 Cache إذا كانت موجودة فيه.",
+        "en": "The time taken to read data from L1 Cache if it is present there."
+      }
+    },
+    "id": 21
+  },
+  {
+    "front": {
+      "ar": "في الكاش الترابطي بالكامل، إذا كان عنوان الذاكرة 14 بت وحجم الكتلة 8 بايت، ما هو حجم حقل Tag؟",
+      "en": "In a Fully Associative cache, if the memory address is 14 bits and the block size is 8 bytes, what is the size of the Tag field?"
+    },
+    "back": {
+      "definition": {
+        "ar": "11 بت.",
+        "en": "11 bits."
+      },
+      "example": {
+        "ar": "حجم الكتلة 8 بايت يحتاج 3 بت للـ Offset. إذن Tag = 14 - 3 = 11 بت.",
+        "en": "Block size 8 bytes needs 3 bits for Offset. So Tag = 14 - 3 = 11 bits."
+      }
+    },
+    "id": 22
   }
 ]
 </script>
@@ -1496,7 +1661,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1512,7 +1677,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1837,6 +2002,70 @@
     },
     "difficulty": "easy",
     "conceptId": "memory-hierarchy-and-locality"
+  },
+  {
+    "conceptId": "cache-access-outcomes",
+    "question": {
+      "ar": "ماذا يطلق على الوقت الإضافي المطلوب لمعالجة عدم العثور على البيانات في الكاش، والذي يشمل جلبها من الذاكرة الرئيسية؟",
+      "en": "What is the additional time required to process not finding data in the cache, which includes fetching it from main memory, called?"
+    },
+    "options": {
+      "ar": [
+        "وقت الإصابة (Hit Time)",
+        "غرامة الإخفاق (Miss Penalty)",
+        "وقت الوصول الفعال (EAT)",
+        "دورة الذاكرة (Memory Cycle)"
+      ],
+      "en": [
+        "Hit Time",
+        "Miss Penalty",
+        "Effective Access Time (EAT)",
+        "Memory Cycle"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "غرامة الإخفاق (Miss Penalty) هي التكلفة الزمنية التي يدفعها النظام عند عدم العثور على البيانات في الكاش، وتتضمن وقت جلبها من مستوى أبطأ.",
+      "en": "Miss Penalty is the time cost the system pays when data is not found in the cache, including the time to fetch it from a slower level."
+    },
+    "hint": {
+      "ar": "إنها 'عقوبة' أو 'غرامة' لعدم وجود البيانات.",
+      "en": "It's a 'penalty' for the data not being there."
+    },
+    "difficulty": "easy",
+    "id": 11
+  },
+  {
+    "conceptId": "worked-examples-cache-mapping",
+    "question": {
+      "ar": "إذا كان حجم الكتلة في الكاش هو 16 بايت، كم عدد البتات المطلوبة لحقل الإزاحة (Offset)؟",
+      "en": "If the block size in the cache is 16 bytes, how many bits are required for the Offset field?"
+    },
+    "options": {
+      "ar": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ],
+      "en": [
+        "2",
+        "3",
+        "4",
+        "5"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "حقل الإزاحة يحدد البايت داخل الكتلة. بما أن الكتلة تحتوي على 16 بايت، نحتاج إلى 4 بتات لأن 2 أس 4 يساوي 16.",
+      "en": "The offset field identifies the byte within the block. Since the block has 16 bytes, we need 4 bits because 2 to the power of 4 equals 16."
+    },
+    "hint": {
+      "ar": "ابحث عن الأس الذي نرفعه للأساس 2 ليعطينا 16.",
+      "en": "Find the power of 2 that gives 16."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>

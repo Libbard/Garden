@@ -1,0 +1,132 @@
+.gsud {
+  --gsud-thick: var(--text-muted); --gsud-thin: var(--border-color);
+  position: relative; inline-size: min(100%, 620px, max(280px, 100dvh - 400px)); display: grid; gap: .5rem; justify-items: center;
+}
+.gsud-board {
+  position: relative; inline-size: 100%; aspect-ratio: 1; direction: ltr; container-type: inline-size;
+  border-radius: var(--radius-md); touch-action: manipulation; outline: none;
+}
+.gsud-board:focus-visible { outline: 2px solid var(--gm-tint); outline-offset: 3px; }
+.gsud-grid {
+  position: absolute; inset: 0; display: grid; gap: 2px; padding: 2px; overflow: hidden;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr));
+  border-radius: var(--radius-md); background: var(--gsud-thick);
+}
+.gsud-box {
+  display: grid; gap: 1px; min-inline-size: 0; min-block-size: 0; background: var(--gsud-thin);
+  grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+.gsud-c {
+  --gsud-w: transparent;
+  position: relative; display: grid; place-items: center; min-inline-size: 0; min-block-size: 0; overflow: hidden;
+  background: var(--bg-card); cursor: pointer;
+}
+.gsud-c::before, .gsud-fx { content: ""; position: absolute; inset: 0; pointer-events: none; }
+.gsud-c::before { background: var(--gsud-w); }
+.gsud-fx { background: color-mix(in oklab, var(--gm-ok) 20%, transparent); opacity: 0; }
+.gsud-v {
+  position: relative; display: block; line-height: 1; color: var(--text-primary);
+  font-family: 'Inter', 'Cairo', sans-serif; font-variant-numeric: tabular-nums; font-weight: 600;
+  font-size: calc(min(100vw - 2.5rem, 460px) * .064); font-size: 6.4cqi;
+}
+.gsud-g .gsud-v { font-weight: 700; }
+.gsud-u .gsud-v { color: var(--gm-tint); }
+.gsud-h .gsud-v { text-decoration: underline 2px color-mix(in oklab, var(--gm-tint) 45%, transparent); text-underline-offset: .16em; }
+.gsud-err .gsud-v { color: var(--gm-bad); }
+.gsud-sm .gsud-v { font-weight: 800; }
+.gsud-ns {
+  position: absolute; inset: 5%; display: grid; pointer-events: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(0, 1fr));
+}
+.gsud-n {
+  display: grid; place-items: center; line-height: 1; color: var(--text-secondary); opacity: 0;
+  font-family: 'Inter', 'Cairo', sans-serif; font-weight: 600;
+  font-size: calc(min(100vw - 2.5rem, 460px) * .026); font-size: 2.6cqi;
+}
+.gsud-n.gsud-on { opacity: 1; }
+.gsud-n.gsud-hi { color: var(--gm-tint); font-weight: 800; }
+.gsud-pr { --gsud-w: color-mix(in oklab, var(--gm-tint) 12%, transparent); }
+.gsud-sm, .gsud-sel { --gsud-w: color-mix(in oklab, var(--gm-tint) 20%, transparent); }
+.gsud-cl { --gsud-w: color-mix(in oklab, var(--gm-bad) 18%, transparent); }
+.gsud-sel::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 2px var(--gm-tint); pointer-events: none; }
+@media (hover: hover) {
+  .gsud-c:not(.gsud-sel):not(.gsud-pr):not(.gsud-sm):not(.gsud-cl):hover { --gsud-w: color-mix(in oklab, var(--text-primary) 12%, transparent); }
+}
+
+.gsud-pp { animation: gsudPop .22s cubic-bezier(.3, 1.4, .5, 1); }
+.gsud-sh { animation: gsudShake .3s ease; }
+.gsud-wv { animation: gsudWave .5s ease var(--d, 0ms) both; }
+.gsud-fx.gsud-fl { animation: gsudFlash .7s ease var(--d, 0ms) both; }
+@keyframes gsudPop { from { transform: scale(.55); opacity: .3; } }
+@keyframes gsudShake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+@keyframes gsudWave { 40% { transform: scale(1.3); } }
+@keyframes gsudFlash { 0%, 100% { opacity: 0; } 35% { opacity: 1; } }
+
+.gsud-hide .gsud-board { filter: blur(14px); pointer-events: none; }
+.gsud-hide .gsud-v, .gsud-hide .gsud-ns { opacity: 0; }
+.gsud-sr {
+  position: absolute; inline-size: 1px; block-size: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+b.gsud-bad { color: var(--gm-bad); }
+
+.gsud-ctl { inline-size: min(100%, 620px); margin-inline: auto; display: grid; gap: .55rem; }
+.gsud-ctl.gsud-hide { opacity: .4; pointer-events: none; }
+.gsud-tools { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; }
+.gsud-tool {
+  display: grid; justify-items: center; align-content: center; gap: .3rem; min-block-size: 3.7rem; padding: .3rem .2rem;
+  border: 0; border-radius: var(--radius-lg); background: none; color: var(--text-secondary); cursor: pointer;
+  font: inherit; font-size: .76rem; font-weight: 600; line-height: 1.2;
+}
+.gsud-ti {
+  position: relative; display: grid; place-items: center; inline-size: 2.65rem; block-size: 2.65rem; font-size: 1.05rem;
+  border: 1px solid var(--border-color); border-radius: 50%; background: var(--bg-card);
+  transition: transform .12s ease;
+}
+.gsud-tool:active .gsud-ti { transform: scale(.92); }
+.gsud-tool:focus-visible { outline: 2px solid var(--gm-tint); outline-offset: 2px; }
+.gsud-tool.gsud-on { color: var(--gm-tint); }
+.gsud-tool.gsud-on .gsud-ti { border-color: var(--gm-tint); background: color-mix(in oklab, var(--gm-tint) 14%, transparent); }
+.gsud-tool.gsud-off { opacity: .45; }
+@media (hover: hover) {
+  .gsud-tool:hover { color: var(--text-primary); }
+  .gsud-tool:hover .gsud-ti { border-color: var(--text-muted); }
+  .gsud-tool.gsud-on:hover .gsud-ti { border-color: var(--gm-tint); }
+}
+.gsud-badge {
+  position: absolute; inset-block-start: -.4rem; inset-inline-end: -.85rem; min-inline-size: 1.1rem; padding: .08rem .32rem;
+  border: 1px solid var(--border-color); border-radius: 999px; background: var(--bg-elevated); color: var(--text-secondary);
+  font-family: 'Inter', 'Cairo', sans-serif; font-size: .6rem; font-weight: 800; line-height: 1.25; text-align: center; white-space: nowrap;
+}
+.gsud-badge:empty { display: none; }
+.gsud-on .gsud-badge { border-color: transparent; background: var(--gm-tint); color: var(--bg-body); }
+
+.gsud-pad { container: gsudpad / inline-size; direction: ltr; }
+.gsud-keys { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: .3rem; }
+.gsud-k {
+  display: grid; justify-items: center; align-content: center; gap: .2rem; min-block-size: 3.7rem; padding: .25rem 0;
+  border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-card); color: var(--gm-tint);
+  font: inherit; cursor: pointer; transition: transform .1s ease, opacity .2s ease;
+}
+.gsud-k b { font-family: 'Inter', 'Cairo', sans-serif; font-size: 1.6rem; font-weight: 700; line-height: 1; }
+.gsud-k small { min-block-size: .64rem; font-family: 'Inter', 'Cairo', sans-serif; font-size: .64rem; font-weight: 600; line-height: 1; color: var(--text-muted); }
+.gsud-k:active { transform: scale(.94); }
+.gsud-k:focus-visible { outline: 2px solid var(--gm-tint); outline-offset: 2px; }
+.gsud-k.gsud-sm { border-color: var(--gm-tint); background: color-mix(in oklab, var(--gm-tint) 14%, transparent); }
+.gsud-k.gsud-done { opacity: .3; }
+.gsud-nm .gsud-k { color: var(--text-secondary); }
+.gsud-nm .gsud-k b { font-size: 1.3rem; font-weight: 500; }
+@media (hover: hover) {
+  .gsud-k:hover { border-color: color-mix(in oklab, var(--gm-tint) 50%, var(--border-color)); }
+}
+@container gsudpad (inline-size < 410px) {
+  .gsud-keys { gap: .22rem; }
+  .gsud-k { min-block-size: 3.3rem; border-radius: var(--radius-sm); }
+  .gsud-k b { font-size: 1.45rem; }
+  .gsud-tool { min-block-size: 3.3rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gsud-pp, .gsud-sh, .gsud-wv, .gsud-fx.gsud-fl { animation: none; }
+  .gsud-ti, .gsud-k { transition: none; }
+}

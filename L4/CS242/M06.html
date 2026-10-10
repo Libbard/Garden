@@ -116,6 +116,11 @@
         <template class="content-en">Deterministic Pushdown Automata (DPDA)</template>
         <span class="content-target">آلات الدفع السفلي الحتمية (DPDA)</span>
       </a>
+      <a href="#worked-example-lwwr" class="toc-link" data-bilingual>
+        <template class="content-ar">مثال عملي: آلة دفع سفلي للغة التناظر المزدوج</template>
+        <template class="content-en">Worked Example: PDA for Palindrome Language</template>
+        <span class="content-target">مثال عملي: آلة دفع سفلي للغة التناظر المزدوج</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -989,8 +994,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>الفكرة الأساسية هي أن الآلة تحاكي الاشتقاق الأيسر (Leftmost Derivation). خطوات البناء:</p><ol><li>الآلة تحتوي على حالة واحدة فقط (q).</li><li>لكل متغير A في القاعدة، نضيف انتقال إبسيلون يستبدل A في قمة المكدس بالطرف الأيمن من القاعدة (α).</li><li>لكل رمز طرفي (Terminal) a، نضيف انتقالاً يطابق الرمز a في المدخلات مع الرمز a في قمة المكدس ويقوم بحذفه (Pop).</li></ol><p>الآلة الناتجة تقبل بالمكدس الفارغ.</p></template>
-    <template class="content-en"><p>The main idea is that the PDA simulates a leftmost derivation. Construction steps:</p><ol><li>The PDA has only one state (q).</li><li>For every variable A in the grammar, add an epsilon-transition that replaces A on the stack top with the right-hand side of its production (α).</li><li>For every terminal symbol a, add a transition that matches 'a' on the input with 'a' on the stack top and pops it.</li></ol><p>The resulting PDA accepts by empty stack.</p></template>
+    <template class="content-ar"><p>الفكرة الأساسية هي أن الآلة تحاكي الاشتقاق الأيسر (Leftmost Derivation). خطوات البناء:</p><ol><li>الآلة تحتوي على حالة واحدة فقط (q).</li><li>لكل متغير A في القاعدة، نضيف انتقال إبسيلون يستبدل A في قمة المكدس بالطرف الأيمن من القاعدة (α).</li><li>لكل رمز طرفي (Terminal) a، نضيف انتقالاً يطابق الرمز a في المدخلات مع الرمز a في قمة المكدس ويقوم بحذفه (Pop).</li></ol><p>الآلة الناتجة تقبل بالمكدس الفارغ.</p><p>مثال عملي: تحويل القاعدة $G = (\{S, A\}, \{0, 1\}, P, S)$ حيث $P$ تحتوي على $S \to AS \mid \epsilon$ و $A \to 0A1 \mid A1 \mid 01$.</p><ol><li>ننشئ آلة بحالة واحدة $q$.</li><li>نضيف انتقالات المتغيرات (إبسيلون): $\delta(q, \epsilon, S) = \{(q, AS), (q, \epsilon)\}$ و $\delta(q, \epsilon, A) = \{(q, 0A1), (q, A1), (q, 01)\}$.</li><li>نضيف انتقالات المطابقة للرموز الطرفية: $\delta(q, 0, 0) = \{(q, \epsilon)\}$ و $\delta(q, 1, 1) = \{(q, \epsilon)\}$.</li></ol><p>لمحاكاة السلسلة "0011": يبدأ المكدس بالرمز $S$. نطبق $S \to AS$ ليصبح المكدس $AS$. ثم نطبق $A \to 0A1$ ليصبح المكدس $0A1S$. تُقرأ 0 من المدخلات وتُطابق مع قمة المكدس وتُحذف، يتبقى $A1S$. نطبق $A \to 01$ ليصبح المكدس $011S$. تُقرأ 0 ثم 1 ثم 1 وتُحذف تباعاً. أخيراً نطبق $S \to \epsilon$ ليفرغ المكدس تماماً وتُقبل السلسلة.</p></template>
+    <template class="content-en"><p>The main idea is that the PDA simulates a leftmost derivation. Construction steps:</p><ol><li>The PDA has only one state (q).</li><li>For every variable A in the grammar, add an epsilon-transition that replaces A on the stack top with the right-hand side of its production (α).</li><li>For every terminal symbol a, add a transition that matches 'a' on the input with 'a' on the stack top and pops it.</li></ol><p>The resulting PDA accepts by empty stack.</p><p>Worked example: Converting the grammar $G = (\{S, A\}, \{0, 1\}, P, S)$ where $P$ has $S \to AS \mid \epsilon$ and $A \to 0A1 \mid A1 \mid 01$.</p><ol><li>Create a single-state machine $q$.</li><li>Add variable transitions (epsilon): $\delta(q, \epsilon, S) = \{(q, AS), (q, \epsilon)\}$ and $\delta(q, \epsilon, A) = \{(q, 0A1), (q, A1), (q, 01)\}$.</li><li>Add terminal matching transitions: $\delta(q, 0, 0) = \{(q, \epsilon)\}$ and $\delta(q, 1, 1) = \{(q, \epsilon)\}$.</li></ol><p>To simulate the string "0011": The stack starts with $S$. Apply $S \to AS$ (stack becomes $AS$). Apply $A \to 0A1$ (stack becomes $0A1S$). Match and pop 0 from the input (stack becomes $A1S$). Apply $A \to 01$ (stack becomes $011S$). Match and pop 0, 1, 1 successively. Finally, apply $S \to \epsilon$ to empty the stack and accept the string.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1329,14 +1334,57 @@
   </details>
 </section>
 
+<section id="worked-example-lwwr" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> مثال عملي: آلة دفع سفلي للغة التناظر المزدوج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Worked Example: PDA for Palindrome Language</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تصميم آلة دفع سفلي غير حتمية للغة $L_{wwr} = \{ww^R\}$ يتطلب تخمين منتصف السلسلة للانتقال من حالة إضافة الرموز إلى حالة حذفها ومطابقتها.</p></template>
+    <template class="content-en"><p>Designing a non-deterministic PDA for the language $L_{wwr} = \{ww^R\}$ requires guessing the middle of the string to switch from pushing symbols to popping and matching them.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لنفترض اللغة $L_{wwr} = \{ww^R \mid w \in (0+1)^*\}$. الآلة $P = (\{q_0, q_1, q_2\}, \{0, 1\}, \{0, 1, Z_0\}, \delta, q_0, Z_0, \{q_2\})$ تعمل كالتالي:</p><ol><li><b>حالة الإضافة ($q_0$):</b> نقرأ النصف الأول $w$ ونضيفه للمكدس. مثلاً: $\delta(q_0, 0, Z_0) = \{(q_0, 0Z_0)\}$.</li><li><b>تخمين المنتصف ($q_0 \to q_1$):</b> انتقال إبسيلون غير حتمي $\delta(q_0, \epsilon, X) = \{(q_1, X)\}$ لكل $X \in \{0, 1, Z_0\}$.</li><li><b>حالة الحذف ($q_1$):</b> نقرأ النصف الثاني $w^R$ ونطابقه مع المكدس. $\delta(q_1, 0, 0) = \{(q_1, \epsilon)\}$ و $\delta(q_1, 1, 1) = \{(q_1, \epsilon)\}$.</li><li><b>القبول ($q_1 \to q_2$):</b> عند فراغ المدخلات وظهور $Z_0$، ننتقل لحالة القبول $\delta(q_1, \epsilon, Z_0) = \{(q_2, Z_0)\}$.</li></ol><p>عند محاكاة السلسلة "1111"، تتفرع <span class="smart-term" data-term-en="Computation Tree" data-ar="شجرة الحساب" data-en-def="A tree structure representing all possible execution paths of a non-deterministic automaton.">شجرة الحساب<span class="smart-term-tooltip"></span></span> (Computation Tree) بسبب عدم الحتمية. المسار الصحيح يخمن المنتصف بعد قراءة "11"، وينتقل لـ $q_1$، ثم يطابق الـ "11" المتبقية ويصل لـ $q_2$.</p></template>
+    <template class="content-en"><p>Consider the language $L_{wwr} = \{ww^R \mid w \in (0+1)^*\}$. The PDA $P = (\{q_0, q_1, q_2\}, \{0, 1\}, \{0, 1, Z_0\}, \delta, q_0, Z_0, \{q_2\})$ works as follows:</p><ol><li><b>Grow stack ($q_0$):</b> Read the first half $w$ and push it. E.g., $\delta(q_0, 0, Z_0) = \{(q_0, 0Z_0)\}$.</li><li><b>Guess the middle ($q_0 \to q_1$):</b> Non-deterministic epsilon transition $\delta(q_0, \epsilon, X) = \{(q_1, X)\}$ for all $X \in \{0, 1, Z_0\}$.</li><li><b>Pop stack ($q_1$):</b> Read the second half $w^R$ and match it with the stack. $\delta(q_1, 0, 0) = \{(q_1, \epsilon)\}$ and $\delta(q_1, 1, 1) = \{(q_1, \epsilon)\}$.</li><li><b>Acceptance ($q_1 \to q_2$):</b> When input is exhausted and $Z_0$ appears, transition to accept state $\delta(q_1, \epsilon, Z_0) = \{(q_2, Z_0)\}$.</li></ol><p>When simulating the string "1111", a <span class="smart-term" data-term-en="Computation Tree" data-ar="شجرة الحساب" data-en-def="A tree structure representing all possible execution paths of a non-deterministic automaton.">Computation Tree<span class="smart-term-tooltip"></span></span> branches out due to non-determinism. The correct path guesses the middle after reading "11", switches to $q_1$, matches the remaining "11", and reaches $q_2$.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذا المثال يوضح جوهر عدم الحتمية في آلات الدفع السفلي. الآلة لا تعرف مسبقاً أين يقع المنتصف، لذا فهي "تستنسخ" نفسها عند كل خطوة: نسخة تستمر في الإضافة، ونسخة تفترض أن المنتصف قد حان وتبدأ بالحذف.</p><p>في شجرة الحساب للسلسلة "1111"، المسارات التي تخمن المنتصف مبكراً (مثلاً بعد قراءة "1" واحدة) ستموت (Path dies) لأنها ستحاول مطابقة "1" مع "111" المتبقية وتفشل. المسارات التي تتأخر في التخمين ستموت أيضاً.</p><p>إذا نجح مسار واحد على الأقل في الوصول إلى حالة القبول مع استهلاك كامل السلسلة، تُقبل السلسلة بأكملها.</p></template>
+    <template class="content-en"><p>This example illustrates the essence of non-determinism in PDAs. The machine does not know in advance where the middle is, so it "clones" itself at every step: one clone continues pushing, and another assumes the middle has arrived and starts popping.</p><p>In the computation tree for "1111", paths that guess the middle too early (e.g., after reading one "1") will die because they try to match "1" against the remaining "111" and fail. Paths that guess too late will also die.</p><p>If at least one path successfully reaches the accepting state while consuming the entire string, the string is accepted.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث في شجرة الحساب إذا كانت السلسلة المدخلة "111" (طول فردي)؟</template>
+      <template class="content-en">What happens in the computation tree if the input string is "111" (odd length)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستموت جميع المسارات ولن يصل أي منها إلى حالة القبول، لأن لغة $L_{wwr}$ تتطلب سلاسل بطول زوجي فقط، ولا يمكن مطابقة النصفين بشكل تام.</p></template>
+      <template class="content-en"><p>All paths will die and none will reach the accepting state, because the language $L_{wwr}$ strictly requires even-length strings, making perfect matching of halves impossible.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. لقد درسنا سابقاً الآلات المنتهية ورأينا كيف تعجز عن 'العد' أو تذكر تسلسلات طويلة. اليوم، نقدم لها 'مفكرة' سحرية نسميها المكدس (Stack)، لتولد لنا 'آلة الدفع السفلي' (PDA). تذكروا دائماً أن المكدس يعمل بنظام LIFO، وهذا يجعله مثالياً لمطابقة الأقواس أو التحقق من التناظر. في الامتحان، ركزوا جيداً على الفرق بين القبول بالحالة النهائية والقبول بالمكدس الفارغ؛ هما وجهان لعملة واحدة ويمكن التحويل بينهما باستخدام حيلتنا المفضلة: الرمز X0. أيضاً، لا تنسوا الفخ الكلاسيكي: الآلات الحتمية هنا (DPDA) أضعف من غير الحتمية (NPDA)، عكس ما تعلمناه في الـ DFA و NFA! أخيراً، تدربوا على تحويل القواعد (CFG) إلى PDA، فهي عملية ميكانيكية تعتمد على حالة واحدة فقط وتحاكي الاشتقاق الأيسر. بالتوفيق!</template>
-    <template class="content-en">Welcome, my friends, to this pivotal module. We previously studied finite automata and saw how they fail to 'count' or remember long sequences. Today, we give them a magical 'notepad' called a Stack, creating the Pushdown Automaton (PDA). Always remember the stack is LIFO, making it perfect for matching parentheses or checking palindromes. For the exam, focus heavily on the difference between acceptance by final state and empty stack; they are two sides of the same coin, convertible using our favorite trick: the X0 symbol. Also, beware the classic trap: Deterministic PDAs are strictly weaker than Non-Deterministic ones, unlike DFAs and NFAs! Finally, practice converting CFGs to PDAs; it's a mechanical process using just one state that beautifully simulates leftmost derivation. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. لقد درسنا سابقاً الآلات المنتهية ورأينا كيف تعجز عن 'العد' أو تذكر تسلسلات طويلة. اليوم، نقدم لها 'مفكرة' سحرية نسميها المكدس (Stack)، لتولد لنا 'آلة الدفع السفلي' (PDA). تذكروا دائماً أن المكدس يعمل بنظام LIFO، وهذا يجعله مثالياً لمطابقة الأقواس أو التحقق من التناظر. في الامتحان، ركزوا جيداً على الفرق بين القبول بالحالة النهائية والقبول بالمكدس الفارغ؛ هما وجهان لعملة واحدة ويمكن التحويل بينهما باستخدام حيلتنا المفضلة: الرمز X0. أيضاً، لا تنسوا الفخ الكلاسيكي: الآلات الحتمية هنا (DPDA) أضعف من غير الحتمية (NPDA)، عكس ما تعلمناه في الـ DFA و NFA! أخيراً، تدربوا على تحويل القواعد (CFG) إلى PDA، فهي عملية ميكانيكية تعتمد على حالة واحدة فقط وتحاكي الاشتقاق الأيسر. بالتوفيق!<p>فهم التعريفات النظرية هو مجرد الخطوة الأولى. من خلال تتبع شجرة الحساب للغة التناظر المزدوج، ومحاكاة المكدس خطوة بخطوة أثناء تحويل القواعد النحوية، يمكنك سد الفجوة بين القواعد المجردة والتنفيذ الفعلي للآلة. هذه الأمثلة العملية هي المفتاح لإتقان مفهوم عدم الحتمية.</p></template>
+    <template class="content-en">Welcome, my friends, to this pivotal module. We previously studied finite automata and saw how they fail to 'count' or remember long sequences. Today, we give them a magical 'notepad' called a Stack, creating the Pushdown Automaton (PDA). Always remember the stack is LIFO, making it perfect for matching parentheses or checking palindromes. For the exam, focus heavily on the difference between acceptance by final state and empty stack; they are two sides of the same coin, convertible using our favorite trick: the X0 symbol. Also, beware the classic trap: Deterministic PDAs are strictly weaker than Non-Deterministic ones, unlike DFAs and NFAs! Finally, practice converting CFGs to PDAs; it's a mechanical process using just one state that beautifully simulates leftmost derivation. Good luck!<p>Understanding the theoretical definitions is just the first step. By walking through the computation tree of a palindrome and tracing the stack step-by-step during a CFG simulation, you bridge the gap between abstract rules and actual machine execution. These worked examples are the key to mastering non-determinism.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1510,6 +1558,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأن الآلات الحتمية يمكن برمجتها وتنفيذها بكفاءة عالية جداً (O(n)). وهي الأساس الذي تبنى عليه المترجمات (Compilers) لتحليل لغات البرمجة.</template>
           <template class="content-en">Because deterministic machines can be programmed and executed highly efficiently (O(n)). They form the foundation for building compilers to parse programming languages.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في محاكاة CFG إلى PDA، لماذا نستخدم انتقالات إبسيلون لتوسيع المتغيرات بدلاً من استهلاك رموز الإدخال؟</template>
+          <template class="content-en">In the CFG to PDA simulation, why do we use epsilon transitions to expand variables instead of consuming input symbols?</template>
+          <span class="content-target">في محاكاة CFG إلى PDA، لماذا نستخدم انتقالات إبسيلون لتوسيع المتغيرات بدلاً من استهلاك رموز الإدخال؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن توسيع المتغير (مثل $A \to 0A1$) هو عملية إعادة كتابة داخلية في القواعد النحوية ولا يقابلها قراءة حرف من السلسلة الفعلية. نحن نستهلك المدخلات فقط عندما يظهر رمز طرفي (Terminal) في قمة المكدس ونطابقه مع المدخل.</p></template>
+          <template class="content-en"><p>Because expanding a variable (like $A \to 0A1$) is an internal rewriting step in the grammar and does not correspond to reading a character from the actual string. We only consume input when a terminal symbol appears on top of the stack and we match it with the input.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الذي يضمن أن الآلة غير الحتمية للغة $L_{wwr}$ لن تقبل سلسلة خاطئة عن طريق الصدفة؟</template>
+          <template class="content-en">What guarantees that the non-deterministic PDA for $L_{wwr}$ won't accidentally accept an invalid string?</template>
+          <span class="content-target">ما الذي يضمن أن الآلة غير الحتمية للغة $L_{wwr}$ لن تقبل سلسلة خاطئة عن طريق الصدفة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>حتى لو خمنت الآلة المنتصف بشكل خاطئ، فإن مرحلة الحذف ($q_1$) صارمة جداً. إذا لم يتطابق الرمز المقروء تماماً مع قمة المكدس، سيموت المسار. القبول يتطلب استهلاك كامل السلسلة وفراغ المكدس معاً، وهو ما لا يحدث إلا إذا كانت السلسلة متناظرة فعلاً.</p></template>
+          <template class="content-en"><p>Even if the machine guesses the middle incorrectly, the popping phase ($q_1$) is strictly deterministic in its matching. If the read symbol doesn't perfectly match the stack top, the path dies. Acceptance requires both consuming the entire string and emptying the stack, which only aligns if the string is a true palindrome.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1777,6 +1860,40 @@
         "en": "There is no explicit middle marker."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في آلة الدفع السفلي للغة $L_{wwr}$، متى تنتقل الآلة من حالة الإضافة ($q_0$) إلى حالة الحذف ($q_1$)؟",
+      "en": "In the PDA for $L_{wwr}$, when does the machine transition from the push state ($q_0$) to the pop state ($q_1$)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنتقل بشكل غير حتمي (عبر إبسيلون) في أي لحظة، مخمنةً أن منتصف السلسلة قد تم الوصول إليه.",
+        "en": "It transitions non-deterministically (via epsilon) at any moment, guessing that the middle of the string has been reached."
+      },
+      "example": {
+        "ar": "هذا التخمين يولد شجرة حساب بمسارات متعددة.",
+        "en": "This guessing generates a computation tree with multiple paths."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ماذا يعني مصطلح 'موت المسار' (Path dies) في شجرة الحساب لـ NPDA؟",
+      "en": "What does the term 'Path dies' mean in the computation tree of an NPDA?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعني أن الآلة وصلت إلى حالة لا يوجد فيها انتقال صالح للرمز المدخل الحالي أو قمة المكدس، فتتوقف تلك النسخة من الحساب.",
+        "en": "It means the machine reached a state where no valid transition exists for the current input symbol or stack top, halting that specific computation clone."
+      },
+      "example": {
+        "ar": "يحدث إذا خمنت الآلة منتصف السلسلة بشكل خاطئ.",
+        "en": "Happens if the machine guesses the middle of the string incorrectly."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1786,7 +1903,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1802,7 +1919,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2127,6 +2244,38 @@
     },
     "difficulty": "hard",
     "conceptId": "equivalence-acceptance"
+  },
+  {
+    "conceptId": "worked-example-lwwr",
+    "question": {
+      "ar": "عند تتبع شجرة الحساب لآلة $L_{wwr}$ على السلسلة '1111'، كم عدد المسارات التي ستصل بنجاح إلى حالة القبول؟",
+      "en": "When tracing the computation tree for the $L_{wwr}$ PDA on the string '1111', how many paths will successfully reach the accepting state?"
+    },
+    "options": {
+      "ar": [
+        "صفر (السلسلة مرفوضة)",
+        "مسار واحد فقط",
+        "مساران",
+        "أربعة مسارات"
+      ],
+      "en": [
+        "Zero (string is rejected)",
+        "Exactly one path",
+        "Two paths",
+        "Four paths"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مسار واحد فقط هو الذي سيخمن المنتصف بشكل صحيح (بعد قراءة '11') ويطابق النصف الثاني بنجاح. جميع المسارات الأخرى التي تخمن مبكراً أو متأخراً ستموت.",
+      "en": "Exactly one path will correctly guess the middle (after reading '11') and successfully match the second half. All other paths that guess too early or too late will die."
+    },
+    "hint": {
+      "ar": "تذكر أن السلسلة لها منتصف واحد صحيح فقط.",
+      "en": "Remember that the string has only one correct exact middle."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>

@@ -1,0 +1,2218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS473" data-module="5" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>معالجة الصور: التفكير في التردد وتحويلات فورييه · DS473 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS473" data-page-title-en="DS473">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M04.html" data-gh-next="M06.html" data-gh-card="../../hub/course.html?code=DS473"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#fourier-transform-basics" class="toc-link" data-bilingual>
+        <template class="content-ar">أساسيات تحويل فورييه</template>
+        <template class="content-en">Fourier Transform Basics</template>
+        <span class="content-target">أساسيات تحويل فورييه</span>
+      </a>
+      <a href="#frequency-filters" class="toc-link" data-bilingual>
+        <template class="content-ar">المرشحات في نطاق التردد</template>
+        <template class="content-en">Filters in Frequency Domain</template>
+        <span class="content-target">المرشحات في نطاق التردد</span>
+      </a>
+      <a href="#sinusoidal-signals" class="toc-link" data-bilingual>
+        <template class="content-ar">الإشارات الجيبية واستجابة المرشح</template>
+        <template class="content-en">Sinusoidal Signals and Filter Response</template>
+        <span class="content-target">الإشارات الجيبية واستجابة المرشح</span>
+      </a>
+      <a href="#dft-and-fft" class="toc-link" data-bilingual>
+        <template class="content-ar">تحويل فورييه المتقطع والسريع (DFT &amp; FFT)</template>
+        <template class="content-en">Discrete and Fast Fourier Transforms (DFT &amp; FFT)</template>
+        <span class="content-target">تحويل فورييه المتقطع والسريع (DFT &amp; FFT)</span>
+      </a>
+      <a href="#two-dimensional-fourier-transform" class="toc-link" data-bilingual>
+        <template class="content-ar">تحويلات فورييه ثنائية الأبعاد</template>
+        <template class="content-en">Two-Dimensional Fourier Transforms</template>
+        <span class="content-target">تحويلات فورييه ثنائية الأبعاد</span>
+      </a>
+      <a href="#applications-and-evaluation" class="toc-link" data-bilingual>
+        <template class="content-ar">تطبيقات تحويل فورييه وتقييم إزالة الضوضاء</template>
+        <template class="content-en">Applications of Fourier Transforms and Denoising Evaluation</template>
+        <span class="content-target">تطبيقات تحويل فورييه وتقييم إزالة الضوضاء</span>
+      </a>
+      <a href="#image-resizing-interpolation" class="toc-link" data-bilingual>
+        <template class="content-ar">تغيير حجم الصورة: الاستيفاء (التكبير)</template>
+        <template class="content-en">Image Resizing: Interpolation (Upsampling)</template>
+        <span class="content-target">تغيير حجم الصورة: الاستيفاء (التكبير)</span>
+      </a>
+      <a href="#image-decimation-downsampling" class="toc-link" data-bilingual>
+        <template class="content-ar">تخفيض حجم الصورة: التخفيض (Downsampling)</template>
+        <template class="content-en">Image Resizing: Decimation (Downsampling)</template>
+        <span class="content-target">تخفيض حجم الصورة: التخفيض (Downsampling)</span>
+      </a>
+      <a href="#multi-resolution-pyramids" class="toc-link" data-bilingual>
+        <template class="content-ar">التمثيلات متعددة الدقة وأهرامات الصور</template>
+        <template class="content-en">Multi-Resolution Representations and Image Pyramids</template>
+        <span class="content-target">التمثيلات متعددة الدقة وأهرامات الصور</span>
+      </a>
+      <a href="#gaussian-pyramid" class="toc-link" data-bilingual>
+        <template class="content-ar">الهرم الغاوسي</template>
+        <template class="content-en">The Gaussian Pyramid</template>
+        <span class="content-target">الهرم الغاوسي</span>
+      </a>
+      <a href="#laplacian-pyramid" class="toc-link" data-bilingual>
+        <template class="content-ar">الهرم اللابلاسي</template>
+        <template class="content-en">The Laplacian Pyramid</template>
+        <span class="content-target">الهرم اللابلاسي</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 5</template>
+      <template class="content-en">Module 5</template>
+      <span class="content-target">الوحدة 5</span>
+    </span> · DS473
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">معالجة الصور: التفكير في التردد وتحويلات فورييه</h1>
+      <p class="hero-description">دراسة تحليل الإشارات في نطاق التردد باستخدام تحويلات فورييه، وتطبيق المرشحات المختلفة، بالإضافة إلى تقنيات تغيير حجم الصورة والأهرامات متعددة الدقة.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Image Processing: Thinking in Frequency and Fourier Transforms</h1>
+      <p class="hero-description">Study of signal analysis in the frequency domain using Fourier transforms, application of various filters, and techniques for image resizing and multi-resolution pyramids.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">تحويل فورييه</span>
+      <span class="tag">المرشحات</span>
+      <span class="tag">معالجة الصور</span>
+      <span class="tag">أهرامات الصور</span>
+      <span class="tag">التردد</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Fourier Transform</span>
+      <span class="tag">Filters</span>
+      <span class="tag">Image Processing</span>
+      <span class="tag">Image Pyramids</span>
+      <span class="tag">Frequency</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>فهم عميق لمعالجة الإشارات في نطاق التردد (مهارات تحليل التردد).</span></li>
+      <li><span class="obj-icon">✦</span><span>إتقان تطبيق تحويلات فورييه على تحديات معالجة الصور في العالم الحقيقي.</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل تحلل الإشارات وطرق الترشيح المختلفة (المنخفضة، العالية، وتمرير النطاق).</span></li>
+      <li><span class="obj-icon">✦</span><span>فهم تقنيات تغيير حجم الصورة (الاستيفاء والتخفيض) وبناء أهرامات الصور.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Deep understanding of signal processing in the frequency domain (Frequency Analysis Skills).</span></li>
+      <li><span class="obj-icon">✦</span><span>Proficiency in applying Fourier transforms to real-world image processing challenges.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analysis of signal decomposition and various filtering methods (Low-pass, High-pass, Band-pass).</span></li>
+      <li><span class="obj-icon">✦</span><span>Understand image resizing techniques (Interpolation and Decimation) and the construction of Image Pyramids.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="fourier-transform-basics" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> أساسيات تحويل فورييه</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Fourier Transform Basics</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تحويل فورييه هو أداة رياضية تفكك الإشارة إلى مكوناتها الترددية الأساسية، تماماً مثل المنشور الذي يحلل الضوء الأبيض إلى ألوان الطيف.</p></template>
+    <template class="content-en"><p>The Fourier transform is a mathematical tool that decomposes a signal into its fundamental frequency components, much like a prism splits white light into a spectrum of colors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يسمح لنا تحويل فورييه (Fourier Transform) بتحليل الإشارة عن طريق تفكيكها إلى مكونات التردد الخاصة بها. هذا التحليل ضروري لفهم كيف ستؤثر المرشحات (Filters) التي تتلاعب بنطاقات ترددية معينة على الإشارة الأصلية.</p><p>في سياق معالجة الصور، تمثل الترددات العالية التغيرات السريعة (مثل الحواف والتفاصيل الدقيقة)، بينما تمثل الترددات المنخفضة التغيرات البطيئة والناعمة (مثل الخلفية العامة للصورة).</p></template>
+    <template class="content-en"><p>The Fourier transform allows us to decompose a signal into its frequency components. This analysis is essential to understand how filters that selectively manipulate different frequency ranges will affect the original signal.</p><p>In the context of image processing, high frequencies correspond to rapid changes (like sharp details and edges), while low frequencies represent slow, smooth variations (like the overall background of the image).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا ننتقل إلى <span class="smart-term" data-term-en="Frequency Domain" data-ar="نطاق التردد" data-en-def="A space where signals are analyzed based on their frequency components rather than time or space.">نطاق التردد<span class="smart-term-tooltip"></span></span>؟ لأن بعض العمليات المعقدة في النطاق المكاني (Spatial Domain) مثل الالتفاف (Convolution) تصبح عمليات ضرب بسيطة في نطاق التردد، مما يسهل التحليل والتطبيق.</p><p>من التحديات الأساسية هي أن تحويل فورييه المستمر يتطلب تكاملاً من اللانهاية السالبة إلى الموجبة، وهو ما لا يمكن تطبيقه مباشرة على الصور الرقمية، مما يستدعي استخدام النسخة المتقطعة (DFT).</p></template>
+    <template class="content-en"><p>Why move to the <span class="smart-term" data-term-en="Frequency Domain" data-ar="نطاق التردد" data-en-def="A space where signals are analyzed based on their frequency components rather than time or space.">frequency domain<span class="smart-term-tooltip"></span></span>? Because certain complex operations in the spatial domain, such as convolution, become simple multiplication operations in the frequency domain, making analysis and application much easier.</p><p>A primary challenge is that the continuous Fourier transform requires integration from negative to positive infinity, which cannot be directly applied to digital images, necessitating the use of the Discrete Fourier Transform (DFT).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمنا بإزالة جميع الترددات العالية من صورة باستخدام تحويل فورييه، كيف ستبدو الصورة الناتجة؟</template>
+      <template class="content-en">If we remove all high frequencies from an image using the Fourier transform, what will the resulting image look like?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستبدو الصورة ضبابية (Blurred)، حيث أن الترددات العالية هي المسؤولة عن الحواف والتفاصيل الحادة.</p></template>
+      <template class="content-en"><p>The image will look blurred, as high frequencies are responsible for edges and sharp details.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="frequency-filters" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> المرشحات في نطاق التردد</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Filters in Frequency Domain</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المرشحات هي بوابات تسمح بمرور ترددات معينة وتمنع أخرى؛ لتنعيم الصورة أو إبراز حوافها.</p></template>
+    <template class="content-en"><p>Filters are gates that allow specific frequencies to pass while blocking others, used to smooth an image or highlight its edges.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُصمم المرشحات (Filters) للتأثير على الإشارات بناءً على ترددها. وهناك ثلاثة أنواع رئيسية:</p><ol><li><b>مرشحات التمرير المنخفض (Low-pass Filters):</b> تسمح بمرور الترددات المنخفضة وتخفف الترددات العالية. تُستخدم لتنعيم الإشارات وإزالة الضوضاء عالية التردد.</li><li><b>مرشحات التمرير العالي (High-pass Filters):</b> تسمح بمرور الترددات العالية وتخفف الترددات المنخفضة. تُستخدم في اكتشاف الحواف في الصور وإزالة الترددات المنخفضة مثل الطنين في الصوت.</li><li><b>مرشحات تمرير النطاق (Band-pass Filters):</b> تسمح بمرور نطاق معين من الترددات (الترددات المتوسطة). تُستخدم في استخراج الميزات وتحليل النسيج في الصور.</li></ol></template>
+    <template class="content-en"><p>Filters are designed to affect signals based on frequency. There are three main types:</p><ol><li><b>Low-pass Filters:</b> Designed to pass low frequencies while attenuating high frequencies. Used for smoothing signals and removing high-frequency noise.</li><li><b>High-pass Filters:</b> Designed to pass high frequencies and attenuate low frequencies. Used in edge detection in images and removing low frequency such as hum in audio.</li><li><b>Band-pass Filters:</b> Designed to pass a specific range of frequencies, neither low nor high (medium frequencies). Used in feature extractions and texture analysis in images.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لتحليل تأثير مرشح معين، نقوم بتمرير إشارة جيبية (Sinusoid) بتردد معروف عبر المرشح ونلاحظ مقدار التخفيف (Attenuation). كل مرشح له استجابة ترددية (Frequency Response) توضح مقدار تخفيفه للترددات المختلفة.</p><p>المرشحات المثالية تمتلك قطعاً حاداً (Sharp Cutoff)، لكن يصعب تنفيذها عملياً. المرشحات الأبسط تترك بعض التشوهات (Aliasing). اختيار المرشح يعتمد على حساسية التطبيق للتشوهات والقيود الحسابية.</p></template>
+    <template class="content-en"><p>To analyze a filter's behavior, we pass a sinusoid of known frequency through the filter and observe how much it is attenuated. Each filter has a frequency response showing how much it attenuates different frequencies.</p><p>Ideal filters have sharp cutoffs but are harder to implement. Simpler filters leave more aliasing. The best filter depends on the task's sensitivity to artifacts and its computational limitations.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a multi-panel diagram showing three frequency response graphs. Panel 1: Low-pass filter (curve starting high at 0 frequency and dropping to 0 at high frequencies). Panel 2: High-pass filter (curve starting at 0 and rising to high at high frequencies). Panel 3: Band-pass filter (bell-like curve peaking in the middle frequencies). Style: educational, dark background #0d1117, accent colors [blue, red, green], viewBox 0 0 800 300, Arabic + English labels for axes (Frequency vs Magnitude). -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 350" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+        <linearGradient id="area-gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-500)" stop-opacity="0.25" />
+            <stop offset="100%" stop-color="var(--brand-500)" stop-opacity="0.0" />
+        </linearGradient>
+        <linearGradient id="stop-gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--text-muted)" stop-opacity="0.1" />
+            <stop offset="100%" stop-color="var(--text-muted)" stop-opacity="0.0" />
+        </linearGradient>
+    </defs>
+
+    <!-- ================= PANEL 1: LOW-PASS FILTER ================= -->
+    <g>
+        <!-- Stopband Background -->
+        <rect x="130" y="90" width="100" height="158" fill="url(#stop-gradient)" />
+
+        <!-- Axes -->
+        <line x1="30" y1="250" x2="240" y2="250" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="30" y1="250" x2="30" y2="90" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- Cutoff Line -->
+        <line x1="130" y1="90" x2="130" y2="250" stroke="var(--brand-400)" stroke-dasharray="4,4" stroke-width="1.5" />
+
+        <!-- Curve Area -->
+        <path d="M 30 248 L 30 120 L 100 120 C 120 120, 140 248, 160 248 L 230 248 Z" fill="url(#area-gradient)" />
+        
+        <!-- Curve Line -->
+        <path d="M 30 120 L 100 120 C 120 120, 140 248, 160 248 L 230 248" stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linecap="round" />
+
+        <!-- Titles -->
+        <text x="130" y="40" text-anchor="middle" class="gsvg-en" font-size="18" font-weight="bold" fill="var(--text-primary)">Low-pass Filter</text>
+        <text x="130" y="40" text-anchor="middle" class="gsvg-ar" font-size="18" font-weight="bold" fill="var(--text-primary)">مرشح تمرير منخفض</text>
+
+        <!-- Axis Labels -->
+        <text x="30" y="75" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Magnitude</text>
+        <text x="30" y="75" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">المقدار</text>
+        
+        <text x="130" y="310" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Frequency</text>
+        <text x="130" y="310" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">التردد</text>
+
+        <!-- Cutoff Label -->
+        <text x="130" y="270" text-anchor="middle" font-size="14" font-style="italic" fill="var(--text-primary)">f<tspan dy="4" font-size="10">c</tspan></text>
+
+        <!-- Region Labels -->
+        <text x="80" y="235" text-anchor="middle" class="gsvg-en" font-size="13" font-weight="600" fill="var(--brand-ink)">Passband</text>
+        <text x="80" y="235" text-anchor="middle" class="gsvg-ar" font-size="13" font-weight="600" fill="var(--brand-ink)">تمرير</text>
+        
+        <text x="180" y="235" text-anchor="middle" class="gsvg-en" font-size="13" font-weight="600" fill="var(--text-muted)">Stopband</text>
+        <text x="180" y="235" text-anchor="middle" class="gsvg-ar" font-size="13" font-weight="600" fill="var(--text-muted)">إيقاف</text>
+    </g>
+
+    <!-- ================= PANEL 2: HIGH-PASS FILTER ================= -->
+    <g>
+        <!-- Stopband Background -->
+        <rect x="290" y="90" width="100" height="158" fill="url(#stop-gradient)" />
+
+        <!-- Axes -->
+        <line x1="290" y1="250" x2="500" y2="250" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="290" y1="250" x2="290" y2="90" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- Cutoff Line -->
+        <line x1="390" y1="90" x2="390" y2="250" stroke="var(--brand-400)" stroke-dasharray="4,4" stroke-width="1.5" />
+
+        <!-- Curve Area -->
+        <path d="M 290 248 L 360 248 C 380 248, 400 120, 420 120 L 490 120 L 490 248 Z" fill="url(#area-gradient)" />
+        
+        <!-- Curve Line -->
+        <path d="M 290 248 L 360 248 C 380 248, 400 120, 420 120 L 490 120" stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linecap="round" />
+
+        <!-- Titles -->
+        <text x="390" y="40" text-anchor="middle" class="gsvg-en" font-size="18" font-weight="bold" fill="var(--text-primary)">High-pass Filter</text>
+        <text x="390" y="40" text-anchor="middle" class="gsvg-ar" font-size="18" font-weight="bold" fill="var(--text-primary)">مرشح تمرير عالي</text>
+
+        <!-- Axis Labels -->
+        <text x="290" y="75" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Magnitude</text>
+        <text x="290" y="75" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">المقدار</text>
+        
+        <text x="390" y="310" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Frequency</text>
+        <text x="390" y="310" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">التردد</text>
+
+        <!-- Cutoff Label -->
+        <text x="390" y="270" text-anchor="middle" font-size="14" font-style="italic" fill="var(--text-primary)">f<tspan dy="4" font-size="10">c</tspan></text>
+
+        <!-- Region Labels -->
+        <text x="340" y="235" text-anchor="middle" class="gsvg-en" font-size="13" font-weight="600" fill="var(--text-muted)">Stopband</text>
+        <text x="340" y="235" text-anchor="middle" class="gsvg-ar" font-size="13" font-weight="600" fill="var(--text-muted)">إيقاف</text>
+        
+        <text x="440" y="235" text-anchor="middle" class="gsvg-en" font-size="13" font-weight="600" fill="var(--brand-ink)">Passband</text>
+        <text x="440" y="235" text-anchor="middle" class="gsvg-ar" font-size="13" font-weight="600" fill="var(--brand-ink)">تمرير</text>
+    </g>
+
+    <!-- ================= PANEL 3: BAND-PASS FILTER ================= -->
+    <g>
+        <!-- Stopband Backgrounds -->
+        <rect x="550" y="90" width="60" height="158" fill="url(#stop-gradient)" />
+        <rect x="690" y="90" width="60" height="158" fill="url(#stop-gradient)" />
+
+        <!-- Axes -->
+        <line x1="550" y1="250" x2="760" y2="250" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+        <line x1="550" y1="250" x2="550" y2="90" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow)" />
+
+        <!-- Cutoff Lines -->
+        <line x1="610" y1="90" x2="610" y2="250" stroke="var(--brand-400)" stroke-dasharray="4,4" stroke-width="1.5" />
+        <line x1="690" y1="90" x2="690" y2="250" stroke="var(--brand-400)" stroke-dasharray="4,4" stroke-width="1.5" />
+
+        <!-- Curve Area -->
+        <path d="M 550 248 L 580 248 C 600 248, 620 120, 640 120 L 660 120 C 680 120, 700 248, 720 248 L 750 248 Z" fill="url(#area-gradient)" />
+        
+        <!-- Curve Line -->
+        <path d="M 550 248 L 580 248 C 600 248, 620 120, 640 120 L 660 120 C 680 120, 700 248, 720 248 L 750 248" stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linecap="round" />
+
+        <!-- Titles -->
+        <text x="650" y="40" text-anchor="middle" class="gsvg-en" font-size="18" font-weight="bold" fill="var(--text-primary)">Band-pass Filter</text>
+        <text x="650" y="40" text-anchor="middle" class="gsvg-ar" font-size="18" font-weight="bold" fill="var(--text-primary)">مرشح تمرير النطاق</text>
+
+        <!-- Axis Labels -->
+        <text x="550" y="75" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Magnitude</text>
+        <text x="550" y="75" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">المقدار</text>
+        
+        <text x="650" y="310" text-anchor="middle" class="gsvg-en" font-size="14" fill="var(--text-secondary)">Frequency</text>
+        <text x="650" y="310" text-anchor="middle" class="gsvg-ar" font-size="14" fill="var(--text-secondary)">التردد</text>
+
+        <!-- Cutoff Labels -->
+        <text x="610" y="270" text-anchor="middle" font-size="14" font-style="italic" fill="var(--text-primary)">f<tspan dy="4" font-size="10">L</tspan></text>
+        <text x="690" y="270" text-anchor="middle" font-size="14" font-style="italic" fill="var(--text-primary)">f<tspan dy="4" font-size="10">H</tspan></text>
+
+        <!-- Region Labels -->
+        <text x="580" y="235" text-anchor="middle" class="gsvg-en" font-size="12" font-weight="600" fill="var(--text-muted)">Stop</text>
+        <text x="580" y="235" text-anchor="middle" class="gsvg-ar" font-size="12" font-weight="600" fill="var(--text-muted)">إيقاف</text>
+        
+        <text x="650" y="235" text-anchor="middle" class="gsvg-en" font-size="13" font-weight="600" fill="var(--brand-ink)">Passband</text>
+        <text x="650" y="235" text-anchor="middle" class="gsvg-ar" font-size="13" font-weight="600" fill="var(--brand-ink)">تمرير</text>
+        
+        <text x="720" y="235" text-anchor="middle" class="gsvg-en" font-size="12" font-weight="600" fill="var(--text-muted)">Stop</text>
+        <text x="720" y="235" text-anchor="middle" class="gsvg-ar" font-size="12" font-weight="600" fill="var(--text-muted)">إيقاف</text>
+    </g>
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Low-pass Filter</th><th>High-pass Filter</th><th>Band-pass Filter</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الترددات المسموح بمرورها</template>
+          <template class="content-en">Frequencies Allowed to Pass</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">المنخفضة فقط</template>
+          <template class="content-en">Low only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">العالية فقط</template>
+          <template class="content-en">High only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نطاق متوسط محدد</template>
+          <template class="content-en">Specific medium range</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التأثير البصري على الصورة</template>
+          <template class="content-en">Visual Effect on Image</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">تنعيم / ضبابية</template>
+          <template class="content-en">Smoothing / Blurring</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">إبراز الحواف / توضيح</template>
+          <template class="content-en">Edge highlighting / Sharpening</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">استخراج النسيج والميزات</template>
+          <template class="content-en">Texture and feature extraction</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي نوع من المرشحات ستستخدم لإزالة النمش أو الحبوب الصغيرة من صورة وجه شخص؟ ولماذا؟</template>
+      <template class="content-en">Which type of filter would you use to remove freckles or small blemishes from a picture of a person's face? And why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>مرشح التمرير المنخفض (Low-pass filter)، لأن النمش يمثل تفاصيل صغيرة وتغيرات سريعة في اللون (ترددات عالية). التمرير المنخفض سينعم هذه التفاصيل.</p></template>
+      <template class="content-en"><p>A Low-pass filter, because freckles represent small details and rapid color changes (high frequencies). A low-pass filter will smooth out these details.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="sinusoidal-signals" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الإشارات الجيبية واستجابة المرشح</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Sinusoidal Signals and Filter Response</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الإشارة الجيبية هي موجة دورية أساسية تُستخدم لاختبار كيفية تفاعل المرشحات مع الترددات المختلفة.</p></template>
+    <template class="content-en"><p>A sinusoidal signal is a fundamental periodic wave used to test how filters react to different frequencies.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعرّف الإشارات الجيبية (Sinusoidal Signals) كإشارات دورية لها شكل موجة الجيب. تتكرر قيمتها بعد فترة زمنية أو زاوية مقدارها 2π (أي 360 درجة). المعلمات الأساسية للإشارة الجيبية هي:</p><ul><li><b>الفترة الزمنية (Time period):</b> الوقت المستغرق لإكمال دورة واحدة.</li><li><b>السعة (Amplitude - A):</b> أقصى مسافة بين المحور الأفقي والموضع الرأسي للإشارة.</li><li><b>التردد (Frequency - f):</b> عدد مرات تذبذب الإشارة في ثانية واحدة (مقلوب الفترة).</li><li><b>الطور (Phase - ɸ):</b> الموضع الأفقي لشكل الموجة في تذبذب واحد.</li></ul><p>عند عمل التفاف (Convolve) لإشارة جيبية مع مرشح، نحصل على إشارة جيبية أخرى بنفس التردد ولكن بسعة (Magnitude) وطور (Phase) مختلفين.</p></template>
+    <template class="content-en"><p>Sinusoidal signals are defined as periodic signals with a sine wave waveform. They repeat values after a time period or angle of 2π (360°). Key parameters include:</p><ul><li><b>Time period:</b> Time taken to complete one cycle.</li><li><b>Amplitude (A):</b> Maximum distance between the horizontal axis and the vertical position.</li><li><b>Frequency (f):</b> Number of oscillations in one second (reciprocal of period).</li><li><b>Phase (ɸ):</b> Horizontal position of a waveform in one oscillation.</li></ul><p>If we convolve a sinusoidal signal with a filter, we get another sinusoid of the same frequency but different magnitude and phase.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التغير الكبير في السعة (Magnitude) يعني تأثيراً قوياً للمرشح على الإشارة الأصلية، بينما التغير الطفيف يعني أن المرشح يسمح بمرور الإشارة دون تأثر تقريباً.</p><p>العديد من المرشحات تُحدث أيضاً إزاحة في الطور (Phase Shift)، مما يعني أن الإشارة الناتجة تتأخر أو تتقدم مقارنة بالإشارة الأصلية. تحويل فورييه يحلل هذا التأثير وينتج رقماً مركباً يمثل التغير في السعة (A) و<span class="smart-term" data-term-en="Phase Shift" data-ar="إزاحة الطور" data-en-def="A horizontal displacement of a wave, representing a delay or advancement in timing.">إزاحة الطور<span class="smart-term-tooltip"></span></span> (φ).</p></template>
+    <template class="content-en"><p>A large change in magnitude equals a strong effect on the original sinusoid, while minimal change means the filter allows it to pass nearly unaffected.</p><p>Many filters also introduce a <span class="smart-term" data-term-en="Phase Shift" data-ar="إزاحة الطور" data-en-def="A horizontal displacement of a wave, representing a delay or advancement in timing.">phase shift<span class="smart-term-tooltip"></span></span> (horizontal displacement), meaning the output sinusoid is delayed or advanced. The Fourier Transform analyzes this, outputting a complex number representing the magnitude change (A) and phase shift (φ).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة استجابة المرشح لإشارة جيبية، حيث A هي السعة الجديدة و phi_o هو الطور الجديد.</strong></template>
+      <template class="content-en"><strong>Equation of filter response to a sinusoidal signal, where A is the new magnitude and phi_o is the new phase.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$o(x) = h(x) * s(x) = A \sin(\omega x + \phi_o)$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show a block diagram. On the left, an input sine wave s(x) entering a box labeled 'Filter h(x)'. On the right, the output sine wave o(x) emerging from the box. The output wave should have a noticeably smaller amplitude (showing attenuation) and a slight horizontal shift (showing phase shift). Include labels for Amplitude (A) and Phase shift (phi). Style: educational, dark background #0d1117, accent colors. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for signal flow -->
+        <marker id="arrow-flow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M0,1 L8,5 L0,9 Z" fill="var(--brand-500)"/>
+        </marker>
+        
+        <!-- Arrowhead for axes -->
+        <marker id="arrow-axis" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L8,5 L0,9 Z" fill="var(--text-muted)"/>
+        </marker>
+        
+        <!-- Arrowheads for measurements -->
+        <marker id="arrow-measure" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L8,5 L0,9 Z" fill="var(--brand-400)"/>
+        </marker>
+        <marker id="arrow-measure-start" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M10,1 L2,5 L10,9 Z" fill="var(--brand-400)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Title -->
+    <text x="400" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Sinusoidal Signal &amp; Filter Response</text>
+    <text x="400" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الإشارة الجيبية واستجابة المرشح</text>
+
+    <!-- ========================================== -->
+    <!-- GUIDES & AXES                              -->
+    <!-- ========================================== -->
+    <g id="axes" stroke="var(--text-muted)" stroke-width="1.5">
+        <!-- Input Axes -->
+        <line x1="60" y1="200" x2="275" y2="200" marker-end="url(#arrow-axis)"/>
+        <line x1="60" y1="280" x2="60" y2="110" marker-end="url(#arrow-axis)"/>
+        
+        <!-- Output Axes -->
+        <line x1="520" y1="200" x2="735" y2="200" marker-end="url(#arrow-axis)"/>
+        <line x1="520" y1="280" x2="520" y2="110" marker-end="url(#arrow-axis)"/>
+    </g>
+
+    <!-- Axis Labels -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">
+        <text x="40" y="115">s(x)</text>
+        <text x="275" y="220">x</text>
+        <text x="500" y="115">o(x)</text>
+        <text x="735" y="220">x</text>
+    </g>
+
+    <!-- Attenuation Guide Lines (Old Peak Level) -->
+    <g id="guides" stroke="var(--text-muted)" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.5">
+        <line x1="90" y1="140" x2="330" y2="140"/>
+        <line x1="470" y1="140" x2="730" y2="140"/>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- SIGNALS & FLOW                             -->
+    <!-- ========================================== -->
+    
+    <!-- Signal Flow Arrows -->
+    <g stroke="var(--brand-500)" stroke-width="2">
+        <line x1="280" y1="200" x2="330" y2="200" marker-end="url(#arrow-flow)"/>
+        <line x1="460" y1="200" x2="510" y2="200" marker-end="url(#arrow-flow)"/>
+    </g>
+
+    <!-- Input Signal s(x) -->
+    <!-- Amplitude = 60, Period = 120 -->
+    <path d="M 60 200 Q 75 140, 90 140 T 120 200 T 150 260 T 180 200 T 210 140 T 240 200 T 270 260" 
+          fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Output Signal o(x) - Unshifted Reference -->
+    <!-- Amplitude = 30, Period = 120 -->
+    <path d="M 520 200 Q 535 170, 550 170 T 580 200 T 610 230 T 640 200 T 670 170 T 700 200 T 730 230" 
+          fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4 4" opacity="0.6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Output Signal o(x) - Shifted & Attenuated -->
+    <!-- Amplitude = 30, Period = 120, Phase Shift = +30 -->
+    <path d="M 520 230 Q 535 230, 550 200 T 580 170 T 610 200 T 640 230 T 670 200 T 700 170 T 730 200" 
+          fill="none" stroke="var(--brand-500)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- ========================================== -->
+    <!-- FILTER BOX                                 -->
+    <!-- ========================================== -->
+    <g id="filter-box">
+        <rect x="340" y="150" width="120" height="100" rx="8" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2"/>
+        <text x="400" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Filter</text>
+        <text x="400" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مرشح</text>
+        <text x="400" y="225" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--brand-ink)" class="gsvg-en">h(x)</text>
+        <text x="400" y="225" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--brand-ink)" class="gsvg-ar">h(x)</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- MEASUREMENTS & LABELS                      -->
+    <!-- ========================================== -->
+    <g id="measurements" stroke="var(--brand-400)" stroke-width="1.5">
+        <!-- Input Amplitude A -->
+        <line x1="90" y1="200" x2="90" y2="146" marker-end="url(#arrow-measure)"/>
+        
+        <!-- Output Amplitude A' -->
+        <line x1="580" y1="200" x2="580" y2="176" marker-end="url(#arrow-measure)"/>
+        
+        <!-- Phase Shift Guides & Arrow -->
+        <line x1="550" y1="170" x2="550" y2="145" stroke-dasharray="2 2" opacity="0.7"/>
+        <line x1="580" y1="170" x2="580" y2="145" stroke-dasharray="2 2" opacity="0.7"/>
+        <line x1="552" y1="150" x2="576" y2="150" marker-start="url(#arrow-measure-start)" marker-end="url(#arrow-measure)"/>
+
+        <!-- Attenuation Arrow -->
+        <line x1="700" y1="140" x2="700" y2="164" marker-end="url(#arrow-measure)"/>
+    </g>
+
+    <!-- Measurement Text -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)">
+        <text x="78" y="178" text-anchor="end">A</text>
+        <text x="572" y="192" text-anchor="end">A'</text>
+        
+        <text x="565" y="138" text-anchor="middle" font-size="14" class="gsvg-en">Phase shift φ</text>
+        <text x="565" y="138" text-anchor="middle" font-size="14" class="gsvg-ar">إزاحة الطور φ</text>
+        
+        <text x="700" y="132" text-anchor="middle" font-size="14" class="gsvg-en">Attenuation</text>
+        <text x="700" y="132" text-anchor="middle" font-size="14" class="gsvg-ar">توهين</text>
+    </g>
+
+    <!-- Bottom Labels -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" fill="var(--text-primary)">
+        <!-- Input Label -->
+        <text x="170" y="330" text-anchor="middle" font-weight="bold" class="gsvg-en">Input Signal s(x)</text>
+        <text x="170" y="330" text-anchor="middle" font-weight="bold" class="gsvg-ar">إشارة الدخل s(x)</text>
+        
+        <!-- Output Label -->
+        <text x="630" y="330" text-anchor="middle" font-weight="bold" class="gsvg-en">Output Signal o(x)</text>
+        <text x="630" y="330" text-anchor="middle" font-weight="bold" class="gsvg-ar">إشارة الخرج o(x)</text>
+        
+        <!-- Output Sub-label -->
+        <text x="630" y="355" text-anchor="middle" font-size="14" fill="var(--text-secondary)" font-weight="normal" class="gsvg-en">Amplitude A' &lt; A</text>
+        <text x="630" y="355" text-anchor="middle" font-size="14" fill="var(--text-secondary)" font-weight="normal" class="gsvg-ar">السعة A' &lt; A</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان ناتج تحويل فورييه لتردد معين هو عدد مركب مقداره (Magnitude) يساوي 1 وزاويته (Phase) تساوي صفر، ماذا يعني ذلك بالنسبة للمرشح؟</template>
+      <template class="content-en">If the Fourier transform output for a specific frequency is a complex number with a magnitude of 1 and a phase of 0, what does this mean for the filter?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يعني أن المرشح يسمح لهذا التردد بالمرور تماماً كما هو، دون أي تغيير في السعة (لا تكبير ولا تخفيف) ودون أي تأخير زمني (لا إزاحة في الطور).</p></template>
+      <template class="content-en"><p>It means the filter allows this frequency to pass exactly as is, with no change in amplitude (no amplification or attenuation) and no time delay (no phase shift).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="dft-and-fft" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تحويل فورييه المتقطع والسريع (DFT &amp; FFT)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Discrete and Fast Fourier Transforms (DFT &amp; FFT)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>DFT هو النسخة الرقمية من تحويل فورييه، و FFT هو الخوارزمية الذكية التي تحسبه بسرعة فائقة.</p></template>
+    <template class="content-en"><p>DFT is the digital version of the Fourier transform, and FFT is the clever algorithm that computes it incredibly fast.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بينما يُطبق تحويل فورييه (FT) على الإشارات المستمرة، يُستخدم <b>تحويل فورييه المتقطع (DFT)</b> للإشارات الرقمية (البيانات المأخوذة كعينات - Sampled data).</p><ul><li><b>التعقيد الحسابي لـ DFT:</b> يتطلب عمليات حسابية بترتيب $O(N^2)$، مما يجعله بطيئاً جداً للصور الكبيرة.</li><li><b>تحويل فورييه السريع (FFT):</b> هو خوارزمية فعالة جداً لحساب DFT بسرعة. يقلل التعقيد الحسابي إلى $O(N \log_2 N)$، مما يجعل معالجة الصور في نطاق التردد ممكنة عملياً.</li></ul></template>
+    <template class="content-en"><p>While FT is applied to continuous signals, the <b>Discrete Fourier Transform (DFT)</b> is a version specifically for digital signals (<span class="smart-term" data-term-en="Sampled Data" data-ar="بيانات العينات" data-en-def="Continuous signals that have been converted into a discrete sequence of numbers.">sampled data<span class="smart-term-tooltip"></span></span>).</p><ul><li><b>DFT Complexity:</b> Takes $O(N^2)$ operations, making it very slow for large images.</li><li><b>Fast Fourier Transform (FFT):</b> An efficient algorithm to compute the DFT quickly. It reduces the operations to $O(N \log_2 N)$, making frequency domain image processing practically feasible.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في معادلة DFT، يمثل الجزء $e^{-j(\frac{2\pi kx}{N})}$ دوال الأساس الجيبية (Sinusoidal basis functions).</p><p>نقوم بضرب الإشارة الأصلية $h(x)$ في هذه الدوال ونجمع النتائج لمعرفة مدى تواجد كل تردد $k$ في الإشارة.</p><p>الفرق الهائل في الأداء بين $O(N^2)$ و $O(N \log_2 N)$ هو ما سمح بظهور تقنيات ضغط الصور الحديثة (مثل JPEG) ومعالجة الإشارات الرقمية في الوقت الفعلي.</p></template>
+    <template class="content-en"><p>In the DFT equation, the term $e^{-j(\frac{2\pi kx}{N})}$ represents the sinusoidal basis functions.</p><p>We multiply the original signal $h(x)$ by these functions and sum the results to find how much of each frequency $k$ is present.</p><p>The massive performance difference between $O(N^2)$ and $O(N \log_2 N)$ is what enabled modern image compression techniques (like JPEG) and real-time digital signal processing.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تحويل فورييه المتقطع (DFT) في بُعد واحد.</strong></template>
+      <template class="content-en"><strong>1D Discrete Fourier Transform (DFT) equation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$H(k) = \frac{1}{N} \sum_{x=0}^{N-1} h(x)e^{-j(\frac{2\pi kx}{N})}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لصورة بحجم 1024 بكسل، كم مرة تقريباً يكون FFT أسرع من DFT العادي؟</template>
+      <template class="content-en">For an image with 1024 pixels, approximately how many times faster is FFT compared to standard DFT?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>DFT يتطلب \(1024^2\) (حوالي مليون) عملية. FFT يتطلب 1024 * log2(1024) = 1024 * 10 = 10240 عملية. إذن FFT أسرع بحوالي 100 مرة (1,000,000 / 10,240).</p></template>
+      <template class="content-en"><p>DFT takes \(1024^2\) (~1 million) operations. FFT takes 1024 * log2(1024) = 1024 * 10 = 10240 operations. So FFT is roughly 100 times faster.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="two-dimensional-fourier-transform" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> تحويلات فورييه ثنائية الأبعاد</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Two-Dimensional Fourier Transforms</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بما أن الصور مسطحة (لها طول وعرض)، نستخدم تحويل فورييه ثنائي الأبعاد لتحليل الترددات أفقياً وعمودياً.</p></template>
+    <template class="content-en"><p>Since images are flat (having width and height), we use a 2D Fourier transform to analyze frequencies both horizontally and vertically.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تصور الصورة كدالة ثنائية الأبعاد للموضع (إحداثيات x و y). يوسع تحويل فورييه ثنائي الأبعاد (2D FT) المفهوم لتحليل محتوى التردد للصورة عبر كلا الاتجاهين الأفقي والعمودي ($\omega_x, \omega_y$).</p><p>في هذا النطاق:</p><ul><li><b>الترددات العالية:</b> تتوافق مع التغيرات السريعة مثل التفاصيل الحادة والحواف.</li><li><b>الترددات المنخفضة:</b> تمثل التغيرات البطيئة والناعمة والخلفية العامة للصورة.</li></ul></template>
+    <template class="content-en"><p>An image can be visualized as a 2D function of position (x and y coordinates). The 2D FT extends the concept to analyze the frequency content of an image across both horizontal and vertical directions ($\omega_x, \omega_y$).</p><p>In this domain:</p><ul><li><b>High frequencies:</b> Correspond to rapid changes like sharp details and edges.</li><li><b>Low frequencies:</b> Represent slow, smooth variations and overall background.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المعادلة ثنائية الأبعاد هي ببساطة تطبيق متداخل للتحويل أحادي البعد. يتم حساب التحويل لكل صف في الصورة، ثم يتم حساب التحويل لكل عمود من النتيجة السابقة (أو العكس).</p><p>هذا الفصل (Separability) هو خاصية رياضية هامة تجعل حساب التحويل ثنائي الأبعاد فعالاً جداً برمجياً.</p></template>
+    <template class="content-en"><p>The 2D equation is essentially a nested application of the 1D transform. The transform is computed for each row of the image, and then for each column of the resulting intermediate data (or vice versa).</p><p>This <span class="smart-term" data-term-en="Separability" data-ar="قابلية الفصل" data-en-def="A property allowing a multi-dimensional operation to be broken down into a sequence of 1D operations.">separability<span class="smart-term-tooltip"></span></span> is a crucial mathematical property that makes computing the 2D transform highly efficient in software.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة تحويل فورييه المتقطع ثنائي الأبعاد (2D DFT)، حيث N و M هما عرض وارتفاع الصورة.</strong></template>
+      <template class="content-en"><strong>2D Discrete Fourier Transform (DFT) equation, where N and M are the width and height of the image.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$H(k_x, k_y) = \frac{1}{NM} \sum_{y=0}^{M-1} \sum_{x=0}^{N-1} h(x, y)e^{-j2\pi(\frac{k_x x}{N} + \frac{k_y y}{M})}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت الصورة عبارة عن خطوط عمودية سوداء وبيضاء متناوبة، أين ستتركز الطاقة في نطاق فورييه ثنائي الأبعاد؟</template>
+      <template class="content-en">If an image consists of alternating black and white vertical stripes, where will the energy be concentrated in the 2D Fourier domain?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستتركز الطاقة على المحور الأفقي (ترددات x عالية) لأن التغير يحدث أفقياً فقط، بينما لا يوجد تغير عمودياً (تردد y يساوي صفر).</p></template>
+      <template class="content-en"><p>The energy will be concentrated on the horizontal axis (high x-frequencies) because the change occurs only horizontally, with no change vertically (y-frequency is zero).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="applications-and-evaluation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تطبيقات تحويل فورييه وتقييم إزالة الضوضاء</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Applications of Fourier Transforms and Denoising Evaluation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يُستخدم تحويل فورييه لتحسين الصور (توضيح، إزالة ضبابية، إزالة ضوضاء)، ونستخدم مقاييس مثل PSNR و SSIM لتقييم جودة هذه التحسينات.</p></template>
+    <template class="content-en"><p>Fourier transforms are used for image enhancement (sharpening, deblurring, denoising), and we use metrics like PSNR and SSIM to evaluate the quality of these enhancements.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تطبيقات تحويل فورييه في تحسين الصور (Image Enhancement):</p><ul><li><b>التوضيح (Sharpening):</b> تعزيز الحواف والتفاصيل عن طريق تضخيم المكونات عالية التردد.</li><li><b>إزالة الضبابية (Blur Removal):</b> إذا كان نوع الضبابية معروفاً، يمكن أحياناً عكس تأثيره في نطاق فورييه.</li><li><b>إزالة الضوضاء (Denoising):</b> غالباً ما تكون الضوضاء ذات ترددات عالية. بتقليل الترددات العالية، نزيل الضوضاء مع محاولة الحفاظ على التفاصيل المهمة.</li></ul><p>لتقييم خوارزميات إزالة الضوضاء، نستخدم:</p><ul><li><b>PSNR (<span class="smart-term" data-term-en="PSNR" data-ar="نسبة الإشارة إلى الضوضاء القصوى" data-en-def="An engineering term for the ratio between the maximum possible power of a signal and the power of corrupting noise.">نسبة الإشارة إلى الضوضاء القصوى<span class="smart-term-tooltip"></span></span>):</b> خوارزمية شائعة لمقارنة الصورة المعالجة بالصورة الأصلية.</li><li><b>SSIM (<span class="smart-term" data-term-en="SSIM" data-ar="مؤشر التشابه الهيكلي" data-en-def="A method for predicting the perceived quality of digital television and cinematic pictures, as well as other kinds of digital images and videos.">مؤشر التشابه الهيكلي<span class="smart-term-tooltip"></span></span>):</b> خوارزمية أفضل تعكس الإدراك البشري للتشابه.</li><li><b>FLIP:</b> يقيم سلاسة الفيديو أو تسلسل الصور بالتركيز على الوميض (Flicker).</li></ul></template>
+    <template class="content-en"><p>Applications of Fourier Transforms in Image Enhancement:</p><ul><li><b>Sharpening:</b> Enhance edges and details by amplifying high-frequency components.</li><li><b>Blur Removal:</b> If the blur type is known, its effect can sometimes be undone in the Fourier domain.</li><li><b>Noise Removal (Denoising):</b> Noise often has high frequencies. By reducing high frequencies, we remove noise while keeping important details.</li></ul><p>To evaluate denoising algorithms, we use:</p><ul><li><b><span class="smart-term" data-term-en="PSNR" data-ar="نسبة الإشارة إلى الضوضاء القصوى" data-en-def="An engineering term for the ratio between the maximum possible power of a signal and the power of corrupting noise.">PSNR<span class="smart-term-tooltip"></span></span> (Peak Signal-to-Noise Ratio):</b> A common algorithm to compare denoised images to original images.</li><li><b><span class="smart-term" data-term-en="SSIM" data-ar="مؤشر التشابه الهيكلي" data-en-def="A method for predicting the perceived quality of digital television and cinematic pictures, as well as other kinds of digital images and videos.">SSIM<span class="smart-term-tooltip"></span></span> (Structural Similarity Index):</b> A better algorithm that reflects human perception.</li><li><b>FLIP (Flicker Perception):</b> Evaluates smoothness of video/image sequences focusing on flicker.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المشكلة الأساسية في إزالة الضوضاء باستخدام مرشح تمرير منخفض هي أن الحواف (التي هي أيضاً ترددات عالية) ستتأثر وتصبح ضبابية. لذلك، الخوارزميات المتقدمة تحاول التمييز بين الضوضاء العشوائية والحواف الهيكلية.</p><p>مقياس PSNR يعتمد على الخطأ التربيعي المتوسط (MSE)، وهو مقياس رياضي بحت قد لا يتوافق دائماً مع ما تراه العين البشرية كـ "صورة جيدة". لذلك تم ابتكار SSIM الذي يقيس التغيرات في الهيكل والإضاءة والتباين، وهو أقرب للإدراك البشري.</p></template>
+    <template class="content-en"><p>The fundamental problem with denoising using a low-pass filter is that edges (which are also high frequencies) will be blurred. Advanced algorithms try to distinguish between random noise and structural edges.</p><p>PSNR relies on Mean Squared Error (MSE), a purely mathematical metric that doesn't always align with human visual perception of a 'good image'. Hence, SSIM was created to measure changes in structure, luminance, and contrast, aligning closer to human perception.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُعتبر SSIM أفضل من PSNR في تقييم جودة الصور الطبية؟</template>
+      <template class="content-en">Why is SSIM considered better than PSNR for evaluating the quality of medical images?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن SSIM يأخذ في الاعتبار الهيكل والتباين، وهو ما يتوافق مع كيفية قراءة الأطباء للصور (البحث عن هياكل وأنماط معينة)، بينما PSNR يقيس فقط الفروق الرقمية المطلقة للبيكسلات.</p></template>
+      <template class="content-en"><p>Because SSIM takes structure and contrast into account, which aligns with how doctors read images (looking for specific structures and patterns), whereas PSNR only measures absolute numerical pixel differences.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="image-resizing-interpolation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تغيير حجم الصورة: الاستيفاء (التكبير)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Image Resizing: Interpolation (Upsampling)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الاستيفاء هو عملية تخمين قيم البيكسلات الجديدة عند تكبير الصورة لملء الفراغات بين البيكسلات الأصلية.</p></template>
+    <template class="content-en"><p>Interpolation is the process of guessing new pixel values when enlarging an image to fill the gaps between original pixels.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أسباب تغيير حجم الصورة تشمل: مطابقة دقة جهاز الإخراج (شاشة، طابعة)، تقليل حجم الملف، تحسين سرعة الخوارزميات، والعثور على كائنات بمقاييس مختلفة.</p><p><b><span class="smart-term" data-term-en="Interpolation" data-ar="الاستيفاء" data-en-def="A method of constructing new data points within the range of a discrete set of known data points.">الاستيفاء<span class="smart-term-tooltip"></span></span> للتكبير (Upsampling):</b> لتكبير صورة، نستخدم نواة استيفاء (Interpolation kernel) يتم عمل التفاف لها مع الصورة لملء الفراغات في شبكة البيكسلات. أنواع النوى (Kernels) تشمل:</p><ul><li><b>خطي (Linear / Bilinear):</b> بسيط ولكنه قد يخلق حوافاً متعرجة (Jagged edges).</li><li><b>تكعيبي (Bicubic):</b> خيار شائع، يعطي نتائج أكثر نعومة.</li><li><b>Windowed Sinc:</b> أعلى جودة، ولكنه قد يُدخل <span class="smart-term" data-term-en="Ringing Artifact" data-ar="تأثير الرنين" data-en-def="An artifact that appears as spurious signals near sharp transitions in a signal, looking like ripples or halos.">تأثير الرنين<span class="smart-term-tooltip"></span></span> (Ringing artifact).</li></ul></template>
+    <template class="content-en"><p>Reasons for resizing include: matching output device resolution, reducing file size, optimizing algorithm speed, and finding objects at different scales.</p><p><b><span class="smart-term" data-term-en="Interpolation" data-ar="الاستيفاء" data-en-def="A method of constructing new data points within the range of a discrete set of known data points.">Interpolation<span class="smart-term-tooltip"></span></span> for Upsampling:</b> To enlarge an image, we use an interpolation kernel convolved with the image to fill in the blanks in a grid of pixels. Types of kernels include:</p><ul><li><b>Linear (Bilinear):</b> Simple but can create jagged edges.</li><li><b>Bicubic:</b> Common choice, smoother results.</li><li><b>Windowed Sinc:</b> Highest quality, but can introduce ringing.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تأثير الرنين (Ringing) يحدث مع مرشحات Sinc لأنها تقطع الترددات بشكل حاد جداً في نطاق التردد، مما يسبب تموجات في النطاق المكاني (الصورة) تظهر كحلقات حول الحواف الحادة.</p><p>الاستيفاء التكعيبي (Bicubic) يعتبر الحل الوسط الذهبي في معظم برامج تحرير الصور (مثل فوتوشوب) لأنه يوازن بين الحدة والنعومة دون إحداث رنين ملحوظ.</p></template>
+    <template class="content-en"><p>The <span class="smart-term" data-term-en="Ringing Artifact" data-ar="تأثير الرنين" data-en-def="An artifact that appears as spurious signals near sharp transitions in a signal, looking like ripples or halos.">ringing artifact<span class="smart-term-tooltip"></span></span> occurs with Sinc filters because they cut off frequencies very sharply in the frequency domain, causing ripples in the spatial domain (the image) that appear as halos around sharp edges.</p><p>Bicubic interpolation is considered the golden middle ground in most image editing software (like Photoshop) because it balances sharpness and smoothness without introducing noticeable ringing.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم ببساطة تكرار البيكسل (Nearest Neighbor) لتكبير الصور بدلاً من الاستيفاء الخطي أو التكعيبي؟</template>
+      <template class="content-en">Why don't we simply use pixel replication (Nearest Neighbor) to enlarge images instead of Linear or Bicubic interpolation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>تكرار البيكسل يجعل الصورة تبدو "مربعات" (Pixelated) وخشنة جداً، بينما الاستيفاء يحسب تدرجات لونية ناعمة بين البيكسلات الأصلية لتبدو الصورة طبيعية أكثر.</p></template>
+      <template class="content-en"><p>Pixel replication makes the image look blocky and highly pixelated, whereas interpolation calculates smooth color gradients between original pixels to make the image look more natural.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="image-decimation-downsampling" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> تخفيض حجم الصورة: التخفيض (Downsampling)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Image Resizing: Decimation (Downsampling)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التخفيض هو تصغير الصورة، ويجب دائماً تطبيق مرشح تنعيم (Low-pass) قبله لمنع تشوه التفاصيل الدقيقة (Aliasing).</p></template>
+    <template class="content-en"><p>Decimation is shrinking an image, and a smoothing filter (Low-pass) must always be applied beforehand to prevent distortion of fine details (Aliasing).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عملية التخفيض (Decimation / Downsampling) تُستخدم لتقليل دقة الصورة. تتكون العملية من خطوتين أساسيتين:</p><ol><li><b>الترشيح (Filtering):</b> عمل التفاف للصورة مع مرشح تمرير منخفض (Low-pass filter) لمنع التشوه (Aliasing) الذي قد تسببه التفاصيل عالية التردد عند تصغير الصورة.</li><li><b>أخذ العينات (Subsampling):</b> تقييم الالتفاف فقط عند كل عينة رقم $r$ (مثلاً، أخذ بيكسل واحد وترك بيكسل لتصغير الصورة للنصف).</li></ol><p>المرشحات الشائعة للتخفيض (بمعامل r=2):</p><ul><li><b>خطي (Linear)، ثنائي الحدين (Binomial)، تكعيبي (Cubic):</b> مرشحات تتدرج في التعقيد.</li><li><b>المفاضلة:</b> مرشح Binomial أفضل من الخطي لكنه يترك بعض التشوه. التكعيبي يقمع التشوه جيداً لكنه قد يُدخل تأثير الرنين.</li></ul></template>
+    <template class="content-en"><p>Decimation or Downsampling is used to reduce image resolution. The process consists of two main steps:</p><ol><li><b>Filtering:</b> Convolving the image with a low-pass filter to prevent <span class="smart-term" data-term-en="Aliasing" data-ar="التشوه الترددي / التعرج" data-en-def="An effect that causes different signals to become indistinguishable when sampled, often appearing as jagged edges or Moiré patterns in images.">aliasing<span class="smart-term-tooltip"></span></span> which may be caused by high-frequency details.</li><li><b>Subsampling:</b> The convolution may only be evaluated at every $r^{th}$ sample to optimize computation.</li></ol><p>Common filters for decimation (r=2):</p><ul><li><b>Linear, Binomial, Cubic:</b> Simple to increasingly complex filters.</li><li><b>Tradeoffs:</b> Binomial is better than linear but leaves some aliasing. Cubic suppresses aliasing well but can introduce ringing.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا يحدث الـ Aliasing؟ وفقاً لنظرية شانون-نايكويست، إذا قمنا بأخذ عينات من إشارة بمعدل أقل من ضعف أعلى تردد فيها، فإن الترددات العالية ستتداخل وتظهر كترددات منخفضة مزيفة (أنماط تموجية غريبة في الصور تسمى Moiré patterns).</p><p>لذلك، المرشح المنخفض التمرير (Anti-aliasing filter) يزيل هذه الترددات العالية <i>قبل</i> أن نقوم بحذف البيكسلات، مما يضمن تصغيراً نظيفاً.</p></template>
+    <template class="content-en"><p>Why does Aliasing occur? According to the Shannon-Nyquist theorem, if we sample a signal at a rate less than twice its highest frequency, high frequencies will fold back and appear as fake low frequencies (strange wavy patterns in images called Moiré patterns).</p><p>Therefore, the low-pass filter (Anti-aliasing filter) removes these high frequencies <i>before</i> we discard pixels, ensuring a clean downsampling.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة التخفيض، حيث يتم حساب الصورة g كالتفاف للصورة الأصلية f مع المرشح h، ولكن فقط عند كل عينة r.</strong></template>
+      <template class="content-en"><strong>Decimation equation, where image g is computed as a convolution of original image f with filter h, but only at every r-th sample.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$g(i, j) = \sum_{k,l} f(k, l)h(ri - k, rnj - l)$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ما هو الخطأ الفادح الذي يقع فيه المبرمجون المبتدئون عند تصغير حجم مصفوفة صورة برمجياً؟</template>
+      <template class="content-en">What is the fatal mistake beginner programmers make when downsizing an image array programmatically?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يقومون بحذف صفوف وأعمدة من المصفوفة مباشرة (Subsampling) دون تطبيق مرشح تنعيم (Low-pass filter) أولاً، مما يؤدي إلى ظهور تشوهات (Aliasing) وفقدان جودة الصورة.</p></template>
+      <template class="content-en"><p>They directly delete rows and columns from the array (Subsampling) without applying a smoothing filter (Low-pass filter) first, leading to aliasing artifacts and loss of image quality.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="multi-resolution-pyramids" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> التمثيلات متعددة الدقة وأهرامات الصور</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Multi-Resolution Representations and Image Pyramids</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هرم الصور هو مجموعة من النسخ لنفس الصورة بأحجام متناقصة، يُستخدم للبحث عن الأشياء بسرعة بغض النظر عن حجمها.</p></template>
+    <template class="content-en"><p>An image pyramid is a collection of copies of the same image at decreasing sizes, used to quickly search for objects regardless of their scale.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>التحليل متعدد الدقة (Multi-Resolution Analysis) هو طريقة قوية لفهم الإشارات والصور بمقاييس تفاصيل مختلفة. في الصور، يعني هذا تحليل الميزات واسعة النطاق (مثل الأشكال العامة) والتفاصيل الدقيقة (مثل الحواف والنسيج).</p><p><b>أهرامات الصور (Image Pyramids):</b> هي سلسلة هرمية من الصور، حيث يمثل كل مستوى نسخة منخفضة الدقة من المستوى السابق له. يتم إنشاؤها عبر التخفيض التدريجي (Downsampling)، غالباً بتقليل الحجم للنصف في كل مستوى.</p><p>تطبيقاتها تشمل:</p><ul><li><b>البحث من الخشن إلى الدقيق (Coarse-to-Fine Search):</b> العثور على الكائنات (مثل المشاة) بكفاءة بالبدء من المستوى الخشن (الصغير) ثم التحسين في المستويات الدقيقة.</li><li><b>الدمج متعدد الدقة (Multi-Resolution Blending):</b> دمج صور بدقات مختلفة بسلاسة.</li><li><b>ضغط الصور واكتشاف الميزات.</b></li></ul></template>
+    <template class="content-en"><p>Multi-Resolution Analysis is a powerful way to understand signals and images at different scales of detail. In images, this means analyzing both large-scale features (overall shapes) and fine-scale details (edges and textures).</p><p><b>Image Pyramids:</b> A hierarchical series of images, where each level is a lower-resolution version of the previous one. They are created by progressive resolution reduction (Downsampling), commonly halving the size at each level.</p><p>Applications include:</p><ul><li><b>Coarse-to-Fine Search:</b> Find objects (e.g., pedestrians) efficiently by starting at a coarse level, refining at finer levels.</li><li><b>Multi-Resolution Blending:</b> Seamlessly blend images of different resolutions.</li><li><b>Image Compression and Feature Detection.</b></li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>فكرة البحث "من الخشن إلى الدقيق" توفر قوة حسابية هائلة. بدلاً من تمرير نافذة بحث على صورة ضخمة (ملايين العمليات)، نبحث في قمة الهرم (صورة صغيرة جداً). إذا وجدنا تطابقاً محتملاً، ننزل مستوى واحد فقط في تلك المنطقة المحددة للتحقق، مما يقلل مساحة البحث بشكل لوغاريتمي.</p><p>في الرسوميات (Graphics)، تُعرف هذه التقنية باسم MIP-Mapping، وتُستخدم لتصيير الأنسجة (Textures) على الأجسام البعيدة دون إحداث تشوه (Blockiness) وبكفاءة عالية.</p></template>
+    <template class="content-en"><p>The 'coarse-to-fine' search idea saves massive computational power. Instead of sliding a search window over a huge image (millions of operations), we search at the top of the pyramid (a tiny image). If we find a potential match, we go down one level only in that specific area to verify, reducing the search space logarithmically.</p><p>In computer graphics, this technique is known as <span class="smart-term" data-term-en="MIP-Mapping" data-ar="تخطيط MIP" data-en-def="A technique in 3D graphics where pre-calculated, optimized sequences of images accompany a main texture, intended to increase rendering speed and reduce aliasing artifacts.">MIP-Mapping<span class="smart-term-tooltip"></span></span>, used to render textures on distant objects efficiently and without blockiness.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Draw a 3D-like pyramid structure made of 4 image planes stacked vertically. The bottom plane is the largest (Level 0, high resolution). The next plane up is half the width/height (Level 1, medium). The next is smaller (Level 2, coarse). The top is the smallest. Draw dashed lines connecting the corners of the planes to emphasize the pyramid shape. Style: educational, dark background #0d1117, wireframe style for the planes with a subtle image pattern inside. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" style="font-family: system-ui, 'Cairo', 'Inter', sans-serif;">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Image Pyramids &amp; Multi-Resolution Analysis</text>
+    <text x="400" y="40" text-anchor="middle" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أهرامات الصور وتحليل الدقة المتعددة</text>
+    
+    <text x="400" y="65" text-anchor="middle" font-size="16" fill="var(--text-secondary)" class="gsvg-en">Progressive downsampling for coarse-to-fine analysis</text>
+    <text x="400" y="65" text-anchor="middle" font-size="16" fill="var(--text-secondary)" class="gsvg-ar">تقليل الدقة التدريجي للتحليل من الخشن إلى الدقيق</text>
+
+    <!-- Dashed Pyramid Bounds (3D Effect) -->
+    <path d="M 240 500 L 380 180" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.7" fill="none" />
+    <path d="M 560 500 L 420 180" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.7" fill="none" />
+    <path d="M 400 564 L 400 188" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.7" fill="none" />
+    <path d="M 400 436 L 400 172" stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="6,4" opacity="0.7" fill="none" />
+
+    <!-- Connecting Lines for Labels -->
+    <!-- Left Side (Level Names) -->
+    <line x1="190" y1="500" x2="230" y2="500" stroke="var(--border-color)" stroke-width="1.5" />
+    <line x1="270" y1="360" x2="310" y2="360" stroke="var(--border-color)" stroke-width="1.5" />
+    <line x1="310" y1="260" x2="350" y2="260" stroke="var(--border-color)" stroke-width="1.5" />
+    <line x1="330" y1="180" x2="370" y2="180" stroke="var(--border-color)" stroke-width="1.5" />
+    
+    <!-- Right Side (Resolutions) -->
+    <line x1="570" y1="500" x2="610" y2="500" stroke="var(--border-color)" stroke-width="1.5" />
+    <line x1="490" y1="360" x2="530" y2="360" stroke="var(--border-color)" stroke-width="1.5" />
+    <line x1="450" y1="260" x2="490" y2="260" stroke="var(--border-color)" stroke-width="1.5" />
+    <line x1="430" y1="180" x2="470" y2="180" stroke="var(--border-color)" stroke-width="1.5" />
+
+    <!-- Level 0 (Bottom - High Res) -->
+    <g id="level-0">
+        <polygon points="400,436 560,500 400,564 240,500" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" />
+        <!-- 4x4 Grid -->
+        <line x1="360" y1="452" x2="520" y2="516" stroke="var(--brand-400)" stroke-width="1" opacity="0.4" />
+        <line x1="320" y1="468" x2="480" y2="532" stroke="var(--brand-400)" stroke-width="1" opacity="0.4" />
+        <line x1="280" y1="484" x2="440" y2="548" stroke="var(--brand-400)" stroke-width="1" opacity="0.4" />
+        <line x1="440" y1="452" x2="280" y2="516" stroke="var(--brand-400)" stroke-width="1" opacity="0.4" />
+        <line x1="480" y1="468" x2="320" y2="532" stroke="var(--brand-400)" stroke-width="1" opacity="0.4" />
+        <line x1="520" y1="484" x2="360" y2="548" stroke="var(--brand-400)" stroke-width="1" opacity="0.4" />
+    </g>
+
+    <!-- Level 1 (Medium Res) -->
+    <g id="level-1">
+        <polygon points="400,328 480,360 400,392 320,360" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" />
+        <!-- 2x2 Grid -->
+        <line x1="360" y1="344" x2="440" y2="376" stroke="var(--brand-400)" stroke-width="1" opacity="0.4" />
+        <line x1="440" y1="344" x2="360" y2="376" stroke="var(--brand-400)" stroke-width="1" opacity="0.4" />
+    </g>
+
+    <!-- Level 2 (Coarse Res) -->
+    <g id="level-2">
+        <polygon points="400,244 440,260 400,276 360,260" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" stroke-linejoin="round" />
+    </g>
+
+    <!-- Level 3 (Top - Lowest Res) -->
+    <g id="level-3">
+        <polygon points="400,172 420,180 400,188 380,180" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2.5" stroke-linejoin="round" />
+    </g>
+
+    <!-- Downsampling Arrow (Right Side) -->
+    <line x1="730" y1="480" x2="730" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+    <rect x="670" y="315" width="120" height="30" fill="var(--bg-surface)" />
+    <text x="730" y="335" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Downsampling</text>
+    <text x="730" y="335" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تقليل الدقة</text>
+
+    <!-- Applications Box (Left Side) -->
+    <rect x="30" y="100" width="180" height="130" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1.5" />
+    <text x="120" y="130" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Applications</text>
+    <text x="120" y="130" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">التطبيقات</text>
+    
+    <text x="120" y="160" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">• Coarse-to-Fine Search</text>
+    <text x="120" y="160" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">البحث من الخشن للدقيق •</text>
+    
+    <text x="120" y="185" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">• Image Blending</text>
+    <text x="120" y="185" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">دمج الصور •</text>
+    
+    <text x="120" y="210" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-en">• Image Compression</text>
+    <text x="120" y="210" text-anchor="middle" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">ضغط الصور •</text>
+
+    <!-- Labels: Left Side (Level Names) -->
+    <text x="180" y="505" text-anchor="end" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Level 0: Original</text>
+    <text x="180" y="505" text-anchor="end" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المستوى 0: الأصلي</text>
+
+    <text x="260" y="365" text-anchor="end" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Level 1: Medium</text>
+    <text x="260" y="365" text-anchor="end" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المستوى 1: متوسط</text>
+
+    <text x="300" y="265" text-anchor="end" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Level 2: Coarse</text>
+    <text x="300" y="265" text-anchor="end" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المستوى 2: خشن</text>
+
+    <text x="320" y="185" text-anchor="end" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Level 3: Coarsest</text>
+    <text x="320" y="185" text-anchor="end" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المستوى 3: الأكثر خشونة</text>
+
+    <!-- Labels: Right Side (Resolutions) -->
+    <text x="620" y="505" text-anchor="start" font-size="15" fill="var(--text-secondary)" class="gsvg-en">Full Resolution (1x)</text>
+    <text x="620" y="505" text-anchor="start" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">الدقة الكاملة (1x)</text>
+
+    <text x="540" y="365" text-anchor="start" font-size="15" fill="var(--text-secondary)" class="gsvg-en">1/2 Resolution</text>
+    <text x="540" y="365" text-anchor="start" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">1/2 الدقة</text>
+
+    <text x="500" y="265" text-anchor="start" font-size="15" fill="var(--text-secondary)" class="gsvg-en">1/4 Resolution</text>
+    <text x="500" y="265" text-anchor="start" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">1/4 الدقة</text>
+
+    <text x="480" y="185" text-anchor="start" font-size="15" fill="var(--text-secondary)" class="gsvg-en">1/8 Resolution</text>
+    <text x="480" y="185" text-anchor="start" font-size="15" fill="var(--text-secondary)" class="gsvg-ar">1/8 الدقة</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت الصورة الأصلية بحجم 1024x1024، ما هو حجم الصورة في المستوى الثالث (Level 3) من الهرم إذا كنا نقسم الحجم على 2 في كل مستوى؟ (بافتراض المستوى 0 هو الأصل)</template>
+      <template class="content-en">If the original image is 1024x1024, what is the size of the image at Level 3 of the pyramid if we halve the size at each level? (Assuming Level 0 is the original)</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المستوى 0: 1024x1024. المستوى 1: 512x512. المستوى 2: 256x256. المستوى 3: 128x128.</p></template>
+      <template class="content-en"><p>Level 0: 1024x1024. Level 1: 512x512. Level 2: 256x256. Level 3: 128x128.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="gaussian-pyramid" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> الهرم الغاوسي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> The Gaussian Pyramid</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الهرم الغاوسي هو هرم صور يتم بناؤه عن طريق التنعيم المتكرر (الضبابية) ثم تصغير الصورة للنصف في كل خطوة.</p></template>
+    <template class="content-en"><p>The Gaussian Pyramid is an image pyramid built by repeatedly smoothing (blurring) and then halving the image at each step.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>بناء الهرم الغاوسي (Construction):</b></p><ol><li>تنعيم (Blur) الصورة بشكل متكرر باستخدام مرشح غاوسي (Gaussian filter).</li><li>تخفيض العينة (Downsample) بمعامل 2 لإنشاء المستويات اللاحقة.</li></ol><p>غالباً ما يُستخدم <b>مرشح ثنائي الحدين (Binomial Filter)</b> كبديل فعال؛ لأنه يوفر توازناً جيداً بين البساطة والجودة، وهو تقريب غير مكلف حسابياً للتنعيم الغاوسي.</p><p>يُعتبر الهرم الغاوسي الأساس لبناء أهرامات أخرى (مثل الهرم اللابلاسي) ويُستخدم لاكتشاف الميزات عبر مقاييس مختلفة (Feature detection across scales).</p></template>
+    <template class="content-en"><p><b>Construction of the Gaussian Pyramid:</b></p><ol><li>Repeatedly blur the image with a <span class="smart-term" data-term-en="Gaussian Filter" data-ar="المرشح الغاوسي" data-en-def="A linear filter whose impulse response is a Gaussian function, widely used to reduce image noise and reduce detail.">Gaussian filter<span class="smart-term-tooltip"></span></span>.</li><li>Downsample by a factor of 2 to create subsequent levels.</li></ol><p>A <b>Binomial Filter</b> is often used as it offers a good balance between simplicity and quality, being a computationally inexpensive approximation of a Gaussian blur (efficient).</p><p>Applications: It is the foundation for other pyramids (like Laplacian) and is used for feature detection across scales.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السبب في تسميته "غاوسي" هو أن عملية التنعيم المتكررة بمرشحات صغيرة (مثل Binomial) تقترب رياضياً من الالتفاف مع دالة غاوسية كبيرة، وذلك بفضل نظرية النهاية المركزية (Central Limit Theorem).</p><p>كل مستوى في الهرم الغاوسي يحتوي على ترددات منخفضة فقط مقارنة بالمستوى الذي تحته، حيث يعمل التنعيم كمرشح تمرير منخفض يزيل التفاصيل الدقيقة قبل التصغير.</p></template>
+    <template class="content-en"><p>The reason it's called 'Gaussian' is that repeated smoothing with small filters (like Binomial) mathematically approximates convolution with a large Gaussian function, thanks to the Central Limit Theorem.</p><p>Each level in the Gaussian pyramid contains only lower frequencies compared to the level below it, as the smoothing acts as a low-pass filter removing fine details before downsampling.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Gaussian Pyramid</th><th>Laplacian Pyramid</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المحتوى المخزن</template>
+          <template class="content-en">Stored Content</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">نسخ مموهة ومصغرة من الصورة</template>
+          <template class="content-en">Blurred and downsampled versions of image</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الفروق (التفاصيل) بين المستويات الغاوسية</template>
+          <template class="content-en">Differences (details) between Gaussian levels</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">إمكانية إعادة البناء</template>
+          <template class="content-en">Reconstruction Capability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">لا يمكن إعادة بناء الصورة الأصلية من مستوى واحد</template>
+          <template class="content-en">Cannot reconstruct original image from one level</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">إعادة بناء مثالية (بإضافة قمة الغاوسي)</template>
+          <template class="content-en">Perfect reconstruction (adding Gaussian top)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم مرشح Binomial بدلاً من معادلة غاوس المعقدة لبناء الهرم؟</template>
+      <template class="content-en">Why do we use a Binomial filter instead of the complex Gaussian equation to build the pyramid?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مرشح Binomial يستخدم أوزاناً صحيحة بسيطة (مثل 1, 4, 6, 4, 1) مما يجعل العمليات الحسابية سريعة جداً (باستخدام الجمع والإزاحة بدلاً من الضرب المعقد)، مع إعطاء نتيجة قريبة جداً من غاوس.</p></template>
+      <template class="content-en"><p>Because the Binomial filter uses simple integer weights (like 1, 4, 6, 4, 1) making computations very fast (using addition and bit-shifting instead of complex multiplication), while giving a result very close to a true Gaussian.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="laplacian-pyramid" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> الهرم اللابلاسي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> The Laplacian Pyramid</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الهرم اللابلاسي يخزن فقط "التفاصيل" المفقودة بين مستويات الهرم الغاوسي، مما يسمح بإعادة بناء الصورة الأصلية بدقة تامة.</p></template>
+    <template class="content-en"><p>The Laplacian Pyramid stores only the 'details' lost between Gaussian pyramid levels, allowing for perfect reconstruction of the original image.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>تخزين التفاصيل:</b> بينما يخزن الهرم الغاوسي النسخ المموهة، يحتفظ الهرم اللابلاسي بالفرق (Difference) بين مستويات الهرم الغاوسي.</p><p><b>طريقة البناء (Construction):</b></p><ol><li>قم بتكبير (Upsample) مستوى غاوسي ذو دقة منخفضة (باستخدام الاستيفاء).</li><li>اطرح هذه الصورة المكبرة من المستوى الغاوسي ذو الدقة الأعلى مباشرة.</li><li>النتيجة هي صورة لابلاسية (تحتوي فقط على الحواف والتفاصيل الدقيقة).</li></ol><p><b>إعادة البناء المثالية (Perfect Reconstruction):</b> الميزة الكبرى للهرم اللابلاسي هي أنه بجمع الصور اللابلاسية مع أصغر مستوى غاوسي، يمكننا <span class="smart-term" data-term-en="Image Reconstruction" data-ar="إعادة بناء الصورة" data-en-def="The process of recreating an original image from its decomposed parts or compressed data.">إعادة بناء الصورة<span class="smart-term-tooltip"></span></span> الأصلية بالكامل دون أي فقدان للبيانات.</p></template>
+    <template class="content-en"><p><b>Storing the Detail:</b> While the Gaussian pyramid stores blurred versions, the Laplacian Pyramid holds the difference between the Gaussian levels.</p><p><b>Construction:</b></p><ol><li>Upsample a lower-resolution Gaussian level.</li><li>Subtract this from the higher-resolution level to get the Laplacian image.</li><li>The result is a Laplacian image (containing only edges and fine details).</li></ol><p><b>Perfect Reconstruction:</b> The major advantage is that Laplacian images + the smallest Gaussian level can fully reconstruct the original image without any data loss.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الهرم اللابلاسي هو في جوهره تطبيق لمرشح تمرير النطاق (Band-pass filter). كل مستوى يلتقط نطاقاً ترددياً معيناً (تفاصيل بحجم معين). هذا يجعله مثالياً لضغط الصور، حيث يمكننا ضغط المستويات التي تحتوي على تفاصيل أقل أهمية للعين البشرية بقوة أكبر.</p><p>عملية الطرح تزيل التكرار (Redundancy) الموجود في الهرم الغاوسي. الصور اللابلاسية تكون في الغالب رمادية (قيم قريبة من الصفر) مع وجود قيم عالية فقط عند الحواف، مما يجعلها قابلة للضغط بشكل ممتاز.</p></template>
+    <template class="content-en"><p>The Laplacian pyramid is essentially an application of a band-pass filter. Each level captures a specific frequency band (details of a certain size). This makes it ideal for image compression, as we can heavily compress levels containing details less important to the human eye.</p><p>The subtraction process removes the redundancy present in the Gaussian pyramid. Laplacian images are mostly gray (values near zero) with high values only at edges, making them highly compressible.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Show the process of creating a Laplacian level. Left side: Gaussian Level L (sharp image). Below it: Gaussian Level L+1 (smaller, blurred image). Arrow from L+1 pointing up to an 'Expand/Upsample' box. The output of this box is subtracted (minus sign) from Gaussian Level L. The result equals (=) the Laplacian Level L (a grey image showing only the edges of the original). Style: educational, dark background #0d1117, clear flow arrows. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Blur Filter for Gaussian L+1 -->
+    <filter id="blurFilter" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" />
+    </filter>
+
+    <!-- Gradient for Expand Box -->
+    <linearGradient id="expandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="var(--brand-800)" />
+      <stop offset="100%" stop-color="var(--brand-600)" />
+    </linearGradient>
+
+    <!-- Clip Path for Images -->
+    <clipPath id="imgClip">
+      <rect width="140" height="140" rx="4" />
+    </clipPath>
+
+    <!-- Base Image Content (Landscape) -->
+    <g id="imageContent">
+      <rect width="140" height="140" fill="var(--bg-elevated)" />
+      <circle cx="100" cy="45" r="18" fill="var(--brand-400)" />
+      <polygon points="20,140 75,60 130,140" fill="var(--brand-700)" />
+      <polygon points="-10,140 40,80 90,140" fill="var(--brand-500)" />
+    </g>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="425" y="50" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)">Laplacian Pyramid Level Construction</text>
+  <text x="425" y="50" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)">بناء مستوى هرم لابلاس</text>
+
+  <!-- ========================================== -->
+  <!-- CONNECTIONS & ARROWS                       -->
+  <!-- ========================================== -->
+
+  <!-- L+1 to Expand -->
+  <path d="M 200 400 L 310 400" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+  
+  <!-- Expand to Subtraction -->
+  <path d="M 400 370 L 400 235" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+  
+  <!-- L to Subtraction -->
+  <path d="M 230 200 L 365 200" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+  
+  <!-- Subtraction to Laplacian -->
+  <path d="M 425 200 L 595 200" fill="none" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+  <!-- Math Symbols on Paths -->
+  <text x="345" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="28" font-weight="bold" fill="var(--brand-ink)">+</text>
+  <text x="420" y="255" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="28" font-weight="bold" fill="var(--brand-ink)">-</text>
+  <text x="515" y="190" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="28" font-weight="bold" fill="var(--brand-ink)">=</text>
+
+  <!-- Label for Upsampled Arrow -->
+  <text x="470" y="300" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">Upsampled L+1</text>
+  <text x="470" y="300" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">L+1 بعد زيادة الدقة</text>
+
+  <!-- ========================================== -->
+  <!-- NODES & IMAGES                             -->
+  <!-- ========================================== -->
+
+  <!-- Gaussian Level L (Sharp Image) -->
+  <text x="160" y="110" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Gaussian Level L</text>
+  <text x="160" y="110" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">المستوى الغاوسي L</text>
+  
+  <g transform="translate(90, 130)">
+    <g clip-path="url(#imgClip)">
+      <use href="#imageContent" />
+    </g>
+    <rect width="140" height="140" fill="none" stroke="var(--border-color)" stroke-width="2" rx="4" />
+  </g>
+
+  <!-- Gaussian Level L+1 (Blurred Image) -->
+  <g transform="translate(120, 360)">
+    <g transform="scale(0.5714)" clip-path="url(#imgClip)" filter="url(#blurFilter)">
+      <use href="#imageContent" />
+    </g>
+    <rect width="80" height="80" fill="none" stroke="var(--border-color)" stroke-width="2" rx="4" />
+  </g>
+  
+  <text x="160" y="470" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Gaussian Level L+1</text>
+  <text x="160" y="470" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">المستوى الغاوسي L+1</text>
+
+  <!-- Expand / Upsample Box -->
+  <rect x="320" y="370" width="160" height="60" rx="8" fill="url(#expandGradient)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="400" y="406" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">Expand / Upsample</text>
+  <text x="400" y="406" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-hi)">توسيع / زيادة الدقة</text>
+
+  <!-- Subtraction Node -->
+  <circle cx="400" cy="200" r="25" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="3" />
+  <line x1="388" y1="200" x2="412" y2="200" stroke="var(--text-primary)" stroke-width="4" stroke-linecap="round" />
+
+  <!-- Laplacian Level L (Edges Image) -->
+  <text x="680" y="110" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Laplacian Level L</text>
+  <text x="680" y="110" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">مستوى لابلاس L</text>
+  
+  <g transform="translate(610, 130)">
+    <g clip-path="url(#imgClip)">
+      <rect width="140" height="140" fill="var(--bg-elevated)" />
+      <!-- Edges representation -->
+      <circle cx="100" cy="45" r="18" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,2" />
+      <polygon points="20,140 75,60 130,140" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+      <polygon points="-10,140 40,80 90,140" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+      <!-- High frequency noise/detail dots -->
+      <circle cx="40" cy="110" r="1.5" fill="var(--brand-500)" />
+      <circle cx="110" cy="120" r="1.5" fill="var(--brand-500)" />
+      <circle cx="70" cy="30" r="1.5" fill="var(--brand-500)" />
+      <circle cx="20" cy="50" r="1.5" fill="var(--brand-500)" />
+      <circle cx="125" cy="80" r="1.5" fill="var(--brand-500)" />
+    </g>
+    <rect width="140" height="140" fill="none" stroke="var(--border-color)" stroke-width="2" rx="4" />
+  </g>
+
+  <text x="680" y="295" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">(Edges &amp; Details)</text>
+  <text x="680" y="295" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">(الحواف والتفاصيل)</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا فقدنا أصغر صورة في قمة الهرم الغاوسي، هل يمكننا إعادة بناء الصورة الأصلية باستخدام الهرم اللابلاسي فقط؟</template>
+      <template class="content-en">If we lose the smallest image at the top of the Gaussian pyramid, can we reconstruct the original image using only the Laplacian pyramid?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لا يمكننا. الهرم اللابلاسي يحتوي فقط على 'التفاصيل' (الترددات العالية). نحتاج إلى قمة الهرم الغاوسي لأنها تحتوي على 'الأساس' أو الترددات المنخفضة جداً (الألوان العامة والخلفية) التي تُبنى عليها التفاصيل.</p></template>
+      <template class="content-en"><p>No, we cannot. The Laplacian pyramid only contains the 'details' (high frequencies). We need the top of the Gaussian pyramid because it contains the 'base' or very low frequencies (overall colors and background) upon which the details are added.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه المراجعة السريعة. تخيلوا أن الصورة ليست مجرد شبكة من المربعات الملونة، بل هي سيمفونية من الموجات! هذا هو جوهر 'نطاق التردد'. تحويل فورييه هو أداتنا السحرية التي تفكك هذه السيمفونية لنرى الترددات العالية (الحواف والتفاصيل) والترددات المنخفضة (الخلفية الناعمة). في الامتحان، ركزوا جيداً على الفرق بين المرشحات: التمرير المنخفض يُنعم، والتمرير العالي يُبرز الحواف. تذكروا دائماً فخ الـ Aliasing؛ لا تصغروا صورة أبداً دون تنعيمها أولاً! وأخيراً، افهموا العلاقة بين الهرم الغاوسي (الذي يطمس الصورة تدريجياً) والهرم اللابلاسي (الذي يحتفظ بالتفاصيل المفقودة بذكاء ليسمح لنا بإعادة البناء). هذه المفاهيم هي أساس ضغط الصور الحديث ورؤية الحاسب. بالتوفيق!</template>
+    <template class="content-en">Welcome friends to this quick review. Imagine an image not just as a grid of colored squares, but as a symphony of waves! That's the essence of the 'frequency domain'. The Fourier Transform is our magic tool that decomposes this symphony so we can see high frequencies (edges and details) and low frequencies (smooth background). For the exam, focus heavily on the difference between filters: Low-pass smooths, High-pass highlights edges. Always remember the Aliasing trap; never downsample an image without smoothing it first! Finally, understand the relationship between the Gaussian Pyramid (which progressively blurs) and the Laplacian Pyramid (which cleverly stores the lost details to allow perfect reconstruction). These concepts are the bedrock of modern image compression and computer vision. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل استخدام FFT بدلاً من معادلة DFT المباشرة في معالجة الصور؟</template>
+          <template class="content-en">Why do we prefer using FFT over the direct DFT equation in image processing?</template>
+          <span class="content-target">لماذا نفضل استخدام FFT بدلاً من معادلة DFT المباشرة في معالجة الصور؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الصور تحتوي على ملايين البيكسلات. DFT العادي يتطلب عمليات حسابية مربعة \(O(N^2)\) مما يجعله بطيئاً جداً. FFT يقلل هذا إلى O(N log N)، مما يجعل المعالجة ممكنة في وقت معقول.</template>
+          <template class="content-en">Because images contain millions of pixels. Standard DFT requires \(O(N^2)\) operations making it extremely slow. FFT reduces this to O(N log N), making processing feasible in a reasonable time.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو التأثير البصري لمرشح التمرير المنخفض (Low-pass filter) على الصورة؟</template>
+          <template class="content-en">What is the visual effect of a Low-pass filter on an image?</template>
+          <span class="content-target">ما هو التأثير البصري لمرشح التمرير المنخفض (Low-pass filter) على الصورة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يقوم بتنعيم الصورة وجعلها ضبابية (Blurring)، لأنه يزيل الترددات العالية المسؤولة عن الحواف والتفاصيل الدقيقة.</template>
+          <template class="content-en">It smooths and blurs the image, because it removes the high frequencies responsible for edges and fine details.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكننا إزالة الضوضاء (Denoising) من صورة باستخدام نطاق التردد؟</template>
+          <template class="content-en">How can we remove noise (Denoising) from an image using the frequency domain?</template>
+          <span class="content-target">كيف يمكننا إزالة الضوضاء (Denoising) من صورة باستخدام نطاق التردد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الضوضاء العشوائية غالباً ما تظهر كترددات عالية جداً. بتطبيق مرشح تمرير منخفض، يمكننا قطع هذه الترددات العالية، مما يقلل الضوضاء (ولكن قد يطمس الحواف قليلاً).</template>
+          <template class="content-en">Random noise often appears as very high frequencies. By applying a low-pass filter, we can cut off these high frequencies, reducing the noise (though it might slightly blur the edges).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الـ Aliasing وكيف نتجنبه عند تصغير الصورة؟</template>
+          <template class="content-en">What is Aliasing and how do we avoid it when downsampling an image?</template>
+          <span class="content-target">ما هو الـ Aliasing وكيف نتجنبه عند تصغير الصورة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الـ Aliasing هو تشوه يحدث عندما تظهر الترددات العالية كأنماط مزيفة عند تقليل الدقة. نتجنبه بتطبيق مرشح تنعيم (Low-pass) قبل حذف البيكسلات.</template>
+          <template class="content-en">Aliasing is a distortion that occurs when high frequencies appear as fake patterns when reducing resolution. We avoid it by applying a smoothing (Low-pass) filter before discarding pixels.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين الاستيفاء الخطي (Linear) والتكعيبي (Bicubic)؟</template>
+          <template class="content-en">What is the difference between Linear and Bicubic interpolation?</template>
+          <span class="content-target">ما الفرق بين الاستيفاء الخطي (Linear) والتكعيبي (Bicubic)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">الخطي أبسط وأسرع لكنه قد ينتج حوافاً متعرجة. التكعيبي يأخذ في الاعتبار بيكسلات مجاورة أكثر، مما ينتج عنه صورة مكبرة أكثر نعومة وجودة، وهو الخيار الشائع.</template>
+          <template class="content-en">Linear is simpler and faster but can produce jagged edges. Bicubic considers more neighboring pixels, resulting in a smoother, higher-quality enlarged image, making it the common choice.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الهرم الغاوسي (Gaussian Pyramid)؟</template>
+          <template class="content-en">What is the Gaussian Pyramid?</template>
+          <span class="content-target">ما هو الهرم الغاوسي (Gaussian Pyramid)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو سلسلة من الصور حيث كل مستوى هو نسخة مصغرة ومموهة (باستخدام مرشح غاوسي) من المستوى الذي تحته.</template>
+          <template class="content-en">It is a series of images where each level is a downsampled and blurred (using a Gaussian filter) version of the level below it.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتم بناء مستوى واحد في الهرم اللابلاسي؟</template>
+          <template class="content-en">How is a single level in the Laplacian Pyramid built?</template>
+          <span class="content-target">كيف يتم بناء مستوى واحد في الهرم اللابلاسي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">نأخذ مستوى غاوسي، نقوم بتكبيره، ثم نطرحه من المستوى الغاوسي الأكبر منه مباشرة. النتيجة هي الصورة اللابلاسية التي تمثل التفاصيل.</template>
+          <template class="content-en">We take a Gaussian level, upsample it, and then subtract it from the immediately larger Gaussian level. The result is the Laplacian image representing the details.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يُعتبر الهرم اللابلاسي مفيداً جداً في ضغط الصور؟</template>
+          <template class="content-en">Why is the Laplacian Pyramid very useful in image compression?</template>
+          <span class="content-target">لماذا يُعتبر الهرم اللابلاسي مفيداً جداً في ضغط الصور؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأنه يزيل التكرار. الصور اللابلاسية تحتوي في الغالب على قيم قريبة من الصفر (رمادي) مع قيم عالية فقط عند الحواف، وهذا النوع من البيانات يسهل ضغطه جداً.</template>
+          <template class="content-en">Because it removes redundancy. Laplacian images mostly contain near-zero values (gray) with high values only at edges, and this type of data is very easy to compress.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو تأثير الرنين (Ringing) ومتى يظهر؟</template>
+          <template class="content-en">What is the Ringing effect and when does it appear?</template>
+          <span class="content-target">ما هو تأثير الرنين (Ringing) ومتى يظهر؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو ظهور تموجات أو هالات حول الحواف الحادة في الصورة. يظهر عادة عند استخدام مرشحات تقطع الترددات بشكل حاد جداً، مثل مرشح Windowed Sinc أثناء التكبير.</template>
+          <template class="content-en">It is the appearance of ripples or halos around sharp edges in an image. It usually appears when using filters that cut off frequencies very sharply, like the Windowed Sinc filter during upsampling.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم SSIM بدلاً من PSNR في بعض الأحيان لتقييم جودة الصورة؟</template>
+          <template class="content-en">Why do we sometimes use SSIM instead of PSNR to evaluate image quality?</template>
+          <span class="content-target">لماذا نستخدم SSIM بدلاً من PSNR في بعض الأحيان لتقييم جودة الصورة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">PSNR يقيس الخطأ الرياضي البحت، بينما SSIM يقيس التشابه الهيكلي والتباين، وهو ما يتوافق بشكل أفضل مع كيفية إدراك العين البشرية لجودة الصورة.</template>
+          <template class="content-en">PSNR measures pure mathematical error, while SSIM measures structural similarity and contrast, which aligns much better with how the human eye perceives image quality.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هو الهدف الأساسي من تحويل فورييه (Fourier Transform)؟",
+      "en": "What is the primary goal of the Fourier Transform?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تفكيك الإشارة إلى مكوناتها الترددية الأساسية.",
+        "en": "To decompose a signal into its fundamental frequency components."
+      },
+      "example": {
+        "ar": "معرفة مقدار الترددات العالية (الحواف) والمنخفضة (الخلفية) في الصورة.",
+        "en": "Finding out how much high frequency (edges) and low frequency (background) is in an image."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هي وظيفة مرشح التمرير المنخفض (Low-pass Filter)؟",
+      "en": "What is the function of a Low-pass Filter?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يسمح بمرور الترددات المنخفضة ويمنع العالية، مما يؤدي إلى تنعيم الإشارة.",
+        "en": "Passes low frequencies and attenuates high frequencies, resulting in signal smoothing."
+      },
+      "example": {
+        "ar": "إزالة الضوضاء عالية التردد من صورة (جعلها ضبابية قليلاً).",
+        "en": "Removing high-frequency noise from an image (blurring it slightly)."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي وظيفة مرشح التمرير العالي (High-pass Filter)؟",
+      "en": "What is the function of a High-pass Filter?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يسمح بمرور الترددات العالية ويمنع المنخفضة.",
+        "en": "Passes high frequencies and attenuates low frequencies."
+      },
+      "example": {
+        "ar": "اكتشاف الحواف (Edge detection) في الصور.",
+        "en": "Edge detection in images."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو مرشح تمرير النطاق (Band-pass Filter)؟",
+      "en": "What is a Band-pass Filter?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مرشح يسمح بمرور نطاق معين من الترددات (الترددات المتوسطة) ويمنع ما دونه وما فوقه.",
+        "en": "A filter designed to pass a specific range of frequencies (medium frequencies)."
+      },
+      "example": {
+        "ar": "يُستخدم في استخراج الميزات وتحليل النسيج.",
+        "en": "Used in feature extractions and texture analysis."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "في الإشارة الجيبية، ماذا تعني السعة (Amplitude)؟",
+      "en": "In a sinusoidal signal, what does Amplitude mean?"
+    },
+    "back": {
+      "definition": {
+        "ar": "أقصى مسافة بين المحور الأفقي والموضع الرأسي للإشارة (قوة الإشارة).",
+        "en": "The maximum distance between the horizontal axis and the vertical position of any signal."
+      },
+      "example": {
+        "ar": "موجة صوتية عالية السعة تعني صوتاً أعلى.",
+        "en": "A high amplitude sound wave means a louder sound."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما هو الفرق في التعقيد الحسابي بين DFT و FFT؟",
+      "en": "What is the difference in computational complexity between DFT and FFT?"
+    },
+    "back": {
+      "definition": {
+        "ar": "DFT يأخذ \\(O(N^2)\\) بينما FFT يأخذ O(N log2 N).",
+        "en": "DFT takes \\(O(N^2)\\) operations, while FFT takes O(N log2 N) operations."
+      },
+      "example": {
+        "ar": "FFT يجعل معالجة الصور الكبيرة في نطاق التردد ممكنة وسريعة.",
+        "en": "FFT makes processing large images in the frequency domain feasible and fast."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ماذا تمثل الترددات العالية في الصورة؟",
+      "en": "What do high frequencies represent in an image?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التغيرات السريعة في قيم البيكسلات.",
+        "en": "Rapid changes in pixel values."
+      },
+      "example": {
+        "ar": "التفاصيل الحادة، الحواف، والضوضاء.",
+        "en": "Sharp details, edges, and noise."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "ما هو مقياس PSNR؟",
+      "en": "What is the PSNR metric?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نسبة الإشارة إلى الضوضاء القصوى، خوارزمية شائعة لمقارنة الصورة المعالجة بالأصلية.",
+        "en": "Peak Signal-to-Noise Ratio, a common algorithm to compare denoised images to original images."
+      },
+      "example": {
+        "ar": "قيمة PSNR أعلى تعني جودة صورة أفضل رياضياً.",
+        "en": "A higher PSNR value means mathematically better image quality."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "لماذا يُفضل استخدام SSIM على PSNR أحياناً؟",
+      "en": "Why is SSIM sometimes preferred over PSNR?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن SSIM (مؤشر التشابه الهيكلي) يعكس الإدراك البشري للتشابه بشكل أفضل من PSNR.",
+        "en": "Because SSIM (Structural Similarity Index) reflects human perception of similarity better than PSNR."
+      },
+      "example": {
+        "ar": "صورتان قد يكون لهما نفس PSNR لكن إحداهما تبدو أفضل بكثير للعين البشرية، هنا SSIM سيعطي تقييماً أدق.",
+        "en": "Two images might have the same PSNR but one looks much better to the human eye; SSIM will give a more accurate rating here."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "ما هو الاستيفاء (Interpolation) في معالجة الصور؟",
+      "en": "What is Interpolation in image processing?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية تُستخدم لتكبير الصورة (Upsampling) عن طريق تخمين قيم البيكسلات الجديدة لملء الفراغات.",
+        "en": "A process used for enlarging images (Upsampling) by guessing new pixel values to fill in the blanks."
+      },
+      "example": {
+        "ar": "استخدام الاستيفاء التكعيبي (Bicubic) لتكبير صورة دون جعلها تبدو مربعة (Pixelated).",
+        "en": "Using Bicubic interpolation to enlarge an image without making it look pixelated."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هي الخطوة الحاسمة قبل إجراء التخفيض (Decimation) للصورة؟",
+      "en": "What is the crucial step before performing Decimation on an image?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تطبيق مرشح تمرير منخفض (Low-pass filter) لمنع التشوه (Aliasing).",
+        "en": "Applying a low-pass filter to prevent aliasing."
+      },
+      "example": {
+        "ar": "تنعيم الصورة قبل حذف البيكسلات لتصغيرها.",
+        "en": "Smoothing the image before discarding pixels to shrink it."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ما هو الهرم الغاوسي (Gaussian Pyramid)؟",
+      "en": "What is a Gaussian Pyramid?"
+    },
+    "back": {
+      "definition": {
+        "ar": "سلسلة هرمية من الصور يتم إنشاؤها عن طريق التنعيم المتكرر وتخفيض العينة (تصغير الحجم).",
+        "en": "A hierarchical series of images created by repeated smoothing and downsampling."
+      },
+      "example": {
+        "ar": "يُستخدم للبحث السريع عن الكائنات بأحجام مختلفة (Coarse-to-Fine Search).",
+        "en": "Used for fast object search at different scales (Coarse-to-Fine Search)."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ماذا يخزن الهرم اللابلاسي (Laplacian Pyramid)؟",
+      "en": "What does the Laplacian Pyramid store?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يخزن الفروق (التفاصيل) بين المستويات المتتالية في الهرم الغاوسي.",
+        "en": "It stores the detail differences between consecutive levels of the Gaussian pyramid."
+      },
+      "example": {
+        "ar": "يسمح بإعادة بناء الصورة الأصلية بشكل مثالي ويُستخدم في ضغط الصور.",
+        "en": "Allows for perfect reconstruction of the original image and is used in image compression."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هو تأثير الرنين (Ringing artifact)؟",
+      "en": "What is the Ringing artifact?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تموجات تظهر حول الحواف الحادة في الصورة، وتحدث غالباً بسبب مرشحات ذات قطع حاد مثل Windowed Sinc.",
+        "en": "Ripples appearing around sharp edges in an image, often caused by filters with sharp cutoffs like Windowed Sinc."
+      },
+      "example": {
+        "ar": "ظهور هالات خفيفة حول النص الأسود على خلفية بيضاء بعد تكبير الصورة.",
+        "en": "Faint halos appearing around black text on a white background after enlarging the image."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "ما هو التشوه الترددي (Aliasing) في الصور؟",
+      "en": "What is Aliasing in images?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تشوه يحدث عند أخذ عينات من إشارة بمعدل منخفض، مما يجعل الترددات العالية تظهر كترددات منخفضة مزيفة.",
+        "en": "Distortion occurring when a signal is sampled at a low rate, causing high frequencies to appear as fake low frequencies."
+      },
+      "example": {
+        "ar": "ظهور أنماط تموجية (Moiré) عند تصغير صورة لقميص مخطط دون تنعيم مسبق.",
+        "en": "Moiré patterns appearing when downsampling an image of a striped shirt without prior smoothing."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي من المرشحات التالية يُستخدم لاكتشاف الحواف في الصورة؟",
+      "en": "Which of the following filters is used for edge detection in an image?"
+    },
+    "options": {
+      "ar": [
+        "مرشح التمرير المنخفض (Low-pass)",
+        "مرشح التمرير العالي (High-pass)",
+        "مرشح تمرير النطاق (Band-pass)",
+        "مرشح غاوسي (Gaussian)"
+      ],
+      "en": [
+        "Low-pass Filter",
+        "High-pass Filter",
+        "Band-pass Filter",
+        "Gaussian Filter"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مرشح التمرير العالي يسمح بمرور الترددات العالية التي تمثل التغيرات السريعة مثل الحواف، ويمنع الترددات المنخفضة.",
+      "en": "A high-pass filter allows high frequencies (which represent rapid changes like edges) to pass and blocks low frequencies."
+    },
+    "hint": {
+      "ar": "الحواف تمثل تغيراً سريعاً جداً في لون البيكسلات.",
+      "en": "Edges represent a very rapid change in pixel color."
+    },
+    "difficulty": "easy",
+    "conceptId": "frequency-filters"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هو التعقيد الحسابي لخوارزمية تحويل فورييه السريع (FFT)؟",
+      "en": "What is the computational complexity of the Fast Fourier Transform (FFT) algorithm?"
+    },
+    "options": {
+      "ar": [
+        "\\(O(N^2)\\)",
+        "O(N)",
+        "O(N log2 N)",
+        "O(log N)"
+      ],
+      "en": [
+        "\\(O(N^2)\\)",
+        "O(N)",
+        "O(N log2 N)",
+        "O(log N)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "خوارزمية FFT تقلل التعقيد من \\(O(N^2)\\) الخاص بـ DFT العادي إلى O(N log2 N)، مما يجعلها سريعة جداً.",
+      "en": "The FFT algorithm reduces the complexity from \\(O(N^2)\\) of standard DFT to O(N log2 N), making it very fast."
+    },
+    "hint": {
+      "ar": "إنها أسرع بكثير من التربيع، ولكنها ليست خطية تماماً.",
+      "en": "It's much faster than quadratic, but not strictly linear."
+    },
+    "difficulty": "medium",
+    "conceptId": "dft-and-fft"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "عند تقييم خوارزميات إزالة الضوضاء، أي مقياس يعكس الإدراك البشري للتشابه بشكل أفضل؟",
+      "en": "When evaluating denoising algorithms, which metric better reflects human perception of similarity?"
+    },
+    "options": {
+      "ar": [
+        "PSNR",
+        "MSE",
+        "SSIM",
+        "DFT"
+      ],
+      "en": [
+        "PSNR",
+        "MSE",
+        "SSIM",
+        "DFT"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مؤشر التشابه الهيكلي (SSIM) صُمم خصيصاً ليتوافق مع كيفية إدراك العين البشرية لجودة الصورة، على عكس PSNR الذي يعتمد على الفروق الرياضية البحتة.",
+      "en": "The Structural Similarity Index (SSIM) is specifically designed to align with how the human eye perceives image quality, unlike PSNR which relies on pure mathematical differences."
+    },
+    "hint": {
+      "ar": "ابحث عن المقياس الذي يحتوي على كلمة 'هيكلي' (Structural).",
+      "en": "Look for the metric that contains the word 'Structural'."
+    },
+    "difficulty": "medium",
+    "conceptId": "applications-and-evaluation"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي المشكلة التي قد تحدث عند استخدام نواة استيفاء Windowed Sinc لتكبير الصورة؟",
+      "en": "What problem might occur when using a Windowed Sinc interpolation kernel to enlarge an image?"
+    },
+    "options": {
+      "ar": [
+        "حواف متعرجة (Jagged edges)",
+        "تأثير الرنين (Ringing artifact)",
+        "ضبابية شديدة (Severe blurring)",
+        "فقدان الألوان (Color loss)"
+      ],
+      "en": [
+        "Jagged edges",
+        "Ringing artifact",
+        "Severe blurring",
+        "Color loss"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "على الرغم من أن Sinc يعطي أعلى جودة، إلا أن قطعه الحاد للترددات يمكن أن يُدخل تأثير الرنين (تموجات حول الحواف).",
+      "en": "Although Sinc gives the highest quality, its sharp frequency cutoff can introduce ringing artifacts (ripples around edges)."
+    },
+    "hint": {
+      "ar": "تأثير يشبه التموجات أو الهالات حول الحواف.",
+      "en": "An effect that looks like ripples or halos around edges."
+    },
+    "difficulty": "hard",
+    "conceptId": "image-resizing-interpolation"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "لماذا يجب تطبيق مرشح تمرير منخفض قبل عملية التخفيض (Downsampling)؟",
+      "en": "Why must a low-pass filter be applied before the downsampling process?"
+    },
+    "options": {
+      "ar": [
+        "لزيادة تباين الصورة",
+        "لمنع تأثير التشوه (Aliasing)",
+        "لتسريع عملية التخفيض",
+        "لتحويل الصورة إلى أبيض وأسود"
+      ],
+      "en": [
+        "To increase image contrast",
+        "To prevent Aliasing artifacts",
+        "To speed up the downsampling process",
+        "To convert the image to black and white"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المرشح المنخفض يزيل الترددات العالية التي لا يمكن تمثيلها في الدقة الجديدة الأقل، مما يمنع تداخلها وظهورها كتشوهات (Aliasing).",
+      "en": "The low-pass filter removes high frequencies that cannot be represented in the new lower resolution, preventing them from folding back and appearing as aliasing artifacts."
+    },
+    "hint": {
+      "ar": "تذكر نظرية شانون-نايكويست وما يحدث للترددات العالية عند تقليل العينات.",
+      "en": "Remember the Shannon-Nyquist theorem and what happens to high frequencies when subsampling."
+    },
+    "difficulty": "medium",
+    "conceptId": "image-decimation-downsampling"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "ما الذي يخزنه الهرم اللابلاسي (Laplacian Pyramid) في كل مستوى؟",
+      "en": "What does the Laplacian Pyramid store at each level?"
+    },
+    "options": {
+      "ar": [
+        "نسخة مصغرة ومموهة من الصورة",
+        "الترددات المنخفضة فقط",
+        "الفرق (التفاصيل) بين مستويات الهرم الغاوسي",
+        "مدرج تكراري (Histogram) لألوان الصورة"
+      ],
+      "en": [
+        "A downsampled and blurred version of the image",
+        "Only the low frequencies",
+        "The difference (details) between Gaussian pyramid levels",
+        "A color histogram of the image"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الهرم اللابلاسي يخزن التفاصيل المفقودة (الفرق) عند الانتقال من مستوى غاوسي عالي الدقة إلى مستوى أقل دقة.",
+      "en": "The Laplacian pyramid stores the lost details (the difference) when moving from a high-resolution Gaussian level to a lower-resolution one."
+    },
+    "hint": {
+      "ar": "إنه يسمح بإعادة البناء المثالية لأنه يحتفظ بما تم حذفه.",
+      "en": "It allows perfect reconstruction because it keeps what was removed."
+    },
+    "difficulty": "medium",
+    "conceptId": "laplacian-pyramid"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "في سياق الإشارات الجيبية، ماذا يمثل 'الطور' (Phase)؟",
+      "en": "In the context of sinusoidal signals, what does 'Phase' represent?"
+    },
+    "options": {
+      "ar": [
+        "أقصى ارتفاع للموجة",
+        "عدد التذبذبات في الثانية",
+        "الموضع الأفقي لشكل الموجة (التأخير أو التقدم)",
+        "الوقت المستغرق لإكمال دورة واحدة"
+      ],
+      "en": [
+        "The maximum height of the wave",
+        "The number of oscillations per second",
+        "The horizontal position of the waveform (delay or advancement)",
+        "The time taken to complete one cycle"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الطور (Phase) يحدد الإزاحة الأفقية للموجة، مما يشير إلى ما إذا كانت الإشارة متأخرة أو متقدمة زمنياً.",
+      "en": "Phase determines the horizontal displacement of the wave, indicating whether the signal is delayed or advanced in time."
+    },
+    "hint": {
+      "ar": "يتعلق بموضع البداية للموجة على المحور الأفقي.",
+      "en": "It relates to the starting position of the wave on the horizontal axis."
+    },
+    "difficulty": "easy",
+    "conceptId": "sinusoidal-signals"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "أي من التطبيقات التالية يستفيد من 'أهرامات الصور' (Image Pyramids)؟",
+      "en": "Which of the following applications benefits from 'Image Pyramids'?"
+    },
+    "options": {
+      "ar": [
+        "البحث من الخشن إلى الدقيق (Coarse-to-Fine Search)",
+        "الدمج متعدد الدقة (Multi-Resolution Blending)",
+        "تخطيط MIP في الرسوميات",
+        "جميع ما سبق"
+      ],
+      "en": [
+        "Coarse-to-Fine Search",
+        "Multi-Resolution Blending",
+        "MIP-Mapping in graphics",
+        "All of the above"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "أهرامات الصور تُستخدم في جميع هذه التطبيقات لأنها توفر تمثيلاً للصورة بمقاييس دقة متعددة، مما يسرع البحث ويحسن الدمج والرسوميات.",
+      "en": "Image pyramids are used in all these applications because they provide a representation of the image at multiple scales, speeding up search and improving blending and graphics."
+    },
+    "hint": {
+      "ar": "فكر في فوائد امتلاك نسخ متعددة الأحجام من نفس الصورة.",
+      "en": "Think about the benefits of having multiple sized versions of the same image."
+    },
+    "difficulty": "easy",
+    "conceptId": "multi-resolution-pyramids"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هو المرشح الذي يُستخدم غالباً كبديل فعال حسابياً للتنعيم الغاوسي عند بناء الهرم الغاوسي؟",
+      "en": "Which filter is often used as a computationally efficient alternative to Gaussian smoothing when building a Gaussian Pyramid?"
+    },
+    "options": {
+      "ar": [
+        "مرشح سوبيل (Sobel)",
+        "مرشح ثنائي الحدين (Binomial)",
+        "مرشح التمرير العالي (High-pass)",
+        "مرشح Sinc"
+      ],
+      "en": [
+        "Sobel Filter",
+        "Binomial Filter",
+        "High-pass Filter",
+        "Sinc Filter"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مرشح Binomial يوفر توازناً ممتازاً بين البساطة والجودة، وهو تقريب غير مكلف حسابياً للتنعيم الغاوسي.",
+      "en": "The Binomial filter offers an excellent balance between simplicity and quality, being a computationally inexpensive approximation of Gaussian smoothing."
+    },
+    "hint": {
+      "ar": "اسمه مرتبط بمعادلة رياضية شهيرة تتضمن معاملات (1, 4, 6, 4, 1).",
+      "en": "Its name is related to a famous mathematical equation involving coefficients (1, 4, 6, 4, 1)."
+    },
+    "difficulty": "medium",
+    "conceptId": "gaussian-pyramid"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في تحويل فورييه ثنائي الأبعاد لصورة، ماذا تمثل الترددات المنخفضة؟",
+      "en": "In a 2D Fourier transform of an image, what do low frequencies represent?"
+    },
+    "options": {
+      "ar": [
+        "الحواف الحادة",
+        "الضوضاء العشوائية",
+        "التغيرات البطيئة والخلفية العامة",
+        "الزوايا الدقيقة"
+      ],
+      "en": [
+        "Sharp edges",
+        "Random noise",
+        "Slow variations and overall background",
+        "Fine corners"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الترددات المنخفضة تمثل المناطق التي لا يتغير فيها لون البيكسلات بسرعة، مثل السماء أو الخلفيات الناعمة.",
+      "en": "Low frequencies represent areas where pixel colors do not change rapidly, such as the sky or smooth backgrounds."
+    },
+    "hint": {
+      "ar": "عكس الترددات العالية التي تمثل التغيرات المفاجئة.",
+      "en": "The opposite of high frequencies which represent sudden changes."
+    },
+    "difficulty": "easy",
+    "conceptId": "two-dimensional-fourier-transform"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن مرشح التمرير العالي (High-pass) يجعل الصورة أكثر سطوعاً. الحقيقة: هو يزيل الترددات المنخفضة (التي تحمل معظم طاقة الإضاءة في الصورة)، مما يجعل الصورة الناتجة تبدو رمادية داكنة مع إبراز الحواف فقط.</template>
+    <template class="content-en">Believing that a High-pass filter makes the image brighter. Fact: It removes low frequencies (which carry most of the luminance energy), making the resulting image look dark gray with only the edges highlighted.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">قاعدة ذهبية في التخفيض (Downsampling): لا تقم أبداً بحذف البيكسلات لتصغير الصورة دون تطبيق مرشح تنعيم (Low-pass) أولاً. تجاهل هذه الخطوة سيؤدي حتماً إلى تشوه (Aliasing) لا يمكن إصلاحه لاحقاً.</template>
+    <template class="content-en">Golden rule in Downsampling: Never discard pixels to shrink an image without applying a smoothing (Low-pass) filter first. Ignoring this step will inevitably lead to irreversible Aliasing.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">سر الهرم اللابلاسي: على الرغم من أنه يبدو كأنه يفقد بيانات بسبب عمليات الطرح، إلا أنه في الواقع يسمح بـ 'إعادة بناء مثالية' (Perfect Reconstruction) للصورة الأصلية إذا احتفظنا بأصغر صورة غاوسية في قمة الهرم.</template>
+    <template class="content-en">The secret of the Laplacian Pyramid: Although it seems to lose data due to subtractions, it actually allows for 'Perfect Reconstruction' of the original image if we keep the smallest Gaussian image at the top of the pyramid.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين الاستيفاء (Interpolation) والتخفيض (Decimation). الاستيفاء يُستخدم للتكبير (Upsampling) ويخمن بيكسلات جديدة. التخفيض يُستخدم للتصغير (Downsampling) ويحذف بيكسلات بعد التنعيم.</template>
+    <template class="content-en">Confusing Interpolation with Decimation. Interpolation is used for enlarging (Upsampling) and guesses new pixels. Decimation is used for shrinking (Downsampling) and discards pixels after smoothing.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M04.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M06.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

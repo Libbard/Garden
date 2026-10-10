@@ -95,6 +95,21 @@
         <template class="content-en">Cook's Theorem and SAT</template>
         <span class="content-target">نظرية كوك ومشكلة الإرضاء (SAT)</span>
       </a>
+      <a href="#reduction-lu-to-mpcp" class="toc-link" data-bilingual>
+        <template class="content-ar">اختزال لغة آلة تورينج العالمية إلى MPCP</template>
+        <template class="content-en">Reducing Universal Language to MPCP</template>
+        <span class="content-target">اختزال لغة آلة تورينج العالمية إلى MPCP</span>
+      </a>
+      <a href="#undecidable-cfl-problems" class="toc-link" data-bilingual>
+        <template class="content-ar">مشاكل اللغات الخالية من السياق غير القابلة للحل</template>
+        <template class="content-en">Undecidable CFL Problems</template>
+        <span class="content-target">مشاكل اللغات الخالية من السياق غير القابلة للحل</span>
+      </a>
+      <a href="#worked-examples-pcp" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة محلولة: مشكلة المراسلة لبوست</template>
+        <template class="content-en">Worked Examples: Post's Correspondence Problem</template>
+        <span class="content-target">أمثلة محلولة: مشكلة المراسلة لبوست</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -212,8 +227,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>مشكلة المراسلة لبوست (PCP) هي مثال لمشكلة لا تذكر آلات تورينج في صياغتها، ومع ذلك فهي <span class="smart-term" data-term-en="Undecidable" data-ar="غير قابل للحل / غير قابل للتقرير" data-en-def="A problem for which no algorithm can always provide a correct yes/no answer.">غير قابلة للحل (Undecidable)</span>.</p><p>تتكون المشكلة من قائمة من أزواج السلاسل النصية غير الفارغة $(w_1, x_1), (w_2, x_2), \dots, (w_n, x_n)$.</p><p>الحل هو إيجاد تسلسل من المؤشرات $i_1, \dots, i_k$ بحيث يكون دمج السلاسل $w_{i_1}\dots w_{i_k} = x_{i_1}\dots x_{i_k}$.</p><p>النسخة المعدلة (MPCP) تشترط أن يبدأ الحل بالزوج الأول في القائمة.</p></template>
-    <template class="content-en"><p>Post's Correspondence Problem (PCP) is an example of a problem that does not mention Turing Machines in its statement, yet is <span class="smart-term" data-term-en="Undecidable" data-ar="غير قابل للحل / غير قابل للتقرير" data-en-def="A problem for which no algorithm can always provide a correct yes/no answer.">undecidable</span>.</p><p>An instance consists of a list of pairs of nonempty strings $(w_1, x_1), (w_2, x_2), \dots, (w_n, x_n)$.</p><p>The answer is 'yes' if there exists a sequence of indices $i_1, \dots, i_k$ such that $w_{i_1}\dots w_{i_k} = x_{i_1}\dots x_{i_k}$.</p><p>The Modified PCP (MPCP) requires the solution to start with the first pair.</p></template>
+    <template class="content-ar"><p>مشكلة المراسلة لبوست (PCP) هي مثال لمشكلة لا تذكر آلات تورينج في صياغتها، ومع ذلك فهي <span class="smart-term" data-term-en="Undecidable" data-ar="غير قابل للحل / غير قابل للتقرير" data-en-def="A problem for which no algorithm can always provide a correct yes/no answer.">غير قابلة للحل (Undecidable)</span>.</p><p>تتكون المشكلة من قائمة من أزواج السلاسل النصية غير الفارغة $(w_1, x_1), (w_2, x_2), \dots, (w_n, x_n)$.</p><p>الحل هو إيجاد تسلسل من المؤشرات $i_1, \dots, i_k$ بحيث يكون دمج السلاسل $w_{i_1}\dots w_{i_k} = x_{i_1}\dots x_{i_k}$.</p><p>النسخة المعدلة (MPCP) تشترط أن يبدأ الحل بالزوج الأول في القائمة.</p><p>لتحويل النسخة المعدلة (MPCP) إلى النسخة العادية (PCP)، نستخدم 4 قواعد لإضافة الرموز <code>*</code> و <code>$</code> لضمان أن التطابق لا يمكن أن يبدأ إلا بالزوج الأول المخصص:</p><ol><li>للسلسلة الأولى في كل زوج، أضف <code>*</code> <b>بعد</b> كل حرف.</li><li>للسلسلة الثانية في كل زوج، أضف <code>*</code> <b>قبل</b> كل حرف.</li><li>أضف <span class="smart-term" data-term-en="Ender Pair" data-ar="زوج النهاية" data-en-def="A special pair added during the MPCP to PCP reduction to even up the lengths and successfully terminate the string match.">زوج النهاية<span class="smart-term-tooltip"></span></span> (Ender Pair) وهو <code>($, *$)</code>.</li><li>أنشئ "زوج البداية" بنسخ الزوج الأول من MPCP وتطبيق القواعد السابقة عليه، مع إضافة <code>*</code> إضافية في بداية السلسلة الأولى.</li></ol><p><b>مثال تطبيقي:</b> إذا كان لدينا MPCP بالترتيب: (110, 10), (0, 01), (100, 001). زوج البداية الخاص (المشتق من الزوج الأول) سيكون <code>(*1*1*0*, *1*0)</code>. الزوج العادي الأول سيكون <code>(1*1*0*, *1*0)</code>، والزوج الثاني <code>(0*, *0*1)</code>، وزوج النهاية <code>($, *$)</code>.</p></template>
+    <template class="content-en"><p>Post's Correspondence Problem (PCP) is an example of a problem that does not mention Turing Machines in its statement, yet is <span class="smart-term" data-term-en="Undecidable" data-ar="غير قابل للحل / غير قابل للتقرير" data-en-def="A problem for which no algorithm can always provide a correct yes/no answer.">undecidable</span>.</p><p>An instance consists of a list of pairs of nonempty strings $(w_1, x_1), (w_2, x_2), \dots, (w_n, x_n)$.</p><p>The answer is 'yes' if there exists a sequence of indices $i_1, \dots, i_k$ such that $w_{i_1}\dots w_{i_k} = x_{i_1}\dots x_{i_k}$.</p><p>The Modified PCP (MPCP) requires the solution to start with the first pair.</p><p>To reduce MPCP to PCP, we use 4 rules to add <code>*</code> and <code>$</code> symbols, ensuring the match can ONLY start with the designated first pair:</p><ol><li>For the first string of each pair, add <code>*</code> <b>after</b> every character.</li><li>For the second string of each pair, add <code>*</code> <b>before</b> every character.</li><li>Add the <span class="smart-term" data-term-en="Ender Pair" data-ar="زوج النهاية" data-en-def="A special pair added during the MPCP to PCP reduction to even up the lengths and successfully terminate the string match.">ender pair<span class="smart-term-tooltip"></span></span> <code>($, *$)</code>.</li><li>Create a "special starting pair" by copying the first MPCP pair, applying the above rules, and prepending an extra <code>*</code> to the first string.</li></ol><p><b>Worked Example:</b> Given MPCP instance in order: (110, 10), (0, 01), (100, 001). The special start pair (from pair 1) is <code>(*1*1*0*, *1*0)</code>. The normal pair 1 is <code>(1*1*0*, *1*0)</code>, pair 2 is <code>(0*, *0*1)</code>, and the ender pair is <code>($, *$)</code>.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -825,8 +840,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>مشكلة SAT تسأل: هل يوجد تعيين للقيم (صح/خطأ) للمتغيرات يجعل المعادلة المنطقية صحيحة؟</p><p>تنص نظرية كوك على أن SAT هي NP-Complete.</p><p>لإثبات ذلك، نأخذ أي لغة $L \in NP$ (والتي لها آلة تورينج غير حتمية $M$ تحلها في وقت $p(n)$) ونبني محولاً ينتج معادلة منطقية.</p><p>هذه المعادلة تكون قابلة للإرضاء إذا وفقط إذا كانت الآلة $M$ تقبل الإدخال $w$.</p></template>
-    <template class="content-en"><p>The SAT problem asks: given a boolean formula, does there exist a truth assignment to variables that makes the expression true?</p><p>Cook's Theorem states that SAT is NP-Complete.</p><p>To prove this, we take any language $L \in NP$ (which has an NTM $M$ deciding it in time $p(n)$) and construct a transducer that outputs a boolean formula.</p><p>This formula is satisfiable if and only if $M$ accepts input $w$.</p></template>
+    <template class="content-ar"><p>مشكلة SAT تسأل: هل يوجد تعيين للقيم (صح/خطأ) للمتغيرات يجعل المعادلة المنطقية صحيحة؟</p><p>تنص نظرية كوك على أن SAT هي NP-Complete.</p><p>لإثبات ذلك، نأخذ أي لغة $L \in NP$ (والتي لها آلة تورينج غير حتمية $M$ تحلها في وقت $p(n)$) ونبني محولاً ينتج معادلة منطقية.</p><p>هذه المعادلة تكون قابلة للإرضاء إذا وفقط إذا كانت الآلة $M$ تقبل الإدخال $w$.</p><p>لبناء المعادلة المنطقية في إثبات كوك، نستخدم المتغير المنطقي <code>y_{ijA}</code> والذي يكون صحيحاً (True) إذا وفقط إذا كانت الخلية <code>j</code> في التكوين <code>i</code> تحتوي على الرمز <code>A</code>. الشروط الأربعة تُصاغ رياضياً كالتالي:</p><ol><li><b>Unique (فريد):</b> لضمان وجود رمز واحد فقط لكل خلية، نستخدم بوابة AND لكل <code>i, j</code> ولأي رمزين مختلفين <code>Y, Z</code> للصيغة: <code>(~y_{ijY} ∨ ~y_{ijZ})</code>.</li><li><b>Starts Right (يبدأ صحيحاً):</b> نؤكد التكوين الابتدائي للإدخال <code>w = a_1...a_n</code> باستخدام: <code>y_{00q_0} ∧ y_{01a_1} ∧ ... ∧ y_{0na_n}</code>، ونملأ باقي الشريط بالفراغات <code>B</code>.</li><li><b>Finishes Right (ينتهي صحيحاً):</b> نستخدم بوابة OR للمتغير <code>y_{ijq}</code> لجميع قيم <code>i, j</code> حيث <code>q</code> هي حالة قبول.</li><li><b>Moves Right (يتحرك صحيحاً):</b> معادلة تضمن أن قيمة <code>X_{ij}</code> تُستنتج منطقياً من الخلايا الثلاث التي فوقها <code>X_{i-1, j-1}, X_{i-1, j}, X_{i-1, j+1}</code> بناءً على دالة الانتقال للآلة.</li></ol></template>
+    <template class="content-en"><p>The SAT problem asks: given a boolean formula, does there exist a truth assignment to variables that makes the expression true?</p><p>Cook's Theorem states that SAT is NP-Complete.</p><p>To prove this, we take any language $L \in NP$ (which has an NTM $M$ deciding it in time $p(n)$) and construct a transducer that outputs a boolean formula.</p><p>This formula is satisfiable if and only if $M$ accepts input $w$.</p><p>To build the boolean formula in Cook's proof, we use the <span class="smart-term" data-term-en="Boolean Variable" data-ar="متغير منطقي" data-en-def="A variable that can take on one of two values: true or false, used here to represent the presence of a symbol in a TM tape cell.">boolean variable<span class="smart-term-tooltip"></span></span> <code>y_{ijA}</code>, which is true if and only if cell <code>j</code> in ID <code>i</code> contains symbol <code>A</code>. The 4 conditions are formulated mathematically as follows:</p><ol><li><b>Unique:</b> To ensure exactly one symbol per cell, we take the AND over all <code>i, j</code> and distinct symbols <code>Y, Z</code> of the clause: <code>(~y_{ijY} ∨ ~y_{ijZ})</code>.</li><li><b>Starts Right:</b> We assert the initial ID for input <code>w = a_1...a_n</code> using: <code>y_{00q_0} ∧ y_{01a_1} ∧ ... ∧ y_{0na_n}</code>, and fill the rest with blanks <code>B</code>.</li><li><b>Finishes Right:</b> We take the OR of <code>y_{ijq}</code> over all <code>i, j</code> where <code>q</code> is an accepting state.</li><li><b>Moves Right:</b> A formula ensuring that the value of <code>X_{ij}</code> logically follows from the three cells above it <code>X_{i-1, j-1}, X_{i-1, j}, X_{i-1, j+1}</code> based on the TM's transition function.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1038,14 +1053,152 @@
   </details>
 </section>
 
+<section id="reduction-lu-to-mpcp" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> اختزال لغة آلة تورينج العالمية إلى MPCP</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Reducing Universal Language to MPCP</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تعتمد فكرة الاختزال على جعل مشكلة MPCP تحاكي تاريخ حسابات آلة تورينج. نقوم بإنشاء أزواج من السلاسل النصية تجبر النصين العلوي والسفلي على تمثيل تكوينات لحظية (IDs) متتالية للآلة.</p></template>
+    <template class="content-en"><p>The reduction works by making MPCP simulate a Turing Machine's <span class="smart-term" data-term-en="Computation History" data-ar="تاريخ الحساب" data-en-def="A sequence of Instantaneous Descriptions (IDs) that records every step of a Turing Machine&#x27;s execution on a specific input.">computation history<span class="smart-term-tooltip"></span></span>. We create string pairs that force the top and bottom strings to represent consecutive Instantaneous Descriptions (IDs) of the TM.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون طريقة محاكاة تكوينات آلة تورينج (IDs) باستخدام أزواج MPCP من أربع خطوات أساسية:</p><ol><li><b>الزوج الابتدائي (Initial Pair):</b> نبدأ بالزوج $(\#, \#q_0w\#)$. هنا يكون النص السفلي متقدماً بتكوين كامل عن النص العلوي.</li><li><b>أزواج النسخ (Copy Pairs):</b> لنسخ الرموز التي لم تتغير إلى التكوين التالي، نضيف الأزواج $(X, X)$ لكل رمز شريط، و $(\#, \#)$ لفصل التكوينات.</li><li><b>أزواج الانتقال (Transition Pairs):</b> لمحاكاة حركة رأس الآلة. إذا كانت الحركة لليمين $\delta(q, X) = (p, Y, R)$، نضيف الزوج $(qX, Yp)$. وإذا كانت لليسار $\delta(q, X) = (p, Y, L)$، نضيف $(ZqX, pZY)$ لأي رمز $Z$.</li><li><b>أزواج التنظيف (Cleanup Pairs):</b> عند الوصول لحالة قبول $f$، تقوم هذه الحالة "بابتلاع" الرموز المجاورة لتقليص التكوين باستخدام أزواج مثل $(XfY, f)$ و $(Xf, f)$. أخيراً، نستخدم الزوج $(f\#\#, \#)$ لمساواة طول النصين وإنهاء التطابق.</li></ol></template>
+    <template class="content-en"><p>The method of simulating TM Instantaneous Descriptions (IDs) using MPCP pairs consists of four main steps:</p><ol><li><b>Initial Pair:</b> We start with $(\#, \#q_0w\#)$. The bottom string is exactly one full ID ahead of the top string.</li><li><b>Copy Pairs:</b> To copy unchanged symbols to the next ID, we add pairs $(X, X)$ for every tape symbol, and $(\#, \#)$ to separate IDs.</li><li><b>Transition Pairs:</b> To simulate the TM's head movement. For a right move $\delta(q, X) = (p, Y, R)$, we add $(qX, Yp)$. For a left move $\delta(q, X) = (p, Y, L)$, we add $(ZqX, pZY)$ for any symbol $Z$.</li><li><b>Cleanup Pairs:</b> Once an accepting state $f$ is reached, it "eats" adjacent symbols to shrink the ID using pairs like $(XfY, f)$ and $(Xf, f)$. Finally, the pair $(f\#\#, \#)$ evens up the strings to complete the match.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا تنجح هذه الطريقة؟ النص السفلي يسبق النص العلوي دائماً بخطوة واحدة (تكوين واحد). الطريقة الوحيدة التي يمكن للنص العلوي أن "يلحق" بها بالنص السفلي ويتطابق معه هي من خلال الوصول إلى حالة قبول.</p><p>حالة القبول تفعل أزواج التنظيف التي تجعل النص السفلي ينمو ببطء شديد (أو يتقلص) بينما يستمر النص العلوي في النمو، حتى يتساوى الطولان.</p><p>إذا دخلت الآلة في حلقة لا نهائية، سيستمر النص السفلي في النمو إلى الأبد ولن يحدث التطابق أبداً.</p></template>
+    <template class="content-en"><p>Why does this work? The bottom string is always one step (one ID) ahead of the top string. The only way the top string can "catch up" and match the bottom string is if the TM reaches an accepting state.</p><p>The accepting state triggers the cleanup pairs, which cause the bottom string to grow very slowly (or shrink) while the top string continues to grow, until both lengths are equal.</p><p>If the TM enters an infinite loop, the bottom string grows forever, and a match is never possible.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى أزواج النسخ (Copy Pairs) إذا كانت أزواج الانتقال (Transition Pairs) هي التي تحاكي عمل الآلة؟</template>
+      <template class="content-en">Why do we need Copy Pairs if the Transition Pairs are the ones simulating the machine's operation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>أزواج الانتقال تغير فقط الرموز الموجودة تحت رأس القراءة/الكتابة. أزواج النسخ ضرورية لنقل باقي محتويات الشريط كما هي إلى التكوين التالي.</p></template>
+      <template class="content-en"><p>Transition pairs only change the symbols under the read/write head. Copy pairs are essential to transfer the rest of the tape's contents unchanged to the next ID.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="undecidable-cfl-problems" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> مشاكل اللغات الخالية من السياق غير القابلة للحل</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Undecidable CFL Problems</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم مشكلة المراسلة لبوست (PCP) لإثبات أن بعض الأسئلة حول اللغات الخالية من السياق (CFLs) مستحيلة الحل، مثل معرفة ما إذا كانت لغة CFL تساوي كل السلاسل الممكنة، أو ما إذا كانت لغة منتظمة.</p></template>
+    <template class="content-en"><p>Post's Correspondence Problem (PCP) is used to prove that certain questions about Context-Free Languages (CFLs) are undecidable, such as whether a CFL equals all possible strings, or if it is regular.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>باستخدام الاختزال من PCP، يمكننا إثبات عدم قابلية حل (Undecidability) مشاكل أخرى خارج نطاق آلات تورينج. من أهم هذه المشاكل:</p><ul><li>هل <span class="smart-term" data-term-en="Context-Free Language (CFL)" data-ar="لغة خالية من السياق" data-en-def="A language generated by a context-free grammar, which is more powerful than regular languages but still restricted.">لغة خالية من السياق<span class="smart-term-tooltip"></span></span> معطاة $L$ تساوي مجموعة كل السلاسل الممكنة $\Sigma^*$؟</li><li>هل لغة خالية من السياق معطاة $L$ هي لغة منتظمة (Regular Language)؟</li></ul><p>كلا المشكلتين غير قابلتين للحل. يتم الإثبات عن طريق تحويل مثيل من PCP إلى لغة خالية من السياق بحيث تعتمد خصائص هذه اللغة على ما إذا كان لـ PCP حل أم لا.</p></template>
+    <template class="content-en"><p>Using reductions from PCP, we can prove the undecidability of other problems outside the realm of Turing Machines. Key examples include:</p><ul><li>Is a given Context-Free Language $L$ equal to the set of all possible strings $\Sigma^*$?</li><li>Is a given Context-Free Language $L$ a Regular Language?</li></ul><p>Both problems are undecidable. The proof involves converting a PCP instance into a CFL such that the properties of this language depend entirely on whether the PCP instance has a solution.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لإثبات أن مشكلة "هل CFL منتظمة؟" غير قابلة للحل، نفترض أن $wx$ هو حل لـ PCP (حيث $x$ هو تسلسل المؤشرات). نُعرّف تشاكلاً (Homomorphism) بحيث $h(0) = w$ و $h(1) = x$.</p><p>السلسلة $h(0^n 1^n)$ ليست في اللغة $L$ لأن تكرار أي حل لـ PCP هو أيضاً حل. ومع ذلك، $h(y)$ موجودة في $L$ لأي سلسلة أخرى $y \in \{0,1\}^*$.</p><p>لو كانت $L$ منتظمة، لكانت لغة <span class="smart-term" data-term-en="Homomorphism" data-ar="التشاكل" data-en-def="A function that maps strings from one alphabet to another while preserving the concatenation operation.">التشاكل<span class="smart-term-tooltip"></span></span> العكسي $h^{-1}(L)$ منتظمة أيضاً، وبالتالي مكملتها $\{0^n 1^n \mid n > 1\}$ ستكون منتظمة، وهذا تناقض معروف يثبت أن $L$ لا يمكن أن تكون منتظمة إذا كان لـ PCP حل.</p></template>
+    <template class="content-en"><p>To prove "Is a CFL regular?" is undecidable, suppose $wx$ is a PCP solution (where $x$ is the sequence of indices). We define a <span class="smart-term" data-term-en="Homomorphism" data-ar="التشاكل" data-en-def="A function that maps strings from one alphabet to another while preserving the concatenation operation.">homomorphism<span class="smart-term-tooltip"></span></span> $h$ such that $h(0) = w$ and $h(1) = x$.</p><p>The string $h(0^n 1^n)$ is not in language $L$ because a repetition of any PCP solution is also a solution. However, $h(y)$ is in $L$ for any other string $y \in \{0,1\}^*$.</p><p>If $L$ were regular, its inverse homomorphism $h^{-1}(L)$ would also be regular, and thus its complement $\{0^n 1^n \mid n > 1\}$ would be regular. This is a known contradiction, proving $L$ cannot be regular if the PCP has a solution.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الشرط الذي يربط بين لغة خالية من السياق ومجموعة كل السلاسل الممكنة في إثبات الاختزال.</strong></template>
+      <template class="content-en"><strong>The condition linking a CFL to the set of all possible strings in the reduction proof.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$L = L_A^c \cup L_B^c = \Sigma^*$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا يمكننا ببساطة فحص جميع السلاسل لمعرفة ما إذا كانت لغة خالية من السياق تساوي $\Sigma^*$؟</template>
+      <template class="content-en">Why can't we simply check all strings to see if a Context-Free Language equals $\Sigma^*$?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن مجموعة $\Sigma^*$ هي مجموعة لا نهائية من السلاسل. لا يمكن لأي خوارزمية فحص عدد لا نهائي من الحالات في وقت محدود لتقرير النتيجة.</p></template>
+      <template class="content-en"><p>Because the set $\Sigma^*$ is an infinite set of strings. No algorithm can check an infinite number of cases in finite time to decide the outcome.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="worked-examples-pcp" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> أمثلة محلولة: مشكلة المراسلة لبوست</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Worked Examples: Post's Correspondence Problem</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أمثلة عملية توضح متى يكون لمشكلة PCP حل (تطابق السلاسل) ومتى يكون الحل مستحيلاً بسبب عدم قدرة إحدى السلاسل على اللحاق بالأخرى.</p></template>
+    <template class="content-en"><p>Practical examples demonstrating when a PCP instance has a solution (strings match) and when it is impossible because one string can never catch up to the other.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>مثال 1 (لا يوجد حل):</b> الأبجدية $\{0, 1\}$. الأزواج: 1=(0, 01) و 2=(100, 001).<br>لا يمكن البدء بالزوج 1 لأن الحرف الأول (0) لا يطابق (1). يجب البدء بالزوج 2. النص العلوي: 100، السفلي: 001. لمطابقة الأصفار المتبقية، يجب إضافة الزوج 2 مراراً وتكراراً. النص العلوي سيظل دائماً أقصر من السفلي، لذا لا يوجد حل.</p><p><b>مثال 2 (يوجد حل):</b> نضيف زوجاً ثالثاً: 1=(0, 01), 2=(100, 001), 3=(110, 10).<br>الحل هو التسلسل 1, 3.<br>النص العلوي: $w_1 w_3 = 0 \cdot 110 = 0110$.<br>النص السفلي: $x_1 x_3 = 01 \cdot 10 = 0110$. متطابقان!</p></template>
+    <template class="content-en"><p><b>Example 1 (No solution):</b> Alphabet $\{0, 1\}$. Pairs: 1=(0, 01) and 2=(100, 001).<br>You cannot start with pair 1 because the first character (0) doesn't match (1). You must start with pair 2. Top: 100, Bottom: 001. To match the remaining zeros, you must add pair 2 repeatedly. The top string will always be shorter than the bottom, so there is no solution.</p><p><b>Example 2 (Solution):</b> Add a third pair: 1=(0, 01), 2=(100, 001), 3=(110, 10).<br>The solution is the sequence 1, 3.<br>Top string: $w_1 w_3 = 0 \cdot 110 = 0110$.<br>Bottom string: $x_1 x_3 = 01 \cdot 10 = 0110$. They match!</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في المثال الثاني، التسلسل 1, 3 ليس الحل الوحيد. في الواقع، أي تسلسل يتبع النمط $1 2^* 3$ هو حل صحيح.</p><p>على سبيل المثال، التسلسل 1, 2, 3:<br>النص العلوي: $w_1 w_2 w_3 = 0 \cdot 100 \cdot 110 = 0100110$.<br>النص السفلي: $x_1 x_2 x_3 = 01 \cdot 001 \cdot 10 = 0100110$.</p><p>الزوج 3 يعمل كـ "منهي" (Terminator) يسمح للنص العلوي بتعويض النقص في الطول وإغلاق التطابق بنجاح.</p></template>
+    <template class="content-en"><p>In the second example, the sequence 1, 3 is not the only solution. In fact, any sequence following the pattern $1 2^* 3$ is a valid solution.</p><p>For example, the sequence 1, 2, 3:<br>Top string: $w_1 w_2 w_3 = 0 \cdot 100 \cdot 110 = 0100110$.<br>Bottom string: $x_1 x_2 x_3 = 01 \cdot 001 \cdot 10 = 0100110$.</p><p>Pair 3 acts as a "terminator" that allows the top string to compensate for its length deficit and successfully close the match.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا أدى إضافة الزوج (110, 10) إلى جعل المثال الأول قابلاً للحل؟</template>
+      <template class="content-en">Why did adding the pair (110, 10) make the first example solvable?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الزوج الثالث يوفر طريقة للنص العلوي لإضافة أحرف أكثر (3 أحرف) من النص السفلي (حرفان)، مما يسمح للنص العلوي باللحاق بالنص السفلي الذي كان أطول منه، وبالتالي إنهاء التطابق.</p></template>
+      <template class="content-en"><p>Because the third pair provides a way for the top string to add more characters (3) than the bottom string (2), allowing the top string to catch up to the longer bottom string and terminate the match.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في التحدي الأكبر في نظرية الحوسبة! في هذه الوحدة، ننتقل من المشاكل التي يمكن حلها إلى تلك التي تتحدى أقوى حواسيبنا. نبدأ بمشكلة المراسلة لبوست (PCP)، وهي مشكلة تبدو كلعبة ألغاز بسيطة ولكنها في الحقيقة غير قابلة للحل، ونستخدمها كأداة لإثبات استحالة حل مشاكل أخرى. ثم ندخل إلى قلب علوم الحاسب الحديثة: معركة P مقابل NP. هل كل ما يمكن التحقق منه بسرعة يمكن حله بسرعة؟ هذا هو سؤال المليون دولار. نختتم بنظرية كوك العبقرية التي أثبتت أن مشكلة الإرضاء (SAT) هي 'أم المشاكل' (NP-Complete). ركزوا جيداً على اتجاهات الاختزال (Reductions) والفرق بين حجم الإدخال الفعلي والقيمة الرقمية، فهذه هي الفخاخ الكلاسيكية في الامتحانات. بالتوفيق!</template>
-    <template class="content-en">Welcome to the ultimate challenge in computation theory! In this module, we transition from solvable problems to those that defy our most powerful computers. We start with Post's Correspondence Problem (PCP), a seemingly simple puzzle that is actually undecidable, using it as a tool to prove other problems unsolvable. Then, we dive into the heart of modern computer science: the P vs NP battle. Can everything verified quickly also be solved quickly? That's the million-dollar question. We conclude with Cook's brilliant theorem, proving SAT is the 'mother of all problems' (NP-Complete). Pay close attention to the direction of reductions and the difference between actual input size and numerical value—these are classic exam traps. Good luck!</template>
+    <template class="content-ar">أهلاً بكم في التحدي الأكبر في نظرية الحوسبة! في هذه الوحدة، ننتقل من المشاكل التي يمكن حلها إلى تلك التي تتحدى أقوى حواسيبنا. نبدأ بمشكلة المراسلة لبوست (PCP)، وهي مشكلة تبدو كلعبة ألغاز بسيطة ولكنها في الحقيقة غير قابلة للحل، ونستخدمها كأداة لإثبات استحالة حل مشاكل أخرى. ثم ندخل إلى قلب علوم الحاسب الحديثة: معركة P مقابل NP. هل كل ما يمكن التحقق منه بسرعة يمكن حله بسرعة؟ هذا هو سؤال المليون دولار. نختتم بنظرية كوك العبقرية التي أثبتت أن مشكلة الإرضاء (SAT) هي 'أم المشاكل' (NP-Complete). ركزوا جيداً على اتجاهات الاختزال (Reductions) والفرق بين حجم الإدخال الفعلي والقيمة الرقمية، فهذه هي الفخاخ الكلاسيكية في الامتحانات. بالتوفيق!<p>إتقان الاختزال من لغة آلة تورينج العالمية إلى MPCP هو خطوة حاسمة. إنه يوضح ببراعة موضوعاً متكرراً في نظرية التعقيد: تشفير تاريخ حسابات الآلة بأكمله في هيكل ثابت، وهو هنا تسلسل من أزواج السلاسل. هذه الفلسفة ذاتها هي ما استخدمه كوك لاحقاً لتشفير تاريخ الحسابات في معادلات منطقية لمشكلة SAT.</p><p>لقد رأينا كيف أن التفاصيل الميكانيكية الدقيقة، مثل إضافة النجوم في PCP أو تعريف المتغيرات المنطقية $y_{ijA}$ في نظرية كوك، ليست مجرد حيل رياضية، بل هي جوهر نظرية التعقيد. هذه الاختزالات تثبت أن الهياكل البسيطة ظاهرياً (كالسلاسل النصية أو المعادلات المنطقية) قادرة على تشفير قوة حوسبة آلة تورينج بأكملها، مما يربط المشاكل ببعضها في شبكة محكمة من الصعوبة الحسابية.</p></template>
+    <template class="content-en">Welcome to the ultimate challenge in computation theory! In this module, we transition from solvable problems to those that defy our most powerful computers. We start with Post's Correspondence Problem (PCP), a seemingly simple puzzle that is actually undecidable, using it as a tool to prove other problems unsolvable. Then, we dive into the heart of modern computer science: the P vs NP battle. Can everything verified quickly also be solved quickly? That's the million-dollar question. We conclude with Cook's brilliant theorem, proving SAT is the 'mother of all problems' (NP-Complete). Pay close attention to the direction of reductions and the difference between actual input size and numerical value—these are classic exam traps. Good luck!<p>Mastering the reduction from the Universal Language to MPCP is a rite of passage. It beautifully illustrates a recurring theme in complexity theory: encoding a machine's entire computation history into a static structure—in this case, a sequence of string pairs. This exact philosophy is what Cook later used to encode computation histories into boolean formulas for SAT.</p><p>We have seen how precise mechanical details, like adding stars in PCP or defining boolean variables $y_{ijA}$ in Cook's Theorem, are not just mathematical tricks—they are the heart of complexity theory. These reductions prove that seemingly simple structures (like strings or logic formulas) can encode the full computational power of a Turing Machine, binding problems together in a tight web of computational hardness.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1219,6 +1372,59 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأن الاختزالات تسمح لنا بنقل المعرفة. إذا أثبتنا أن مشكلة جديدة يمكن اختزالها إلى مشكلة معروفة (مثل SAT)، فإننا نرث كل ما نعرفه عن تعقيد تلك المشكلة المعروفة دون الحاجة للبدء من الصفر.</template>
           <template class="content-en">Because reductions allow us to transfer knowledge. If we prove a new problem reduces to a known one (like SAT), we inherit everything we know about the known problem's complexity without starting from scratch.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في محاكاة آلة تورينج باستخدام MPCP، النص السفلي يسبق دائماً النص العلوي. كيف يتمكن النص العلوي من اللحاق به وتكوين تطابق كامل؟</template>
+          <template class="content-en">In the MPCP simulation of a Turing Machine, the bottom string is always ahead. How does the top string ever manage to catch up and form a complete match?</template>
+          <span class="content-target">في محاكاة آلة تورينج باستخدام MPCP، النص السفلي يسبق دائماً النص العلوي. كيف يتمكن النص العلوي من اللحاق به وتكوين تطابق كامل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يلحق النص العلوي بالسفلي فقط خلال مرحلة "التنظيف" (Cleanup). عندما تصل الآلة إلى حالة قبول، نستخدم أزواج تنظيف خاصة تقوم بتعيين عدة رموز في الأعلى إلى رمز واحد في الأسفل (مثل $XfY \to f$). هذا يقلص الشريط المحاكى، مما يسمح للنص العلوي بإغلاق الفجوة والتطابق تماماً مع النص السفلي.</p></template>
+          <template class="content-en"><p>The top string catches up only during the "cleanup" phase. When the TM reaches an accepting state, we use special cleanup pairs that map multiple symbols on the top to a single symbol on the bottom (e.g., $XfY \to f$). This shrinks the simulated tape, allowing the top string to finally close the gap and match the bottom string perfectly.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في اختزال MPCP إلى PCP، لماذا نحتاج إلى إنشاء 'زوج بداية' خاص يحتوي على نجمة إضافية في البداية؟</template>
+          <template class="content-en">In the MPCP to PCP reduction, why do we need to create a special 'start pair' with an extra star at the beginning?</template>
+          <span class="content-target">في اختزال MPCP إلى PCP، لماذا نحتاج إلى إنشاء 'زوج بداية' خاص يحتوي على نجمة إضافية في البداية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن MPCP تشترط البدء بالزوج الأول، بينما PCP تسمح بالبدء بأي زوج. النجمة الإضافية في السلسلة الأولى لزوج البداية هي الوحيدة التي يمكن أن تتطابق مع النجمة الموجودة قبل الحرف الأول في السلسلة الثانية. هذا يجبر أي حل لـ PCP على استخدام هذا الزوج كخطوة أولى وحيدة ممكنة.</p></template>
+          <template class="content-en"><p>Because MPCP requires starting with the first pair, while PCP allows starting anywhere. The extra star in the first string of the start pair is the ONLY way to match the star placed before the first character of the second string. This forces any PCP solution to use this specific pair as its only possible first step.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يضمن شرط 'Moves Right' في إثبات نظرية كوك أن المعادلة المنطقية تمثل حساباً حقيقياً لآلة تورينج؟</template>
+          <template class="content-en">How does the 'Moves Right' condition in Cook's Theorem proof ensure the boolean formula represents a valid Turing Machine computation?</template>
+          <span class="content-target">كيف يضمن شرط 'Moves Right' في إثبات نظرية كوك أن المعادلة المنطقية تمثل حساباً حقيقياً لآلة تورينج؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>شرط 'Moves Right' يربط كل خلية في الزمن (i) بالخلايا الثلاث التي تقع فوقها مباشرة في الزمن (i-1). من خلال تشفير دالة الانتقال (Transition Function) للآلة داخل بوابات منطقية، فإنه يجبر المتغيرات المنطقية على تغيير قيمها فقط بالطرق التي تسمح بها قواعد الآلة، مما يمنع أي 'غش' أو قفزات غير منطقية في الحساب.</p></template>
+          <template class="content-en"><p>The 'Moves Right' condition links every cell at time (i) to the three cells directly above it at time (i-1). By encoding the TM's Transition Function into logic gates, it forces the boolean variables to change values ONLY in ways permitted by the machine's rules, preventing any 'cheating' or illogical jumps in the computation.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1503,6 +1709,91 @@
         "en": "The number 1000 has a size of its binary representation length, not 1000."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في اختزال Lu إلى MPCP، ما هو الغرض من الزوج الابتدائي (Initial Pair) $(\\#, \\#q_0w\\#)$؟",
+      "en": "In the reduction of Lu to MPCP, what is the purpose of the Initial Pair $(\\#, \\#q_0w\\#)$?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجبر النص السفلي على البدء متقدماً بتكوين كامل (ID) عن النص العلوي، مما يبدأ عملية المحاكاة.",
+        "en": "It forces the bottom string to start exactly one full ID ahead of the top string, initiating the simulation."
+      },
+      "example": {
+        "ar": "بدون هذا الزوج، لن يكون هناك فرق بين النصين لدفعهما لمحاكاة خطوات الآلة.",
+        "en": "Without it, there would be no offset to drive the simulation of the TM's steps."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "كيف يتعامل اختزال MPCP مع وصول آلة تورينج إلى حالة قبول (Accepting State)؟",
+      "en": "How does the MPCP reduction handle the TM reaching an accepting state?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخدم \"أزواج التنظيف\" (Cleanup Pairs) حيث تقوم حالة القبول بابتلاع الرموز المجاورة لتقليص التكوين، مما يسمح للنص العلوي باللحاق بالسفلي.",
+        "en": "It uses \"Cleanup Pairs\" where the accepting state \"eats\" adjacent tape symbols to shrink the ID, allowing the top string to catch up."
+      },
+      "example": {
+        "ar": "استخدام الزوج $(XfY, f)$ لتحويل ثلاثة رموز في الأعلى إلى رمز واحد في الأسفل.",
+        "en": "Using the pair $(XfY, f)$ to map three symbols on top to one symbol on the bottom."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "ما هي القواعد الأربع لتحويل MPCP إلى PCP باستخدام الرموز * و $؟",
+      "en": "What are the 4 rules to reduce MPCP to PCP using * and $ symbols?"
+    },
+    "back": {
+      "definition": {
+        "ar": "1) إضافة * بعد حروف السلسلة الأولى. 2) إضافة * قبل حروف السلسلة الثانية. 3) إضافة زوج النهاية ($, *$). 4) إنشاء زوج بداية بنسخ الزوج الأول وإضافة * في بدايته.",
+        "en": "1) Add * after 1st string chars. 2) Add * before 2nd string chars. 3) Add ender pair ($, *$). 4) Create start pair from the 1st pair by prepending an extra *."
+      },
+      "example": {
+        "ar": "زوج البداية الخاص يضمن أن التطابق لا يمكن أن يبدأ إلا به.",
+        "en": "The special start pair ensures the match can only begin with it."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "في إثبات نظرية كوك، ماذا يمثل المتغير المنطقي $y_{ijA}$؟",
+      "en": "In Cook's Theorem proof, what does the boolean variable $y_{ijA}$ represent?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يكون صحيحاً (True) إذا وفقط إذا كانت الخلية $j$ في التكوين اللحظي $i$ تحتوي على الرمز $A$.",
+        "en": "It is true if and only if cell $j$ in Instantaneous Description (ID) $i$ contains the symbol $A$."
+      },
+      "example": {
+        "ar": "يُستخدم في شرط Unique كالتالي: $(\\neg y_{ijY} \\lor \\neg y_{ijZ})$ لمنع وجود رمزين في نفس الخلية.",
+        "en": "Used in the Unique condition as $(\\neg y_{ijY} \\lor \\neg y_{ijZ})$ to prevent two symbols in the same cell."
+      }
+    },
+    "id": 20
+  },
+  {
+    "front": {
+      "ar": "هل مشكلة تحديد ما إذا كانت لغة خالية من السياق (CFL) هي لغة منتظمة (Regular) قابلة للحل؟",
+      "en": "Is the problem of determining if a Context-Free Language (CFL) is regular decidable?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لا، هي مشكلة غير قابلة للحل (Undecidable).",
+        "en": "No, it is an undecidable problem."
+      },
+      "example": {
+        "ar": "يتم إثبات ذلك عن طريق الاختزال من مشكلة المراسلة لبوست (PCP).",
+        "en": "This is proven via a reduction from Post's Correspondence Problem (PCP)."
+      }
+    },
+    "id": 21
   }
 ]
 </script>
@@ -1512,7 +1803,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 13</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1528,7 +1819,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 13</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1853,6 +2144,102 @@
     },
     "difficulty": "medium",
     "conceptId": "np-complete-and-reductions"
+  },
+  {
+    "conceptId": "reduction-lu-to-mpcp",
+    "question": {
+      "ar": "في الاختزال من لغة آلة تورينج العالمية إلى MPCP، أي نوع من الأزواج مسؤول عن محاكاة حركة رأس الآلة إلى اليسار؟",
+      "en": "In the reduction from the Universal Language to MPCP, which type of pair is responsible for simulating the TM's head moving to the left?"
+    },
+    "options": {
+      "ar": [
+        "أزواج النسخ (Copy Pairs)",
+        "الزوج الابتدائي (Initial Pair)",
+        "أزواج الانتقال مثل $(ZqX, pZY)$",
+        "أزواج التنظيف (Cleanup Pairs)"
+      ],
+      "en": [
+        "Copy pairs",
+        "Initial pair",
+        "Transition pairs like $(ZqX, pZY)$",
+        "Cleanup pairs"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "عندما يتحرك الرأس لليسار، يجب أن نأخذ في الاعتبار الرمز $Z$ الموجود على يسار الرأس الحالي $q$، ولذلك نستخدم الزوج $(ZqX, pZY)$ ليعكس الحالة الجديدة $p$ وموضعها.",
+      "en": "When the head moves left, we must account for the symbol $Z$ to the left of the current state $q$, hence the pair $(ZqX, pZY)$ reflects the new state $p$ and its position."
+    },
+    "hint": {
+      "ar": "ابحث عن الزوج الذي يتضمن رمزاً إضافياً $Z$ لتمثيل الرمز الموجود على يسار الرأس.",
+      "en": "Look for the pair that includes an extra symbol $Z$ to represent the symbol to the left of the head."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "posts-correspondence-problem",
+    "question": {
+      "ar": "عند اختزال MPCP إلى PCP، أين يتم وضع الرمز <code>*<\/code> في السلسلة الثانية من كل زوج؟",
+      "en": "When reducing MPCP to PCP, where is the <code>*<\/code> symbol placed in the second string of each pair?"
+    },
+    "options": {
+      "ar": [
+        "بعد كل حرف",
+        "قبل كل حرف",
+        "في بداية ونهاية السلسلة فقط",
+        "لا يتم إضافة أي رموز للسلسلة الثانية"
+      ],
+      "en": [
+        "After every character",
+        "Before every character",
+        "Only at the beginning and end of the string",
+        "No symbols are added to the second string"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "القاعدة تنص على إضافة <code>*<\/code> قبل كل حرف في السلسلة الثانية، بينما تضاف بعد كل حرف في السلسلة الأولى، لضمان تداخل الرموز بشكل صحيح عند التطابق.",
+      "en": "The rule states to add <code>*<\/code> before every character in the second string, while it is added after every character in the first string, ensuring symbols interleave correctly during a match."
+    },
+    "hint": {
+      "ar": "تذكر أن السلسلة الأولى والسلسلة الثانية لهما قواعد متعاكسة بالنسبة لمكان النجمة.",
+      "en": "Remember that the first and second strings have opposite rules for the star placement."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "cooks-theorem-and-sat",
+    "question": {
+      "ar": "في إثبات نظرية كوك، أي من الشروط التالية يستخدم الصيغة المنطقية <code>(~y_{ijY} ∨ ~y_{ijZ})<\/code>؟",
+      "en": "In Cook's Theorem proof, which of the following conditions uses the logical formula <code>(~y_{ijY} ∨ ~y_{ijZ})<\/code>?"
+    },
+    "options": {
+      "ar": [
+        "Starts Right (يبدأ صحيحاً)",
+        "Moves Right (يتحرك صحيحاً)",
+        "Finishes Right (ينتهي صحيحاً)",
+        "Unique (فريد)"
+      ],
+      "en": [
+        "Starts Right",
+        "Moves Right",
+        "Finishes Right",
+        "Unique"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "شرط Unique يضمن أن كل خلية تحتوي على رمز واحد فقط. الصيغة تعني 'لا يمكن أن تحتوي الخلية على الرمز Y والرمز Z في نفس الوقت'.",
+      "en": "The Unique condition ensures each cell contains exactly one symbol. The formula means 'the cell cannot contain both symbol Y and symbol Z at the same time'."
+    },
+    "hint": {
+      "ar": "هذا الشرط يمنع التناقض في محتويات الخلية الواحدة.",
+      "en": "This condition prevents contradictions in the contents of a single cell."
+    },
+    "difficulty": "hard",
+    "id": 13
   }
 ]
 </script>
@@ -1897,6 +2284,14 @@
       <template class="content-ar">المحول (Transducer) الذي يعمل في وقت كثير الحدود p(n) لا يمكنه إنتاج مخرجات أطول من p(n). هذا القيد الفيزيائي يضمن أن المشكلة المحولة لن تنفجر في الحجم وتخرج من الفئة P.</template>
       <template class="content-en">A transducer running in polytime p(n) cannot produce an output longer than p(n). This physical constraint ensures the transformed problem doesn't blow up in size and escape Class P.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن عوامل اللوغاريتم في وقت تشغيل المحول (مثل $O(p^2(n) \log n)$) تجعله غير كثير الحدود. الحقيقة أن عوامل اللوغاريتم لا تؤثر على طبيعة كثيرة الحدود، ويبقى الاختزال ضمن الفئة P.</template>
+    <template class="content-en">Believing that log factors in a transducer's running time (like $O(p^2(n) \log n)$) make it non-polynomial. In reality, log factors do not affect the polynomial nature, and the reduction remains in Class P.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

@@ -1998,12 +1998,25 @@
     this.onTextAt(this.toWorld({ x: h.x, y: h.y }), r ? { x: r.left + h.x * hz, y: r.top + h.y * hz } : null);
   };
 
+  Canvas.prototype.dropDot = function () {
+    var e = this.els[this.els.length - 1];
+    if (!e || e.ty !== 'st' || !(e.ts > 0) || Date.now() - e.ts > 900) return false;
+    var bb = bboxOf(e);
+    if (!bb || bb.w > 6 || bb.h > 6) return false;
+    this.els.pop();
+    this.paint();
+    this.commit();
+    this.emit();
+    return true;
+  };
+
   Canvas.prototype.bindInput = function () {
     var self = this;
     this.router = window.GardenInkInput.create({
       el: this.wet,
       mode: function () { return self.tool === 'hand' ? 'pan' : 'draw'; },
       onEndMod: function (info) { self.endMod(info); },
+      onDouble: function () { self.dropDot(); },
 
       onBegin: function (id, pt, ptype, act) {
         if (act) { self.beginMod(act); self._modDid = false; }

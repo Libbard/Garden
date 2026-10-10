@@ -338,8 +338,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>عملية الإدراج (Insert) تعتمد على المقارنة المتكررة. نبدأ من الجذر:</p><ul><li>إذا كانت القيمة المراد إدراجها أصغر من الجذر، ننتقل إلى الشجرة الفرعية اليسرى.</li><li>إذا كانت أكبر، ننتقل إلى الشجرة الفرعية اليمنى.</li></ul><p>تستمر هذه العملية بشكل <span class="smart-term" data-term-en="Recursive Insertion" data-ar="الإدراج العودي" data-en-def="A method of inserting a node by calling the insert function on subtrees until a base case (null) is reached.">عودي (Recursive)</span> حتى نصل إلى مرجع فارغ (null)، حيث نقوم بإنشاء العقدة الجديدة وربطها.</p></template>
-    <template class="content-en"><p>The insertion operation relies on repeated comparisons. Starting at the root:</p><ul><li>if the value to insert is smaller than the root, we move to the left subtree.</li><li>If it is larger, we move to the right subtree.</li></ul><p>This process continues <span class="smart-term" data-term-en="Recursive Insertion" data-ar="الإدراج العودي" data-en-def="A method of inserting a node by calling the insert function on subtrees until a base case (null) is reached.">recursively</span> until a null reference is reached, at which point the new node is created and linked.</p></template>
+    <template class="content-ar"><p>عملية الإدراج (Insert) تعتمد على المقارنة المتكررة. نبدأ من الجذر:</p><ul><li>إذا كانت القيمة المراد إدراجها أصغر من الجذر، ننتقل إلى الشجرة الفرعية اليسرى.</li><li>إذا كانت أكبر، ننتقل إلى الشجرة الفرعية اليمنى.</li></ul><p>تستمر هذه العملية بشكل <span class="smart-term" data-term-en="Recursive Insertion" data-ar="الإدراج العودي" data-en-def="A method of inserting a node by calling the insert function on subtrees until a base case (null) is reached.">عودي (Recursive)</span> حتى نصل إلى مرجع فارغ (null)، حيث نقوم بإنشاء العقدة الجديدة وربطها.</p><p>دعونا نتتبع إدراج القيمة 5 في شجرة البحث الثنائية كمثال عملي:</p><ol><li>نبدأ من الجذر (6). بما أن 5 أصغر من 6، ننتقل إلى الطفل الأيسر (2).</li><li>عند العقدة 2، بما أن 5 أكبر من 2، ننتقل إلى الطفل الأيمن (4).</li><li>عند العقدة 4، بما أن 5 أكبر من 4، ننتقل إلى الطفل الأيمن.</li><li>الطفل الأيمن للعقدة 4 فارغ (null). ننشئ عقدة جديدة بالقيمة 5 ونربطها كطفل أيمن للعقدة 4.</li></ol><p>النتيجة هي إضافة العقدة 5 كطفل أيمن للعقدة 4، مما يحافظ على ترتيب الشجرة.</p></template>
+    <template class="content-en"><p>The insertion operation relies on repeated comparisons. Starting at the root:</p><ul><li>if the value to insert is smaller than the root, we move to the left subtree.</li><li>If it is larger, we move to the right subtree.</li></ul><p>This process continues <span class="smart-term" data-term-en="Recursive Insertion" data-ar="الإدراج العودي" data-en-def="A method of inserting a node by calling the insert function on subtrees until a base case (null) is reached.">recursively</span> until a null reference is reached, at which point the new node is created and linked.</p><p>Let's trace inserting the value 5 into the binary search tree as a practical example:</p><ol><li>Start at the root (6). Since 5 is less than 6, go to the left child (2).</li><li>At node 2, since 5 is greater than 2, go to the right child (4).</li><li>At node 4, since 5 is greater than 4, go to the right child.</li><li>The right child of 4 is null. Create a new node with value 5 and attach it as the right child of 4.</li></ol><p>The result is node 5 being added as the right child of node 4, perfectly maintaining the tree's order.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -402,8 +402,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>عملية الحذف (Remove) هي الأكثر تعقيداً في شجرة البحث الثنائية وتتضمن ثلاث حالات رئيسية:</p><ol><li><b>العقدة ورقة (Leaf):</b> يتم حذفها مباشرة بإرجاع null.</li><li><b>العقدة لها طفل واحد:</b> يتم تجاوز العقدة المراد حذفها وربط والدها بطفلها الوحيد.</li><li><b>العقدة لها طفلان:</b> لا يمكن حذفها مباشرة. بدلاً من ذلك، نجد أصغر عنصر في الشجرة الفرعية اليمنى (<span class="smart-term" data-term-en="FindMin" data-ar="إيجاد الحد الأدنى" data-en-def="A helper function used during deletion to find the smallest value in a right subtree.">FindMin</span>)، وننسخ قيمته إلى العقدة المراد حذفها، ثم نقوم بحذف تلك العقدة الصغرى من الشجرة الفرعية اليمنى.</li></ol></template>
-    <template class="content-en"><p>The Remove operation is the most complex in a BST and involves three main cases:</p><ol><li><b>Node is a leaf:</b> It is simply removed by returning null.</li><li><b>Node has one child:</b> The node is bypassed, and its parent is linked directly to its single child.</li><li><b>Node has two children:</b> It cannot be removed directly. Instead, we find the minimum element in its right subtree (<span class="smart-term" data-term-en="FindMin" data-ar="إيجاد الحد الأدنى" data-en-def="A helper function used during deletion to find the smallest value in a right subtree.">FindMin</span>), copy its value to the node being deleted, and then recursively delete that minimum node from the right subtree.</li></ol></template>
+    <template class="content-ar"><p>عملية الحذف (Remove) هي الأكثر تعقيداً في شجرة البحث الثنائية وتتضمن ثلاث حالات رئيسية:</p><ol><li><b>العقدة ورقة (Leaf):</b> يتم حذفها مباشرة بإرجاع null.</li><li><b>العقدة لها طفل واحد:</b> يتم تجاوز العقدة المراد حذفها وربط والدها بطفلها الوحيد.</li><li><b>العقدة لها طفلان:</b> لا يمكن حذفها مباشرة. بدلاً من ذلك، نجد أصغر عنصر في الشجرة الفرعية اليمنى (<span class="smart-term" data-term-en="FindMin" data-ar="إيجاد الحد الأدنى" data-en-def="A helper function used during deletion to find the smallest value in a right subtree.">FindMin</span>)، وننسخ قيمته إلى العقدة المراد حذفها، ثم نقوم بحذف تلك العقدة الصغرى من الشجرة الفرعية اليمنى.</li></ol><p>دعونا نتتبع حالتين لحذف عقدة من الشجرة عملياً:</p><ol><li><b>حذف عقدة بطفل واحد (مثل العقدة 4):</b> العقدة 4 لها طفل أيسر فقط (3). لحذف 4، نتجاوزها بربط والدها (2) مباشرة بطفلها (3). المؤشر الأيمن للعقدة 2 يشير الآن إلى 3.</li><li><b>حذف عقدة بطفلين (مثل العقدة 2):</b> العقدة 2 لها طفل أيسر (1) وأيمن (5). نجد أصغر قيمة في الشجرة الفرعية اليمنى (<span class="smart-term" data-term-en="Inorder Successor" data-ar="الخليفة الداخلي" data-en-def="The node with the smallest key greater than the key of the current node, often used to replace a deleted node with two children.">الخليفة الداخلي<span class="smart-term-tooltip"></span></span>)، وهي 3. نستبدل قيمة 2 بـ 3. بعد ذلك، نحذف العقدة 3 الأصلية بشكل عودي من الشجرة الفرعية اليمنى (والتي تندرج الآن تحت حالة الصفر أو طفل واحد).</li></ol><p>تضمن هذه الخطوات بقاء هيكل الشجرة متوافقاً مع شروط شجرة البحث الثنائية بعد الحذف.</p></template>
+    <template class="content-en"><p>The Remove operation is the most complex in a BST and involves three main cases:</p><ol><li><b>Node is a leaf:</b> It is simply removed by returning null.</li><li><b>Node has one child:</b> The node is bypassed, and its parent is linked directly to its single child.</li><li><b>Node has two children:</b> It cannot be removed directly. Instead, we find the minimum element in its right subtree (<span class="smart-term" data-term-en="FindMin" data-ar="إيجاد الحد الأدنى" data-en-def="A helper function used during deletion to find the smallest value in a right subtree.">FindMin</span>), copy its value to the node being deleted, and then recursively delete that minimum node from the right subtree.</li></ol><p>Let's trace two deletion scenarios from the tree practically:</p><ol><li><b>Deleting a node with one child (e.g., node 4):</b> Node 4 has only a left child (3). To delete 4, we bypass it by linking its parent (2) directly to its child (3). The right pointer of 2 now points to 3.</li><li><b>Deleting a node with two children (e.g., node 2):</b> Node 2 has left (1) and right (5) children. We find the minimum value in its right subtree (its <span class="smart-term" data-term-en="Inorder Successor" data-ar="الخليفة الداخلي" data-en-def="The node with the smallest key greater than the key of the current node, often used to replace a deleted node with two children.">inorder successor<span class="smart-term-tooltip"></span></span>), which is 3. We replace 2's value with 3. Then, we recursively delete the original node 3 from the right subtree (which now falls into the zero or one-child case).</li></ol><p>These steps ensure the tree's structure remains compliant with BST conditions after deletion.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -633,8 +633,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>هناك ثلاث طرق رئيسية لاجتياز الأشجار الثنائية، وتختلف بناءً على متى يتم زيارة العقدة الجذرية (Root):</p><ol><li><b>الاجتياز الداخلي (Inorder):</b> زيارة الشجرة اليسرى، ثم الجذر، ثم الشجرة اليمنى. في BST، هذا يطبع العناصر بترتيب تصاعدي.</li><li><b>الاجتياز المسبق (Preorder):</b> زيارة الجذر، ثم الشجرة اليسرى، ثم الشجرة اليمنى.</li><li><b>الاجتياز اللاحق (Postorder):</b> زيارة الشجرة اليسرى، ثم الشجرة اليمنى، ثم الجذر. يُستخدم بشكل شائع لتقييم <span class="smart-term" data-term-en="Expression Tree" data-ar="شجرة التعبيرات" data-en-def="A binary tree where internal nodes are operators and leaf nodes are operands.">أشجار التعبيرات الرياضية (Expression Trees)</span>.</li></ol></template>
-    <template class="content-en"><p>There are three main depth-first traversal schemes for binary trees, differing by when the root node is visited:</p><ol><li><b>Inorder Traversal:</b> Visit left subtree, visit root, visit right subtree. In a BST, this prints elements in sorted order.</li><li><b>Preorder Traversal:</b> Visit root, visit left subtree, visit right subtree.</li><li><b>Postorder Traversal:</b> Visit left subtree, visit right subtree, visit root. This is commonly used for evaluating <span class="smart-term" data-term-en="Expression Tree" data-ar="شجرة التعبيرات" data-en-def="A binary tree where internal nodes are operators and leaf nodes are operands.">expression trees</span> on a stack-based calculator.</li></ol></template>
+    <template class="content-ar"><p>هناك ثلاث طرق رئيسية لاجتياز الأشجار الثنائية، وتختلف بناءً على متى يتم زيارة العقدة الجذرية (Root):</p><ol><li><b>الاجتياز الداخلي (Inorder):</b> زيارة الشجرة اليسرى، ثم الجذر، ثم الشجرة اليمنى. في BST، هذا يطبع العناصر بترتيب تصاعدي.</li><li><b>الاجتياز المسبق (Preorder):</b> زيارة الجذر، ثم الشجرة اليسرى، ثم الشجرة اليمنى.</li><li><b>الاجتياز اللاحق (Postorder):</b> زيارة الشجرة اليسرى، ثم الشجرة اليمنى، ثم الجذر. يُستخدم بشكل شائع لتقييم <span class="smart-term" data-term-en="Expression Tree" data-ar="شجرة التعبيرات" data-en-def="A binary tree where internal nodes are operators and leaf nodes are operands.">أشجار التعبيرات الرياضية (Expression Trees)</span>.</li></ol><p>دعونا نتتبع الاجتياز الداخلي (Inorder) للشجرة الفرعية التي تبدأ عند العقدة 45:</p><ol><li>طباعة الشجرة الفرعية اليسرى للعقدة 45. لا يوجد شيء لطباعته (فارغ).</li><li>طباعة بيانات الجذر نفسه: 45.</li><li>طباعة الشجرة الفرعية اليمنى للعقدة 45، وهي العقدة 57.</li></ol><p>تطبيق طرق اجتياز مختلفة على الشجرة بأكملها (الجذر 60) ينتج تسلسلات مميزة. على سبيل المثال، الاجتياز المسبق (Preorder) يطبع: <b>60 45 57 107 100</b>. في المقابل، الاجتياز اللاحق (Postorder) يطبع: <b>57 45 100 107 60</b>.</p></template>
+    <template class="content-en"><p>There are three main depth-first traversal schemes for binary trees, differing by when the root node is visited:</p><ol><li><b>Inorder Traversal:</b> Visit left subtree, visit root, visit right subtree. In a BST, this prints elements in sorted order.</li><li><b>Preorder Traversal:</b> Visit root, visit left subtree, visit right subtree.</li><li><b>Postorder Traversal:</b> Visit left subtree, visit right subtree, visit root. This is commonly used for evaluating <span class="smart-term" data-term-en="Expression Tree" data-ar="شجرة التعبيرات" data-en-def="A binary tree where internal nodes are operators and leaf nodes are operands.">expression trees</span> on a stack-based calculator.</li></ol><p>Let's trace the Inorder traversal for the subtree starting at node 45:</p><ol><li>Print the left subtree of 45. There is nothing to print (null).</li><li>Print the data of the root itself: 45.</li><li>Print the right subtree of 45, which is the node 57.</li></ol><p>Applying different traversal schemes to the entire tree (root 60) yields distinct sequences. For example, a Preorder traversal (Root, Left, Right) outputs: <b>60 45 57 107 100</b>. Conversely, a Postorder traversal (Left, Right, Root) outputs: <b>57 45 100 107 60</b>.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -856,8 +856,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبطال هياكل البيانات. في هذه الوحدة، ننتقل من مجرد بناء الأشجار إلى جعلها ذكية. شجرة البحث الثنائية (BST) هي قلب قواعد البيانات ومحركات البحث. تذكروا دائماً القاعدة الذهبية: اليسار أصغر، واليمين أكبر. في الامتحان، ركزوا بشدة على 'عملية الحذف'، خاصة الحالة الثالثة (عقدة بطفلين)؛ فهي السؤال الكلاسيكي الذي يختبر فهمكم الحقيقي. لا تنسوا أيضاً طرق الاجتياز (Traversals). إذا طلب منكم طباعة الشجرة مرتبة، فالإجابة فوراً هي 'الاجتياز الداخلي' (Inorder). وإذا رأيتم شجرة تعبيرات رياضية، تذكروا أن 'الاجتياز اللاحق' (Postorder) هو صديقكم لتقييمها. تدربوا على رسم الشجرة خطوة بخطوة عند الإدراج والحذف، فهذا سيضمن لكم الدرجة الكاملة.</template>
-    <template class="content-en">Welcome, Data Structures champions. In this module, we move from just building trees to making them smart. The Binary Search Tree (BST) is the heartbeat of databases and search engines. Always remember the golden rule: Left is smaller, Right is larger. For the exam, focus heavily on the 'Deletion' operation, specifically Case 3 (a node with two children); it's the classic question that tests your true understanding. Also, don't forget the Traversals. If asked to print the tree in sorted order, the answer is immediately 'Inorder'. If you see a mathematical expression tree, remember that 'Postorder' is your friend for evaluating it. Practice drawing the tree step-by-step during insertion and deletion, and you'll secure full marks.</template>
+    <template class="content-ar">أهلاً بكم يا أبطال هياكل البيانات. في هذه الوحدة، ننتقل من مجرد بناء الأشجار إلى جعلها ذكية. شجرة البحث الثنائية (BST) هي قلب قواعد البيانات ومحركات البحث. تذكروا دائماً القاعدة الذهبية: اليسار أصغر، واليمين أكبر. في الامتحان، ركزوا بشدة على 'عملية الحذف'، خاصة الحالة الثالثة (عقدة بطفلين)؛ فهي السؤال الكلاسيكي الذي يختبر فهمكم الحقيقي. لا تنسوا أيضاً طرق الاجتياز (Traversals). إذا طلب منكم طباعة الشجرة مرتبة، فالإجابة فوراً هي 'الاجتياز الداخلي' (Inorder). وإذا رأيتم شجرة تعبيرات رياضية، تذكروا أن 'الاجتياز اللاحق' (Postorder) هو صديقكم لتقييمها. تدربوا على رسم الشجرة خطوة بخطوة عند الإدراج والحذف، فهذا سيضمن لكم الدرجة الكاملة.<p>لقد أضفنا أمثلة تتبعية مفصلة لعمليات الإدراج والحذف والاجتياز. في الاختبارات، نادراً ما يُطلب منك كتابة الكود من الصفر، بل يُطلب منك تتبع حالة الشجرة بعد سلسلة من العمليات. تأكد من إتقانك لرسم الشجرة خطوة بخطوة، خاصة عند حذف عقدة بطفلين أو تحديد مخرجات الاجتياز المسبق واللاحق.</p></template>
+    <template class="content-en">Welcome, Data Structures champions. In this module, we move from just building trees to making them smart. The Binary Search Tree (BST) is the heartbeat of databases and search engines. Always remember the golden rule: Left is smaller, Right is larger. For the exam, focus heavily on the 'Deletion' operation, specifically Case 3 (a node with two children); it's the classic question that tests your true understanding. Also, don't forget the Traversals. If asked to print the tree in sorted order, the answer is immediately 'Inorder'. If you see a mathematical expression tree, remember that 'Postorder' is your friend for evaluating it. Practice drawing the tree step-by-step during insertion and deletion, and you'll secure full marks.<p>We have added detailed trace examples for insertion, deletion, and traversal operations. In exams, you are rarely asked to write code from scratch; instead, you must trace the tree's state after a sequence of operations. Ensure you master drawing the tree step-by-step, especially when deleting a two-child node or determining Preorder and Postorder outputs.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1031,6 +1031,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأننا نحتاج إلى تحديث الروابط (Pointers) في الوالد عند إنشاء عقدة جديدة أو تجاوز عقدة محذوفة، خاصة في لغات مثل Java.</template>
           <template class="content-en">Because we need to update the pointers in the parent when a new node is created or a deleted node is bypassed, especially in languages like Java.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في مثال الحذف الخاص بنا، عند إزالة العقدة 2 (التي لها الأبناء 1 و 5)، لماذا استبدلناها تحديداً بالقيمة 3؟</template>
+          <template class="content-en">In our deletion example, when removing node 2 (which has children 1 and 5), why did we specifically replace it with 3?</template>
+          <span class="content-target">في مثال الحذف الخاص بنا، عند إزالة العقدة 2 (التي لها الأبناء 1 و 5)، لماذا استبدلناها تحديداً بالقيمة 3؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>العقدة 3 كانت أصغر قيمة في الشجرة الفرعية اليمنى للعقدة 2 (الخليفة الداخلي). استبدال عقدة ذات طفلين بخليفتها الداخلي يضمن أن الجذر الجديد أكبر من كل شيء على اليسار وأصغر من العقد المتبقية على اليمين، مما يحافظ على خاصية شجرة البحث الثنائية.</p></template>
+          <template class="content-en"><p>Node 3 was the minimum value in node 2's right subtree (its inorder successor). Replacing a two-child node with its inorder successor guarantees that the new root is larger than everything on the left and smaller than the remaining nodes on the right, preserving the BST property.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1298,6 +1316,40 @@
         "en": "45 57 60 100 107"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو ناتج الاجتياز المسبق (Preorder) لشجرة مثالنا (الجذر 60، اليسار 45، اليمين 107)؟",
+      "en": "What is the Preorder traversal output for our example tree (Root 60, Left 45, Right 107)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "60 45 57 107 100",
+        "en": "60 45 57 107 100"
+      },
+      "example": {
+        "ar": "الجذر أولاً، ثم الشجرة اليسرى بأكملها، ثم الشجرة اليمنى بأكملها.",
+        "en": "Root first, then the entire left subtree, then the entire right subtree."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ما هو ناتج الاجتياز اللاحق (Postorder) لشجرة مثالنا (الجذر 60، اليسار 45، اليمين 107)؟",
+      "en": "What is the Postorder traversal output for our example tree (Root 60, Left 45, Right 107)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "57 45 100 107 60",
+        "en": "57 45 100 107 60"
+      },
+      "example": {
+        "ar": "الشجرة اليسرى أولاً، ثم الشجرة اليمنى، والجذر في النهاية.",
+        "en": "Left subtree first, then right subtree, and the root at the very end."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1307,7 +1359,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1323,7 +1375,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1511,8 +1563,8 @@
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "الكود يحتوي على تعليق <code>// Duplicate; do nothing</code>، مما يعني أنه يتجاهل القيم المكررة.",
-      "en": "The code contains the comment <code>// Duplicate; do nothing</code>, meaning it ignores duplicate values."
+      "ar": "الكود يحتوي على تعليق <code>// Duplicate; do nothing<\/code>، مما يعني أنه يتجاهل القيم المكررة.",
+      "en": "The code contains the comment <code>// Duplicate; do nothing<\/code>, meaning it ignores duplicate values."
     },
     "hint": {
       "ar": "راجع جملة else الأخيرة في كود الإدراج.",
@@ -1575,8 +1627,8 @@
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "الدالة تنفذ محتواها فقط إذا كان <code>node != null</code>. إذا كان null، فإنها تتوقف وتعود.",
-      "en": "The function only executes its body if <code>node != null</code>. If it is null, it stops and returns."
+      "ar": "الدالة تنفذ محتواها فقط إذا كان <code>node != null<\/code>. إذا كان null، فإنها تتوقف وتعود.",
+      "en": "The function only executes its body if <code>node != null<\/code>. If it is null, it stops and returns."
     },
     "hint": {
       "ar": "ابحث عن الجملة الشرطية في بداية الدالة.",
@@ -1620,8 +1672,8 @@
   {
     "id": 10,
     "question": {
-      "ar": "لماذا نستخدم <code>t = insert(x, t)</code> بدلاً من مجرد استدعاء <code>insert(x, t)</code>؟",
-      "en": "Why do we use <code>t = insert(x, t)</code> instead of just calling <code>insert(x, t)</code>?"
+      "ar": "لماذا نستخدم <code>t = insert(x, t)<\/code> بدلاً من مجرد استدعاء <code>insert(x, t)<\/code>؟",
+      "en": "Why do we use <code>t = insert(x, t)<\/code> instead of just calling <code>insert(x, t)<\/code>?"
     },
     "options": {
       "ar": [
@@ -1648,6 +1700,38 @@
     },
     "difficulty": "hard",
     "conceptId": "bst-insertion"
+  },
+  {
+    "conceptId": "bst-insertion",
+    "question": {
+      "ar": "عند إدراج القيمة 5 في شجرة بحث ثنائية حيث الجذر هو 6، وطفله الأيسر هو 2، والطفل الأيمن للعقدة 2 هو 4، أين سيتم وضع العقدة الجديدة 5؟",
+      "en": "When inserting the value 5 into a BST where the root is 6, its left child is 2, and 2's right child is 4, where will the new node 5 be placed?"
+    },
+    "options": {
+      "ar": [
+        "كطفل أيسر للعقدة 2",
+        "كطفل أيسر للعقدة 4",
+        "كطفل أيمن للعقدة 4",
+        "كطفل أيمن للعقدة 6"
+      ],
+      "en": [
+        "As the left child of 2",
+        "As the left child of 4",
+        "As the right child of 4",
+        "As the right child of 6"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "5 < 6 (نذهب يساراً إلى 2)، 5 > 2 (نذهب يميناً إلى 4)، 5 > 4 (نذهب يميناً). بما أن الطفل الأيمن للعقدة 4 فارغ، يتم إدراج 5 هناك.",
+      "en": "5 < 6 (go left to 2), 5 > 2 (go right to 4), 5 > 4 (go right). Since 4's right child is null, 5 is inserted there."
+    },
+    "hint": {
+      "ar": "تتبع مسار المقارنة من الجذر خطوة بخطوة.",
+      "en": "Trace the comparison path from the root step-by-step."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -1684,6 +1768,14 @@
       <template class="content-ar">نسيان تحديث الروابط (Pointers) عند الإدراج أو الحذف. في Java، يجب استخدام النمط <code>t.left = insert(x, t.left)</code> لضمان ربط العقدة الجديدة بالشجرة.</template>
       <template class="content-en">Forgetting to update pointers during insertion or deletion. In Java, you must use the pattern <code>t.left = insert(x, t.left)</code> to ensure the new node is actually linked to the tree.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">بينما يضمن الاجتياز الداخلي لـ BST مخرجات مرتبة، فإن الاجتياز المسبق واللاحق لا يفعلان ذلك. تذكر دائماً: الاجتياز المسبق (60 45 57 107 100) يزور الجذر أولاً، مما يجعله مثالياً لنسخ الشجرة، بينما الاجتياز اللاحق (57 45 100 107 60) يزور الجذر أخيراً، وهو مثالي للحذف الآمن من الذاكرة.</template>
+    <template class="content-en">While Inorder traversal of a BST guarantees a sorted output, Preorder and Postorder do not. Always remember: Preorder (60 45 57 107 100) visits the root first, making it ideal for copying the tree, whereas Postorder (57 45 100 107 60) visits the root last, perfect for safely deleting it from memory.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

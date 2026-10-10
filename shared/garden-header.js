@@ -207,6 +207,24 @@
     document.head.appendChild(s);
   }
 
+  var _miLoad = 0;
+  function _openModuleInk(btn) {
+    if (window.GardenModuleInk) { GardenModuleInk.bind(btn); GardenModuleInk.toggle(); return; }
+    if (_miLoad) return;
+    _miLoad = 1;
+    btn.setAttribute('aria-busy', 'true');
+    var q = ((thisScript && thisScript.src) || '').split('?')[1];
+    var s = document.createElement('script');
+    s.src = ROOT + 'shared/module-ink.js' + (q ? '?' + q : '');
+    s.onload = function () {
+      _miLoad = 0;
+      btn.removeAttribute('aria-busy');
+      if (window.GardenModuleInk) { GardenModuleInk.bind(btn); GardenModuleInk.toggle(); }
+    };
+    s.onerror = function () { _miLoad = 0; btn.removeAttribute('aria-busy'); };
+    document.head.appendChild(s);
+  }
+
   /*@3.GAHJ.102*/
   function _quickFromHash() {
     var m = /(?:^|[#&])qn-([A-Za-z0-9_.-]+)/.exec(location.hash || '');
@@ -557,6 +575,25 @@
       inline.appendChild(qnBtn);
     }
 
+    if (document.documentElement.hasAttribute('data-module') && document.documentElement.hasAttribute('data-subject')) {
+      var inkBtn = document.createElement('button');
+      inkBtn.className = 'g-menu-item toggle-btn mi-ink-btn';
+      inkBtn.type = 'button';
+      inkBtn.setAttribute('data-gh-ink', '');
+      inkBtn.setAttribute('aria-pressed', 'false');
+      inkBtn.setAttribute('data-title-ar', 'الدفتر: ارسمْ على الوحدة');
+      inkBtn.setAttribute('data-title-en', 'Notebook: draw on this module');
+      inkBtn.title = L('الدفتر: ارسمْ على الوحدة', 'Notebook: draw on this module');
+      inkBtn.setAttribute('aria-label', inkBtn.title);
+      inkBtn.innerHTML = '<i class="fa-solid fa-pen-nib" aria-hidden="true"></i>';
+      try {
+        var mk = /(L\d+\/[^/]+\/[^/]+)\.html$/.exec(location.pathname);
+        if (localStorage.getItem('garden_mink:' + (mk ? mk[1] : location.pathname))) inkBtn.classList.add('mi-has');
+      } catch (eMi) {}
+      inkBtn.addEventListener('click', function () { _openModuleInk(inkBtn); });
+      inline.appendChild(inkBtn);
+    }
+
     /*@3.GAHJ.49*/
     var langBtn = document.createElement('button');
     langBtn.className = 'toggle-btn g-lang';
@@ -684,6 +721,9 @@
             : /hub\/ratings/.test(path) ? 'ratings'
             : /hub\/faculty/.test(path) ? 'faculty'
             : /hub\/gpa/.test(path) ? 'gpa'
+            : /hub\/notes/.test(path) ? 'notes'
+            : /hub\/quiz/.test(path) ? 'quiz'
+            : /hub\/games/.test(path) ? 'games'
             : /(hub\/labs|\/labs\/)/.test(path) ? 'labs'
             : /hub\/(index|course)/.test(path) ? 'semester'
             : /\/(L\d+|others)\//.test(path) ? 'levels'
@@ -710,7 +750,9 @@
         { key: 'sections', href: ROOT + 'hub/sections.html', icon: 'fa-layer-group', ar: 'الشعب', en: 'Sections' },
         { key: 'ratings', href: ROOT + 'hub/ratings.html', icon: 'fa-star-half-stroke', ar: 'تقييماتي', en: 'My ratings' },
         /*@3.GAHJ.93*/
-        { key: 'notes', href: ROOT + 'hub/notes.html', icon: 'fa-note-sticky', ar: 'ملاحظاتي', en: 'My notes' }
+        { key: 'notes', href: ROOT + 'hub/notes.html', icon: 'fa-note-sticky', ar: 'ملاحظاتي', en: 'My notes' },
+        { key: 'quiz', href: ROOT + 'hub/quiz.html', icon: 'fa-clipboard-question', ar: 'الاختبارات', en: 'Practice tests' },
+        { key: 'games', href: ROOT + 'hub/games.html', icon: 'fa-gamepad', ar: 'ألعاب الذهن', en: 'Brain games' }
       ] },
       { label: null, items: [
         { key: 'tour', href: ROOT + 'tour.html', icon: 'fa-seedling', ar: 'اكتشف الحديقة', en: 'Explore the Garden' },

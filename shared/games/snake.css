@@ -1,0 +1,66 @@
+.gsn {
+  inline-size: min(100%, 680px, max(260px, (100vh - 290px) * 17 / 15));
+  inline-size: min(100%, 680px, max(260px, (100dvh - 290px) * 17 / 15));
+  display: grid; justify-items: center;
+}
+.gsn-board {
+  position: relative; inline-size: 100%; aspect-ratio: 17 / 15; direction: ltr; overflow: hidden;
+  border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-card);
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+}
+.gsn-cv { display: block; inline-size: 100%; block-size: 100%; }
+.gsn-probe { position: absolute; inline-size: 0; block-size: 0; overflow: hidden; visibility: hidden; pointer-events: none; }
+.gsn-hint {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 1rem; pointer-events: none;
+  opacity: 0; transition: opacity .2s ease;
+}
+.gsn-hint--on { opacity: 1; }
+.gsn-hint p {
+  margin: 0; padding: .55rem 1rem; border-radius: var(--radius-md); text-align: center;
+  font-size: clamp(.82rem, 2.6vw, .98rem); font-weight: 700; line-height: 1.6; color: var(--text-primary);
+  background: color-mix(in oklab, var(--bg-elevated) 88%, transparent); border: 1px solid var(--border-color);
+}
+[dir="rtl"] .gsn-hint p { direction: rtl; }
+.gsn-hint-touch { display: none; }
+
+.gsn-pad {
+  display: none; direction: ltr; margin-inline: auto; inline-size: max-content; gap: .45rem;
+  grid-template-columns: repeat(3, 3.5rem); grid-template-rows: repeat(3, 3.1rem);
+  grid-template-areas: ". u ." "l . r" ". d .";
+}
+.gsn-key {
+  display: grid; place-items: center; padding: 0; cursor: pointer; font: inherit; font-size: 1.15rem;
+  border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-card); color: var(--text-secondary);
+  touch-action: manipulation; -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent;
+  transition: background-color .12s ease, color .12s ease, transform .1s ease;
+}
+.gsn-key--up { grid-area: u; }
+.gsn-key--down { grid-area: d; }
+.gsn-key--left { grid-area: l; }
+.gsn-key--right { grid-area: r; }
+.gsn-key:active { transform: scale(.93); background: color-mix(in oklab, var(--gm-tint) 16%, var(--bg-card)); color: var(--text-primary); }
+.gsn-key--hit { animation: gsnHit .18s ease; }
+.gsn-key:focus-visible { outline: 2px solid var(--gm-tint); outline-offset: 2px; }
+@keyframes gsnHit { 40% { transform: scale(.92); } }
+
+@media (pointer: coarse) {
+  .gsn {
+    inline-size: min(100%, 680px, max(260px, (100vh - 450px) * 17 / 15));
+    inline-size: min(100%, 680px, max(260px, (100dvh - 450px) * 17 / 15));
+  }
+  .gsn-pad { display: grid; }
+  .gsn-hint-key { display: none; }
+  .gsn-hint-touch { display: inline; }
+}
+@media (pointer: coarse) and (orientation: landscape) {
+  .gsn {
+    inline-size: min(100%, 680px, max(260px, (100vh - 360px) * 17 / 15));
+    inline-size: min(100%, 680px, max(260px, (100dvh - 360px) * 17 / 15));
+  }
+  .gsn-pad { grid-template-columns: repeat(4, 3.5rem); grid-template-rows: 3rem; grid-template-areas: "l u d r"; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gsn-hint, .gsn-key { transition: none; }
+  .gsn-key--hit { animation: none; }
+  .gsn-key:active { transform: none; }
+}

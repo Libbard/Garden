@@ -513,6 +513,23 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Example: Linda tuple space (Bob publishing a microblog)
+import linda
+linda.connect()
+blog = linda.TupleSpace()
+linda.universe._out(("MicroBlog", blog))
+blog = linda.universe._rd(("MicroBlog", linda.TupleSpace))[1]
+
+# Bob adds tuples to the space
+blog._out(("bob", "distsys", "I am studying chap 2"))
+blog._out(("bob", "distsys", "The linda example's pretty simple"))</code></pre>
+  </div>
+
   <table class="comparison-table">
     <thead><tr><th></th><th>Direct</th><th>Mailbox</th><th>Event-based</th><th>Shared data space</th></tr></thead>
     <tbody>
@@ -826,6 +843,39 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Server
+from socket import *
+s = socket(AF_INET, SOCK_STREAM)
+(conn, addr) = s.accept() # returns new socket and addr. client
+while True: # forever
+    data = conn.recv(1024) # receive data from client
+    if not data: break # stop if client stopped
+    msg = data.decode() + "*" # process the incoming data into a response
+    conn.send(msg.encode()) # return the response
+conn.close() # close the connection</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Python</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code># Client
+from socket import *
+s = socket(AF_INET, SOCK_STREAM)
+s.connect((HOST, PORT)) # connect to server (block until accepted)
+msg = "Hello World" # compose a message
+s.send(msg.encode()) # send the message
+data = s.recv(1024) # receive the response
+print(data.decode()) # print the result
+s.close() # close the connection</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">في البنية ثلاثية الطبقات، كيف يمكن لعملية أن تكون عميلاً وخادماً في نفس الوقت؟</template>
@@ -859,8 +909,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تنقسم أنظمة P2P إلى عدة أنواع:</p><ol><li><strong>P2P المهيكل (Structured P2P)</strong> — يستخدم فهرس خالي من الدلالات (Semantic-free index). يتم ربط كل عنصر بيانات بمفتاح باستخدام دالة تجزئة (Hash function). مثال: <b>Chord</b>، حيث تُنظم العقد في حلقة منطقية بمعرفات m-bit. يتم تخزين البيانات ذات المفتاح k في العقدة ذات المعرف id ≥ k (تسمى <span class="smart-term" data-term-en="Successor" data-ar="اللاحق" data-en-def="In Chord, the node with the smallest identifier id ≥ k responsible for storing key k.">اللاحق - successor<span class="smart-term-tooltip"></span></span>).</li><li><strong>P2P غير المهيكل (Unstructured P2P)</strong> — تحتفظ كل عقدة بقائمة عشوائية من الجيران (Random graph). البحث يتم عبر:<ul><li><strong>الفيضان (Flooding)</strong> — إرسال الطلب لجميع الجيران (محدود بـ Time-To-Live).</li><li><strong>المشي العشوائي (Random walk)</strong> — إرسال الطلب لجار واحد عشوائي متتالي.</li></ul></li><li><strong>شبكات العقد الفائقة (Super-peer networks)</strong> — كسر التماثل لتحسين الأداء. استخدام خوادم فهرسة أو وسطاء (Brokers) لتحديد مكان تخزين البيانات.</li></ol><p><b>حالة BitTorrent:</b> للبحث عن ملف F، يتم جلب ملف تورنت يحتوي على مرجع للمتتبع (Tracker). المتتبع يحتفظ بسجل للعقد النشطة (<span class="smart-term" data-term-en="Swarm" data-ar="السرب" data-en-def="In BitTorrent, the collection of active nodes that have chunks of a specific file.">السرب - Swarm<span class="smart-term-tooltip"></span></span>). تنضم العقدة للسرب وتتبادل أجزاء الملف مع الأقران.</p></template>
-    <template class="content-en"><p>P2P systems are divided into several types:</p><ol><li><strong>Structured P2P</strong> — Uses a semantic-free index. Each data item is associated with a key using a hash function. Example: <b>Chord</b>, where nodes are logically organized in a ring with m-bit identifiers. Data with key k is stored at the node with the smallest id ≥ k (called the <span class="smart-term" data-term-en="Successor" data-ar="اللاحق" data-en-def="In Chord, the node with the smallest identifier id ≥ k responsible for storing key k.">successor<span class="smart-term-tooltip"></span></span>).</li><li><strong>Unstructured P2P</strong> — Each node maintains an ad hoc list of neighbors (Random graph). Searching is done via:<ul><li><strong>Flooding</strong> — passing request to all neighbors (limited by Time-To-Live).</li><li><strong>Random walk</strong> — passing request to a randomly chosen neighbor sequentially.</li></ul></li><li><strong>Super-peer networks</strong> — Breaking symmetry to improve performance. Using index servers or brokers to decide where to store data efficiently.</li></ol><p><b>The BitTorrent case:</b> To search for file F, a torrent file is retrieved containing a reference to a tracker. The tracker keeps an account of active nodes (the <span class="smart-term" data-term-en="Swarm" data-ar="السرب" data-en-def="In BitTorrent, the collection of active nodes that have chunks of a specific file.">swarm<span class="smart-term-tooltip"></span></span>). A node joins the swarm and trades chunks of the file with peers.</p></template>
+    <template class="content-ar"><p>تنقسم أنظمة P2P إلى عدة أنواع:</p><ol><li><strong>P2P المهيكل (Structured P2P)</strong> — يستخدم فهرس خالي من الدلالات (Semantic-free index). يتم ربط كل عنصر بيانات بمفتاح باستخدام دالة تجزئة (Hash function). مثال: <b>Chord</b>، حيث تُنظم العقد في حلقة منطقية بمعرفات m-bit. يتم تخزين البيانات ذات المفتاح k في العقدة ذات المعرف id ≥ k (تسمى <span class="smart-term" data-term-en="Successor" data-ar="اللاحق" data-en-def="In Chord, the node with the smallest identifier id ≥ k responsible for storing key k.">اللاحق - successor<span class="smart-term-tooltip"></span></span>).</li><li><strong>P2P غير المهيكل (Unstructured P2P)</strong> — تحتفظ كل عقدة بقائمة عشوائية من الجيران (Random graph). البحث يتم عبر:<ul><li><strong>الفيضان (Flooding)</strong> — إرسال الطلب لجميع الجيران (محدود بـ Time-To-Live).</li><li><strong>المشي العشوائي (Random walk)</strong> — إرسال الطلب لجار واحد عشوائي متتالي.</li></ul></li><li><strong>شبكات العقد الفائقة (Super-peer networks)</strong> — كسر التماثل لتحسين الأداء. استخدام خوادم فهرسة أو وسطاء (Brokers) لتحديد مكان تخزين البيانات.</li></ol><p><b>حالة BitTorrent:</b> للبحث عن ملف F، يتم جلب ملف تورنت يحتوي على مرجع للمتتبع (Tracker). المتتبع يحتفظ بسجل للعقد النشطة (<span class="smart-term" data-term-en="Swarm" data-ar="السرب" data-en-def="In BitTorrent, the collection of active nodes that have chunks of a specific file.">السرب - Swarm<span class="smart-term-tooltip"></span></span>). تنضم العقدة للسرب وتتبادل أجزاء الملف مع الأقران.</p><p><b>مثال عملي: البحث في نظام Chord</b></p><p>لنفترض أننا نبحث عن البيانات ذات المفتاح <code>3</code> انطلاقاً من العقدة <code>9</code> (يُكتب كـ <code>lookup(3)@9</code>). باستخدام روابط الاختصار (Shortcut links) في الحلقة، يتم توجيه الطلب كالتالي:</p><ol><li>العقدة <code>9</code> تمرر الطلب إلى العقدة <code>28</code>.</li><li>العقدة <code>28</code> تمرر الطلب إلى العقدة <code>1</code>.</li><li>العقدة <code>1</code> تمرر الطلب إلى العقدة <code>4</code>.</li></ol><p>النتيجة: العقدة <code>4</code> هي اللاحق (Successor) للمفتاح <code>3</code>، وبالتالي هي التي تحتفظ بعنصر البيانات المطلوب.</p></template>
+    <template class="content-en"><p>P2P systems are divided into several types:</p><ol><li><strong>Structured P2P</strong> — Uses a semantic-free index. Each data item is associated with a key using a hash function. Example: <b>Chord</b>, where nodes are logically organized in a ring with m-bit identifiers. Data with key k is stored at the node with the smallest id ≥ k (called the <span class="smart-term" data-term-en="Successor" data-ar="اللاحق" data-en-def="In Chord, the node with the smallest identifier id ≥ k responsible for storing key k.">successor<span class="smart-term-tooltip"></span></span>).</li><li><strong>Unstructured P2P</strong> — Each node maintains an ad hoc list of neighbors (Random graph). Searching is done via:<ul><li><strong>Flooding</strong> — passing request to all neighbors (limited by Time-To-Live).</li><li><strong>Random walk</strong> — passing request to a randomly chosen neighbor sequentially.</li></ul></li><li><strong>Super-peer networks</strong> — Breaking symmetry to improve performance. Using index servers or brokers to decide where to store data efficiently.</li></ol><p><b>The BitTorrent case:</b> To search for file F, a torrent file is retrieved containing a reference to a tracker. The tracker keeps an account of active nodes (the <span class="smart-term" data-term-en="Swarm" data-ar="السرب" data-en-def="In BitTorrent, the collection of active nodes that have chunks of a specific file.">swarm<span class="smart-term-tooltip"></span></span>). A node joins the swarm and trades chunks of the file with peers.</p><p><b>Worked Example: Lookup in Chord</b></p><p>Suppose we are looking up data with key <code>3</code> starting from node <code>9</code> (denoted as <code>lookup(3)@9</code>). Using the shortcut links in the ring, the request is routed as follows:</p><ol><li>Node <code>9</code> forwards the request to node <code>28</code>.</li><li>Node <code>28</code> forwards the request to node <code>1</code>.</li><li>Node <code>1</code> forwards the request to node <code>4</code>.</li></ol><p>Result: Node <code>4</code> is the successor for key <code>3</code>, and thus holds the requested data item.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1304,8 +1354,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الدسمة. تخيلوا أننا نبني مدينة ضخمة؛ الأنماط المعمارية هي المخطط الهندسي للمدينة. تحدثنا عن كيف تتواصل المباني (المكونات) عبر الطرق (الموصلات). ثم تعمقنا في كيف يمكن تنظيم هذه المباني في طبقات، أو جعلها تتحدث بلغة بسيطة وموحدة عبر RESTful. لم ننسَ كيف ننسق العمل بين العمال دون أن يلتقوا (Linda Tuple Space). الأهم للامتحان: ركزوا جيداً على الفرق بين P2P المهيكل (Chord واللاحق) وغير المهيكل (الفيضان)، وتأكدوا من فهمكم لتعقيد الأغلفة (O(N) للوسيط مقابل O(N^2) للمباشر). أخيراً، تذكروا أن البلوك تشين ليس سوى قاعدة بيانات لا تقبل الحذف، والتحدي كله يكمن في 'من يكتب السطر التالي؟' (الإجماع). راجعوا هذه النقاط وستكونون بأمان تام في الاختبار!</template>
-    <template class="content-en">Welcome, future engineers, to this dense module. Imagine we are building a massive city; architectural styles are the blueprints. We discussed how buildings (components) communicate via roads (connectors). We then explored organizing these into layers, or making them speak a simple, unified language via RESTful. We didn't forget how to coordinate workers who never meet (Linda Tuple Space). Crucial for the exam: focus heavily on the difference between structured P2P (Chord and the successor) and unstructured (Flooding). Make sure you understand wrapper complexity (O(N) for Broker vs O(N^2) for 1-on-1). Finally, remember that a blockchain is just an append-only database, and the entire challenge is 'who writes the next line?' (Consensus). Review these points, and you'll ace the exam!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الدسمة. تخيلوا أننا نبني مدينة ضخمة؛ الأنماط المعمارية هي المخطط الهندسي للمدينة. تحدثنا عن كيف تتواصل المباني (المكونات) عبر الطرق (الموصلات). ثم تعمقنا في كيف يمكن تنظيم هذه المباني في طبقات، أو جعلها تتحدث بلغة بسيطة وموحدة عبر RESTful. لم ننسَ كيف ننسق العمل بين العمال دون أن يلتقوا (Linda Tuple Space). الأهم للامتحان: ركزوا جيداً على الفرق بين P2P المهيكل (Chord واللاحق) وغير المهيكل (الفيضان)، وتأكدوا من فهمكم لتعقيد الأغلفة (O(N) للوسيط مقابل \(O(N^2)\) للمباشر). أخيراً، تذكروا أن البلوك تشين ليس سوى قاعدة بيانات لا تقبل الحذف، والتحدي كله يكمن في 'من يكتب السطر التالي؟' (الإجماع). راجعوا هذه النقاط وستكونون بأمان تام في الاختبار!<p>لقد أضفنا تفاصيل هامة حول النمط القائم على الكائنات وأنواع التوزيع (العمودي والأفقي). فهمك لكيفية تغليف الكائنات للبيانات عبر الشبكة، وكيفية اتخاذ قرار بتوسيع نظامك إما بتقسيم وظائفه (عمودياً) أو استنساخها (أفقياً)، هو مفتاح لتصميم أنظمة موزعة قابلة للتطوير. هذه المفاهيم تظهر بكثرة في أسئلة التصميم المعماري في الامتحانات.</p></template>
+    <template class="content-en">Welcome, future engineers, to this dense module. Imagine we are building a massive city; architectural styles are the blueprints. We discussed how buildings (components) communicate via roads (connectors). We then explored organizing these into layers, or making them speak a simple, unified language via RESTful. We didn't forget how to coordinate workers who never meet (Linda Tuple Space). Crucial for the exam: focus heavily on the difference between structured P2P (Chord and the successor) and unstructured (Flooding). Make sure you understand wrapper complexity (O(N) for Broker vs \(O(N^2)\) for 1-on-1). Finally, remember that a blockchain is just an append-only database, and the entire challenge is 'who writes the next line?' (Consensus). Review these points, and you'll ace the exam!<p>We have added crucial details on the Object-based style and distribution types (Vertical and Horizontal). Understanding how objects encapsulate data across a network, and how to decide whether to scale a system by splitting its functions (vertically) or cloning them (horizontally), is key to designing scalable distributed systems. These concepts frequently appear in architectural design exam questions.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1341,8 +1391,8 @@
       </button>
       <div class="accordion-body">
         <div class="accordion-body-inner" data-bilingual>
-          <template class="content-ar">لأن الربط المباشر يتطلب O(N^2) من الأغلفة، مما يجعله غير قابل للتوسع. بينما الوسيط يقلل التعقيد إلى O(N).</template>
-          <template class="content-en">Because 1-on-1 requires O(N^2) wrappers, making it unscalable. A broker reduces the complexity to O(N).</template>
+          <template class="content-ar">لأن الربط المباشر يتطلب \(O(N^2)\) من الأغلفة، مما يجعله غير قابل للتوسع. بينما الوسيط يقلل التعقيد إلى O(N).</template>
+          <template class="content-en">Because 1-on-1 requires \(O(N^2)\) wrappers, making it unscalable. A broker reduces the complexity to O(N).</template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1479,6 +1529,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">في NFS، يبقى الملف على الخادم وتتم العمليات عبر الشبكة. في FTP، يتم نسخ الملف بالكامل إلى جهاز العميل للعمل عليه محلياً.</template>
           <template class="content-en">In NFS, the file stays on the server and operations are performed over the network. In FTP, the entire file is copied to the client's machine to be worked on locally.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يساهم النمط القائم على الكائنات (Object-based style) في تحقيق شفافية التوزيع (Distribution Transparency)؟</template>
+          <template class="content-en">How does the Object-based style contribute to achieving Distribution Transparency?</template>
+          <span class="content-target">كيف يساهم النمط القائم على الكائنات (Object-based style) في تحقيق شفافية التوزيع (Distribution Transparency)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>من خلال استخدام استدعاء الإجراءات عن بُعد (RPC) والتغليف، يخفي هذا النمط حقيقة أن الكائن موجود على جهاز آخر عبر الشبكة. بالنسبة للمبرمج، يبدو استدعاء طريقة (Method) لكائن بعيد مطابقاً تماماً لاستدعاء كائن محلي، مما يحقق شفافية الموقع والوصول.</p></template>
+          <template class="content-en"><p>By using Remote Procedure Calls (RPC) and encapsulation, this style hides the fact that an object resides on another machine across the network. To the programmer, invoking a method on a remote object looks exactly like invoking a local one, achieving location and access transparency.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى يكون التوزيع الأفقي (Horizontal distribution) خياراً أفضل من التوزيع العمودي؟</template>
+          <template class="content-en">When is Horizontal distribution a better choice than Vertical distribution?</template>
+          <span class="content-target">متى يكون التوزيع الأفقي (Horizontal distribution) خياراً أفضل من التوزيع العمودي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يكون التوزيع الأفقي أفضل عندما يواجه النظام زيادة هائلة في حجم البيانات أو عدد الطلبات المتطابقة التي تتجاوز قدرة خادم واحد. بدلاً من محاولة ترقية خادم واحد (وهو ما له حدود في التوزيع العمودي)، يمكنك ببساطة إضافة المزيد من الخوادم المتكافئة لتوزيع الحمل (Load balancing).</p></template>
+          <template class="content-en"><p>Horizontal distribution is better when the system faces a massive increase in data volume or identical requests that exceed a single server's capacity. Instead of trying to upgrade one server (which has limits in vertical distribution), you simply add more equivalent servers to balance the load.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1934,13 +2019,13 @@
     },
     "options": {
       "ar": [
-        "O(N^2)",
+        "\\(O(N^2)\\)",
         "O(log N)",
         "O(N)",
         "O(1)"
       ],
       "en": [
-        "O(N^2)",
+        "\\(O(N^2)\\)",
         "O(log N)",
         "O(N)",
         "O(1)"
@@ -2225,6 +2310,14 @@
       <template class="content-ar">في البلوك تشين، الإجماع المصرح به (Permissioned) سريع ولكنه محدود التوسع (عشرات العقد)، بينما الإجماع غير المصرح به (Permissionless) يتوسع لآلاف العقد ولكنه يتطلب آلية معقدة لانتخاب القائد (مثل إثبات العمل).</template>
       <template class="content-en">In Blockchain, Permissioned consensus is fast but limited in scale (tens of nodes), while Permissionless consensus scales to thousands of nodes but requires a complex leader election mechanism (like Proof of Work).</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من الخلط بين التوزيع العمودي والأفقي. التوزيع العمودي يعني فصل النظام إلى طبقات (مثل واجهة، معالجة، قاعدة بيانات) على أجهزة مختلفة. التوزيع الأفقي يعني استنساخ نفس الطبقة على عدة أجهزة لتقسيم عبء العمل.</template>
+    <template class="content-en">Beware of confusing vertical and horizontal distribution. Vertical distribution means separating the system into layers (like UI, processing, DB) on different machines. Horizontal distribution means cloning the same layer across multiple machines to split the workload.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

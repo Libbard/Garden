@@ -309,8 +309,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>المشكلة في استخدام <code>ScrollView</code> مع عدد كبير من عناصر <code>TextView</code> هي أن جهاز أندرويد قد تنفد ذاكرته (Out of Memory) بسبب تحميل جميع العناصر في وقت واحد.</p><p>الحل هو استخدام <code>RecyclerView</code>.</p><p>فهو يحتفظ بعدد محدود من عناصر العرض (فقط ما يظهر على الشاشة) ويعيد استخدامها (Recycle) لعرض بيانات جديدة أثناء التمرير.</p></template>
-    <template class="content-en"><p>The problem with using a <code>ScrollView</code> with a vast number of <code>TextView</code> widgets is that the Android device might run out of memory by loading all widgets at once.</p><p>The solution is the <code>RecyclerView</code>.</p><p>It holds a limited number of view instances (only what fits on screen) and reuses (recycles) them to display new data as the user scrolls.</p></template>
+    <template class="content-ar"><p>المشكلة في استخدام <code>ScrollView</code> مع عدد كبير من عناصر <code>TextView</code> هي أن جهاز أندرويد قد تنفد ذاكرته (Out of Memory) بسبب تحميل جميع العناصر في وقت واحد.</p><p>الحل هو استخدام <code>RecyclerView</code>.</p><p>فهو يحتفظ بعدد محدود من عناصر العرض (فقط ما يظهر على الشاشة) ويعيد استخدامها (Recycle) لعرض بيانات جديدة أثناء التمرير.</p><p>لإعداد <code>RecyclerView</code> برمجياً داخل دالة <code>onCreate</code>، يجب اتباع الخطوات التالية لربطه بالبيانات:</p><ol><li>تهيئة مرجع <code>RecyclerView</code> بربطه بالعنصر الموجود في التخطيط.</li><li>إنشاء مثيل من المحول المخصص (مثل <code>NoteAdapter</code>) مع تمرير مصفوفة البيانات (ArrayList).</li><li>إنشاء كائن <code>LayoutManager</code> وتمريره إلى العرض باستخدام دالة <code>setLayoutManager()</code> لتحديد كيفية ترتيب العناصر.</li><li>استدعاء دالة <code>setAdapter()</code> على كائن <code>RecyclerView</code> لدمج المحول مع العرض.</li></ol></template>
+    <template class="content-en"><p>The problem with using a <code>ScrollView</code> with a vast number of <code>TextView</code> widgets is that the Android device might run out of memory by loading all widgets at once.</p><p>The solution is the <code>RecyclerView</code>.</p><p>It holds a limited number of view instances (only what fits on screen) and reuses (recycles) them to display new data as the user scrolls.</p><p>To programmatically set up a <code>RecyclerView</code> inside the <code>onCreate</code> method, follow these steps to bind it to data:</p><ol><li>Initialize the <code>RecyclerView</code> reference by linking it to the layout instance.</li><li>Initialize the custom adapter (e.g., <code>NoteAdapter</code>) by passing the data array (ArrayList).</li><li>Create a <code>LayoutManager</code> object and pass it to the view using the <code>setLayoutManager()</code> method to dictate item arrangement.</li><li>Invoke the <code>setAdapter()</code> method on the <code>RecyclerView</code> instance to combine the adapter with the view.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -551,8 +551,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لإنشاء محول مخصص، يجب أن نرث من <code>RecyclerView.Adapter</code> ونتجاوز ثلاث دوال رئيسية:</p><ol><li><strong><code>onCreateViewHolder</code></strong>: تُستدعى عندما يحتاج RecyclerView إلى تخطيط (Layout) لعنصر جديد في القائمة.</li><li><strong><code>onBindViewHolder</code></strong>: تُستدعى لربط البيانات (من المصفوفة) بعنصر العرض (ViewHolder) في موضع معين.</li><li><strong><code>getItemCount</code></strong>: تُرجع العدد الإجمالي للعناصر في مصفوفة البيانات.</li></ol></template>
-    <template class="content-en"><p>To create a custom adapter, we must extend <code>RecyclerView.Adapter</code> and override three main methods:</p><ol><li><strong><code>onCreateViewHolder</code></strong>: Called when the RecyclerView needs a new layout for a list item.</li><li><strong><code>onBindViewHolder</code></strong>: Called to bind data (from the array) to the view holder at a specific position.</li><li><strong><code>getItemCount</code></strong>: Returns the total number of items in the data array.</li></ol></template>
+    <template class="content-ar"><p>لإنشاء محول مخصص، يجب أن نرث من <code>RecyclerView.Adapter</code> ونتجاوز ثلاث دوال رئيسية:</p><ol><li><strong><code>onCreateViewHolder</code></strong>: تُستدعى عندما يحتاج RecyclerView إلى تخطيط (Layout) لعنصر جديد في القائمة.</li><li><strong><code>onBindViewHolder</code></strong>: تُستدعى لربط البيانات (من المصفوفة) بعنصر العرض (ViewHolder) في موضع معين.</li><li><strong><code>getItemCount</code></strong>: تُرجع العدد الإجمالي للعناصر في مصفوفة البيانات.</li></ol><p>لتنفيذ دالة <code>onCreateViewHolder</code>، نقوم بنفخ (Inflate) تخطيط XML لعنصر القائمة:</p><ol><li>نستخدم <code>LayoutInflater.from(parent.getContext())</code> للحصول على كائن النافخ.</li><li>نستدعي دالة <code>.inflate(R.layout.listitem, parent, false)</code> لإنشاء كائن <code>View</code> يمثل العنصر.</li><li>نُرجع مثيلاً جديداً من الفئة الداخلية (مثل <code>ListItemHolder</code>) مع تمرير هذا العرض (View) إليه.</li></ol></template>
+    <template class="content-en"><p>To create a custom adapter, we must extend <code>RecyclerView.Adapter</code> and override three main methods:</p><ol><li><strong><code>onCreateViewHolder</code></strong>: Called when the RecyclerView needs a new layout for a list item.</li><li><strong><code>onBindViewHolder</code></strong>: Called to bind data (from the array) to the view holder at a specific position.</li><li><strong><code>getItemCount</code></strong>: Returns the total number of items in the data array.</li></ol><p>To implement the <code>onCreateViewHolder</code> method, we inflate the XML layout for the list item:</p><ol><li>Use <code>LayoutInflater.from(parent.getContext())</code> to get the inflater object.</li><li>Invoke the <code>.inflate(R.layout.listitem, parent, false)</code> method to create a <code>View</code> object representing the item.</li><li>Return a new instance of the inner class (e.g., <code>ListItemHolder</code>), passing this View to it.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -575,6 +575,16 @@ noteList.add(n);
 mAdapter.notifyDataSetChanged();</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>View itemView = LayoutInflater.from(parent.getContext())
+    .inflate(R.layout.listitem, parent, false);
+return new ListItemHolder(itemView);</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">لماذا نفصل بين إنشاء العرض (onCreateViewHolder) وربط البيانات (onBindViewHolder)؟</template>
@@ -595,8 +605,8 @@ mAdapter.notifyDataSetChanged();</code></pre>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا شباب في ليلة الامتحان. دعونا نربط خيوط هذه الوحدة معاً. ركزنا اليوم على شيئين أساسيين: التفاعل مع المستخدم عبر نوافذ الحوار (Dialogs)، وعرض البيانات بكفاءة عبر (RecyclerView). تذكروا دائماً أن نوافذ الحوار تُبنى باستخدام DialogFragment لضمان عدم ضياعها عند تدوير الشاشة، ونستخدم AlertDialog.Builder مع تقنية التسلسل (Chaining) لبرمجتها بسرعة. أما بالنسبة للقوائم، فإياكم واستخدام ScrollView لقائمة طويلة! الـ RecyclerView هو الحل السحري لأنه يعيد تدوير العروض (Views) بدلاً من تكديسها في الذاكرة. لكي يعمل RecyclerView، يحتاج إلى RecyclerAdapter، وهنا يأتي سؤال الامتحان المؤكد: ما هي الدوال الثلاث التي يجب تجاوزها؟ تذكروها جيداً: onCreateViewHolder لإنشاء التخطيط، onBindViewHolder لربط البيانات، و getItemCount لمعرفة الحجم. ولا تنسوا استدعاء notifyDataSetChanged() لتحديث الشاشة. ركزوا على هذه المفاهيم وستكونون في أمان تام!</template>
-    <template class="content-en">Welcome to the exam prep session! Let's tie this module together. We focused on two main pillars: user interaction via Dialogs, and efficient data display via RecyclerView. Remember that dialogs are built using DialogFragment to survive screen rotations, and we use AlertDialog.Builder with method chaining to configure them cleanly. As for lists, never use a ScrollView for massive data! RecyclerView is the magic bullet because it recycles views instead of hoarding memory. For RecyclerView to work, it needs a RecyclerAdapter. Here is a guaranteed exam question: What are the three required methods? Memorize them: onCreateViewHolder (to inflate the layout), onBindViewHolder (to bind the data), and getItemCount (to return the size). And never forget to call notifyDataSetChanged() to refresh the UI. Master these, and you'll ace this section!</template>
+    <template class="content-ar">أهلاً بكم يا شباب في ليلة الامتحان. دعونا نربط خيوط هذه الوحدة معاً. ركزنا اليوم على شيئين أساسيين: التفاعل مع المستخدم عبر نوافذ الحوار (Dialogs)، وعرض البيانات بكفاءة عبر (RecyclerView). تذكروا دائماً أن نوافذ الحوار تُبنى باستخدام DialogFragment لضمان عدم ضياعها عند تدوير الشاشة، ونستخدم AlertDialog.Builder مع تقنية التسلسل (Chaining) لبرمجتها بسرعة. أما بالنسبة للقوائم، فإياكم واستخدام ScrollView لقائمة طويلة! الـ RecyclerView هو الحل السحري لأنه يعيد تدوير العروض (Views) بدلاً من تكديسها في الذاكرة. لكي يعمل RecyclerView، يحتاج إلى RecyclerAdapter، وهنا يأتي سؤال الامتحان المؤكد: ما هي الدوال الثلاث التي يجب تجاوزها؟ تذكروها جيداً: onCreateViewHolder لإنشاء التخطيط، onBindViewHolder لربط البيانات، و getItemCount لمعرفة الحجم. ولا تنسوا استدعاء notifyDataSetChanged() لتحديث الشاشة. ركزوا على هذه المفاهيم وستكونون في أمان تام!<p>تذكر دائماً أن إعداد RecyclerView يشبه بناء جسر؛ فالمحول (Adapter) هو المواد الخام، و LayoutManager هو المخطط الهندسي. يجب عليك استخدام setAdapter() و setLayoutManager() معاً لربط كل شيء، واستخدام LayoutInflater بدقة لنفخ عناصرك. إغفال أي من هذه الخطوات سيؤدي إلى انهيار الجسر (أو في حالتنا، شاشة فارغة).</p></template>
+    <template class="content-en">Welcome to the exam prep session! Let's tie this module together. We focused on two main pillars: user interaction via Dialogs, and efficient data display via RecyclerView. Remember that dialogs are built using DialogFragment to survive screen rotations, and we use AlertDialog.Builder with method chaining to configure them cleanly. As for lists, never use a ScrollView for massive data! RecyclerView is the magic bullet because it recycles views instead of hoarding memory. For RecyclerView to work, it needs a RecyclerAdapter. Here is a guaranteed exam question: What are the three required methods? Memorize them: onCreateViewHolder (to inflate the layout), onBindViewHolder (to bind the data), and getItemCount (to return the size). And never forget to call notifyDataSetChanged() to refresh the UI. Master these, and you'll ace this section!<p>Always remember that setting up a RecyclerView is like building a bridge; the Adapter is your raw material, and the LayoutManager is the blueprint. You must use setAdapter() and setLayoutManager() together to connect everything, and use LayoutInflater precisely to inflate your items. Missing any of these steps means the bridge collapses (or in our case, a blank screen).</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -770,6 +780,41 @@ mAdapter.notifyDataSetChanged();</code></pre>
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">يجب أن تبدأ متغيرات الأعضاء (Member variables) في الفئة بحرف 'm' صغير، مثل mAdapter.</template>
           <template class="content-en">Member variables in a class should be prefixed with a lowercase 'm', such as mAdapter.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نمرر 'false' كمعامل ثالث لدالة inflate() داخل onCreateViewHolder؟</template>
+          <template class="content-en">Why do we pass 'false' as the third argument to the inflate() method inside onCreateViewHolder?</template>
+          <span class="content-target">لماذا نمرر 'false' كمعامل ثالث لدالة inflate() داخل onCreateViewHolder؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>المعامل الثالث يحدد ما إذا كان يجب إرفاق العرض المنفوخ بالعنصر الأصل (parent) فوراً. نمرر 'false' لأن RecyclerView هو المسؤول عن إرفاق وفصل هذه العروض ديناميكياً أثناء التمرير، وإرفاقها يدوياً سيؤدي إلى خطأ برمجي.</p></template>
+          <template class="content-en"><p>The third argument specifies whether the inflated view should be attached to the parent immediately. We pass 'false' because the RecyclerView is responsible for dynamically attaching and detaching these views during scrolling; attaching it manually would cause a crash.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الخطوات البرمجية الأساسية لربط RecyclerView بالبيانات في النشاط (Activity)؟</template>
+          <template class="content-en">What are the essential programmatic steps to bind a RecyclerView to data in an Activity?</template>
+          <span class="content-target">ما هي الخطوات البرمجية الأساسية لربط RecyclerView بالبيانات في النشاط (Activity)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>أولاً، يجب العثور على RecyclerView باستخدام findViewById. ثانياً، يجب إنشاء كائن LayoutManager وتعيينه باستخدام setLayoutManager(). أخيراً، يجب تهيئة المحول (Adapter) بالبيانات وتمريره إلى RecyclerView باستخدام setAdapter(). بدون هذه الخطوات، ستظل الشاشة فارغة.</p></template>
+          <template class="content-en"><p>First, find the RecyclerView using findViewById. Second, create a LayoutManager object and set it using setLayoutManager(). Finally, initialize your Adapter with the data and pass it to the RecyclerView using setAdapter(). Without these steps, the screen remains blank.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1037,6 +1082,40 @@ mAdapter.notifyDataSetChanged();</code></pre>
         "en": null
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف تقوم بنفخ (Inflate) تخطيط داخل دالة onCreateViewHolder؟",
+      "en": "How do you inflate a layout inside the onCreateViewHolder method?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام فئة LayoutInflater واستدعاء دالة inflate.",
+        "en": "By using the LayoutInflater class and calling the inflate method."
+      },
+      "example": {
+        "ar": "LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem, parent, false);",
+        "en": "LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem, parent, false);"
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ما هي الدالة المستخدمة لربط المحول (Adapter) بـ RecyclerView؟",
+      "en": "Which method is used to bind the Adapter to the RecyclerView?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الدالة setAdapter().",
+        "en": "The setAdapter() method."
+      },
+      "example": {
+        "ar": "recyclerView.setAdapter(mAdapter);",
+        "en": "recyclerView.setAdapter(mAdapter);"
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1046,7 +1125,7 @@ mAdapter.notifyDataSetChanged();</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1062,7 +1141,7 @@ mAdapter.notifyDataSetChanged();</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1387,6 +1466,70 @@ mAdapter.notifyDataSetChanged();</code></pre>
     },
     "difficulty": "easy",
     "conceptId": "dialog-window-fragment"
+  },
+  {
+    "conceptId": "recycler-adapter",
+    "question": {
+      "ar": "أي من الأسطر التالية يمثل الطريقة الصحيحة لإنشاء كائن View من ملف XML داخل onCreateViewHolder؟",
+      "en": "Which of the following lines represents the correct way to create a View object from an XML file inside onCreateViewHolder?"
+    },
+    "options": {
+      "ar": [
+        "new View(R.layout.listitem);",
+        "findViewById(R.layout.listitem);",
+        "LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem, parent, false);",
+        "parent.addView(R.layout.listitem);"
+      ],
+      "en": [
+        "new View(R.layout.listitem);",
+        "findViewById(R.layout.listitem);",
+        "LayoutInflater.from(parent.getContext()).inflate(R.layout.listitem, parent, false);",
+        "parent.addView(R.layout.listitem);"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تُستخدم فئة LayoutInflater لتحويل ملفات تخطيط XML إلى كائنات View فعلية في الذاكرة.",
+      "en": "The LayoutInflater class is used to instantiate layout XML files into actual View objects in memory."
+    },
+    "hint": {
+      "ar": "ابحث عن الفئة التي تقوم بـ 'نفخ' (Inflate) التخطيط.",
+      "en": "Look for the class that 'inflates' the layout."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "recyclerview-concept",
+    "question": {
+      "ar": "ما هما المكونان الأساسيان اللذان يجب تعيينهما لـ RecyclerView لكي يعرض البيانات بشكل صحيح؟",
+      "en": "What are the two essential components that must be set on a RecyclerView for it to display data correctly?"
+    },
+    "options": {
+      "ar": [
+        "ScrollView و LinearLayout",
+        "LayoutManager و Adapter",
+        "FragmentManager و DialogFragment",
+        "ViewHolder و LayoutInflater"
+      ],
+      "en": [
+        "ScrollView and LinearLayout",
+        "LayoutManager and Adapter",
+        "FragmentManager and DialogFragment",
+        "ViewHolder and LayoutInflater"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يحتاج RecyclerView إلى LayoutManager لتحديد كيفية ترتيب العناصر (عمودي، أفقي، إلخ)، وإلى Adapter لتزويده بالبيانات.",
+      "en": "RecyclerView needs a LayoutManager to determine how items are arranged (vertical, horizontal, etc.), and an Adapter to provide it with data."
+    },
+    "hint": {
+      "ar": "أحدهما يدير التخطيط والآخر يحول البيانات.",
+      "en": "One manages the layout and the other adapts the data."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1431,6 +1574,14 @@ mAdapter.notifyDataSetChanged();</code></pre>
       <template class="content-ar">الفصل بين <code>onCreateViewHolder</code> و <code>onBindViewHolder</code> هو جوهر أداء RecyclerView. النفخ (Inflation) مكلف ويحدث نادراً، بينما الربط (Binding) رخيص ويحدث باستمرار.</template>
       <template class="content-en">The separation between <code>onCreateViewHolder</code> and <code>onBindViewHolder</code> is the core of RecyclerView's performance. Inflation is expensive and happens rarely, while binding is cheap and happens constantly.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان استدعاء <code>setLayoutManager()</code> أو <code>setAdapter()</code> عند إعداد RecyclerView. إذا نسيت أياً منهما، ستظهر الشاشة فارغة تماماً ولن يتم عرض أي بيانات حتى لو كانت المصفوفة ممتلئة.</template>
+    <template class="content-en">Forgetting to call <code>setLayoutManager()</code> or <code>setAdapter()</code> when setting up a RecyclerView. If you miss either, the screen will be completely blank and no data will be displayed, even if your array is full.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

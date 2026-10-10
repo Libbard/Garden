@@ -99,6 +99,11 @@
         <template class="content-en">Object Instantiation</template>
         <span class="content-target">إنشاء الكائنات (Object Instantiation)</span>
       </a>
+      <a href="#implementing-test-class" class="toc-link" data-bilingual>
+        <template class="content-ar">تنفيذ فئة الاختبار (Implementing a Test Class)</template>
+        <template class="content-en">Implementing a Test Class</template>
+        <span class="content-target">تنفيذ فئة الاختبار (Implementing a Test Class)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -813,14 +818,111 @@ MyClass t1 = new MyClass(10);</code></pre>
   </details>
 </section>
 
+<section id="implementing-test-class" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> تنفيذ فئة الاختبار (Implementing a Test Class)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Implementing a Test Class</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>فئة الاختبار هي <span class="smart-term" data-term-en="Entry Point" data-ar="نقطة الدخول" data-en-def="The starting point of program execution, typically the main method in Java.">نقطة الدخول<span class="smart-term-tooltip"></span></span> لبرنامجك، حيث تقوم بإنشاء الكائنات من الفئات الأخرى واختبار سلوكياتها.</p></template>
+    <template class="content-en"><p>A test class is the entry point of your program, where you instantiate objects from other classes and test their behaviors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في التطبيقات متعددة الفئات (Multi-class applications)، من المعتاد فصل الفئة التي تمثل المخطط (Blueprint) عن الفئة التي تحتوي على نقطة التشغيل (الدالة <code>main</code>).</p><ol><li><strong>إنشاء فئة المخطط:</strong> مثل فئة <code>Account</code> التي تحتوي على الخصائص (رقم الحساب، الرصيد) والسلوكيات (إيداع، سحب).</li><li><strong>إنشاء <span class="smart-term" data-term-en="Test Class" data-ar="فئة الاختبار" data-en-def="A class that contains the main method and is used to instantiate and test other classes.">فئة الاختبار<span class="smart-term-tooltip"></span></span>:</strong> مثل فئة <code>TestAccount</code> التي تحتوي على الدالة <code>public static void main</code>.</li><li><strong>التفاعل:</strong> داخل الدالة <code>main</code>، نقوم بإنشاء كائن من <code>Account</code> باستخدام <code>new</code>، ثم نستدعي دواله لاختبار عمله (مثل <code>a1.deposit(40000);</code>).</li></ol></template>
+    <template class="content-en"><p>In <span class="smart-term" data-term-en="Multi-class Application" data-ar="تطبيق متعدد الفئات" data-en-def="An application designed using multiple interacting classes, separating blueprints from execution logic.">multi-class application<span class="smart-term-tooltip"></span></span>s, it is standard practice to separate the blueprint class from the class containing the execution <span class="smart-term" data-term-en="Entry Point" data-ar="نقطة الدخول" data-en-def="The starting point of program execution, typically the main method in Java.">entry point<span class="smart-term-tooltip"></span></span> (the <code>main</code> method).</p><ol><li><strong>Create the Blueprint Class:</strong> Such as an <code>Account</code> class containing attributes (account number, balance) and behaviors (deposit, withdraw).</li><li><strong>Create the <span class="smart-term" data-term-en="Test Class" data-ar="فئة الاختبار" data-en-def="A class that contains the main method and is used to instantiate and test other classes.">Test Class<span class="smart-term-tooltip"></span></span>:</strong> Such as a <code>TestAccount</code> class containing the <code>public static void main</code> method.</li><li><strong>Interaction:</strong> Inside <code>main</code>, we instantiate an <code>Account</code> object using <code>new</code>, then call its methods to test its functionality (e.g., <code>a1.deposit(40000);</code>).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>فصل فئة الاختبار عن فئة المخطط يعزز مبدأ فصل الاهتمامات (Separation of Concerns). فئة <code>Account</code> تصبح قابلة لإعادة الاستخدام في أي مشروع آخر دون أن تكون مرتبطة بسيناريو تشغيل محدد.</p><p>عند تشغيل البرنامج، يبحث نظام التشغيل (JVM) عن الدالة <code>main</code> الثابتة (static) ليبدأ التنفيذ منها، ومن هناك تتوالى عمليات إنشاء الكائنات وتواصلها مع بعضها البعض.</p></template>
+    <template class="content-en"><p>Separating the test class from the blueprint class promotes the Separation of Concerns principle. The <code>Account</code> class becomes reusable in any other project without being tied to a specific execution scenario.</p><p>When running the program, the JVM looks for the <code>static</code> <code>main</code> method to begin execution. From there, objects are instantiated and begin communicating with one another.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class Account {
+    int acc_no;
+    String name;
+    float amount;
+
+    void insert(int a, String n, float amt) {
+        acc_no = a;
+        name = n;
+        amount = amt;
+    }
+
+    void deposit(float amt) {
+        amount = amount + amt;
+        System.out.println(amt + " deposited");
+    }
+
+    void withdraw(float amt) {
+        if (amount &lt; amt) {
+            System.out.println("Insufficient Balance");
+        } else {
+            amount = amount - amt;
+            System.out.println(amt + " withdrawn");
+        }
+    }
+
+    void checkBalance() {
+        System.out.println("Balance is: " + amount);
+    }
+
+    void display() {
+        System.out.println(acc_no + " " + name + " " + amount);
+    }
+}
+
+// Test Class
+class TestAccount {
+    public static void main(String[] args) {
+        Account a1 = new Account();
+        a1.insert(832345, "Ankit", 1000);
+        a1.display();
+        a1.checkBalance();
+        a1.deposit(40000);
+        a1.checkBalance();
+        a1.withdraw(15000);
+        a1.checkBalance();
+    }
+}</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكننا وضع الدالة <code>main</code> داخل فئة <code>Account</code> بدلاً من إنشاء فئة <code>TestAccount</code> منفصلة؟</template>
+      <template class="content-en">Can we put the <code>main</code> method inside the <code>Account</code> class instead of creating a separate <code>TestAccount</code> class?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، لغة جافا تسمح بذلك. ولكن من أفضل الممارسات (Best Practices) فصلها في فئة اختبار مستقلة للحفاظ على فئة <code>Account</code> كقالب نقي قابل لإعادة الاستخدام دون ربطه بكود تشغيل محدد.</p></template>
+      <template class="content-en"><p>Yes, Java allows this. However, it is a best practice to separate it into an independent test class to keep the <code>Account</code> class as a pure, reusable blueprint uncoupled from specific execution code.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل. في هذه الوحدة، نضع حجر الأساس للبرمجة كائنية التوجه. تخيلوا أن الفئة (Class) هي المخطط الهندسي لسيارة، والكائنات (Objects) هي السيارات الحقيقية التي تسير في الشارع. كل سيارة لها لونها وسرعتها الخاصة (متغيرات النسخة)، ولكن جميعها صُنعت من نفس المخطط. لكي نُنشئ سيارة، نستخدم الكلمة السحرية <code>new</code>، وأول من يستقبل هذه السيارة في الحياة هو 'المُنشئ' (Constructor) ليعطيها لونها المبدئي. تذكروا جيداً للامتحان: المُنشئ لا يملك نوع إرجاع أبداً! وإذا أردنا معلومة تشترك فيها جميع السيارات (مثل اسم المصنع)، نستخدم <code>static</code>. وأخيراً، لحماية محرك السيارة من العبث الخارجي، نغلفه بـ <code>private</code>. ركزوا على هذه المفاهيم، فهي لغة التخاطب في عالم جافا.</template>
-    <template class="content-en">Welcome, future engineers. In this module, we lay the foundation of Object-Oriented Programming. Imagine a Class as the blueprint of a car, and Objects as the actual cars on the street. Each car has its own color and speed (instance variables), but all are built from the same blueprint. To build a car, we use the magic word <code>new</code>, and the first to welcome this car into existence is the 'Constructor' to give it its initial color. Remember for the exam: Constructors NEVER have a return type! If we want a piece of information shared by all cars (like the factory name), we use <code>static</code>. Finally, to protect the engine from outside tampering, we encapsulate it with <code>private</code>. Master these concepts; they are the vocabulary of the Java world.</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل. في هذه الوحدة، نضع حجر الأساس للبرمجة كائنية التوجه. تخيلوا أن الفئة (Class) هي المخطط الهندسي لسيارة، والكائنات (Objects) هي السيارات الحقيقية التي تسير في الشارع. كل سيارة لها لونها وسرعتها الخاصة (متغيرات النسخة)، ولكن جميعها صُنعت من نفس المخطط. لكي نُنشئ سيارة، نستخدم الكلمة السحرية <code>new</code>، وأول من يستقبل هذه السيارة في الحياة هو 'المُنشئ' (Constructor) ليعطيها لونها المبدئي. تذكروا جيداً للامتحان: المُنشئ لا يملك نوع إرجاع أبداً! وإذا أردنا معلومة تشترك فيها جميع السيارات (مثل اسم المصنع)، نستخدم <code>static</code>. وأخيراً، لحماية محرك السيارة من العبث الخارجي، نغلفه بـ <code>private</code>. ركزوا على هذه المفاهيم، فهي لغة التخاطب في عالم جافا.<p>الآن بعد أن فهمت كيف تبني الفئات وتنشئ الكائنات، تكتمل الصورة عندما تبدأ في تصميم تطبيقات متعددة الفئات. في الاختبارات، غالباً ما سأطلب منك كتابة فئة تمثل المخطط (Blueprint) وفئة أخرى منفصلة للاختبار (Test Class) تحتوي على الدالة main لإثبات أن كائناتك تتفاعل بشكل صحيح.</p></template>
+    <template class="content-en">Welcome, future engineers. In this module, we lay the foundation of Object-Oriented Programming. Imagine a Class as the blueprint of a car, and Objects as the actual cars on the street. Each car has its own color and speed (instance variables), but all are built from the same blueprint. To build a car, we use the magic word <code>new</code>, and the first to welcome this car into existence is the 'Constructor' to give it its initial color. Remember for the exam: Constructors NEVER have a return type! If we want a piece of information shared by all cars (like the factory name), we use <code>static</code>. Finally, to protect the engine from outside tampering, we encapsulate it with <code>private</code>. Master these concepts; they are the vocabulary of the Java world.<p>Now that you understand how to build classes and instantiate objects, the picture is complete when you design multi-class applications. In exams, I will often ask you to write a blueprint class and a separate Test Class with a main method to prove your objects interact correctly.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -998,6 +1100,24 @@ MyClass t1 = new MyClass(10);</code></pre>
         </div>
       </div>
     </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في التطبيقات الحقيقية، هل نضع كل الكود في فئة واحدة تحتوي على الدالة main؟</template>
+          <template class="content-en">In real-world applications, do we put all the code in a single class containing the main method?</template>
+          <span class="content-target">في التطبيقات الحقيقية، هل نضع كل الكود في فئة واحدة تحتوي على الدالة main؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>بالطبع لا. التطبيقات الحقيقية هي تطبيقات متعددة الفئات (Multi-class). نقوم بتصميم فئات تمثل الكيانات (مثل طالب، حساب، سيارة)، ثم نستخدم فئة اختبار أو فئة رئيسية واحدة فقط تحتوي على الدالة main لربط هذه الكيانات وإدارة تدفق البرنامج.</p></template>
+          <template class="content-en"><p>Absolutely not. Real-world applications are multi-class. We design classes representing entities (like Student, Account, Car), and then use a single test or main class containing the main method to connect these entities and manage the program's flow.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1053,8 +1173,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "At runtime when an object or instance is created."
       },
       "example": {
-        "ar": "عند تنفيذ <code>new Account()</code>.",
-        "en": "When <code>new Account()</code> is executed."
+        "ar": "عند تنفيذ <code>new Account()<\/code>.",
+        "en": "When <code>new Account()<\/code> is executed."
       }
     }
   },
@@ -1070,16 +1190,16 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "Used to expose or represent the behavior of an object."
       },
       "example": {
-        "ar": "دالة <code>turnOn()</code> في فئة المصباح.",
-        "en": "The <code>turnOn()</code> method in a Lamp class."
+        "ar": "دالة <code>turnOn()<\/code> في فئة المصباح.",
+        "en": "The <code>turnOn()<\/code> method in a Lamp class."
       }
     }
   },
   {
     "id": 5,
     "front": {
-      "ar": "ما هو معدل الوصول <code>public</code>؟",
-      "en": "What is the <code>public</code> access modifier?"
+      "ar": "ما هو معدل الوصول <code>public<\/code>؟",
+      "en": "What is the <code>public<\/code> access modifier?"
     },
     "back": {
       "definition": {
@@ -1087,16 +1207,16 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "Makes the variable or method accessible from outside the class."
       },
       "example": {
-        "ar": "<code>public void display()</code>",
-        "en": "<code>public void display()</code>"
+        "ar": "<code>public void display()<\/code>",
+        "en": "<code>public void display()<\/code>"
       }
     }
   },
   {
     "id": 6,
     "front": {
-      "ar": "ما هو معدل الوصول <code>private</code>؟",
-      "en": "What is the <code>private</code> access modifier?"
+      "ar": "ما هو معدل الوصول <code>private<\/code>؟",
+      "en": "What is the <code>private<\/code> access modifier?"
     },
     "back": {
       "definition": {
@@ -1104,16 +1224,16 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "Restricts access to the variable or method to only within the same class."
       },
       "example": {
-        "ar": "<code>private String name;</code>",
-        "en": "<code>private String name;</code>"
+        "ar": "<code>private String name;<\/code>",
+        "en": "<code>private String name;<\/code>"
       }
     }
   },
   {
     "id": 7,
     "front": {
-      "ar": "ما هي الكلمة المفتاحية <code>this</code>؟",
-      "en": "What is the <code>this</code> keyword?"
+      "ar": "ما هي الكلمة المفتاحية <code>this<\/code>؟",
+      "en": "What is the <code>this<\/code> keyword?"
     },
     "back": {
       "definition": {
@@ -1121,16 +1241,16 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "Used to explicitly refer to the shadowed instance variable of the current object."
       },
       "example": {
-        "ar": "<code>this.name = name;</code>",
-        "en": "<code>this.name = name;</code>"
+        "ar": "<code>this.name = name;<\/code>",
+        "en": "<code>this.name = name;<\/code>"
       }
     }
   },
   {
     "id": 8,
     "front": {
-      "ar": "ما هي وظيفة الكلمة المفتاحية <code>new</code>؟",
-      "en": "What is the function of the <code>new</code> keyword?"
+      "ar": "ما هي وظيفة الكلمة المفتاحية <code>new<\/code>؟",
+      "en": "What is the function of the <code>new<\/code> keyword?"
     },
     "back": {
       "definition": {
@@ -1138,8 +1258,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "Creates a new object of the specified class in memory."
       },
       "example": {
-        "ar": "<code>new Account();</code>",
-        "en": "<code>new Account();</code>"
+        "ar": "<code>new Account();<\/code>",
+        "en": "<code>new Account();<\/code>"
       }
     }
   },
@@ -1155,8 +1275,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "A block used to initialize an object, having the same name as the class and no return type."
       },
       "example": {
-        "ar": "<code>public MyClass() { ... }</code>",
-        "en": "<code>public MyClass() { ... }</code>"
+        "ar": "<code>public MyClass() { ... }<\/code>",
+        "en": "<code>public MyClass() { ... }<\/code>"
       }
     }
   },
@@ -1172,8 +1292,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "A constructor that accepts parameters to initialize an object with specific values."
       },
       "example": {
-        "ar": "<code>MyClass(int i) { x = i; }</code>",
-        "en": "<code>MyClass(int i) { x = i; }</code>"
+        "ar": "<code>MyClass(int i) { x = i; }<\/code>",
+        "en": "<code>MyClass(int i) { x = i; }<\/code>"
       }
     }
   },
@@ -1189,8 +1309,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "A variable belonging to the class, shared by all objects, getting memory only once."
       },
       "example": {
-        "ar": "<code>static String college = \"ITS\";</code>",
-        "en": "<code>static String college = \"ITS\";</code>"
+        "ar": "<code>static String college = \"ITS\";<\/code>",
+        "en": "<code>static String college = \"ITS\";<\/code>"
       }
     }
   },
@@ -1206,8 +1326,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "A method relating to the class as a whole, callable without instantiating an object."
       },
       "example": {
-        "ar": "<code>public static void main(String[] args)</code>",
-        "en": "<code>public static void main(String[] args)</code>"
+        "ar": "<code>public static void main(String[] args)<\/code>",
+        "en": "<code>public static void main(String[] args)<\/code>"
       }
     }
   },
@@ -1223,8 +1343,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "They are initialized to 0 by default."
       },
       "example": {
-        "ar": "<code>int numberOfStudents; // defaults to 0</code>",
-        "en": "<code>int numberOfStudents; // defaults to 0</code>"
+        "ar": "<code>int numberOfStudents; // defaults to 0<\/code>",
+        "en": "<code>int numberOfStudents; // defaults to 0<\/code>"
       }
     }
   },
@@ -1240,8 +1360,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "They are initialized to false by default."
       },
       "example": {
-        "ar": "<code>boolean isOn; // defaults to false</code>",
-        "en": "<code>boolean isOn; // defaults to false</code>"
+        "ar": "<code>boolean isOn; // defaults to false<\/code>",
+        "en": "<code>boolean isOn; // defaults to false<\/code>"
       }
     }
   },
@@ -1257,8 +1377,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "No, local variables are not initialized by default."
       },
       "example": {
-        "ar": "متغير معرّف داخل دالة <code>main</code>.",
-        "en": "A variable declared inside the <code>main</code> method."
+        "ar": "متغير معرّف داخل دالة <code>main<\/code>.",
+        "en": "A variable declared inside the <code>main<\/code> method."
       }
     }
   },
@@ -1274,8 +1394,8 @@ MyClass t1 = new MyClass(10);</code></pre>
         "en": "Associating a variable name with an object type."
       },
       "example": {
-        "ar": "<code>Point originOne;</code>",
-        "en": "<code>Point originOne;</code>"
+        "ar": "<code>Point originOne;<\/code>",
+        "en": "<code>Point originOne;<\/code>"
       }
     }
   },
@@ -1287,12 +1407,12 @@ MyClass t1 = new MyClass(10);</code></pre>
     },
     "back": {
       "definition": {
-        "ar": "استخدام الكلمة المفتاحية <code>new</code> لإنشاء الكائن في الذاكرة.",
-        "en": "Using the <code>new</code> keyword to create the object."
+        "ar": "استخدام الكلمة المفتاحية <code>new<\/code> لإنشاء الكائن في الذاكرة.",
+        "en": "Using the <code>new<\/code> keyword to create the object."
       },
       "example": {
-        "ar": "<code>... = new ...</code>",
-        "en": "<code>... = new ...</code>"
+        "ar": "<code>... = new ...<\/code>",
+        "en": "<code>... = new ...<\/code>"
       }
     }
   },
@@ -1304,14 +1424,31 @@ MyClass t1 = new MyClass(10);</code></pre>
     },
     "back": {
       "definition": {
-        "ar": "استدعاء المُنشئ بعد <code>new</code> لإعطاء الكائن قيمه الأولية.",
-        "en": "Calling a constructor after the <code>new</code> operator to initialize the new object."
+        "ar": "استدعاء المُنشئ بعد <code>new<\/code> لإعطاء الكائن قيمه الأولية.",
+        "en": "Calling a constructor after the <code>new<\/code> operator to initialize the new object."
       },
       "example": {
-        "ar": "<code>Point(23, 94);</code>",
-        "en": "<code>Point(23, 94);</code>"
+        "ar": "<code>Point(23, 94);<\/code>",
+        "en": "<code>Point(23, 94);<\/code>"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو الغرض من فئة الاختبار (Test Class) في التطبيقات متعددة الفئات؟",
+      "en": "What is the purpose of a Test Class in multi-class applications?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحتوي على الدالة <code>main<\/code> وتُستخدم كنقطة دخول لإنشاء الكائنات واختبار وظائف الفئات الأخرى.",
+        "en": "It contains the <code>main<\/code> method and serves as the entry point to instantiate objects and test the functionality of other classes."
+      },
+      "example": {
+        "ar": "فئة <code>TestAccount<\/code> التي تختبر فئة <code>Account<\/code>.",
+        "en": "A <code>TestAccount<\/code> class testing an <code>Account<\/code> class."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1321,7 +1458,7 @@ MyClass t1 = new MyClass(10);</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1337,7 +1474,7 @@ MyClass t1 = new MyClass(10);</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1570,8 +1707,8 @@ MyClass t1 = new MyClass(10);</code></pre>
   {
     "id": 8,
     "question": {
-      "ar": "في الجملة <code>Account myAccount = new Account();</code>، ماذا يمثل الجزء <code>new</code>؟",
-      "en": "In the statement <code>Account myAccount = new Account();</code>, what does the <code>new</code> part represent?"
+      "ar": "في الجملة <code>Account myAccount = new Account();<\/code>، ماذا يمثل الجزء <code>new<\/code>؟",
+      "en": "In the statement <code>Account myAccount = new Account();<\/code>, what does the <code>new<\/code> part represent?"
     },
     "options": {
       "ar": [
@@ -1662,6 +1799,38 @@ MyClass t1 = new MyClass(10);</code></pre>
     },
     "difficulty": "hard",
     "conceptId": "static-keyword"
+  },
+  {
+    "conceptId": "implementing-test-class",
+    "question": {
+      "ar": "لماذا يُفضل فصل الدالة <code>main<\/code> في فئة اختبار مستقلة بدلاً من وضعها في فئة المخطط (مثل Account)؟",
+      "en": "Why is it preferred to separate the <code>main<\/code> method into an independent test class rather than putting it in the blueprint class (like Account)?"
+    },
+    "options": {
+      "ar": [
+        "لأن جافا لا تسمح بوضع الدالة main في فئة تحتوي على متغيرات نسخة",
+        "لتعزيز قابلية إعادة الاستخدام وفصل الاهتمامات (Separation of Concerns)",
+        "لأن الدالة main يجب أن تكون دائماً private",
+        "لتسريع وقت تنفيذ البرنامج"
+      ],
+      "en": [
+        "Because Java does not allow the main method in a class with instance variables",
+        "To promote reusability and Separation of Concerns",
+        "Because the main method must always be private",
+        "To speed up the program's execution time"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "فصل كود التشغيل (الاختبار) عن كود الهيكل (المخطط) يجعل الفئة الأساسية نظيفة وقابلة للاستخدام في مشاريع أخرى بسهولة.",
+      "en": "Separating the execution (test) code from the structural (blueprint) code keeps the base class clean and easily reusable in other projects."
+    },
+    "hint": {
+      "ar": "فكر في مبدأ فصل الاهتمامات.",
+      "en": "Think about the principle of Separation of Concerns."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>

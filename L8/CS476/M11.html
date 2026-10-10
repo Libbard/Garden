@@ -99,6 +99,16 @@
         <template class="content-en">Message-Oriented Middleware (MOM) & Message Brokers</template>
         <span class="content-target">البرمجيات الوسيطة الموجهة للرسائل (MOM) ووسطاء الرسائل</span>
       </a>
+      <a href="#synchronization-places" class="toc-link" data-bilingual>
+        <template class="content-ar">أماكن المزامنة في الاتصال</template>
+        <template class="content-en">Places for Synchronization in Communication</template>
+        <span class="content-target">أماكن المزامنة في الاتصال</span>
+      </a>
+      <a href="#queue-messaging-combinations" class="toc-link" data-bilingual>
+        <template class="content-ar">حالات المراسلة القائمة على الطوابير</template>
+        <template class="content-en">Queue-Based Messaging Combinations</template>
+        <span class="content-target">حالات المراسلة القائمة على الطوابير</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -1151,14 +1161,100 @@
   </details>
 </section>
 
+<section id="synchronization-places" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> أماكن المزامنة في الاتصال</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Places for Synchronization in Communication</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن أن تحدث المزامنة في الاتصال عند ثلاث نقاط مختلفة: عند تقديم الطلب، أو عند تسليم الطلب، أو بعد معالجة الطلب.</p></template>
+    <template class="content-en"><p>Synchronization in communication can occur at three distinct points: at request submission, at request delivery, or after request processing.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عندما يرسل عميل رسالة إلى خادم، يمكن تحديد نقطة المزامنة (متى يُسمح للعميل بمواصلة العمل) في ثلاثة أماكن رئيسية:</p><ol><li><strong>عند <span class="smart-term" data-term-en="Request Submission" data-ar="تقديم الطلب" data-en-def="The point where a message is handed over to the local communication facility.">تقديم الطلب<span class="smart-term-tooltip"></span></span> (At request submission):</strong> يُحظر العميل فقط حتى يتم تسليم الرسالة إلى نظام التشغيل أو البرمجيات الوسيطة المحلية الخاصة به.</li><li><strong>عند <span class="smart-term" data-term-en="Request Delivery" data-ar="تسليم الطلب" data-en-def="The point where a message successfully reaches the remote communication facility.">تسليم الطلب<span class="smart-term-tooltip"></span></span> (At request delivery):</strong> يُحظر العميل حتى يتم تسليم الرسالة بنجاح إلى نظام التشغيل أو البرمجيات الوسيطة الخاصة بالمستلم (الخادم).</li><li><strong>بعد <span class="smart-term" data-term-en="Request Processing" data-ar="معالجة الطلب" data-en-def="The completion of the actual work requested by the message on the server side.">معالجة الطلب<span class="smart-term-tooltip"></span></span> (After request processing):</strong> يُحظر العميل حتى يقوم الخادم باستلام الطلب، ومعالجته بالكامل، وإرسال الرد (وهذا هو الاتصال المتزامن التقليدي).</li></ol></template>
+    <template class="content-en"><p>When a client sends a message to a server, the synchronization point (when the client is allowed to continue execution) can be defined at three main places:</p><ol><li><strong>At <span class="smart-term" data-term-en="Request Submission" data-ar="تقديم الطلب" data-en-def="The point where a message is handed over to the local communication facility.">request submission<span class="smart-term-tooltip"></span></span>:</strong> The client blocks only until the message is handed over to its local OS or middleware.</li><li><strong>At <span class="smart-term" data-term-en="Request Delivery" data-ar="تسليم الطلب" data-en-def="The point where a message successfully reaches the remote communication facility.">request delivery<span class="smart-term-tooltip"></span></span>:</strong> The client blocks until the message is successfully delivered to the receiver's OS or middleware.</li><li><strong>After <span class="smart-term" data-term-en="Request Processing" data-ar="معالجة الطلب" data-en-def="The completion of the actual work requested by the message on the server side.">request processing<span class="smart-term-tooltip"></span></span>:</strong> The client blocks until the server receives the request, fully processes it, and returns a response (this is traditional synchronous communication).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>اختيار نقطة المزامنة المناسبة يوازن بين الأداء والموثوقية. المزامنة عند التقديم سريعة جداً ولكنها لا تقدم أي ضمانات بوصول الرسالة. المزامنة بعد المعالجة تضمن إنجاز العمل ولكنها تترك العميل خاملاً لفترة طويلة.</p><p>تُستخدم المزامنة عند التسليم غالباً في الأنظمة التي تتطلب تأكيداً موثوقاً لوصول البيانات دون الحاجة لانتظار المعالجة الحسابية الثقيلة، مما يحسن من إنتاجية النظام (Throughput).</p></template>
+    <template class="content-en"><p>Choosing the right synchronization point balances performance and reliability. Synchronizing at submission is very fast but offers no delivery guarantees. Synchronizing after processing guarantees the work is done but leaves the client idle for a long time.</p><p>Synchronization at delivery is often used in systems that require reliable confirmation of data arrival without waiting for heavy computational processing, thereby improving overall system throughput.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا قد يختار نظام ما المزامنة عند 'تسليم الطلب' بدلاً من 'بعد المعالجة'؟</template>
+      <template class="content-en">Why might a system choose to synchronize at 'request delivery' rather than 'after processing'?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لضمان وصول الرسالة بأمان إلى وجهتها دون إجبار العميل على الانتظار لفترة طويلة إذا كانت عملية المعالجة على الخادم تستغرق وقتاً طويلاً.</p></template>
+      <template class="content-en"><p>To ensure the message safely reached its destination without forcing the client to wait for a long time if the processing operation on the server is time-consuming.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="queue-messaging-combinations" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> حالات المراسلة القائمة على الطوابير</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Queue-Based Messaging Combinations</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تسمح المراسلة القائمة على الطوابير بأربع حالات (تركيبات) مختلفة بناءً على ما إذا كان المرسل والمستقبل في حالة نشطة (Running) أو خاملة (Passive).</p></template>
+    <template class="content-en"><p>Queue-based messaging allows for four different combinations based on whether the sender and receiver are actively running or passive.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في أنظمة المراسلة القائمة على الطوابير (مثل MOM)، يتم فصل الاتصال زمنياً، مما يخلق أربع تركيبات ممكنة لحالة المرسل والمستقبل أثناء نقل الرسالة:</p><ol><li><strong>المرسل نشط، المستقبل نشط (Sender running, Receiver running):</strong> كلاهما يعملان في نفس الوقت ويتبادلان الرسائل عبر الطابور.</li><li><strong>المرسل نشط، المستقبل خامل (Sender running, Receiver passive):</strong> المرسل يولد الرسائل ويضعها في الطابور، بينما المستقبل غير متصل أو نائم.</li><li><strong>المرسل خامل، المستقبل نشط (Sender passive, Receiver running):</strong> المرسل توقف عن العمل، لكن المستقبل يستيقظ ويبدأ في سحب الرسائل المتراكمة من الطابور.</li><li><strong>المرسل خامل، المستقبل خامل (Sender passive, Receiver passive):</strong> لا أحد منهما يعمل حالياً، والرسائل محفوظة بأمان في الطابور لمعالجتها لاحقاً.</li></ol></template>
+    <template class="content-en"><p>In queue-based messaging systems (like MOM), communication is decoupled in time, creating four possible state combinations for the sender and receiver during message transfer:</p><ol><li><strong>Sender running, Receiver running:</strong> Both are active simultaneously, exchanging messages via the queue.</li><li><strong>Sender running, Receiver passive:</strong> The sender generates messages and puts them in the queue, while the receiver is offline or sleeping.</li><li><strong>Sender passive, Receiver running:</strong> The sender has terminated or is idle, but the receiver wakes up and pulls accumulated messages from the queue.</li><li><strong>Sender passive, Receiver passive:</strong> Neither is currently active, and messages are safely stored in the queue for later processing.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذا <span class="smart-term" data-term-en="Temporal Decoupling" data-ar="الفصل الزمني" data-en-def="The ability of a system to allow components to communicate without needing to be active at the same time.">الفصل الزمني<span class="smart-term-tooltip"></span></span> (Temporal Decoupling) هو الميزة الكبرى للاتصال المستمر غير المتزامن. فهو يجعل النظام مقاوماً للأعطال الجزئية (Partial failures).</p><p>على سبيل المثال، إذا تعطل خادم قاعدة البيانات (المستقبل خامل)، يمكن لتطبيق الويب (المرسل نشط) الاستمرار في قبول طلبات المستخدمين وتخزينها في الطابور. بمجرد عودة قاعدة البيانات للعمل، ستقوم بمعالجة الطلبات دون فقدان أي بيانات.</p></template>
+    <template class="content-en"><p>This <span class="smart-term" data-term-en="Temporal Decoupling" data-ar="الفصل الزمني" data-en-def="The ability of a system to allow components to communicate without needing to be active at the same time.">temporal decoupling<span class="smart-term-tooltip"></span></span> is the greatest advantage of persistent asynchronous communication. It makes the system highly resilient to partial failures.</p><p>For example, if a database server crashes (Receiver passive), a web application (Sender running) can continue accepting user requests and storing them in the queue. Once the database is back online, it will process the backlog without any data loss.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أي من هذه الحالات الأربع مستحيلة في نموذج العميل/الخادم المتزامن التقليدي؟</template>
+      <template class="content-en">Which of these four combinations are impossible in a traditional synchronous Client/Server model?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>أي حالة يكون فيها أحد الطرفين (أو كلاهما) خاملاً. الاتصال المتزامن يتطلب أن يكون كل من العميل والخادم نشطين في نفس الوقت.</p></template>
+      <template class="content-en"><p>Any combination where one (or both) of the parties is passive. Synchronous communication requires both the client and the server to be running at the same time.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. إذا أردنا أن تعمل أجهزة الكمبيوتر معاً كنظام واحد، فيجب أن تتحدث مع بعضها البعض، وهذا هو جوهر 'الاتصالات'. في الامتحان، ركزوا جيداً على التمييز بين أنواع الاتصال: متى نستخدم العابر (Transient) ومتى نستخدم المستمر (Persistent)؟ تذكروا أن RPC هو الساحر الذي يخفي تعقيد الشبكة ليجعل الاستدعاء البعيد يبدو محلياً، لكن لا تنسوا دور 'الوكيل' (Stub) في تغليف البيانات. أيضاً، واجهة المقابس (Sockets) هي الأساس المنخفض المستوى، بينما MPI تُستخدم عندما نحتاج لأداء خارق ومرونة في الحوسبة المتوازية. وأخيراً، البرمجيات الوسيطة (MOM) ووسطاء الرسائل (Brokers) هم أبطال الأنظمة المؤسسية الحديثة، حيث يحلون مشكلة اختلاف لغات التطبيقات (Heterogeneity) ويضمنون عدم ضياع الرسائل. راجعوا الفروق بين عمليات الطوابير (GET مقابل POLL) جيداً، فهي موضع أسئلة دائم. بالتوفيق!</template>
-    <template class="content-en">Welcome, my friends, to this pivotal module. For computers to work together as a single system, they must talk to each other—this is the essence of 'Communication'. For the exam, focus heavily on distinguishing communication types: when do we use Transient vs Persistent? Remember that RPC is the magician that hides network complexity to make remote calls look local, but don't forget the 'Stub's' role in marshaling data. Also, Sockets are the low-level foundation, while MPI is used when we need extreme performance and flexibility in parallel computing. Finally, MOM and Message Brokers are the heroes of modern enterprise systems, solving application heterogeneity and ensuring messages aren't lost. Review the differences between queue operations (GET vs POLL) carefully, as they are frequent exam questions. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة المحورية. إذا أردنا أن تعمل أجهزة الكمبيوتر معاً كنظام واحد، فيجب أن تتحدث مع بعضها البعض، وهذا هو جوهر 'الاتصالات'. في الامتحان، ركزوا جيداً على التمييز بين أنواع الاتصال: متى نستخدم العابر (Transient) ومتى نستخدم المستمر (Persistent)؟ تذكروا أن RPC هو الساحر الذي يخفي تعقيد الشبكة ليجعل الاستدعاء البعيد يبدو محلياً، لكن لا تنسوا دور 'الوكيل' (Stub) في تغليف البيانات. أيضاً، واجهة المقابس (Sockets) هي الأساس المنخفض المستوى، بينما MPI تُستخدم عندما نحتاج لأداء خارق ومرونة في الحوسبة المتوازية. وأخيراً، البرمجيات الوسيطة (MOM) ووسطاء الرسائل (Brokers) هم أبطال الأنظمة المؤسسية الحديثة، حيث يحلون مشكلة اختلاف لغات التطبيقات (Heterogeneity) ويضمنون عدم ضياع الرسائل. راجعوا الفروق بين عمليات الطوابير (GET مقابل POLL) جيداً، فهي موضع أسئلة دائم. بالتوفيق!<p>لفهم الاتصال في الأنظمة الموزعة بعمق، يجب ألا نكتفي بمعرفة 'كيف' تُرسل الرسائل، بل 'متى' ننتظرها. تحديد نقطة المزامنة بدقة، واستغلال الطوابير لفصل المرسل عن المستقبل زمنياً، هي الأدوات التي نستخدمها لبناء أنظمة لا تنهار بمجرد تعطل خادم واحد.</p></template>
+    <template class="content-en">Welcome, my friends, to this pivotal module. For computers to work together as a single system, they must talk to each other—this is the essence of 'Communication'. For the exam, focus heavily on distinguishing communication types: when do we use Transient vs Persistent? Remember that RPC is the magician that hides network complexity to make remote calls look local, but don't forget the 'Stub's' role in marshaling data. Also, Sockets are the low-level foundation, while MPI is used when we need extreme performance and flexibility in parallel computing. Finally, MOM and Message Brokers are the heroes of modern enterprise systems, solving application heterogeneity and ensuring messages aren't lost. Review the differences between queue operations (GET vs POLL) carefully, as they are frequent exam questions. Good luck!<p>To deeply understand communication in distributed systems, we must not only know 'how' messages are sent, but 'when' we wait for them. Precisely defining the synchronization point, and leveraging queues to temporally decouple senders from receivers, are the tools we use to build systems that don't collapse just because a single server goes down.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1336,6 +1432,41 @@
         </div>
       </div>
     </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يؤثر اختيار نقطة المزامنة (Submission مقابل Processing) على أداء النظام الموزع؟</template>
+          <template class="content-en">How does the choice of synchronization point (Submission vs Processing) affect the performance of a distributed system?</template>
+          <span class="content-target">كيف يؤثر اختيار نقطة المزامنة (Submission مقابل Processing) على أداء النظام الموزع؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>المزامنة عند التقديم (Submission) تزيد من إنتاجية العميل لأنه لا ينتظر طويلاً، لكنها تفتقر إلى الموثوقية إذا ضاعت الرسالة. المزامنة بعد المعالجة (Processing) تضمن الموثوقية التامة ولكنها تقلل الأداء لأن العميل يظل معطلاً (Blocked) طوال فترة الإرسال والمعالجة والعودة.</p></template>
+          <template class="content-en"><p>Synchronization at submission increases client throughput because it doesn't wait long, but lacks reliability if the message is lost. Synchronization after processing guarantees absolute reliability but reduces performance because the client remains blocked throughout the transmission, processing, and return phases.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر القدرة على دعم حالة 'المرسل نشط والمستقبل خامل' ميزة معمارية حاسمة في الأنظمة الموزعة الحديثة؟</template>
+          <template class="content-en">Why do we consider the ability to support the 'Sender running, Receiver passive' state a crucial architectural advantage in modern distributed systems?</template>
+          <span class="content-target">لماذا نعتبر القدرة على دعم حالة 'المرسل نشط والمستقبل خامل' ميزة معمارية حاسمة في الأنظمة الموزعة الحديثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها توفر 'الفصل الزمني' (Temporal Decoupling). هذا يعني أن مكونات النظام لا تعتمد على التوافر الفوري لبعضها البعض. إذا تعطلت خدمة خلفية، يمكن للواجهة الأمامية الاستمرار في العمل وتخزين الطلبات في طابور، مما يحسن من مرونة النظام (Resilience) وتجربة المستخدم.</p></template>
+          <template class="content-en"><p>Because it provides 'Temporal Decoupling'. This means system components do not rely on the immediate availability of one another. If a backend service crashes, the frontend can continue operating and queue the requests, vastly improving system resilience and user experience.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1442,8 +1573,8 @@
         "en": "To hide communication between caller and callee by using a procedure-call mechanism to make it look local."
       },
       "example": {
-        "ar": "استدعاء دالة <code>getUser()</code> على خادم بعيد كما لو كانت في نفس البرنامج.",
-        "en": "Calling <code>getUser()</code> on a remote server as if it were in the same program."
+        "ar": "استدعاء دالة <code>getUser()<\/code> على خادم بعيد كما لو كانت في نفس البرنامج.",
+        "en": "Calling <code>getUser()<\/code> on a remote server as if it were in the same program."
       }
     }
   },
@@ -1501,8 +1632,8 @@
   {
     "id": 10,
     "front": {
-      "ar": "ماذا تفعل عملية <code>bind</code> في المقابس (Sockets)؟",
-      "en": "What does the <code>bind</code> operation do in Sockets?"
+      "ar": "ماذا تفعل عملية <code>bind<\/code> في المقابس (Sockets)؟",
+      "en": "What does the <code>bind<\/code> operation do in Sockets?"
     },
     "back": {
       "definition": {
@@ -1518,8 +1649,8 @@
   {
     "id": 11,
     "front": {
-      "ar": "ماذا تفعل عملية <code>accept</code> في المقابس؟",
-      "en": "What does the <code>accept</code> operation do in Sockets?"
+      "ar": "ماذا تفعل عملية <code>accept<\/code> في المقابس؟",
+      "en": "What does the <code>accept<\/code> operation do in Sockets?"
     },
     "back": {
       "definition": {
@@ -1535,13 +1666,13 @@
   {
     "id": 12,
     "front": {
-      "ar": "في MPI، ما الفرق بين <code>MPI_SEND</code> و <code>MPI_ISEND</code>؟",
-      "en": "In MPI, what is the difference between <code>MPI_SEND</code> and <code>MPI_ISEND</code>?"
+      "ar": "في MPI، ما الفرق بين <code>MPI_SEND<\/code> و <code>MPI_ISEND<\/code>؟",
+      "en": "In MPI, what is the difference between <code>MPI_SEND<\/code> and <code>MPI_ISEND<\/code>?"
     },
     "back": {
       "definition": {
-        "ar": "<code>MPI_SEND</code> يحظر التنفيذ حتى يتم النسخ، بينما <code>MPI_ISEND</code> يمرر المرجع ويستمر فوراً (غير محظور).",
-        "en": "<code>MPI_SEND</code> blocks until copied, while <code>MPI_ISEND</code> passes a reference and continues immediately (non-blocking)."
+        "ar": "<code>MPI_SEND<\/code> يحظر التنفيذ حتى يتم النسخ، بينما <code>MPI_ISEND<\/code> يمرر المرجع ويستمر فوراً (غير محظور).",
+        "en": "<code>MPI_SEND<\/code> blocks until copied, while <code>MPI_ISEND<\/code> passes a reference and continues immediately (non-blocking)."
       },
       "example": {
         "ar": "[EXAMPLE_NEEDED]",
@@ -1569,13 +1700,13 @@
   {
     "id": 14,
     "front": {
-      "ar": "في MOM، ما الفرق بين <code>GET</code> و <code>POLL</code>؟",
-      "en": "In MOM, what is the difference between <code>GET</code> and <code>POLL</code>?"
+      "ar": "في MOM، ما الفرق بين <code>GET<\/code> و <code>POLL<\/code>؟",
+      "en": "In MOM, what is the difference between <code>GET<\/code> and <code>POLL<\/code>?"
     },
     "back": {
       "definition": {
-        "ar": "<code>GET</code> يحظر التنفيذ إذا كان الطابور فارغاً، بينما <code>POLL</code> يتحقق ويعود فوراً دون حظر.",
-        "en": "<code>GET</code> blocks if the queue is empty, while <code>POLL</code> checks and returns immediately without blocking."
+        "ar": "<code>GET<\/code> يحظر التنفيذ إذا كان الطابور فارغاً، بينما <code>POLL<\/code> يتحقق ويعود فوراً دون حظر.",
+        "en": "<code>GET<\/code> blocks if the queue is empty, while <code>POLL<\/code> checks and returns immediately without blocking."
       },
       "example": {
         "ar": "[EXAMPLE_NEEDED]",
@@ -1599,6 +1730,40 @@
         "en": "Converting an XML message from a legacy system to JSON for a modern system."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هي الأماكن الثلاثة التي يمكن أن تحدث فيها المزامنة في الاتصال؟",
+      "en": "What are the three places where synchronization can occur in communication?"
+    },
+    "back": {
+      "definition": {
+        "ar": "1) عند تقديم الطلب. 2) عند تسليم الطلب. 3) بعد معالجة الطلب.",
+        "en": "1) At request submission. 2) At request delivery. 3) After request processing."
+      },
+      "example": {
+        "ar": "المزامنة بعد المعالجة تشبه انتظارك في المطعم حتى يتم طهي طعامك وتقديمه لك.",
+        "en": "Synchronizing after processing is like waiting at a restaurant until your food is cooked and served to you."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "كيف يتيح نظام الطوابير (MOM) الاتصال عندما يكون المستقبل خاملاً (Passive)؟",
+      "en": "How does a queue system (MOM) enable communication when the receiver is passive?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستمر المرسل النشط في وضع الرسائل في الطابور، وتُحفظ هناك بأمان حتى يستيقظ المستقبل الخامل لمعالجتها لاحقاً.",
+        "en": "The active sender continues to put messages in the queue, where they are safely stored until the passive receiver wakes up to process them later."
+      },
+      "example": {
+        "ar": "إرسال بريد إلكتروني لصديق هاتفه مغلق.",
+        "en": "Sending an email to a friend whose phone is turned off."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1608,7 +1773,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1624,7 +1789,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1748,8 +1913,8 @@
     },
     "correctIndex": 1,
     "explanation": {
-      "ar": "عملية <code>listen</code> تُستخدم لتهيئة المقبس لاستقبال الاتصالات وتحديد حجم طابور الانتظار للاتصالات الواردة.",
-      "en": "The <code>listen</code> operation is used to prepare the socket for incoming connections and sets the backlog queue size."
+      "ar": "عملية <code>listen<\/code> تُستخدم لتهيئة المقبس لاستقبال الاتصالات وتحديد حجم طابور الانتظار للاتصالات الواردة.",
+      "en": "The <code>listen<\/code> operation is used to prepare the socket for incoming connections and sets the backlog queue size."
     },
     "hint": {
       "ar": "الكلمة تعني 'الاستماع'.",
@@ -1761,8 +1926,8 @@
   {
     "id": 5,
     "question": {
-      "ar": "ما هي وظيفة <code>MPI_ISEND</code> في واجهة تمرير الرسائل؟",
-      "en": "What is the function of <code>MPI_ISEND</code> in the Message-Passing Interface?"
+      "ar": "ما هي وظيفة <code>MPI_ISEND<\/code> في واجهة تمرير الرسائل؟",
+      "en": "What is the function of <code>MPI_ISEND<\/code> in the Message-Passing Interface?"
     },
     "options": {
       "ar": [
@@ -1780,8 +1945,8 @@
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "حرف 'I' في <code>MPI_ISEND</code> يرمز إلى Immediate (أو غير محظور)، مما يعني أن العملية تعود فوراً ليتمكن البرنامج من مواصلة العمل.",
-      "en": "The 'I' in <code>MPI_ISEND</code> stands for Immediate (non-blocking), meaning the operation returns immediately so the program can continue."
+      "ar": "حرف 'I' في <code>MPI_ISEND<\/code> يرمز إلى Immediate (أو غير محظور)، مما يعني أن العملية تعود فوراً ليتمكن البرنامج من مواصلة العمل.",
+      "en": "The 'I' in <code>MPI_ISEND<\/code> stands for Immediate (non-blocking), meaning the operation returns immediately so the program can continue."
     },
     "hint": {
       "ar": "تذكر أن 'I' تعني غير متزامن أو فوري.",
@@ -1812,8 +1977,8 @@
     },
     "correctIndex": 3,
     "explanation": {
-      "ar": "عملية <code>POLL</code> مصممة للتحقق السريع؛ إذا كان الطابور فارغاً، تعود فوراً ولا توقف البرنامج، عكس <code>GET</code> التي تنتظر.",
-      "en": "<code>POLL</code> is designed for quick checking; if the queue is empty, it returns immediately without halting the program, unlike <code>GET</code>."
+      "ar": "عملية <code>POLL<\/code> مصممة للتحقق السريع؛ إذا كان الطابور فارغاً، تعود فوراً ولا توقف البرنامج، عكس <code>GET<\/code> التي تنتظر.",
+      "en": "<code>POLL<\/code> is designed for quick checking; if the queue is empty, it returns immediately without halting the program, unlike <code>GET<\/code>."
     },
     "hint": {
       "ar": "الكلمة تعني 'استطلاع'.",
@@ -1949,6 +2114,70 @@
     },
     "difficulty": "medium",
     "conceptId": "rpc-operation"
+  },
+  {
+    "conceptId": "synchronization-places",
+    "question": {
+      "ar": "إذا كان العميل يُحظر فقط حتى يتم تسليم رسالته بنجاح إلى البرمجيات الوسيطة الخاصة بالخادم، فأين حدثت المزامنة؟",
+      "en": "If a client blocks only until its message is successfully delivered to the server's middleware, where did synchronization occur?"
+    },
+    "options": {
+      "ar": [
+        "عند تقديم الطلب (At request submission)",
+        "عند تسليم الطلب (At request delivery)",
+        "بعد معالجة الطلب (After request processing)",
+        "لم تحدث أي مزامنة"
+      ],
+      "en": [
+        "At request submission",
+        "At request delivery",
+        "After request processing",
+        "No synchronization occurred"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المزامنة عند تسليم الطلب تعني أن العميل ينتظر تأكيد الوصول إلى الوجهة، ولكنه لا ينتظر حتى يقوم الخادم بمعالجة البيانات فعلياً.",
+      "en": "Synchronization at request delivery means the client waits for confirmation of arrival at the destination, but does not wait for the server to actually process the data."
+    },
+    "hint": {
+      "ar": "الرسالة وصلت للطرف الآخر، لكن لم يتم العمل عليها بعد.",
+      "en": "The message reached the other side, but hasn't been worked on yet."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "queue-messaging-combinations",
+    "question": {
+      "ar": "أي من الحالات التالية تبرز الفائدة الكبرى للبرمجيات الوسيطة الموجهة للرسائل (MOM) في التعامل مع أعطال النظام؟",
+      "en": "Which of the following states highlights the greatest benefit of Message-Oriented Middleware (MOM) in handling system failures?"
+    },
+    "options": {
+      "ar": [
+        "المرسل نشط والمستقبل نشط",
+        "المرسل نشط والمستقبل خامل",
+        "المرسل خامل والمستقبل خامل",
+        "جميع الحالات تتطلب أن يكون كلاهما نشطاً"
+      ],
+      "en": [
+        "Sender running and Receiver running",
+        "Sender running and Receiver passive",
+        "Sender passive and Receiver passive",
+        "All states require both to be active"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "حالة (المرسل نشط والمستقبل خامل) تسمح للنظام بالاستمرار في استقبال البيانات وتخزينها في الطابور حتى لو تعطل المستقبل، مما يمنع فقدان البيانات.",
+      "en": "The state (Sender running and Receiver passive) allows the system to continue accepting and storing data in the queue even if the receiver crashes, preventing data loss."
+    },
+    "hint": {
+      "ar": "فكر في حالة يتعطل فيها جزء من النظام بينما يستمر الجزء الآخر في العمل.",
+      "en": "Think of a situation where one part of the system crashes while the other continues to work."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1993,6 +2222,22 @@
       <template class="content-ar">وسيط الرسائل (Message Broker) يفصل الأنظمة في بُعدين: 'الزمن' (عبر الطوابير) و 'بنية البيانات' (عبر تحويل الصيغ).</template>
       <template class="content-en">A Message Broker decouples systems in two dimensions: 'Time' (via queues) and 'Data Structure' (via format transformation).</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن المزامنة تحدث دائماً بعد انتهاء الخادم من المعالجة. تذكر أن المزامنة يمكن أن تحدث مبكراً بمجرد تقديم الطلب لنظام التشغيل، أو بمجرد تسليمه للطرف الآخر.</template>
+    <template class="content-en">Assuming synchronization always happens after the server finishes processing. Remember that synchronization can occur early as soon as the request is submitted to the OS, or as soon as it is delivered to the remote side.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الطوابير (Queues) توفر 'الفصل الزمني' (Temporal Decoupling)، مما يعني أن المرسل والمستقبل لا يحتاجان إلى أن يكونا نشطين في نفس الوقت لكي ينجح الاتصال.</template>
+    <template class="content-en">Queues provide 'Temporal Decoupling', meaning the sender and receiver do not need to be active at the same time for communication to succeed.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

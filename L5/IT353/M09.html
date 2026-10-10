@@ -124,6 +124,11 @@
         <template class="content-en">File Organizations</template>
         <span class="content-target">تنظيم الملفات</span>
       </a>
+      <a href="#er-to-relational-rules" class="toc-link" data-bilingual>
+        <template class="content-ar">قواعد تحويل مخطط E-R إلى علاقات</template>
+        <template class="content-en">E-R to Relational Transformation Rules</template>
+        <span class="content-target">قواعد تحويل مخطط E-R إلى علاقات</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -590,14 +595,14 @@
 <li>يتكون المفتاح الأساسي من سمة واحدة فقط.</li>
 <li>لا توجد سمات غير أساسية في العلاقة.</li>
 <li>كل سمة غير أساسية تعتمد وظيفياً على المجموعة الكاملة لسمات المفتاح الأساسي.</li>
-</ol></template>
+</ol><p>مثال عملي لتحويل علاقة إلى 2NF: لنفترض أن لدينا العلاقة <code>EMPLOYEE2(Emp_ID, Name, Dept, Salary, Course, Date_Completed)</code>. في هذه العلاقة، المفتاح الأساسي مركب من <code>(Emp_ID, Course)</code>. نلاحظ الاعتمادات التالية:</p><ul><li><code>Emp_ID &rarr; Name, Dept, Salary</code> (اعتماد جزئي على <code>Emp_ID</code> فقط).</li><li><code>Emp_ID, Course &rarr; Date_Completed</code> (اعتماد كلي على المفتاح المركب).</li></ul><p>لتحويلها إلى 2NF، نقوم بتفكيكها إلى علاقات جديدة باستخدام السمات التي تحدد سمات أخرى:</p><ol><li>علاقة للموظف: <code>EMPLOYEE1(Emp_ID, Name, Dept, Salary)</code>.</li><li>علاقة للدورة: <code>EMP COURSE(Emp_ID, Course, Date_Completed)</code>.</li></ol></template>
     <template class="content-en"><p>A relation is in 2NF if every nonprimary key attribute is functionally dependent on the whole (not part of) primary key.</p>
 <p>A relation is automatically in 2NF if any of the following conditions is achieved:</p>
 <ol>
 <li>The primary key consists of only one attribute.</li>
 <li>No nonprimary key attributes exist in the relation.</li>
 <li>Every nonprimary key attribute is functionally dependent on the full set of primary key attributes.</li>
-</ol></template>
+</ol><p>Worked example for converting a relation to 2NF: Suppose we have the relation <code>EMPLOYEE2(Emp_ID, Name, Dept, Salary, Course, Date_Completed)</code>. The primary key is composite: <code>(Emp_ID, Course)</code>. We observe the following dependencies:</p><ul><li><code>Emp_ID &rarr; Name, Dept, Salary</code> (partial dependency on <code>Emp_ID</code> only).</li><li><code>Emp_ID, Course &rarr; Date_Completed</code> (full dependency on the composite key).</li></ul><p>To convert the relation to 2NF, we decompose it into new relations using the attributes that determine other attributes:</p><ol><li>Employee relation: <code>EMPLOYEE1(Emp_ID, Name, Dept, Salary)</code>.</li><li>Course relation: <code>EMP COURSE(Emp_ID, Course, Date_Completed)</code>.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -647,13 +652,13 @@
 <li>العلاقة موجودة في 2NF.</li>
 <li>لا توجد اعتمادات وظيفية بين أكثر من سمة غير أساسية (أي لا يوجد اعتماد متعدي - Transitive Dependency).</li>
 </ol>
-<p>لتحويل علاقة إلى 3NF، يتم تفكيكها إلى علاقات جديدة لفصل السمات المعتمدة على بعضها.</p></template>
+<p>لتحويل علاقة إلى 3NF، يتم تفكيكها إلى علاقات جديدة لفصل السمات المعتمدة على بعضها.</p><p>مثال عملي لتحويل علاقة إلى 3NF: لدينا العلاقة <code>SALES(Customer_ID, Customer_Name, Salesperson, Region)</code>. هذه العلاقة في 2NF لأن المفتاح الأساسي <code>Customer_ID</code> هو سمة واحدة. لكن نلاحظ الاعتمادات التالية:</p><ul><li><code>Customer_ID &rarr; Customer_Name, Salesperson, Region</code></li><li><code>Salesperson &rarr; Region</code> (اعتماد متعدي، حيث تعتمد سمة غير أساسية على سمة غير أساسية أخرى).</li></ul><p>لتحويل العلاقة إلى 3NF، نقوم بتفكيكها إلى علاقات جديدة:</p><ol><li>علاقة المبيعات: <code>SALES1(Customer_ID, Customer_Name, Salesperson)</code>.</li><li>علاقة مندوب المبيعات: <code>SPERSON(Salesperson, Region)</code>.</li></ol></template>
     <template class="content-en"><p>A relation is in the 3NF if the following conditions are satisfied:</p>
 <ol>
 <li>The relation is in the 2NF.</li>
 <li>No functional dependencies exist between more than one nonprimary key attributes (i.e., no transitive dependency).</li>
 </ol>
-<p>To convert a relation to 3NF, decompose it into new relations using the attributes that determine other attributes.</p></template>
+<p>To convert a relation to 3NF, decompose it into new relations using the attributes that determine other attributes.</p><p>Worked example for converting a relation to 3NF: Consider the relation <code>SALES(Customer_ID, Customer_Name, Salesperson, Region)</code>. This relation is in 2NF because the primary key <code>Customer_ID</code> is a single attribute. However, we have the following dependencies:</p><ul><li><code>Customer_ID &rarr; Customer_Name, Salesperson, Region</code></li><li><code>Salesperson &rarr; Region</code> (transitive dependency, where a non-primary key attribute depends on another).</li></ul><p>To convert the relation to 3NF, we decompose it into new relations:</p><ol><li>Sales relation: <code>SALES1(Customer_ID, Customer_Name, Salesperson)</code>.</li><li>Salesperson relation: <code>SPERSON(Salesperson, Region)</code>.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -864,7 +869,13 @@
 <li><strong>اختيار أنواع البيانات</strong> (مثل VARCHAR2, NUMBER, DATE في Oracle 10g)،</li>
 <li><strong>التحكم في سلامة البيانات (Data Integrity)</strong>، و</li>
 <li><strong>تصميم الجداول المادية</strong> لتحقيق الاستخدام الفعال للتخزين وسرعة المعالجة.</li>
-</ul></template>
+</ul><p>تتضمن القرارات الرئيسية في تصميم قاعدة البيانات المادية ما يلي:</p>
+<ol>
+<li>اختيار تنسيق التخزين (نوع البيانات).</li>
+<li>تجميع السمات من نموذج قاعدة البيانات المنطقي في سجلات مادية.</li>
+<li>ترتيب السجلات ذات الصلة في الذاكرة الثانوية.</li>
+<li>زيادة كفاءة تخزين البيانات والوصول إليها عن طريق اختيار أفضل الوسائط والهياكل.</li>
+</ol></template>
     <template class="content-en"><p>Physical design needs information like:</p>
 <ul>
 <li>normalized relations,</li>
@@ -877,7 +888,13 @@
 <li><strong>Choosing Data Types</strong> (coding schemes like VARCHAR2, NUMBER, DATE in Oracle 10g),</li>
 <li><strong>Controlling Data Integrity</strong>, and</li>
 <li><strong>Designing Physical Tables</strong> to achieve efficient secondary storage use and data processing speed.</li>
-</ul></template>
+</ul><p>The main decisions in physical database design include:</p>
+<ol>
+<li>Selecting a storage format (data type).</li>
+<li>Grouping attributes from the logical database model into physical records.</li>
+<li>Arranging related records in secondary memory.</li>
+<li>Increasing the efficiency for storing and accessing data by selecting the best media and structures.</li>
+</ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1145,14 +1162,57 @@
   </details>
 </section>
 
+<section id="er-to-relational-rules" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> قواعد تحويل مخطط E-R إلى علاقات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> E-R to Relational Transformation Rules</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>قواعد محددة لتحويل الكيانات (العادية والضعيفة) والعلاقات (1:1، 1:N، M:N) والأنواع الفائقة/الفرعية إلى جداول علائقية.</p></template>
+    <template class="content-en"><p>Specific rules for transforming entities (regular, weak), relationships (1:1, 1:N, M:N), and supertypes/subtypes into relational tables.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يلخص الجدول التالي قواعد التحويل الأساسية من مخطط E-R إلى النموذج العلائقي:</p><ol><li><strong>الكيان العادي (Regular entity):</strong> إنشاء علاقة بمفتاح أساسي وسمات غير أساسية.</li><li><strong>الكيان الضعيف (Weak entity):</strong> إنشاء علاقة بمفتاح أساسي مركب (يتضمن المفتاح الأساسي للكيان الذي يعتمد عليه) وسمات غير أساسية.</li><li><strong>علاقة 1:1 (ثنائية أو أحادية):</strong> وضع المفتاح الأساسي لأي من الكيانين في علاقة الكيان الآخر كمفتاح أجنبي.</li><li><strong>علاقة 1:N (ثنائية):</strong> وضع المفتاح الأساسي للكيان في جانب "الواحد" كمفتاح أجنبي في علاقة الكيان في جانب "المتعدد".</li><li><strong>علاقة M:N (ثنائية أو أحادية) أو <span class="smart-term" data-term-en="Associative Entity" data-ar="كيان وسيط" data-en-def="An entity type that associates the instances of one or more entity types and contains attributes that are peculiar to the relationship between those entity instances.">كيان وسيط<span class="smart-term-tooltip"></span></span>:</strong> إنشاء علاقة بمفتاح أساسي مركب باستخدام المفاتيح الأساسية للكيانات المرتبطة، بالإضافة إلى أي سمات غير أساسية للكيان الوسيط.</li><li><strong>النوع الفائق/النوع الفرعي (Supertype/subtype):</strong> إنشاء علاقة للنوع الفائق تحتوي على المفتاح الأساسي والسمات المشتركة، وإنشاء علاقة منفصلة لكل نوع فرعي بنفس المفتاح الأساسي والسمات الخاصة به فقط.</li></ol></template>
+    <template class="content-en"><p>The following summarizes the basic transformation rules from an E-R diagram to a relational model:</p><ol><li><strong><span class="smart-term" data-term-en="Regular Entity" data-ar="كيان عادي" data-en-def="An entity type that has its own independent existence and primary key.">Regular entity<span class="smart-term-tooltip"></span></span>:</strong> Create a relation with a primary key and nonkey attributes.</li><li><strong><span class="smart-term" data-term-en="Weak Entity" data-ar="كيان ضعيف" data-en-def="An entity type whose existence depends on some other entity type, requiring a composite primary key.">Weak entity<span class="smart-term-tooltip"></span></span>:</strong> Create a relation with a composite primary key (which includes the primary key of the entity on which this weak entity depends) and nonkey attributes.</li><li><strong>Binary or unary 1:1 relationship:</strong> Place the primary key of either entity in the relation for the other entity as a foreign key.</li><li><strong>Binary 1:N relationship:</strong> Place the primary key of the entity on the one side of the relationship as a foreign key in the relation for the entity on the many side.</li><li><strong>Binary or unary M:N relationship or <span class="smart-term" data-term-en="Associative Entity" data-ar="كيان وسيط" data-en-def="An entity type that associates the instances of one or more entity types and contains attributes that are peculiar to the relationship between those entity instances.">associative entity<span class="smart-term-tooltip"></span></span>:</strong> Create a relation with a composite primary key using the primary keys of the related entities, plus any nonkey attributes of the associative entity.</li><li><strong>Supertype/subtype:</strong> Create a relation for the superclass containing the primary key and shared attributes, and create a separate relation for each subclass with the same primary key and its specific attributes.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تضمن هذه القواعد الحفاظ على جميع القيود والبيانات الموجودة في المخطط المفاهيمي عند الانتقال إلى النموذج العلائقي.</p><p>على سبيل المثال، في علاقة 1:N بين "القسم" و"الموظف"، يتم أخذ رقم القسم (المفتاح الأساسي للقسم) ووضعه كعمود (مفتاح أجنبي) في جدول الموظف، لأن الموظف يتبع لقسم واحد، بينما القسم يضم عدة موظفين.</p></template>
+    <template class="content-en"><p>These rules ensure that all constraints and data present in the conceptual schema are preserved when moving to the relational model.</p><p>For example, in a 1:N relationship between 'Department' and 'Employee', the Department ID (primary key of Department) is placed as a column (foreign key) in the Employee table, because an employee belongs to one department, while a department has many employees.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">أين نضع المفتاح الأجنبي في علاقة 1:N بين كيانين؟</template>
+      <template class="content-en">Where do we place the foreign key in a 1:N relationship between two entities?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نضع المفتاح الأساسي للكيان الموجود في جانب "الواحد" (1) كمفتاح أجنبي في جدول الكيان الموجود في جانب "المتعدد" (N).</p></template>
+      <template class="content-en"><p>We place the primary key of the entity on the "one" side as a foreign key in the relation for the entity on the "many" side.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في ليلة الامتحان! هذه الوحدة هي قلب تصميم قواعد البيانات. تخيل أنك تبني منزلاً؛ التصميم المنطقي هو المخطط الهندسي (أين الغرف وكيف تتصل)، والتصميم المادي هو اختيار مواد البناء (نوع الطوب والأسلاك). ركزوا جداً على التطبيع (Normalization). تذكروا القاعدة الذهبية: في 2NF يجب أن تعتمد السمة على المفتاح 'كله'، وفي 3NF يجب أن تعتمد على المفتاح 'ولا شيء غير المفتاح' (لا للاعتماد المتعدي!). لا تنسوا خطوات تحويل E-R إلى جداول، وكيف ندمجها لإزالة التكرار. أخيراً، في التصميم المادي، افهموا متى نستخدم كل نوع من تنظيم الملفات (التسلسلي، المفهرس، المجزأ). ركزوا على هذه المفاهيم وستكونون جاهزين تماماً للامتحان. بالتوفيق!</template>
-    <template class="content-en">Welcome, future engineers, to exam eve! This module is the heart of database design. Imagine building a house; logical design is the blueprint (where rooms are and how they connect), and physical design is choosing the materials (bricks and wiring). Focus heavily on Normalization. Remember the golden rule: in 2NF an attribute must depend on the 'whole' key, and in 3NF it must depend on the key and 'nothing but the key' (no transitive dependencies!). Don't forget the steps to transform E-R into tables and how merging removes redundancy. Finally, in physical design, understand exactly when to use Sequential, Indexed, or Hashed file organizations. Master these, and you'll ace the exam. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في ليلة الامتحان! هذه الوحدة هي قلب تصميم قواعد البيانات. تخيل أنك تبني منزلاً؛ التصميم المنطقي هو المخطط الهندسي (أين الغرف وكيف تتصل)، والتصميم المادي هو اختيار مواد البناء (نوع الطوب والأسلاك). ركزوا جداً على التطبيع (Normalization). تذكروا القاعدة الذهبية: في 2NF يجب أن تعتمد السمة على المفتاح 'كله'، وفي 3NF يجب أن تعتمد على المفتاح 'ولا شيء غير المفتاح' (لا للاعتماد المتعدي!). لا تنسوا خطوات تحويل E-R إلى جداول، وكيف ندمجها لإزالة التكرار. أخيراً، في التصميم المادي، افهموا متى نستخدم كل نوع من تنظيم الملفات (التسلسلي، المفهرس، المجزأ). ركزوا على هذه المفاهيم وستكونون جاهزين تماماً للامتحان. بالتوفيق!<p>بينما تنتقل من المخططات المفاهيمية إلى الجداول الفعلية، فإن إتقان قواعد التحويل المحددة والتدرب على التطبيع خطوة بخطوة أمر بالغ الأهمية. هذه الخطوات الميكانيكية تضمن أن قاعدة بياناتك النهائية قوية، فعالة، وخالية من أخطاء التحديث.</p><p>بينما تتقن عملية تصميم قاعدة البيانات، تذكر أنها رحلة مستمرة. تبدأ بجمع البيانات وتطبيعها بدقة من واجهات مستخدم مختلفة لبناء نموذج منطقي متين، ثم تتحقق من صحته مقابل مخططات E-R المفاهيمية. وفقط عندما يكون هذا الأساس المنطقي صلباً، تنتقل إلى التصميم المادي، متخذاً قرارات حاسمة حول تنسيقات التخزين وترتيب الذاكرة لضمان الأداء الأمثل.</p></template>
+    <template class="content-en">Welcome, future engineers, to exam eve! This module is the heart of database design. Imagine building a house; logical design is the blueprint (where rooms are and how they connect), and physical design is choosing the materials (bricks and wiring). Focus heavily on Normalization. Remember the golden rule: in 2NF an attribute must depend on the 'whole' key, and in 3NF it must depend on the key and 'nothing but the key' (no transitive dependencies!). Don't forget the steps to transform E-R into tables and how merging removes redundancy. Finally, in physical design, understand exactly when to use Sequential, Indexed, or Hashed file organizations. Master these, and you'll ace the exam. Good luck!<p>As you transition from conceptual diagrams to actual tables, mastering the specific transformation rules and practicing normalization step-by-step is crucial. These mechanical steps ensure your final database is robust, efficient, and free of update anomalies.</p><p>As you master the database design process, remember that it is a continuous journey. You start by meticulously gathering and normalizing data from various user interfaces to build a solid logical model, validating it against your conceptual E-R diagrams. Only when this logical foundation is rock-solid do you move to the physical design, making critical decisions about storage formats and memory arrangement to ensure optimal performance.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1326,6 +1386,59 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">VARCHAR2 يستخدم لتخزين نصوص متغيرة الطول (يستهلك المساحة المطلوبة فقط)، بينما CHAR يخزن نصوصاً ثابتة الطول (يحجز المساحة كاملة حتى لو لم تُستخدم).</template>
           <template class="content-en">VARCHAR2 is used for variable-length text (consumes only required space), while CHAR is for fixed-length text (reserves the full space even if unused).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">عند تحويل مخطط E-R، لماذا لا نكتفي بوضع مفتاح أجنبي لتمثيل علاقة متعدد إلى متعدد (M:N)؟</template>
+          <template class="content-en">When transforming an E-R diagram, why can't we just use a foreign key to represent a many-to-many (M:N) relationship?</template>
+          <span class="content-target">عند تحويل مخطط E-R، لماذا لا نكتفي بوضع مفتاح أجنبي لتمثيل علاقة متعدد إلى متعدد (M:N)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن وضع مفتاح أجنبي في أحد الجدولين سيسمح بربط سجل واحد بسجل واحد فقط من الجهة الأخرى. لتمثيل ارتباط عدة سجلات بعدة سجلات، نحتاج إلى جدول وسيط (Associative Entity) يجمع بين المفاتيح الأساسية للجدولين كمفتاح مركب.</p></template>
+          <template class="content-en"><p>Because placing a foreign key in one of the tables would only allow linking one record to one record on the other side. To represent multiple records linking to multiple records, we need an intermediate table (Associative Entity) that combines the primary keys of both tables as a composite key.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في خطوات تصميم قاعدة البيانات المنطقية، ما أهمية خطوة 'دمج العلاقات' (Merging Relations)؟</template>
+          <template class="content-en">In the logical database design steps, what is the importance of the 'Merging Relations' step?</template>
+          <span class="content-target">في خطوات تصميم قاعدة البيانات المنطقية، ما أهمية خطوة 'دمج العلاقات' (Merging Relations)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>غالباً ما نقوم بتطوير نماذج بيانات منفصلة لكل واجهة مستخدم أو تقرير. خطوة الدمج ضرورية لتوحيد هذه النماذج المتفرقة في قاعدة بيانات واحدة متماسكة، وإزالة أي تكرار للبيانات قد ينشأ عن تداخل متطلبات واجهات المستخدم المختلفة.</p></template>
+          <template class="content-en"><p>We often develop separate data models for each user interface or report. The merging step is essential to consolidate these disparate models into a single cohesive database, removing any data redundancy that might arise from overlapping requirements of different user interfaces.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في خطوات التصميم المنطقي، لماذا نقوم بمقارنة تصميم قاعدة البيانات المنطقية مع نموذج بيانات E-R المترجم في الخطوة الأخيرة؟</template>
+          <template class="content-en">In the logical design steps, why do we compare the logical database design with the translated E-R data model in the final step?</template>
+          <span class="content-target">في خطوات التصميم المنطقي، لماذا نقوم بمقارنة تصميم قاعدة البيانات المنطقية مع نموذج بيانات E-R المترجم في الخطوة الأخيرة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>نقوم بذلك كخطوة تحقق (Validation). التصميم المنطقي يتم بناؤه غالباً من أسفل إلى أعلى (Bottom-up) عبر دمج واجهات المستخدم، بينما نموذج E-R يمثل نظرة شاملة من أعلى إلى أسفل (Top-down) لمتطلبات العمل. المقارنة تضمن عدم إغفال أي متطلبات وتؤكد اتساق قاعدة البيانات مع أهداف النظام ككل.</p></template>
+          <template class="content-en"><p>We do this as a validation step. The logical design is often built bottom-up by merging user interfaces, while the E-R model represents a top-down comprehensive view of business requirements. The comparison ensures no requirements were missed and confirms the database's consistency with the overall system goals.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1610,6 +1723,74 @@
         "en": "Converting an ID number into a specific memory address."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "تحويل الكيان الضعيف (Weak Entity)",
+      "en": "Weak Entity Transformation"
+    },
+    "back": {
+      "definition": {
+        "ar": "إنشاء علاقة بمفتاح أساسي مركب يتضمن المفتاح الأساسي للكيان القوي الذي يعتمد عليه.",
+        "en": "Create a relation with a composite primary key that includes the primary key of the strong entity it depends on."
+      },
+      "example": {
+        "ar": "جدول 'المُعال' (Dependent) يأخذ رقم 'الموظف' كجزء من مفتاحه الأساسي.",
+        "en": "A 'Dependent' table takes the 'Employee' ID as part of its primary key."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "تحويل علاقة 1:N",
+      "en": "1:N Relationship Transformation"
+    },
+    "back": {
+      "definition": {
+        "ar": "وضع المفتاح الأساسي للكيان في جانب 'الواحد' كمفتاح أجنبي في علاقة الكيان في جانب 'المتعدد'.",
+        "en": "Place the primary key of the entity on the 'one' side as a foreign key in the relation for the entity on the 'many' side."
+      },
+      "example": {
+        "ar": "وضع رقم القسم في جدول الموظفين.",
+        "en": "Placing Department_ID in the Employees table."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "الخطوة الأخيرة في النمذجة المنطقية لقاعدة البيانات",
+      "en": "The final step in logical database modeling"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقارنة تصميم قاعدة البيانات المنطقية الموحد مع نموذج بيانات E-R المترجم لضمان التطابق.",
+        "en": "Comparing the consolidated logical database design with the translated E-R data model to ensure consistency."
+      },
+      "example": {
+        "ar": "التأكد من أن جميع الكيانات في مخطط E-R لها جداول مقابلة في التصميم المنطقي.",
+        "en": "Ensuring all entities in the E-R diagram have corresponding tables in the logical design."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "القرارات الرئيسية للتصميم المادي",
+      "en": "Main decisions of physical design"
+    },
+    "back": {
+      "definition": {
+        "ar": "اختيار تنسيق التخزين، تجميع السمات في سجلات، ترتيب السجلات في الذاكرة، واختيار الوسائط لزيادة الكفاءة.",
+        "en": "Selecting storage format, grouping attributes into records, arranging records in memory, and selecting media for efficiency."
+      },
+      "example": {
+        "ar": "تحديد أن حقل 'الراتب' سيخزن كـ NUMBER وترتيب سجلات الموظفين تسلسلياً.",
+        "en": "Deciding the 'Salary' field will be stored as NUMBER and arranging employee records sequentially."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1619,7 +1800,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 14</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1635,7 +1816,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 14</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1960,6 +2141,134 @@
     },
     "difficulty": "medium",
     "conceptId": "normalization-and-functional-dependency"
+  },
+  {
+    "conceptId": "er-to-relational-rules",
+    "question": {
+      "ar": "كيف يتم تحويل علاقة من نوع النوع الفائق/النوع الفرعي (Supertype/subtype) إلى جداول علائقية؟",
+      "en": "How is a Supertype/subtype relationship transformed into relational tables?"
+    },
+    "options": {
+      "ar": [
+        "يتم دمج جميع السمات في جدول واحد كبير",
+        "يتم إنشاء جدول للنوع الفائق وجداول منفصلة للأنواع الفرعية تشاركه نفس المفتاح الأساسي",
+        "يتم إنشاء جداول للأنواع الفرعية فقط وتجاهل النوع الفائق",
+        "يتم استخدام مفتاح أساسي مركب في جدول النوع الفائق"
+      ],
+      "en": [
+        "All attributes are merged into one large table",
+        "A table is created for the supertype and separate tables for subtypes sharing the same primary key",
+        "Tables are created only for subtypes, ignoring the supertype",
+        "A composite primary key is used in the supertype table"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "القاعدة تنص على إنشاء علاقة للنوع الفائق تحتوي على السمات المشتركة، وعلاقات منفصلة لكل نوع فرعي تحتوي على سماته الخاصة، وترتبط جميعها بنفس المفتاح الأساسي.",
+      "en": "The rule states to create a relation for the supertype with shared attributes, and separate relations for each subtype with their specific attributes, all linked by the same primary key."
+    },
+    "hint": {
+      "ar": "تذكر أن الأنواع الفرعية ترث من النوع الفائق، لذا يجب ربطها به.",
+      "en": "Remember that subtypes inherit from the supertype, so they must be linked to it."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "second-normal-form",
+    "question": {
+      "ar": "في مثال تحويل الجدول EMPLOYEE2 إلى 2NF، لماذا تم فصل سمة Date_Completed في جدول مستقل (EMP COURSE)؟",
+      "en": "In the example of converting the EMPLOYEE2 table to 2NF, why was the Date_Completed attribute separated into an independent table (EMP COURSE)?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تعتمد على سمة غير أساسية أخرى",
+        "لأنها تعتمد كلياً على المفتاح المركب (Emp_ID, Course)",
+        "لأنها تعتمد جزئياً على Emp_ID فقط",
+        "لأنها مفتاح أجنبي"
+      ],
+      "en": [
+        "Because it depends on another non-key attribute",
+        "Because it fully depends on the composite key (Emp_ID, Course)",
+        "Because it partially depends only on Emp_ID",
+        "Because it is a foreign key"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "سمة Date_Completed تعتمد على كل من الموظف والدورة معاً (المفتاح المركب)، بينما السمات الأخرى (مثل الاسم) تعتمد فقط على رقم الموظف (اعتماد جزئي). لذا تم فصلها للحفاظ على الاعتماد الكلي.",
+      "en": "The Date_Completed attribute depends on both the employee and the course together (the composite key), while other attributes (like Name) depend only on the employee ID (partial dependency). Thus, it was separated to maintain full dependency."
+    },
+    "hint": {
+      "ar": "تاريخ الانتهاء يخص من وفي أي دورة؟",
+      "en": "The completion date belongs to whom and in which course?"
+    },
+    "difficulty": "hard",
+    "id": 12
+  },
+  {
+    "conceptId": "database-design-process",
+    "question": {
+      "ar": "أي من الخطوات التالية تعتبر جزءاً من النمذجة والتصميم المنطقي لقاعدة البيانات؟",
+      "en": "Which of the following is a step in logical database modeling and design?"
+    },
+    "options": {
+      "ar": [
+        "تجميع السمات في سجلات مادية",
+        "اختيار أفضل الوسائط والهياكل للتخزين",
+        "مقارنة تصميم قاعدة البيانات المنطقية مع نموذج بيانات E-R المترجم",
+        "تحديد أنواع البيانات (Data Types) للحقول"
+      ],
+      "en": [
+        "Grouping attributes into physical records",
+        "Selecting the best media and structures for storage",
+        "Comparing the logical database design with the translated E-R data model",
+        "Selecting data types for fields"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "مقارنة التصميم المنطقي مع نموذج E-R هي الخطوة الرابعة والأخيرة في التصميم المنطقي، بينما الخيارات الأخرى تنتمي للتصميم المادي.",
+      "en": "Comparing the logical design with the E-R model is the fourth and final step of logical design, whereas the other options belong to physical design."
+    },
+    "hint": {
+      "ar": "تذكر أن التصميم المنطقي يركز على الهيكلة والمقارنة مع المتطلبات المفاهيمية، وليس على تفاصيل التخزين.",
+      "en": "Remember that logical design focuses on structure and comparison with conceptual requirements, not on storage details."
+    },
+    "difficulty": "medium",
+    "id": 13
+  },
+  {
+    "conceptId": "physical-database-design",
+    "question": {
+      "ar": "ما هو أحد القرارات الرئيسية التي يجب اتخاذها أثناء تصميم قاعدة البيانات المادية؟",
+      "en": "What is one of the main decisions that must be made during physical database design?"
+    },
+    "options": {
+      "ar": [
+        "تطوير نموذج بيانات منطقي لكل واجهة مستخدم",
+        "ترتيب السجلات ذات الصلة في الذاكرة الثانوية",
+        "ترجمة نموذج E-R المفاهيمي إلى متطلبات بيانات",
+        "دمج البيانات المطبّعة من جميع واجهات المستخدم"
+      ],
+      "en": [
+        "Developing a logical data model for each user interface",
+        "Arranging related records in secondary memory",
+        "Translating the conceptual E-R model into data requirements",
+        "Combining normalized data from all user interfaces"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ترتيب السجلات في الذاكرة الثانوية هو قرار مادي يتعلق بكيفية تخزين البيانات فعلياً على الأجهزة، بينما الخيارات الأخرى هي خطوات في التصميم المنطقي.",
+      "en": "Arranging records in secondary memory is a physical decision about how data is actually stored on hardware, while the other options are logical design steps."
+    },
+    "hint": {
+      "ar": "ابحث عن الخيار الذي يتعامل مع الأجهزة أو التخزين الفعلي (مثل الذاكرة الثانوية).",
+      "en": "Look for the option that deals with hardware or actual storage (like secondary memory)."
+    },
+    "difficulty": "easy",
+    "id": 14
   }
 ]
 </script>
@@ -2009,6 +2318,14 @@
       <template class="content-ar">تنظيم الملفات يعتمد على الهدف: للتصفح الشامل استخدم التسلسلي (Sequential)، للبحث السريع استخدم المفهرس (Indexed)، وللوصول المباشر الفوري استخدم المجزأ (Hashed).</template>
       <template class="content-en">File organization depends on the goal: for full scans use Sequential, for fast searches use Indexed, and for immediate direct access use Hashed.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند تحويل علاقة M:N، لا يمكنك ببساطة وضع مفتاح أجنبي في أحد الجدولين. يجب عليك دائماً إنشاء جدول ثالث (كيان وسيط) بمفتاح أساسي مركب.</template>
+    <template class="content-en">When transforming an M:N relationship, you cannot simply place a foreign key in one of the tables. You must always create a third table (associative entity) with a composite primary key.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

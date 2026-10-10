@@ -1,0 +1,139 @@
+.gmem {
+  --gmem-c: 4; --gmem-g: 8px; --gmem-cw: 72px; --gmem-a: 4 / 5;
+  position: relative; inline-size: min(100%, var(--gmem-w, 560px)); display: grid; gap: .55rem; justify-items: center;
+}
+.gmem-grid {
+  inline-size: 100%; display: grid; gap: var(--gmem-g); direction: ltr;
+  grid-template-columns: repeat(var(--gmem-c), minmax(0, 1fr));
+  touch-action: manipulation; transition: filter .2s ease;
+}
+.gmem-card {
+  position: relative; aspect-ratio: var(--gmem-a); padding: 0; border: 0; margin: 0; cursor: pointer;
+  background: transparent; color: var(--text-primary); font: inherit; perspective: 700px;
+  border-radius: clamp(8px, calc(var(--gmem-cw) * .14), 14px);
+  -webkit-tap-highlight-color: transparent; transition: transform .16s ease;
+}
+.gmem-card:focus-visible { outline: 2px solid var(--gm-tint); outline-offset: 3px; z-index: 1; }
+.gmem-card.ok { cursor: default; }
+@media (hover: hover) {
+  .gmem-card:not(.up):not(.ok):hover { transform: translateY(-2px); }
+  .gmem-card:not(.up):not(.ok):hover .gmem-back { border-color: color-mix(in oklab, var(--gm-tint) 55%, var(--border-color)); }
+}
+.gmem-card:not(.ok):active { transform: scale(.95); }
+.gmem-in {
+  position: absolute; inset: 0; transform-style: preserve-3d;
+  transition: transform .44s cubic-bezier(.2, .8, .25, 1.12);
+}
+.gmem-card.up .gmem-in, .gmem-card.ok .gmem-in { transform: rotateY(180deg); }
+.gmem-back, .gmem-face {
+  position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden;
+  border: 1px solid var(--border-color);
+  border-radius: clamp(8px, calc(var(--gmem-cw) * .14), 14px);
+  backface-visibility: hidden; -webkit-backface-visibility: hidden;
+  box-shadow: 0 2px 0 var(--border-color);
+}
+.gmem-back {
+  background: var(--bg-surface); color: color-mix(in oklab, var(--gm-tint) 62%, var(--text-muted));
+  font-size: calc(var(--gmem-cw) * .3); transition: border-color .18s ease, opacity .2s ease;
+}
+.gmem-back::before {
+  content: ""; position: absolute; inset: calc(var(--gmem-cw) * .07);
+  border: 1px solid color-mix(in oklab, var(--gm-tint) 24%, transparent);
+  border-radius: clamp(5px, calc(var(--gmem-cw) * .09), 10px);
+}
+.gmem-back::after {
+  content: ""; position: absolute; inset: calc(var(--gmem-cw) * .07);
+  border-radius: clamp(5px, calc(var(--gmem-cw) * .09), 10px);
+  background: color-mix(in oklab, var(--gm-tint) 6%, transparent);
+}
+.gmem-back i { position: relative; z-index: 1; }
+.gmem-face {
+  --hc: hsl(var(--h, 262) 72% 64%);
+  transform: rotateY(180deg); background: var(--bg-card);
+  transition: border-color .2s ease, background-color .2s ease, opacity .2s ease;
+}
+[data-theme="light"] .gmem-face { --hc: hsl(var(--h, 262) 64% 40%); }
+.gmem-grid:not(.gmem-grid--terms) .gmem-face {
+  background: color-mix(in oklab, var(--hc) 13%, var(--bg-card));
+  border-color: color-mix(in oklab, var(--hc) 42%, var(--border-color));
+}
+.gmem-ico { font-size: calc(var(--gmem-cw) * .42); color: var(--hc); }
+.gmem-face--t { background: color-mix(in oklab, var(--gm-tint) 11%, var(--bg-card)); border-color: color-mix(in oklab, var(--gm-tint) 38%, var(--border-color)); }
+.gmem-face--t, .gmem-face--d {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: calc(var(--gmem-cw) * .2 + 4px) calc(var(--gmem-cw) * .06 + 2px) calc(var(--gmem-cw) * .07 + 2px);
+}
+.gmem-tag {
+  position: absolute; inset-block-start: calc(var(--gmem-cw) * .06 + 1px); inset-inline: 0; text-align: center;
+  font-size: max(8px, calc(var(--gmem-cw) * .1)); font-weight: 700; line-height: 1.2; color: var(--text-muted);
+}
+.gmem-face--t .gmem-tag { color: var(--gm-tint); }
+.gmem-txt {
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 8; overflow: hidden;
+  max-block-size: 100%; inline-size: 100%; padding-block: .3em; text-align: center; overflow-wrap: normal;
+  line-height: 1.34; font-weight: 600; color: var(--text-primary); unicode-bidi: plaintext;
+}
+.gmem-txt--l { font-size: max(10px, calc(var(--gmem-cw) * .17)); font-weight: 800; }
+.gmem-txt--m { font-size: max(9.5px, calc(var(--gmem-cw) * .138)); }
+.gmem-txt--s { font-size: max(9px, calc(var(--gmem-cw) * .122)); }
+.gmem-txt--xs { font-size: max(8.5px, calc(var(--gmem-cw) * .11)); font-weight: 500; }
+.gmem-face--d .gmem-txt { color: var(--text-secondary); }
+.gmem-txt--wrap { overflow-wrap: anywhere; }
+.gmem-ok {
+  position: absolute; inset-block-start: calc(var(--gmem-cw) * .05 + 1px); inset-inline-end: calc(var(--gmem-cw) * .05 + 1px);
+  inline-size: max(14px, calc(var(--gmem-cw) * .19)); block-size: max(14px, calc(var(--gmem-cw) * .19));
+  display: grid; place-items: center; border-radius: 50%; font-size: max(7px, calc(var(--gmem-cw) * .1));
+  background: var(--gm-ok); color: var(--bg-card); opacity: 0; transform: scale(.3);
+  transition: opacity .2s ease .12s, transform .3s cubic-bezier(.3, 1.6, .5, 1) .12s;
+}
+.gmem-card.ok .gmem-face { border-color: var(--gm-ok); background: color-mix(in oklab, var(--gm-ok) 14%, var(--bg-card)); }
+.gmem-grid:not(.gmem-grid--terms) .gmem-card.ok .gmem-face { background: color-mix(in oklab, var(--hc) 10%, var(--bg-card)); }
+.gmem-card.ok .gmem-ok { opacity: 1; transform: scale(1); }
+.gmem-card.ok .gmem-face--d .gmem-txt { color: var(--text-primary); }
+.gmem-card.no .gmem-face { border-color: var(--gm-bad); background: color-mix(in oklab, var(--gm-bad) 10%, var(--bg-card)); }
+.gmem-card.no { animation: gmemNo .38s ease .3s both; }
+.gmem-card.pop { animation: gmemPop .5s cubic-bezier(.3, 1.5, .5, 1) .28s both; }
+@keyframes gmemNo { 25% { transform: translateX(-4px); } 50% { transform: translateX(3px); } 75% { transform: translateX(-2px); } }
+@keyframes gmemPop { 40% { transform: scale(1.08); } }
+
+.gmem-combo {
+  position: absolute; inset-block-start: -.35rem; inset-inline: 0; margin-inline: auto; inline-size: max-content; z-index: 3;
+  display: inline-flex; align-items: center; gap: .35rem; padding: .32rem .8rem; pointer-events: none;
+  border-radius: var(--radius-pill, 999px); border: 1px solid color-mix(in oklab, var(--gm-tint) 50%, var(--border-color));
+  background: var(--bg-elevated); color: var(--gm-tint); font-size: .84rem; font-weight: 700;
+  opacity: 0; transform: translateY(6px) scale(.9);
+  transition: opacity .2s ease, transform .3s cubic-bezier(.3, 1.5, .5, 1);
+}
+.gmem-combo.on { opacity: 1; transform: none; }
+.gmem-combo b { font-size: 1rem; font-weight: 800; }
+
+.gmem-note, .gmem-src { margin: 0; font-size: .76rem; color: var(--text-muted); text-align: center; line-height: 1.6; }
+.gmem-note {
+  inline-size: 100%; padding: .4rem .7rem; border-radius: var(--radius-md);
+  border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-secondary);
+}
+.gmem-note i { color: var(--gm-tint); }
+.gmem-src span { font-family: 'Inter', 'Cairo', sans-serif; font-variant-numeric: tabular-nums; }
+.gmem-load {
+  min-block-size: 16rem; display: grid; place-content: center; justify-items: center; gap: .8rem;
+  color: var(--text-muted); font-size: .88rem; text-align: center; padding-inline: 1rem;
+}
+.gmem-load i { font-size: 1.6rem; color: var(--gm-tint); }
+.gmem-modes { justify-content: center; }
+.gmem-modes .gsf-chip { display: inline-flex; align-items: center; gap: .4rem; min-block-size: 2.5rem; padding-inline: 1rem; }
+.gmem-stars { color: var(--text-muted); letter-spacing: .12em; font-size: 1.05rem; }
+.gmem-stars b { color: var(--gm-tint); font-weight: 400; }
+.gmem--hide .gmem-grid { filter: blur(14px); pointer-events: none; }
+
+.gmem--rm .gmem-in { transform: none !important; transition: none; }
+.gmem--rm .gmem-face { transform: none; opacity: 0; }
+.gmem--rm .gmem-card.up .gmem-face, .gmem--rm .gmem-card.ok .gmem-face { opacity: 1; }
+.gmem--rm .gmem-card.up .gmem-back, .gmem--rm .gmem-card.ok .gmem-back { opacity: 0; }
+.gmem--rm .gmem-card, .gmem--rm .gmem-ok { animation: none; transition: opacity .2s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .gmem-in { transform: none !important; transition: none; }
+  .gmem-face { transform: none; opacity: 0; }
+  .gmem-card.up .gmem-face, .gmem-card.ok .gmem-face { opacity: 1; }
+  .gmem-card.up .gmem-back, .gmem-card.ok .gmem-back { opacity: 0; }
+  .gmem-card, .gmem-ok, .gmem-combo { animation: none; transition: none; }
+}

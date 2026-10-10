@@ -89,6 +89,11 @@
         <template class="content-en">Constructing an AST with flex/bison</template>
         <span class="content-target">بناء AST باستخدام Flex و Bison</span>
       </a>
+      <a href="#ast-c-structures" class="toc-link" data-bilingual>
+        <template class="content-ar">هياكل عقد AST في لغة C</template>
+        <template class="content-en">AST Node Structures in C</template>
+        <span class="content-target">هياكل عقد AST في لغة C</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -804,14 +809,107 @@
   </details>
 </section>
 
+<section id="ast-c-structures" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> هياكل عقد AST في لغة C</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> AST Node Structures in C</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُستخدم هياكل C (structs) شاملة لتمثيل العبارات والتعبيرات والأنواع، حيث يحتوي كل هيكل على حقل <code>kind</code> لتحديد نوعه الفرعي، وتُترك الحقول غير المستخدمة فارغة (null).</p></template>
+    <template class="content-en"><p>Comprehensive C structures (structs) are used to represent Statements, Expressions, and Types, where each struct has a <code>kind</code> field to specify its subtype, and unused fields are left null.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد شجرة النحو المجردة على هياكل مرنة لتغطية جميع الحالات:</p><ol><li><b>العبارات (Statements):</b> يُستخدم هيكل <code>stmt</code> لجميع أنواع العبارات. على سبيل المثال، في عبارة <code>if-else</code>، نستخدم فقط حقول <code>expr</code> (للشرط)، <code>body</code> (للكتلة المتحققة)، و <code>else_body</code> (للكتلة البديلة)، ونترك باقي الحقول مثل <code>init_expr</code> فارغة (null).</li><li><b>التعبيرات (Expressions):</b> تنقسم إلى أنواع ثنائية (Binary) مثل الجمع، وأنواع ورقية (Leaf) مثل الأرقام. يتم تمثيل استدعاء الدالة كعقدة <code>EXPR_CALL</code>، حيث الجانب الأيسر هو اسم الدالة والجانب الأيمن هو <span class="smart-term" data-term-en="Unbalanced Tree" data-ar="شجرة غير متوازنة" data-en-def="A tree structure where branches can have significantly different depths, used in ASTs to represent a list of function arguments.">شجرة غير متوازنة<span class="smart-term-tooltip"></span></span> من عقد <code>EXPR_ARG</code> تمثل المعاملات.</li><li><b>الأنواع (Types):</b> للأنواع المركبة كالدوال، نستخدم حقل <code>subtype</code> لتمثيل نوع الإرجاع (Return type)، ونربط قائمة <code>param_list</code> لتمثيل معاملات الدالة.</li></ol></template>
+    <template class="content-en"><p>The AST relies on flexible structures to cover all cases:</p><ol><li><b>Statements:</b> The <code>stmt</code> struct is used for all statement kinds. For example, in an <code>if-else</code> statement, we only use the <code>expr</code> (condition), <code>body</code> (true block), and <code>else_body</code> (false block) fields, leaving the rest like <code>init_expr</code> null.</li><li><b>Expressions:</b> Divided into binary types (like addition) and <span class="smart-term" data-term-en="Leaf Type" data-ar="النوع الورقي" data-en-def="A node type in an expression tree that does not have children, such as a literal integer or a variable name.">leaf type<span class="smart-term-tooltip"></span></span>s (like literals). A function call is represented as an <code>EXPR_CALL</code> node, where the left side is the function name and the right side is an <span class="smart-term" data-term-en="Unbalanced Tree" data-ar="شجرة غير متوازنة" data-en-def="A tree structure where branches can have significantly different depths, used in ASTs to represent a list of function arguments.">unbalanced tree<span class="smart-term-tooltip"></span></span> of <code>EXPR_ARG</code> nodes representing arguments.</li><li><b>Types:</b> For <span class="smart-term" data-term-en="Compound Type" data-ar="النوع المركب" data-en-def="A type built by connecting multiple type structures together, such as arrays or functions.">compound type<span class="smart-term-tooltip"></span></span>s like functions, we use the <code>subtype</code> field to represent the return type, and connect a <code>param_list</code> to represent the function's arguments.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تصميم هيكل واحد شامل لكل فئة (مثل هيكل واحد لجميع العبارات) يبسط عملية بناء الشجرة واجتيازها، حتى لو كان يستهلك ذاكرة إضافية للحقول الفارغة.</p><p>في التعبيرات، يتم التمييز بين المعاملات الثنائية (التي تستخدم مؤشري <code>left</code> و <code>right</code>) والقيم الورقية (التي تستخدم حقول القيم المباشرة مثل <code>integer_value</code>).</p><p>بالنسبة للأنواع، يسمح هذا التصميم بتمثيل أنواع معقدة جداً، مثل دالة تعيد مصفوفة من المؤشرات، ببساطة عن طريق ربط هياكل <code>type</code> متتالية عبر حقل <code>subtype</code>.</p></template>
+    <template class="content-en"><p>Designing a single comprehensive struct for each category (e.g., one struct for all statements) simplifies tree construction and traversal, even if it consumes extra memory for null fields.</p><p>In expressions, a distinction is made between binary operators (using <code>left</code> and <code>right</code> pointers) and leaf values (using direct value fields like <code>integer_value</code>).</p><p>For types, this design allows representing highly complex types, such as a function returning an array of pointers, simply by chaining <code>type</code> structures via the <code>subtype</code> field.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>c</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>struct stmt {
+    stmt_t kind;
+    struct decl *decl;
+    struct expr *init_expr;
+    struct expr *expr;
+    struct expr *next_expr;
+    struct stmt *body;
+    struct stmt *else_body;
+    struct stmt *next;
+};</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>c</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>struct expr {
+    expr_t kind;
+    struct expr *left;
+    struct expr *right;
+    const char *name;
+    int integer_value;
+    const char *string_literal;
+};</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>c</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>struct type {
+    type_t kind;
+    struct type *subtype;
+    struct param_list *params;
+};
+
+struct param_list {
+    char *name;
+    struct type *type;
+    struct param_list *next;
+};</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في هيكل العبارة (Statement)، لماذا نستخدم حقولاً متعددة للتعبيرات مثل <code>init_expr</code> و <code>expr</code> و <code>next_expr</code>؟</template>
+      <template class="content-en">In the Statement structure, why do we use multiple expression fields like <code>init_expr</code>, <code>expr</code>, and <code>next_expr</code>?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لاستيعاب عبارات معقدة مثل حلقة <code>for</code>، والتي تتطلب ثلاثة تعبيرات منفصلة في ترويستها (التهيئة، الشرط، والتحديث).</p></template>
+      <template class="content-en"><p>To accommodate complex statements like a <code>for</code> loop, which requires three separate expressions in its header (initialization, condition, and update).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب المترجمات! لقد تجاوزنا مرحلة التحليل النحوي، والآن نحن بحاجة إلى هيكل قوي ونظيف لتمثيل برنامجنا: شجرة النحو المجردة (AST). تخيلوا أن شجرة التحليل (Parse Tree) هي مسودة مليئة بالشطب والتفاصيل المزعجة كالأقواس والفواصل. الـ AST هي النسخة النهائية النظيفة؛ الهيكل العظمي الصافي للكود. في الامتحان، ركزوا جداً على كيفية بناء هذه الشجرة من الأسفل للأعلى (Bottom-up) باستخدام المكدس الدلالي. تذكروا الهياكل الخمسة الأساسية: الإعلانات، العبارات، التعبيرات، الأنواع، والمعاملات. ولا تنسوا كيف نستخدم Flex و Bison لربط كل هذا معاً عبر الإجراءات الدلالية ودوال المصنع (Factory Functions). فهمكم لكيفية ربط الأشقاء (Siblings) بقوائم متصلة باستخدام القواعد العودية اليمنى سيضمن لكم درجات ممتازة. بالتوفيق!</template>
-    <template class="content-en">Welcome, future engineers, to the heart of compilers! We've moved past parsing, and now we need a robust, clean structure to represent our program: the Abstract Syntax Tree (AST). Imagine the Parse Tree as a messy draft full of annoying details like parentheses and commas. The AST is the clean final copy; the pure skeleton of the code. For the exam, focus heavily on how this tree is built bottom-up using the semantic stack. Remember the five core structures: Declarations, Statements, Expressions, Types, and Parameters. Don't forget how we use Flex and Bison to tie this all together via semantic actions and factory functions. Understanding how siblings are linked into lists using right-recursive rules will guarantee you top marks. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب المترجمات! لقد تجاوزنا مرحلة التحليل النحوي، والآن نحن بحاجة إلى هيكل قوي ونظيف لتمثيل برنامجنا: شجرة النحو المجردة (AST). تخيلوا أن شجرة التحليل (Parse Tree) هي مسودة مليئة بالشطب والتفاصيل المزعجة كالأقواس والفواصل. الـ AST هي النسخة النهائية النظيفة؛ الهيكل العظمي الصافي للكود. في الامتحان، ركزوا جداً على كيفية بناء هذه الشجرة من الأسفل للأعلى (Bottom-up) باستخدام المكدس الدلالي. تذكروا الهياكل الخمسة الأساسية: الإعلانات، العبارات، التعبيرات، الأنواع، والمعاملات. ولا تنسوا كيف نستخدم Flex و Bison لربط كل هذا معاً عبر الإجراءات الدلالية ودوال المصنع (Factory Functions). فهمكم لكيفية ربط الأشقاء (Siblings) بقوائم متصلة باستخدام القواعد العودية اليمنى سيضمن لكم درجات ممتازة. بالتوفيق!<p>أثناء بناء المترجم الخاص بك، تذكر أن شجرة النحو المجردة هي مساحة عملك الأساسية. إن تصميم هياكل C قوية وعامة للعبارات والتعبيرات — حتى لو كان ذلك يعني ترك بعض الحقول فارغة (null) — سيوفر لك ساعات طويلة من العمل أثناء التحليل الدلالي وتوليد الكود. أتقن هذه الهياكل، فهي الجسر الحقيقي بين التحليل النحوي والترجمة الفعلية.</p></template>
+    <template class="content-en">Welcome, future engineers, to the heart of compilers! We've moved past parsing, and now we need a robust, clean structure to represent our program: the Abstract Syntax Tree (AST). Imagine the Parse Tree as a messy draft full of annoying details like parentheses and commas. The AST is the clean final copy; the pure skeleton of the code. For the exam, focus heavily on how this tree is built bottom-up using the semantic stack. Remember the five core structures: Declarations, Statements, Expressions, Types, and Parameters. Don't forget how we use Flex and Bison to tie this all together via semantic actions and factory functions. Understanding how siblings are linked into lists using right-recursive rules will guarantee you top marks. Good luck!<p>As you build your compiler, remember that the AST is your primary workspace. Designing robust, generic C structures for statements and expressions—even if it means leaving some fields null—will save you countless hours during semantic analysis and code generation. Master these structures, as they are the true bridge between parsing and actual compilation.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -989,6 +1087,24 @@
         </div>
       </div>
     </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم شجرة غير متوازنة (Unbalanced Tree) من عقد <code>EXPR_ARG</code> لمعاملات استدعاء الدالة بدلاً من قائمة متصلة قياسية؟</template>
+          <template class="content-en">Why do we use an unbalanced tree of <code>EXPR_ARG</code> nodes for function call arguments instead of a standard linked list?</template>
+          <span class="content-target">لماذا نستخدم شجرة غير متوازنة (Unbalanced Tree) من عقد <code>EXPR_ARG</code> لمعاملات استدعاء الدالة بدلاً من قائمة متصلة قياسية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>بينما تُعتبر القوائم المتصلة قياسية للعبارات (Statements)، فإن التعبيرات (Expressions) مبنية بطبيعتها كأشجار. استخدام شجرة ثنائية غير متوازنة (حيث يشير الابن الأيمن للمعامل التالي) يسمح بمعاملة المدخلات بشكل موحد كعقد تعبيرات داخل هيكل <code>expr</code> الحالي دون الحاجة إلى إنشاء هيكل قائمة منفصل خاص بالتعبيرات.</p></template>
+          <template class="content-en"><p>While linked lists are standard for statements, expressions are inherently tree-structured. Using an unbalanced binary tree (where the right child points to the next argument) allows arguments to be treated uniformly as expression nodes within the existing <code>expr</code> struct without needing to create a separate list structure specifically for expressions.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1010,8 +1126,8 @@
         "en": "An internal data structure that represents the primary syntactic structure of a program, leaving out unnecessary parsing details."
       },
       "example": {
-        "ar": "تمثيل عملية الجمع <code>a + b</code> كعقدة جذر <code>+</code> وأبناء <code>a</code> و <code>b</code> بدون أقواس.",
-        "en": "Representing <code>a + b</code> as a root node <code>+</code> with children <code>a</code> and <code>b</code> without parentheses."
+        "ar": "تمثيل عملية الجمع <code>a + b<\/code> كعقدة جذر <code>+<\/code> وأبناء <code>a<\/code> و <code>b<\/code> بدون أقواس.",
+        "en": "Representing <code>a + b<\/code> as a root node <code>+<\/code> with children <code>a<\/code> and <code>b<\/code> without parentheses."
       }
     }
   },
@@ -1044,8 +1160,8 @@
         "en": "It states the name, type, and value of a symbol (like variables or functions) so it can be used in the program."
       },
       "example": {
-        "ar": "<code>b: boolean;</code>",
-        "en": "<code>b: boolean;</code>"
+        "ar": "<code>b: boolean;<\/code>",
+        "en": "<code>b: boolean;<\/code>"
       }
     }
   },
@@ -1078,8 +1194,8 @@
         "en": "A combination of values and operations that is evaluated to yield a value."
       },
       "example": {
-        "ar": "<code>x * x</code>",
-        "en": "<code>x * x</code>"
+        "ar": "<code>x * x<\/code>",
+        "en": "<code>x * x<\/code>"
       }
     }
   },
@@ -1146,8 +1262,8 @@
         "en": "They allocate memory for a node structure and initialize its fields with appropriate values."
       },
       "example": {
-        "ar": "<code>decl_create(name, type, value, code, next)</code>",
-        "en": "<code>decl_create(name, type, value, code, next)</code>"
+        "ar": "<code>decl_create(name, type, value, code, next)<\/code>",
+        "en": "<code>decl_create(name, type, value, code, next)<\/code>"
       }
     }
   },
@@ -1159,20 +1275,20 @@
     },
     "back": {
       "definition": {
-        "ar": "كعقدة <code>EXPR_CALL</code>، حيث الجانب الأيسر هو اسم الدالة، والجانب الأيمن هو شجرة غير متوازنة من عقد <code>EXPR_ARG</code>.",
-        "en": "As an <code>EXPR_CALL</code> node, where the left side is the function name, and the right side is an unbalanced tree of <code>EXPR_ARG</code> nodes."
+        "ar": "كعقدة <code>EXPR_CALL<\/code>، حيث الجانب الأيسر هو اسم الدالة، والجانب الأيمن هو شجرة غير متوازنة من عقد <code>EXPR_ARG<\/code>.",
+        "en": "As an <code>EXPR_CALL<\/code> node, where the left side is the function name, and the right side is an unbalanced tree of <code>EXPR_ARG<\/code> nodes."
       },
       "example": {
-        "ar": "استدعاء <code>print(x)</code>",
-        "en": "Calling <code>print(x)</code>"
+        "ar": "استدعاء <code>print(x)<\/code>",
+        "en": "Calling <code>print(x)<\/code>"
       }
     }
   },
   {
     "id": 11,
     "front": {
-      "ar": "ما هو دور التوجيه <code>%union</code> في Bison عند بناء AST؟",
-      "en": "What is the role of the <code>%union</code> directive in Bison when building an AST?"
+      "ar": "ما هو دور التوجيه <code>%union<\/code> في Bison عند بناء AST؟",
+      "en": "What is the role of the <code>%union<\/code> directive in Bison when building an AST?"
     },
     "back": {
       "definition": {
@@ -1180,8 +1296,8 @@
         "en": "It is used to define the different types of semantic values that can be associated with tokens (e.g., integers, strings, or node pointers)."
       },
       "example": {
-        "ar": "<code>%union { int int_val; struct EXP *exp; }</code>",
-        "en": "<code>%union { int int_val; struct EXP *exp; }</code>"
+        "ar": "<code>%union { int int_val; struct EXP *exp; }<\/code>",
+        "en": "<code>%union { int int_val; struct EXP *exp; }<\/code>"
       }
     }
   },
@@ -1197,8 +1313,8 @@
         "en": "By using right-recursive rules, where the left element represents one declaration and the right represents the rest of the list."
       },
       "example": {
-        "ar": "<code>decl_list : decl decl_list { $$ = $1; $1->next = $2; }</code>",
-        "en": "<code>decl_list : decl decl_list { $$ = $1; $1->next = $2; }</code>"
+        "ar": "<code>decl_list : decl decl_list { $$ = $1; $1->next = $2; }<\/code>",
+        "en": "<code>decl_list : decl decl_list { $$ = $1; $1->next = $2; }<\/code>"
       }
     }
   },
@@ -1214,8 +1330,8 @@
         "en": "Using a set of mutually recursive functions that switch on the node's kind to perform the appropriate action."
       },
       "example": {
-        "ar": "دالة <code>prettyEXP</code> التي تستدعي نفسها لطباعة التعبيرات.",
-        "en": "A <code>prettyEXP</code> function that calls itself to print expressions."
+        "ar": "دالة <code>prettyEXP<\/code> التي تستدعي نفسها لطباعة التعبيرات.",
+        "en": "A <code>prettyEXP<\/code> function that calls itself to print expressions."
       }
     }
   },
@@ -1227,12 +1343,12 @@
     },
     "back": {
       "definition": {
-        "ar": "هيكل يشفر نوع كل متغير ودالة. الأنواع الأساسية تضبط حقل <code>kind</code> فقط، بينما الأنواع المركبة (كالمصفوفات) تربط هياكل متعددة.",
-        "en": "A structure that encodes the type of every variable and function. Primitive types just set the <code>kind</code> field, while compound types connect multiple structures."
+        "ar": "هيكل يشفر نوع كل متغير ودالة. الأنواع الأساسية تضبط حقل <code>kind<\/code> فقط، بينما الأنواع المركبة (كالمصفوفات) تربط هياكل متعددة.",
+        "en": "A structure that encodes the type of every variable and function. Primitive types just set the <code>kind<\/code> field, while compound types connect multiple structures."
       },
       "example": {
-        "ar": "<code>TYPE_INTEGER</code>, <code>TYPE_ARRAY</code>",
-        "en": "<code>TYPE_INTEGER</code>, <code>TYPE_ARRAY</code>"
+        "ar": "<code>TYPE_INTEGER<\/code>, <code>TYPE_ARRAY<\/code>",
+        "en": "<code>TYPE_INTEGER<\/code>, <code>TYPE_ARRAY<\/code>"
       }
     }
   },
@@ -1248,10 +1364,44 @@
         "en": "C code written inside Bison grammar rules that executes when a rule matches, typically used to create AST nodes."
       },
       "example": {
-        "ar": "<code>{ $$ = makeEXP_plus($1, $3); }</code>",
-        "en": "<code>{ $$ = makeEXP_plus($1, $3); }</code>"
+        "ar": "<code>{ $$ = makeEXP_plus($1, $3); }<\/code>",
+        "en": "<code>{ $$ = makeEXP_plus($1, $3); }<\/code>"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يتم تمثيل عبارة <code>if-else<\/code> داخل هيكل <code>stmt<\/code>؟",
+      "en": "How is an <code>if-else<\/code> statement represented inside the <code>stmt<\/code> structure?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بضبط حقل <code>kind<\/code> على <code>STMT_IF_ELSE<\/code>، واستخدام حقول <code>expr<\/code> و <code>body<\/code> و <code>else_body<\/code>، مع ترك باقي الحقول فارغة (null).",
+        "en": "By setting the <code>kind<\/code> to <code>STMT_IF_ELSE<\/code>, using the <code>expr<\/code>, <code>body<\/code>, and <code>else_body<\/code> fields, and leaving the rest null."
+      },
+      "example": {
+        "ar": "حقل <code>init_expr<\/code> سيكون null لأنه غير مستخدم في جملة if.",
+        "en": "The <code>init_expr<\/code> field will be null because it is unused in an if statement."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "كيف يتم تمثيل نوع الدالة (Function Type) في AST؟",
+      "en": "How is a Function Type represented in the AST?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام هيكل <code>type<\/code> حيث يشير حقل <code>subtype<\/code> إلى نوع الإرجاع، ويشير حقل <code>params<\/code> إلى قائمة متصلة من المعاملات.",
+        "en": "Using a <code>type<\/code> structure where the <code>subtype<\/code> field points to the return type, and the <code>params<\/code> field points to a linked list of arguments."
+      },
+      "example": {
+        "ar": "دالة تعيد integer تأخذ حقل <code>subtype<\/code> يشير إلى <code>TYPE_INTEGER<\/code>.",
+        "en": "A function returning an integer has its <code>subtype<\/code> field pointing to <code>TYPE_INTEGER<\/code>."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1261,7 +1411,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1277,7 +1427,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1602,6 +1752,38 @@
     },
     "difficulty": "medium",
     "conceptId": "ast-overview"
+  },
+  {
+    "conceptId": "ast-c-structures",
+    "question": {
+      "ar": "في هيكل التعبيرات (Expressions) الخاص بـ AST، كيف يتم عادةً تمثيل استدعاء الدالة (<code>EXPR_CALL</code>)؟",
+      "en": "In the AST Expression structure, how is a function call (<code>EXPR_CALL</code>) typically represented?"
+    },
+    "options": {
+      "ar": [
+        "الجانب الأيسر هو اسم الدالة، والجانب الأيمن هو شجرة غير متوازنة من المعاملات.",
+        "الجانب الأيسر هو نوع الإرجاع، والجانب الأيمن هو جسم الدالة.",
+        "يتم استخدام هيكل منفصل تماماً ولا يُعتبر تعبيراً.",
+        "يتم تمثيله كعبارة (Statement) وليس كتعبير."
+      ],
+      "en": [
+        "The left side is the function name, and the right side is an unbalanced tree of arguments.",
+        "The left side is the return type, and the right side is the function body.",
+        "It uses a completely separate struct and is not considered an expression.",
+        "It is represented as a Statement, not an expression."
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "في استدعاء الدالة، يُخزن الاسم في الجانب الأيسر (left)، بينما تُربط المعاملات كشجرة غير متوازنة من عقد <code>EXPR_ARG</code> في الجانب الأيمن (right).",
+      "en": "In a function call, the name is stored on the left side, while the arguments are linked as an unbalanced tree of <code>EXPR_ARG</code> nodes on the right side."
+    },
+    "hint": {
+      "ar": "تذكر أن التعبيرات تستخدم مؤشري left و right.",
+      "en": "Remember that expressions use left and right pointers."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -1646,6 +1828,14 @@
       <template class="content-ar">الـ <code>union</code> في هيكل العقدة ضروري لتوفير الذاكرة، حيث يسمح للعقدة بتخزين أنواع مختلفة من البيانات (رقم، سلسلة نصية، مؤشرات لأبناء) في نفس مساحة الذاكرة بناءً على نوع العقدة (<code>kind</code>).</template>
       <template class="content-en">The <code>union</code> in the node struct is essential for memory efficiency, allowing the node to store different data types (integer, string, child pointers) in the same memory space based on its <code>kind</code>.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن كل حقل في هيكل عقدة AST يجب أن يحتوي على قيمة. في الواقع، تُستخدم هياكل عامة (Generic structs)، وتُترك الحقول غير المطلوبة لنوع معين (مثل <code>init_expr</code> في جملة <code>if</code>) فارغة (null).</template>
+    <template class="content-en">Believing that every field in an AST node struct must contain a value. In reality, generic structs are used, and fields not required for a specific kind (like <code>init_expr</code> in an <code>if</code> statement) are simply left null.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

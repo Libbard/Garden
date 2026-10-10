@@ -109,6 +109,11 @@
         <template class="content-en">Mapping EER Model Constructs (Steps 8 & 9)</template>
         <span class="content-target">تحويل مفاهيم EER إلى جداول (EER Mapping Steps 8 & 9)</span>
       </a>
+      <a href="#eer-hierarchy-lattice" class="toc-link" data-bilingual>
+        <template class="content-ar">التسلسل الهرمي والشبكات (Hierarchies and Lattices)</template>
+        <template class="content-en">Hierarchies and Lattices in EER</template>
+        <span class="content-target">التسلسل الهرمي والشبكات (Hierarchies and Lattices)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -624,7 +629,7 @@
 <li><b>الخطوة 5:</b> علاقات M:N تتطلب إنشاء جدول جديد (Relationship relation) يحتوي على المفاتيح الأساسية للكيانين كمفاتيح أجنبية، ومزيجهما يشكل المفتاح الأساسي للجدول الجديد.</li>
 <li><b>الخطوة 6:</b> السمات متعددة القيم (Multivalued) تُحول إلى جدول جديد يحتوي على السمة والمفتاح الأجنبي للكيان الأصلي.</li>
 <li><b>الخطوة 7:</b> العلاقات من الدرجة n (n-ary) تُحول إلى جدول جديد يحتوي على المفاتيح الأجنبية لجميع الكيانات المشاركة.</li>
-</ul></template>
+</ul><p><b>أمثلة عملية (الخطوات 5 و 6):</b> بناءً على قاعدة بيانات COMPANY:</p><ol><li><b>الخطوة 5 (علاقة M:N):</b> لتحويل علاقة <code>WORKS_ON</code> بين الموظف والمشروع، ننشئ جدولاً جديداً <code>WORKS_ON</code>. نضع فيه المفتاحين الأجنبيين <code>ESSN</code> و <code>PNO</code>. المفتاح الأساسي للجدول الجديد هو المزيج <code>{ESSN, PNO}</code>. نضيف أيضاً سمة العلاقة <code>Hours</code> إلى هذا الجدول.</li><li><b>الخطوة 6 (سمة متعددة القيم):</b> لتحويل السمة <code>Locations</code> الخاصة بالقسم، ننشئ جدولاً جديداً <code>DEPT_LOCATIONS</code>. نضع فيه السمة <code>DLOCATION</code> والمفتاح الأجنبي <code>DNUMBER</code>. المفتاح الأساسي هو المزيج <code>{DNUMBER, DLOCATION}</code>.</li></ol></template>
     <template class="content-en"><p>The basic mapping algorithm consists of 7 steps:</p>
 <ul>
 <li><b>Step 1:</b> Regular (strong) entities become relations. Choose one key as the Primary Key (PK).</li>
@@ -634,7 +639,7 @@
 <li><b>Step 5:</b> Binary M:N relationships require creating a new relation (cross-reference) containing the PKs of participating entities as foreign keys. Their combination forms the new PK.</li>
 <li><b>Step 6:</b> Multivalued attributes get their own relation containing the attribute and a foreign key to the parent entity.</li>
 <li><b>Step 7:</b> N-ary relationships (n>2) are mapped to a new relation containing foreign keys from all participating entities.</li>
-</ul></template>
+</ul><p><b>Worked Examples (Steps 5 & 6):</b> Based on the COMPANY database:</p><ol><li><b>Step 5 (M:N relationship):</b> To map the <code>WORKS_ON</code> relationship between EMPLOYEE and PROJECT, create a new relation <code>WORKS_ON</code>. Include the foreign keys <code>ESSN</code> and <code>PNO</code>. The primary key of the new relation is the combination <code>{ESSN, PNO}</code>. Also, include the relationship attribute <code>Hours</code>.</li><li><b>Step 6 (Multivalued attribute):</b> To map the <code>Locations</code> attribute of DEPARTMENT, create a new relation <code>DEPT_LOCATIONS</code>. Include the attribute <code>DLOCATION</code> and the foreign key <code>DNUMBER</code>. The primary key is the combination <code>{DNUMBER, DLOCATION}</code>.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -737,6 +742,61 @@
   </details>
 </section>
 
+<section id="eer-hierarchy-lattice" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> التسلسل الهرمي والشبكات (Hierarchies and Lattices)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Hierarchies and Lattices in EER</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>في نموذج EER، التسلسل الهرمي (Hierarchy) يفرض وراثة مفردة (Single Inheritance) حيث تمتلك الفئة الفرعية فئة عليا واحدة. أما الشبكة (Lattice) فتسمح بوراثة متعددة (Multiple Inheritance) عبر الفئات الفرعية المشتركة (Shared Subclasses).</p></template>
+    <template class="content-en"><p>In the EER model, a Hierarchy enforces single inheritance (a subclass has one superclass). A Lattice allows multiple inheritance via Shared Subclasses.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن أن تمتلك الفئة الفرعية فئات فرعية خاصة بها، مما يشكل هيكلاً شجرياً أو شبكياً:</p>
+<ol>
+<li><b>التسلسل الهرمي (Hierarchy):</b> يمتلك قيداً ينص على أن كل فئة فرعية لها فئة عليا واحدة فقط (وراثة مفردة). هذا يشكل بنية شجرية (Tree structure).</li>
+<li><b>الشبكة (Lattice):</b> يمكن أن تكون الفئة الفرعية تابعة لأكثر من فئة عليا واحدة (وراثة متعددة). تُسمى هذه الفئة بـ <b><span class="smart-term" data-term-en="Shared Subclass" data-ar="الفئة الفرعية المشتركة" data-en-def="A subclass with more than one superclass, representing the intersection of those superclasses.">الفئة الفرعية المشتركة<span class="smart-term-tooltip"></span></span> (Shared Subclass)</b>.</li>
+</ol>
+<p>ترث الفئة الفرعية المشتركة السمات والعلاقات من جميع فئاتها العليا (أسلافها) وصولاً إلى الجذر. ومع ذلك، فإنها ترث السمات من السلف المشترك <i>مرة واحدة فقط</i> (على سبيل المثال، الطالب المساعد يرث سمات الشخص مرة واحدة فقط).</p></template>
+    <template class="content-en"><p>A subclass may itself have further subclasses, forming a hierarchy or a lattice:</p>
+<ol>
+<li><b>Hierarchy:</b> Has a constraint that every subclass has only one superclass (<span class="smart-term" data-term-en="Single Inheritance" data-ar="الوراثة المفردة" data-en-def="A constraint where a subclass has exactly one direct superclass.">single inheritance<span class="smart-term-tooltip"></span></span>). This is basically a tree structure.</li>
+<li><b>Lattice:</b> A subclass can be a subclass of more than one superclass (<span class="smart-term" data-term-en="Multiple Inheritance" data-ar="الوراثة المتعددة" data-en-def="A feature where a subclass can have more than one direct superclass.">multiple inheritance<span class="smart-term-tooltip"></span></span>). Such a subclass is called a <b><span class="smart-term" data-term-en="Shared Subclass" data-ar="الفئة الفرعية المشتركة" data-en-def="A subclass with more than one superclass, representing the intersection of those superclasses.">Shared Subclass<span class="smart-term-tooltip"></span></span></b>.</li>
+</ol>
+<p>A shared subclass inherits attributes and relationships from all its ancestor superclasses up to the root. However, it inherits attributes <i>only once</i> from a common ancestor (e.g., a STUDENT_ASSISTANT inherits PERSON attributes only once).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند تحويل الفئة الفرعية المشتركة إلى جداول علائقية (الخطوة 8)، يجب أن تمتلك جميع فئاتها العليا نفس المفتاح الأساسي (لأنها تمثل نفس الكيان الأساسي). إذا اختلفت المفاتيح، فإننا نتعامل مع فئة (Category/UNION Type) وليس فئة فرعية مشتركة.</p>
+<p>يمكن تطبيق أي من خيارات التحويل في الخطوة 8 على الفئة الفرعية المشتركة، وغالباً ما يُستخدم الخيار 8D إذا كانت الفئات متداخلة.</p></template>
+    <template class="content-en"><p>When mapping a shared subclass to relational tables (Step 8), all its superclasses must have the same key attribute (because they represent the same underlying entity). If the keys differ, it would be a Category (UNION Type), not a shared subclass.</p>
+<p>Any of the mapping options discussed in Step 8 can be applied to a shared subclass, with Option 8D often used if the superclasses are overlapping.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا ترث الفئة الفرعية المشتركة سمات السلف المشترك مرة واحدة فقط؟</template>
+      <template class="content-en">Why does a shared subclass inherit attributes from a common ancestor only once?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الفئة الفرعية المشتركة تمثل نفس الكيان الحقيقي. وراثة نفس السمة (مثل 'الاسم' من كيان 'شخص') عدة مرات سيؤدي إلى تكرار البيانات وتعارضها لنفس الخاصية.</p></template>
+      <template class="content-en"><p>Because the shared subclass represents the exact same real-world entity. Inheriting the same attribute (like 'Name' from PERSON) multiple times would create redundant and conflicting data fields for the same property.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
@@ -745,10 +805,10 @@
   <div class="professor-text" data-bilingual>
     <template class="content-ar">أهلاً بكم يا مهندسي البيانات. في هذه الوحدة، ننتقل من مجرد رسم المخططات إلى بناء هياكل قواعد بيانات حقيقية. بدأنا بنموذج EER، وهو ترقية لنموذج ER يضيف مفاهيم البرمجة الكائنية مثل الوراثة (التخصيص والتعميم). ركزوا جيداً على القيود: هل الفئات منفصلة (Disjoint) أم متداخلة (Overlapping)؟ وهل الانتماء إلزامي (Total) أم اختياري (Partial)؟ هذه القيود ليست مجرد رموز، بل هي التي تحدد كيف سنبني الجداول لاحقاً.
 
-الجزء الأهم في الامتحان هو خوارزمية التحويل (Mapping Algorithm). الخطوات السبع الأولى هي الأساس: الكيانات القوية، الضعيفة، وعلاقات 1:1، 1:N، و M:N. تذكروا القاعدة الذهبية: M:N والسمات متعددة القيم تتطلب دائماً جداول جديدة! أما الخطوتان 8 و 9 فهما للتعامل مع EER. فهمكم لكيفية اختيار الخيار المناسب في الخطوة 8 (جدول واحد مقابل عدة جداول) بناءً على قيود الانفصال والتداخل سيضمن لكم درجات التفوق. بالتوفيق!</template>
+الجزء الأهم في الامتحان هو خوارزمية التحويل (Mapping Algorithm). الخطوات السبع الأولى هي الأساس: الكيانات القوية، الضعيفة، وعلاقات 1:1، 1:N، و M:N. تذكروا القاعدة الذهبية: M:N والسمات متعددة القيم تتطلب دائماً جداول جديدة! أما الخطوتان 8 و 9 فهما للتعامل مع EER. فهمكم لكيفية اختيار الخيار المناسب في الخطوة 8 (جدول واحد مقابل عدة جداول) بناءً على قيود الانفصال والتداخل سيضمن لكم درجات التفوق. بالتوفيق!<p>فهم هياكل EER المتقدمة مثل الشبكات (Lattices) والفئات (Categories) ليس مجرد تمرين نظري؛ بل هو الأساس لإنشاء جداول علائقية دقيقة. تذكر دائماً أن الوراثة المتعددة تتطلب تطابق المفاتيح الأساسية، بينما تتطلب أنواع الاتحاد (UNION) مفاتيح بديلة (Surrogate Keys) لتوحيد الهويات المختلفة.</p></template>
     <template class="content-en">Welcome, data engineers. In this module, we transition from drawing diagrams to building actual database structures. We started with the EER model, an upgrade to ER that adds object-oriented concepts like inheritance (Specialization and Generalization). Pay close attention to the constraints: are subclasses Disjoint or Overlapping? Is membership Total or Partial? These aren't just symbols; they dictate how we build tables later.
 
-The most critical part for the exam is the Mapping Algorithm. The first 7 steps are your bread and butter: strong entities, weak entities, and 1:1, 1:N, M:N relationships. Remember the golden rule: M:N and multivalued attributes ALWAYS require new tables! Steps 8 and 9 handle EER constructs. Understanding how to choose the right option in Step 8 (single vs. multiple tables) based on disjoint/overlapping constraints will secure your top grades. Good luck!</template>
+The most critical part for the exam is the Mapping Algorithm. The first 7 steps are your bread and butter: strong entities, weak entities, and 1:1, 1:N, M:N relationships. Remember the golden rule: M:N and multivalued attributes ALWAYS require new tables! Steps 8 and 9 handle EER constructs. Understanding how to choose the right option in Step 8 (single vs. multiple tables) based on disjoint/overlapping constraints will secure your top grades. Good luck!<p>Understanding advanced EER structures like Lattices and Categories is not just a theoretical exercise; it is the foundation for creating accurate relational tables. Always remember that multiple inheritance requires matching primary keys, whereas UNION types require Surrogate Keys to unify distinct identities.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -922,6 +982,24 @@ The most critical part for the exam is the Mapping Algorithm. The first 7 steps 
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأن الفئات العليا التي تتكون منها الفئة غالباً ما تمتلك مفاتيح أساسية مختلفة (مثل SSN للشخص و Bname للبنك). المفتاح البديل يوفر معرفاً موحداً لجدول الفئة.</template>
           <template class="content-en">Because the superclasses forming the category often have different primary keys (e.g., SSN for Person, Bname for Bank). A surrogate key provides a uniform identifier for the category table.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يُشترط أن تمتلك جميع الفئات العليا للفئة الفرعية المشتركة نفس المفتاح الأساسي؟</template>
+          <template class="content-en">Why is it required that all superclasses of a shared subclass have the same primary key?</template>
+          <span class="content-target">لماذا يُشترط أن تمتلك جميع الفئات العليا للفئة الفرعية المشتركة نفس المفتاح الأساسي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن الفئة الفرعية المشتركة تمثل تقاطعاً (Intersection) لفئاتها العليا، أي أنها تمثل نفس الكيان الحقيقي الذي يتواجد في جميع هذه الفئات. لكي يتم التعرف على هذا الكيان بشكل متسق عبر الجداول، يجب أن يشترك في نفس المُعرّف (المفتاح الأساسي). إذا اختلفت المفاتيح، فهذا يعني أننا نجمع كيانات مختلفة، وهو ما يتطلب استخدام فئة (Category/UNION Type) ومفتاح بديل.</p></template>
+          <template class="content-en"><p>Because a shared subclass represents the intersection of its superclasses, meaning it is the exact same real-world entity existing in all of them. To identify this entity consistently across tables, it must share the same identifier (primary key). If keys differ, it means we are grouping different entities, which requires a Category (UNION Type) and a surrogate key.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1240,6 +1318,23 @@ The most critical part for the exam is the Mapping Algorithm. The first 7 steps 
         "en": "PART relation with Mflag and Pflag fields."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو الشرط الأساسي للمفاتيح في الفئات العليا الخاصة بـ \"الفئة الفرعية المشتركة\" (Shared Subclass)؟",
+      "en": "What is the primary key requirement for the superclasses of a Shared Subclass?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب أن تمتلك جميع الفئات العليا نفس المفتاح الأساسي.",
+        "en": "All superclasses must have the exact same key attribute."
+      },
+      "example": {
+        "ar": "الطالب والموظف (كلاهما يمتلك SSN) يمكن أن يشتركا في فئة فرعية \"طالب مساعد\".",
+        "en": "STUDENT and EMPLOYEE (both having SSN) can share the subclass STUDENT_ASSISTANT."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1249,7 +1344,7 @@ The most critical part for the exam is the Mapping Algorithm. The first 7 steps 
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1265,7 +1360,7 @@ The most critical part for the exam is the Mapping Algorithm. The first 7 steps 
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1590,6 +1685,38 @@ The most critical part for the exam is the Mapping Algorithm. The first 7 steps 
     },
     "difficulty": "medium",
     "conceptId": "er-to-relational-mapping"
+  },
+  {
+    "conceptId": "eer-hierarchy-lattice",
+    "question": {
+      "ar": "أي نوع من الوراثة يمثله هيكل الشبكة (Lattice) في نموذج EER؟",
+      "en": "Which type of inheritance does a Lattice structure in the EER model represent?"
+    },
+    "options": {
+      "ar": [
+        "وراثة مفردة (Single Inheritance)",
+        "وراثة متعددة (Multiple Inheritance)",
+        "وراثة جزئية (Partial Inheritance)",
+        "وراثة منفصلة (Disjoint Inheritance)"
+      ],
+      "en": [
+        "Single Inheritance",
+        "Multiple Inheritance",
+        "Partial Inheritance",
+        "Disjoint Inheritance"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الشبكة تسمح للفئة الفرعية بأن يكون لها أكثر من فئة عليا واحدة، وهو ما يُعرف بالوراثة المتعددة (عبر الفئات الفرعية المشتركة).",
+      "en": "A lattice allows a subclass to have more than one superclass, which is known as multiple inheritance (via shared subclasses)."
+    },
+    "hint": {
+      "ar": "فكر في الفئة الفرعية التي تشترك في خصائص من عدة مصادر.",
+      "en": "Think of a subclass that shares properties from multiple sources."
+    },
+    "difficulty": "easy",
+    "id": 11
   }
 ]
 </script>
@@ -1626,6 +1753,14 @@ The most critical part for the exam is the Mapping Algorithm. The first 7 steps 
       <template class="content-ar">عند تحويل الكيان الضعيف، لا تنسَ أن مفتاحه الأساسي ليس المفتاح الجزئي فقط! بل هو مزيج (Combination) من المفتاح الأساسي للكيان المالك والمفتاح الجزئي للكيان الضعيف.</template>
       <template class="content-en">When mapping a weak entity, don't forget that its primary key is NOT just the partial key! It is the combination of the owner's primary key and the weak entity's partial key.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الوراثة المتعددة في EER (الشبكات) تتطلب أن تكون جميع الفئات العليا للفئة الفرعية المشتركة تمتلك نفس المفتاح الأساسي. إذا لم تكن كذلك، فإننا نتحدث عن فئة (Category) وليس فئة فرعية مشتركة.</template>
+    <template class="content-en">Multiple inheritance in EER (Lattices) requires that all superclasses of a shared subclass have the same primary key. If they don't, we are dealing with a Category, not a shared subclass.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

@@ -100,6 +100,11 @@
         <template class="content-en">Priority Queue and Binary Heap</template>
         <span class="content-target">طابور الأولوية والكومة الثنائية</span>
       </a>
+      <a href="#worked-examples-open-addressing" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة عملية: تقنيات العنونة المفتوحة</template>
+        <template class="content-en">Worked Examples: Open Addressing</template>
+        <span class="content-target">أمثلة عملية: تقنيات العنونة المفتوحة</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -464,6 +469,51 @@
     <template class="content-ar"><p>في لغة Java، تعتمد تطبيقات <code>HashSet</code> و <code>HashMap</code> في المكتبة القياسية حالياً على التجزئة باستخدام السلسلة المنفصلة.</p><p>يجب أن توفر العناصر دوال <code>equals</code> و <code>hashCode</code>.</p></template>
     <template class="content-en"><p>In Java, the Standard Library implementations of <code>HashSet</code> and <code>HashMap</code> are currently implemented using separate chaining hashing.</p><p>The items must provide an <code>equals</code> and <code>hashCode</code> method.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import java.util.*;
+
+public class MapTest {
+    public static void main(String[] args) {
+        Map&lt;Integer, String&gt; students = new HashMap&lt;Integer, String&gt;();
+        // Add an association:
+        students.put(1111, "Mohd");
+        students.put(2222, "Tariq");
+        students.put(3333, "Ali");
+        students.put(4444, "Hasan");
+        
+        // Print all keys and values in the map
+        Set&lt;Integer&gt; keySet1 = students.keySet();
+        for (Integer key : keySet1) {
+            String value = students.get(key);
+            System.out.println(key + " : " + value);
+        }
+        System.out.println("--------------------");
+        
+        // Change an existing association:
+        students.put(4444, "Ismail"); // replace [4444, "Hasan"]
+        
+        // Get the value associated with a key 3333:
+        String std = students.get(3333);
+        System.out.println(std);
+        System.out.println("--------------------");
+        
+        // Remove a key and its associated value:
+        students.remove(1111); // remove [1111, "Mohd"]
+        
+        // Print all keys and values in the map
+        Set&lt;Integer&gt; keySet2 = students.keySet();
+        for (Integer key : keySet2) {
+            String value = students.get(key);
+            System.out.println(key + " : " + value);
+        }
+    }
+}</code></pre>
   </div>
 
   <!-- DIAGRAM[4]: A hash table array vertically aligned. Indices 0, 1, 4, 6, 9 have arrows pointing to linked lists. Index 1 points to [81]->[1]. Index 4 points to [64]->[4]. Index 6 points to [36]->[16]. Style: educational, dark background #0d1117, accent color #007bff. -->
@@ -947,8 +997,8 @@
   </div>
   
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>عندما يمتلئ الجدول (مثلاً أكثر من 70% من الخانات مشغولة): يزداد وقت التشغيل، وقد تفشل عمليات الإدراج، وتزداد احتمالية التصادم.</p><p>الحل هو <span class="smart-term" data-term-en="Rehashing" data-ar="إعادة التجزئة" data-en-def="The process of creating a larger hash table and re-inserting all elements using a new hash function when the load factor gets too high.">إعادة التجزئة</span>: إنشاء جدول جديد بحجم يقارب ضعف الحجم الحالي (يجب أن يكون العدد الأولي التالي لضمان التوزيع الجيد)، وربطه بدالة تجزئة جديدة، ثم إعادة حساب مواقع جميع العناصر الحالية وإدراجها في الجدول الجديد.</p></template>
-    <template class="content-en"><p>When a table gets too full (e.g., >70% occupied): running time increases, insertions might fail, and collision probabilities increase.</p><p>Solution: <span class="smart-term" data-term-en="Rehashing" data-ar="إعادة التجزئة" data-en-def="The process of creating a larger hash table and re-inserting all elements using a new hash function when the load factor gets too high.">Rehashing</span>. Create another table about twice the size of the current one (specifically, the next prime number), associate a new hash function, and rehash all current items to new locations.</p></template>
+    <template class="content-ar"><p>عندما يمتلئ الجدول (مثلاً أكثر من 70% من الخانات مشغولة): يزداد وقت التشغيل، وقد تفشل عمليات الإدراج، وتزداد احتمالية التصادم.</p><p>الحل هو <span class="smart-term" data-term-en="Rehashing" data-ar="إعادة التجزئة" data-en-def="The process of creating a larger hash table and re-inserting all elements using a new hash function when the load factor gets too high.">إعادة التجزئة</span>: إنشاء جدول جديد بحجم يقارب ضعف الحجم الحالي (يجب أن يكون العدد الأولي التالي لضمان التوزيع الجيد)، وربطه بدالة تجزئة جديدة، ثم إعادة حساب مواقع جميع العناصر الحالية وإدراجها في الجدول الجديد.</p><p><b>مثال عملي:</b> إدراج المفاتيح (13، 15، 24، 6، 23) في جدول بحجم 7 باستخدام الفحص الخطي ودالة التجزئة <code>x mod 7</code>.</p><ol><li>يتم إدراج 6 في [6]، 15 في [1]، 23 في [2]، 24 في [3].</li><li>إدراج 13: <code>13 mod 7 = 6</code> (تصادم). نفحص الفهرس التالي لنجد [0] فارغاً. الجدول الآن ممتلئ بنسبة تتجاوز 70%.</li><li><b>إعادة التجزئة:</b> الحجم الجديد هو 17 (العدد الأولي التالي لضعف 7). الدالة الجديدة: <code>x mod 17</code>.</li><li>إعادة الإدراج: 6 في [6]، 15 في [15]، 13 في [13].</li><li>إعادة إدراج 23: <code>23 mod 17 = 6</code> (تصادم مع 6). نفحص الفهرس التالي وندرج في [7].</li><li>إعادة إدراج 24: <code>24 mod 17 = 7</code> (تصادم مع 23). نفحص الفهرس التالي وندرج في [8].</li></ol></template>
+    <template class="content-en"><p>When a table gets too full (e.g., >70% occupied): running time increases, insertions might fail, and collision probabilities increase.</p><p>Solution: <span class="smart-term" data-term-en="Rehashing" data-ar="إعادة التجزئة" data-en-def="The process of creating a larger hash table and re-inserting all elements using a new hash function when the load factor gets too high.">Rehashing</span>. Create another table about twice the size of the current one (specifically, the next prime number), associate a new hash function, and rehash all current items to new locations.</p><p><b>Worked Example:</b> Insert keys (13, 15, 24, 6, 23) into a size 7 table using Linear Probing and <code>x mod 7</code>.</p><ol><li>Insert 6 at [6], 15 at [1], 23 at [2], 24 at [3].</li><li>Insert 13: <code>13 mod 7 = 6</code> (Collision). Probe to [0]. Table is now >70% full.</li><li><b>Rehash:</b> New size is 17 (next prime after 14). New function: <code>x mod 17</code>.</li><li>Re-insert: 6 at [6], 15 at [15], 13 at [13].</li><li>Re-insert 23: <code>23 mod 17 = 6</code> (Collision with 6). Probe to [7].</li><li>Re-insert 24: <code>24 mod 17 = 7</code> (Collision with 23). Probe to [8].</li></ol></template>
     <div class="content-target"></div>
   </div>
   
@@ -1380,14 +1430,57 @@
   </details>
 </section>
 
+<section id="worked-examples-open-addressing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> أمثلة عملية: تقنيات العنونة المفتوحة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Worked Examples: Open Addressing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق خطوة بخطوة لتقنيات الفحص الخطي، الفحص التربيعي، والتجزئة المزدوجة لحل التصادمات في جداول التجزئة.</p></template>
+    <template class="content-en"><p>Step-by-step application of Linear Probing, Quadratic Probing, and Double Hashing techniques to resolve collisions in hash tables.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>1. الفحص الخطي (Linear Probing):</b> إدراج المفتاح 343-567 في الفهرس 4. إذا كانت الفهارس 4، 5، و 6 مشغولة بالفعل، نقوم بالفحص التسلسلي وندرج المفتاح في الفهرس 7 الفارغ.</p><p><b>2. الفحص التربيعي (Quadratic Probing):</b> حجم الجدول = 10. إدراج 88. المحاولة الأولى: <code>88 mod 10 = 8</code> (تصادم). المحاولة الثانية: <code>(88 + 1^2) mod 10 = 9</code> (تصادم). المحاولة الثالثة: <code>(88 + 2^2) mod 10 = 2</code> (فارغ). ندرج في 2.</p><p><b>3. التجزئة المزدوجة (Double Hashing):</b> حجم الجدول = 10، ودالة التجزئة الثانية <code>hash2(x) = 7 - (x mod 7)</code>. إدراج 49. المحاولة الأولى: <code>49 mod 10 = 9</code> (تصادم). نحسب <span class="smart-term" data-term-en="Step Distance" data-ar="مسافة القفز" data-en-def="The number of slots skipped between consecutive probes, determined by the collision resolution strategy.">مسافة القفز<span class="smart-term-tooltip"></span></span>: <code>hash2(49) = 7 - (49 mod 7) = 7</code>. الفهرس التالي: <code>(9 + 7) mod 10 = 6</code>. ندرج في 6.</p></template>
+    <template class="content-en"><p><b>1. Linear Probing:</b> Insert key 343-567 into index 4. If indices 4, 5, and 6 are already occupied, we sequentially probe and insert the key at the empty index 7.</p><p><b>2. Quadratic Probing:</b> TableSize = 10. Insert 88. Attempt 1: <code>88 mod 10 = 8</code> (Collision). Attempt 2: <code>(88 + 1^2) mod 10 = 9</code> (Collision). Attempt 3: <code>(88 + 2^2) mod 10 = 2</code> (Vacant). Insert at 2.</p><p><b>3. Double Hashing:</b> TableSize = 10, second hash function <code>hash2(x) = 7 - (x mod 7)</code>. Insert 49. Attempt 1: <code>49 mod 10 = 9</code> (Collision). Calculate <span class="smart-term" data-term-en="Step Distance" data-ar="مسافة القفز" data-en-def="The number of slots skipped between consecutive probes, determined by the collision resolution strategy.">step distance<span class="smart-term-tooltip"></span></span>: <code>hash2(49) = 7 - (49 mod 7) = 7</code>. Next index: <code>(9 + 7) mod 10 = 6</code>. Insert at 6.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في الفحص الخطي، إذا وصلنا إلى نهاية الجدول، نعود إلى البداية (الفهرس 0) لأن الجدول يُعامل كدائرة.</p><p>في التجزئة المزدوجة، إذا حدث تصادم آخر بعد القفزة الأولى، نستمر في إضافة نفس مسافة القفز (التي حسبناها من الدالة الثانية) إلى الفهرس الحالي. على سبيل المثال، إذا كان الفهرس 6 مشغولاً أيضاً في المثال السابق، سيكون الفهرس التالي <code>(6 + 7) mod 10 = 3</code>.</p></template>
+    <template class="content-en"><p>In Linear Probing, if we reach the end of the table, we wrap around to the beginning (index 0) because the table is treated as circular.</p><p>In Double Hashing, if another collision occurs after the first jump, we continue adding the exact same step distance (calculated from the second function) to the current index. For instance, if index 6 was also occupied in the previous example, the next index would be <code>(6 + 7) mod 10 = 3</code>.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في الفحص التربيعي، لماذا قفز المفتاح 88 إلى الفهرس 2 في المحاولة الثالثة بدلاً من الفهرس 0؟</template>
+      <template class="content-en">In Quadratic Probing, why did key 88 jump to index 2 on the third attempt instead of index 0?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المحاولة الثالثة تضيف 2^2 (أي 4) إلى الفهرس الأصلي (8). 8 + 4 = 12، وباقي قسمة 12 على 10 هو 2.</p></template>
+      <template class="content-en"><p>Because the third attempt adds 2^2 (which is 4) to the original hashed index (8). 8 + 4 = 12, and 12 mod 10 is 2.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبطال الخوارزميات. في هذه الوحدة، نغوص في عالم 'التجزئة' (Hashing) و'أكوام البيانات' (Heaps). تخيل أن لديك مكتبة ضخمة وتريد الوصول لكتاب في ثانية واحدة؛ هذا ما تفعله التجزئة! لكن ماذا لو أراد شخصان وضع كتابيهما في نفس الرف؟ هنا تظهر مشكلة 'التصادم' (Collision). درسنا كيف نحلها إما بربط الكتب ببعضها (السلسلة المنفصلة) أو بالبحث عن رف فارغ مجاور (العنونة المفتوحة). تذكروا جيداً في الامتحان: الفحص الخطي يسبب 'التكتل'، والتجزئة المزدوجة هي الحل الأذكى بشرط ألا تكون القفزة صفراً! وعندما تمتلئ المكتبة، نقوم بـ 'إعادة التجزئة' لجدول بحجم عدد أولي جديد. في الجزء الثاني، انتقلنا لـ 'طابور الأولوية' وكيف ننفذه بعبقرية باستخدام 'الكومة الثنائية' (Binary Heap)، حيث يجلس العنصر الأهم دائماً على عرش الجذر. ركزوا على خطوات الإدراج (التصعيد) والحذف (الهبوط). بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome, algorithm champions. In this module, we dive into the world of Hashing and Heaps. Imagine having a massive library and wanting to find a book in exactly one second; that's what hashing does! But what if two people want to put their books on the exact same shelf? That's a 'Collision'. We learned to solve this either by chaining books together (Separate Chaining) or finding the next empty shelf (Open Addressing). Remember for the exam: Linear Probing causes 'Clustering', and Double Hashing is the smartest fix—provided the step size is never zero! When the library gets too full, we 'Rehash' to a new prime-sized table. In the second part, we explored the 'Priority Queue' and its genius implementation, the 'Binary Heap', where the most important element always sits on the root throne. Focus heavily on the Insert (Bubble Up) and DeleteMin (Bubble Down) steps. Best of luck!</template>
+    <template class="content-ar">أهلاً بكم يا أبطال الخوارزميات. في هذه الوحدة، نغوص في عالم 'التجزئة' (Hashing) و'أكوام البيانات' (Heaps). تخيل أن لديك مكتبة ضخمة وتريد الوصول لكتاب في ثانية واحدة؛ هذا ما تفعله التجزئة! لكن ماذا لو أراد شخصان وضع كتابيهما في نفس الرف؟ هنا تظهر مشكلة 'التصادم' (Collision). درسنا كيف نحلها إما بربط الكتب ببعضها (السلسلة المنفصلة) أو بالبحث عن رف فارغ مجاور (العنونة المفتوحة). تذكروا جيداً في الامتحان: الفحص الخطي يسبب 'التكتل'، والتجزئة المزدوجة هي الحل الأذكى بشرط ألا تكون القفزة صفراً! وعندما تمتلئ المكتبة، نقوم بـ 'إعادة التجزئة' لجدول بحجم عدد أولي جديد. في الجزء الثاني، انتقلنا لـ 'طابور الأولوية' وكيف ننفذه بعبقرية باستخدام 'الكومة الثنائية' (Binary Heap)، حيث يجلس العنصر الأهم دائماً على عرش الجذر. ركزوا على خطوات الإدراج (التصعيد) والحذف (الهبوط). بالتوفيق في دراستكم!<p>إتقان هذه التتبعات خطوة بخطوة أمر بالغ الأهمية لاختبارك. سيُطلب منك محاكاة عمليات الإدراج والحذف على الورق، تماماً كما هو موضح في هذه الأمثلة العملية. انتبه جيداً لحسابات باقي القسمة (Modulo) في التجزئة المزدوجة، وللمسار الدقيق الذي تسلكه 'الخانة الفارغة' أثناء عمليات الكومة.</p><p>انتبه جيداً للخوارزمية الدقيقة المكونة من 4 خطوات لعمليات الكومة الثنائية باستخدام طريقة 'الخانة الفارغة' (Hole Method). في الاختبارات، غالباً ما يُطلب منك تتبع هذه الخطوات بدقة بدلاً من مجرد تبديل القيم عشوائياً. تأكد أيضاً من قدرتك على قراءة وتحليل أكواد Java القياسية مثل HashMap.</p></template>
+    <template class="content-en">Welcome, algorithm champions. In this module, we dive into the world of Hashing and Heaps. Imagine having a massive library and wanting to find a book in exactly one second; that's what hashing does! But what if two people want to put their books on the exact same shelf? That's a 'Collision'. We learned to solve this either by chaining books together (Separate Chaining) or finding the next empty shelf (Open Addressing). Remember for the exam: Linear Probing causes 'Clustering', and Double Hashing is the smartest fix—provided the step size is never zero! When the library gets too full, we 'Rehash' to a new prime-sized table. In the second part, we explored the 'Priority Queue' and its genius implementation, the 'Binary Heap', where the most important element always sits on the root throne. Focus heavily on the Insert (Bubble Up) and DeleteMin (Bubble Down) steps. Best of luck!<p>Mastering these step-by-step traces is crucial for your exam. You will be asked to simulate insertions and deletions on paper, exactly as shown in these worked examples. Pay special attention to the modulo arithmetic in double hashing and the exact path the 'hole' takes during heap operations.</p><p>Pay close attention to the exact 4-step algorithms for binary heap operations using the 'hole' method. Exams frequently test your ability to trace these specific steps rather than just swapping values arbitrarily. Also, ensure you can read and analyze standard Java code snippets like HashMap.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1561,6 +1654,42 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">تتطلب أن توفر الكائنات تنفيذاً صحيحاً لدالتي equals() و hashCode().</template>
           <template class="content-en">They require the objects to provide a correct implementation of the equals() and hashCode() methods.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في عمليات الكومة الثنائية، لماذا نعتبر تحريك 'الخانة الفارغة' (Hole) أفضل من التبديل المباشر (Swapping) للعناصر؟</template>
+          <template class="content-en">In binary heap operations, why is moving the 'Hole' considered better than directly swapping elements?</template>
+          <span class="content-target">في عمليات الكومة الثنائية، لماذا نعتبر تحريك 'الخانة الفارغة' (Hole) أفضل من التبديل المباشر (Swapping) للعناصر؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>عملية التبديل التقليدية تتطلب ثلاثة أوامر برمجية (باستخدام متغير مؤقت). من خلال تحريك الخانة الفارغة، نحن نقوم بعملية تعيين واحدة فقط في كل مستوى من مستويات الشجرة، ولا نضع العنصر الجديد في مكانه إلا في الخطوة الأخيرة. هذا يقلل من العمليات الحسابية بمقدار الثلثين ويزيد من سرعة التنفيذ.</p></template>
+          <template class="content-en"><p>A traditional swap requires three programming statements (using a temporary variable). By moving the hole, we only perform one assignment per tree level, placing the new element only at the very last step. This reduces the computational operations by two-thirds and significantly speeds up execution.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في خوارزمية الإدراج في الكومة الثنائية، لماذا نتوقف عن تصعيد الخانة الفارغة (Bubble Up) بمجرد أن نجد أباً أصغر من أو يساوي العنصر الجديد؟</template>
+          <template class="content-en">In the binary heap insertion algorithm, why do we stop bubbling up the empty slot as soon as we find a parent that is less than or equal to the new element?</template>
+          <span class="content-target">في خوارزمية الإدراج في الكومة الثنائية، لماذا نتوقف عن تصعيد الخانة الفارغة (Bubble Up) بمجرد أن نجد أباً أصغر من أو يساوي العنصر الجديد؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن الكومة الثنائية (Min-Heap) تتطلب فقط أن يكون الأب أصغر من أو يساوي أبنائه. بمجرد أن نجد أباً يحقق هذا الشرط مع العنصر الجديد، فإننا نعلم أن جميع الآباء الأعلى في الشجرة سيكونون أصغر أيضاً (بسبب خاصية الكومة الموجودة مسبقاً)، لذا يكون الموضع الحالي للخانة هو المكان الصحيح والنهائي.</p></template>
+          <template class="content-en"><p>Because a Min-Heap only requires that a parent is less than or equal to its children. Once we find a parent that satisfies this condition with the new element, we know all ancestors higher up are also smaller (due to the pre-existing heap property), so the current hole position is the correct, final spot.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1879,6 +2008,23 @@
         "en": "[EXAMPLE_NEEDED]"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في التجزئة المزدوجة، كيف نحسب الفهرس للمحاولة الثانية إذا كان الفهرس الأصلي هو 9 ومسافة القفز هي 7 وحجم الجدول 10؟",
+      "en": "In Double Hashing, how do we calculate the index for the second attempt if the original index is 9, the step distance is 7, and the table size is 10?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نجمع الفهرس الأصلي مع مسافة القفز ونأخذ باقي القسمة على حجم الجدول: (9 + 7) mod 10 = 6.",
+        "en": "Add the original index to the step distance and modulo by the table size: (9 + 7) mod 10 = 6."
+      },
+      "example": {
+        "ar": "الفهرس التالي سيكون 6.",
+        "en": "The next index will be 6."
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1888,7 +2034,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1904,7 +2050,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2229,6 +2375,38 @@
     },
     "difficulty": "hard",
     "conceptId": "collision-resolution-separate-chaining"
+  },
+  {
+    "conceptId": "worked-examples-open-addressing",
+    "question": {
+      "ar": "في التجزئة المزدوجة بحجم جدول 10 ودالة ثانية hash2(x) = 7 - (x mod 7)، ما هو الفهرس التالي الذي سيتم فحصه إذا أدى إدراج 49 إلى تصادم في الفهرس 9؟",
+      "en": "In Double Hashing with TableSize 10 and hash2(x) = 7 - (x mod 7), what is the next index probed if inserting 49 causes a collision at index 9?"
+    },
+    "options": {
+      "ar": [
+        "0",
+        "3",
+        "6",
+        "7"
+      ],
+      "en": [
+        "0",
+        "3",
+        "6",
+        "7"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "أولاً نحسب مسافة القفز: hash2(49) = 7 - (49 mod 7) = 7 - 0 = 7. ثم نضيفها للفهرس الحالي: (9 + 7) mod 10 = 16 mod 10 = 6.",
+      "en": "First calculate step distance: hash2(49) = 7 - (49 mod 7) = 7 - 0 = 7. Then add to current index: (9 + 7) mod 10 = 16 mod 10 = 6."
+    },
+    "hint": {
+      "ar": "احسب نتيجة الدالة الثانية أولاً، ثم أضفها للفهرس الذي حدث فيه التصادم.",
+      "en": "Calculate the result of the second function first, then add it to the collided index."
+    },
+    "difficulty": "hard",
+    "id": 11
   }
 ]
 </script>

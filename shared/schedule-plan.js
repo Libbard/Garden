@@ -1486,6 +1486,11 @@
 
   function openTimesEditor() { panelView = 'times'; renderPanel(); }
   function openSessionEditor(id) {
+    var plans = store().plans || {};
+    Object.keys(plans).forEach(function (t) {
+      var q = plans[t];
+      if (q && (q.sessions || []).some(function (x) { return x.id === id; })) activeTab = t;
+    });
     var p = normalizePlan(store().plans[activeTab]);
     var s = p && p.sessions.filter(function (x) { return x.id === id; })[0];
     if (!s) return;
@@ -1598,7 +1603,12 @@
       T('رجوع', 'Back') + '</button><b>' + T('تعديل الجلسة', 'Edit session') + '</b></div>';
     h += '<div class="ip-note">' +
       '<span class="ip-dot" style="background:' + S.courseColor(s.course) + '"></span> ' +
-      esc(S.courseShort(s.course)) + ' · ' + esc(sessionLabel(s)) + ' · ' + esc(s.date) + '</div>';
+      esc(S.courseShort(s.course)) + ' · ' + esc(sessionLabel(s)) + '</div>';
+    var dMax = sessionDateMax(p, s);
+    h += '<label class="sch-label" for="ip-se-date">' + T('اليوم', 'Day') + '</label>' +
+      '<input type="date" class="sch-input" id="ip-se-date" value="' + esc(s.date) + '"' +
+      (dMax ? ' max="' + esc(dMax) + '"' : '') + '>' +
+      '<p class="sch-editor-hint" id="ip-se-date-err" style="display:none"></p>';
     h += '<label class="sch-label">' + T('الوقت', 'Time') + '</label>' +
       '<div class="sch-timepick"><select class="tp-h" data-title-ar="الساعة" data-title-en="Hour"></select><span class="tp-colon">:</span>' +
       '<select class="tp-m" data-title-ar="الدقيقة" data-title-en="Minute"></select>' +
@@ -1608,9 +1618,9 @@
       '<input type="number" class="sch-input" id="ip-se-min" min="15" max="240" step="5" value="' + (s.minutes || 60) + '">';
     h += '<p class="sch-editor-hint">' + T(
       'سلسلة هذه الجلسة: ' + S.courseShort(s.course) + ' · ' + orderLabel(s.order) + ' (' + nSessions(n) + '). ' +
-      'التعديل على السلسلة يمسّها كلها ولا يمسّ جلسة المادة الأخرى في اليوم نفسه.',
+      'التعديل على السلسلة يمسّ وقتَها ومدّتَها كلَّها ولا يمسّ جلسة المادة الأخرى في اليوم نفسه، واليومُ يتغيّر لهذه الجلسة وحدَها.',
       'This session\'s series: ' + S.courseShort(s.course) + ' · ' + orderLabel(s.order) + ' (' + nSessions(n) + '). ' +
-      'Applying to the series touches them all and leaves the course\'s other daily slot alone.') + '</p>';
+      'Applying to the series changes the time and duration of them all and leaves the course\'s other daily slot alone; the day changes for this session only.') + '</p>';
     h += '<div class="sch-modal-actions">' +
       '<button class="sch-btn sch-btn-primary" id="ip-se-one">' + T('هذه الجلسة فقط', 'This session only') + '</button>' +
       '<button class="sch-btn sch-btn-secondary" id="ip-se-all">' + T('كل جلسات السلسلة', 'The whole series') + '</button>' +
@@ -1627,11 +1637,29 @@
     if (!s) return;
     var t = document.getElementById('ip-se-time').value || s.start_time;
     var m = parseInt(document.getElementById('ip-se-min').value, 10) || s.minutes;
+    var dEl = document.getElementById('ip-se-date');
+    var nd = dEl && /^\d{4}-\d{2}-\d{2}$/.test(dEl.value) ? dEl.value : s.date;
+    var dMax = sessionDateMax(p, s);
+    if (nd !== s.date && dMax && nd > dMax) {
+      var err = document.getElementById('ip-se-date-err');
+      if (err) {
+        err.textContent = T('اختر يوماً قبل اختبار المادة (' + dMax + ' آخرُ يومٍ متاح).',
+          'Pick a day before the course exam (' + dMax + ' is the last day allowed).');
+        err.style.display = '';
+      }
+      return;
+    }
     var key = seriesKey(s);
     p.sessions.forEach(function (x) {
       if (all ? seriesKey(x) === key : x.id === s.id) { x.start_time = t; x.minutes = m; }
     });
+    s.date = nd;
     persist(); backToMain(); S.render();
+  }
+
+  function sessionDateMax(p, s) {
+    var ex = (p.exam_dates || {})[s.course];
+    return ex ? addDays(ex, -1) : planEndDate(p);
   }
 
   function renderPanel() {
@@ -1883,7 +1911,7 @@
       '<div class="ip-card-body">' + body + '</div>' +
       '<div class="ip-card-actions">' +
         '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-ipedit="' + esc(s.id) + '">' +
-          T('الوقت', 'Time') + '</button>' +
+          T('اليوم والوقت', 'Day & time') + '</button>' +
         (s.module ? '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-ipmod="' + esc(s.course) + '|' + esc(s.module) + '">' +
           T('صفحة الوحدة', 'Module page') + '</button>' : '') +
         '<button class="sch-btn ' + (s.done ? 'sch-btn-secondary' : 'sch-btn-primary') + ' sch-btn-xs" data-ipdone="' + esc(s.id) + '">' +

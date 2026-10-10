@@ -108,6 +108,11 @@
         <template class="content-en">DFS Caching and Consistency</template>
         <span class="content-target">التخزين المؤقت والاتساق في أنظمة الملفات الموزعة</span>
       </a>
+      <a href="#system-models-virtualization" class="toc-link" data-bilingual>
+        <template class="content-ar">نماذج النظام: الآلات غير الافتراضية مقابل الافتراضية</template>
+        <template class="content-en">System Models: Non-virtual vs. Virtual Machines</template>
+        <span class="content-target">نماذج النظام: الآلات غير الافتراضية مقابل الافتراضية</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -419,8 +424,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><ul><li><strong>المحاكاة شبه الافتراضية (Paravirtualization):</strong> يتم تعديل نظام التشغيل الضيف ليعمل بالتعاون مع VMM لتحسين الأداء (مثل Xen). يستخدم مخازن مؤقتة دائرية مشتركة (Circular buffers) للإدخال/الإخراج الفعال.</li><li><strong>المحاكاة (Emulation):</strong> تترجم التعليمات من معالج الضيف إلى معالج المضيف. مفيدة لتشغيل أنظمة مصممة لبنية مختلفة، لكنها أبطأ بكثير.</li><li><strong>احتواء التطبيقات (Application Containment):</strong> لا توفر محاكاة افتراضية كاملة، بل تعزل التطبيقات عن نظام التشغيل (مثل Oracle Solaris Zones). تعمل نواة واحدة فقط (نظام المضيف)، وتُقسم الموارد بين 'المناطق' (Zones).</li></ul></template>
-    <template class="content-en"><ul><li><strong>Paravirtualization:</strong> Guest OS is modified to cooperate with the VMM to optimize performance (e.g., Xen). Uses shared circular buffers for efficient I/O.</li><li><strong>Emulation:</strong> Translates guest instructions from guest CPU to native CPU. Useful for running OSes compiled for different architectures, but significantly slower.</li><li><strong>Application Containment:</strong> Not full virtualization; segregates applications from the OS (e.g., Oracle Solaris Zones). Only one kernel runs (host OS), and resources are divided between zones.</li></ul></template>
+    <template class="content-ar"><ul><li><strong>المحاكاة شبه الافتراضية (Paravirtualization):</strong> يتم تعديل نظام التشغيل الضيف ليعمل بالتعاون مع VMM لتحسين الأداء (مثل Xen). يستخدم مخازن مؤقتة دائرية مشتركة (Circular buffers) للإدخال/الإخراج الفعال.</li><li><strong>المحاكاة (Emulation):</strong> تترجم التعليمات من معالج الضيف إلى معالج المضيف. مفيدة لتشغيل أنظمة مصممة لبنية مختلفة، لكنها أبطأ بكثير.</li><li><strong>احتواء التطبيقات (Application Containment):</strong> لا توفر محاكاة افتراضية كاملة، بل تعزل التطبيقات عن نظام التشغيل (مثل Oracle Solaris Zones). تعمل نواة واحدة فقط (نظام المضيف)، وتُقسم الموارد بين 'المناطق' (Zones).</li></ul><p>في المحاكاة شبه الافتراضية (مثل Xen)، لا تتضمن إدارة الذاكرة جداول صفحات متداخلة (Nested page tables). بدلاً من ذلك، يمتلك كل ضيف جداول للقراءة فقط، ويستخدم <b><span class="smart-term" data-term-en="Hypercall" data-ar="نداء المشرف" data-en-def="A software trap from a guest OS to the hypervisor, requesting a privileged operation like a page-table update.">نداء المشرف<span class="smart-term-tooltip"></span></span> (Hypercall)</b> لطلب تغييرات في جدول الصفحات من VMM. بالنسبة للإدخال والإخراج (I/O)، يستخدم Xen <b>مخزناً مؤقتاً دائرياً مشتركاً (Shared Circular Buffer)</b> حيث يشارك الضيف و VMM مؤشرات (Pointers) لطلبات واستجابات الإدخال/الإخراج عبر ذاكرة مشتركة، مما يسرع الأداء بشكل كبير.</p><p>بالإضافة إلى ذلك، توجد <b>المحاكاة الافتراضية لبيئة البرمجة (Programming-environment virtualization)</b>. في هذا النهج، لا يتم محاكاة عتاد حقيقي، بل يتم توفير واجهات برمجة تطبيقات (APIs) تنشئ نظاماً افتراضياً محسناً للغة برمجة معينة. المثال الأبرز هو <span class="smart-term" data-term-en="Java Virtual Machine (JVM)" data-ar="آلة جافا الافتراضية" data-en-def="A virtualized environment that allows Java programs to run on any hardware or operating system.">آلة جافا الافتراضية<span class="smart-term-tooltip"></span></span> (JVM) من Oracle، والتي تسمح للبرامج المكتوبة بلغة Java بالعمل على أي نظام أساسي، بشكل مشابه للغات المفسرة (Interpreted languages).</p></template>
+    <template class="content-en"><ul><li><strong>Paravirtualization:</strong> Guest OS is modified to cooperate with the VMM to optimize performance (e.g., Xen). Uses shared circular buffers for efficient I/O.</li><li><strong>Emulation:</strong> Translates guest instructions from guest CPU to native CPU. Useful for running OSes compiled for different architectures, but significantly slower.</li><li><strong>Application Containment:</strong> Not full virtualization; segregates applications from the OS (e.g., Oracle Solaris Zones). Only one kernel runs (host OS), and resources are divided between zones.</li></ul><p>In paravirtualization (like Xen), memory management does not use nested page tables. Instead, each guest has read-only tables and issues a <b><span class="smart-term" data-term-en="Hypercall" data-ar="نداء المشرف" data-en-def="A software trap from a guest OS to the hypervisor, requesting a privileged operation like a page-table update.">Hypercall<span class="smart-term-tooltip"></span></span></b> to the VMM when page-table changes are needed. For I/O, Xen utilizes a <b><span class="smart-term" data-term-en="Shared Circular Buffer" data-ar="مخزن مؤقت دائري مشترك" data-en-def="A memory structure shared between the guest and VMM to efficiently queue and process I/O descriptors.">Shared Circular Buffer<span class="smart-term-tooltip"></span></span></b> where the guest and VMM share pointers for I/O requests and responses via shared memory, significantly boosting performance.</p><p>Additionally, there is <b>Programming-environment virtualization</b>. In this approach, real hardware is not virtualized; instead, APIs are provided to create an optimized virtual system for a specific programming language. The most prominent example is Oracle's <span class="smart-term" data-term-en="Java Virtual Machine (JVM)" data-ar="آلة جافا الافتراضية" data-en-def="A virtualized environment that allows Java programs to run on any hardware or operating system.">Java Virtual Machine (JVM)<span class="smart-term-tooltip"></span></span>, which allows programs written in Java to run on any underlying system, similar to interpreted languages.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -695,8 +700,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p><strong>أسباب استخدام الأنظمة الموزعة:</strong></p><ul><li>مشاركة الموارد (ملفات، طابعات، قواعد بيانات)،</li><li>تسريع الحوسبة (توزيع العمليات الفرعية)،</li><li>موازنة الأحمال،</li><li>والموثوقية (اكتشاف الفشل والتعافي منه).</li></ul><p><strong>قضايا التصميم:</strong></p><ol><li><strong>المتانة (Robustness):</strong> قدرة النظام على تحمل الأعطال. يتطلب اكتشاف الفشل (عبر بروتوكول نبض القلب Heartbeat)، إعادة التكوين، والتعافي.</li><li><strong>الشفافية (Transparency):</strong> يجب أن يبدو النظام للمستخدم كنظام مركزي تقليدي (مثل إخفاء موقع الملفات).</li><li><strong>قابلية التوسع (Scalability):</strong> قدرة النظام على استيعاب إضافة موارد جديدة بسلاسة عند زيادة الطلب.</li></ol></template>
-    <template class="content-en"><p><strong>Reasons for Distributed Systems:</strong></p><ul><li>Resource sharing (files, printers, databases),</li><li>computation speedup (distributing subcomputations),</li><li>load balancing,</li><li>and reliability (detecting and recovering from site failure).</li></ul><p><strong>Design Issues:</strong></p><ol><li><strong>Robustness:</strong> Ability to withstand failures. Involves failure detection (via heartbeat protocol), reconfiguration, and recovery.</li><li><strong>Transparency:</strong> The system should appear as a conventional, centralized system to the user (e.g., hiding file locations).</li><li><strong>Scalability:</strong> The system should easily accept the addition of new resources to accommodate increased demand gracefully.</li></ol></template>
+    <template class="content-ar"><p><strong>أسباب استخدام الأنظمة الموزعة:</strong></p><ul><li>مشاركة الموارد (ملفات، طابعات، قواعد بيانات)،</li><li>تسريع الحوسبة (توزيع العمليات الفرعية)،</li><li>موازنة الأحمال،</li><li>والموثوقية (اكتشاف الفشل والتعافي منه).</li></ul><p><strong>قضايا التصميم:</strong></p><ol><li><strong>المتانة (Robustness):</strong> قدرة النظام على تحمل الأعطال. يتطلب اكتشاف الفشل (عبر بروتوكول نبض القلب Heartbeat)، إعادة التكوين، والتعافي.</li><li><strong>الشفافية (Transparency):</strong> يجب أن يبدو النظام للمستخدم كنظام مركزي تقليدي (مثل إخفاء موقع الملفات).</li><li><strong>قابلية التوسع (Scalability):</strong> قدرة النظام على استيعاب إضافة موارد جديدة بسلاسة عند زيادة الطلب.</li></ol><p>عندما تكتشف عقدة حدوث فشل (مثل تعطل رابط أو عقدة أخرى)، يجب عليها <b>إعادة تكوين (Reconfigure)</b> النظام عبر الخطوات التالية:</p><ol><li>إذا تعطل رابط، يتم <span class="smart-term" data-term-en="Broadcast" data-ar="بث" data-en-def="Sending a message to all nodes in the distributed system simultaneously.">بث<span class="smart-term-tooltip"></span></span> (Broadcast) هذا الفشل إلى جميع العقد في النظام.</li><li>إذا تعطلت عقدة، يتم إشعار جميع العقد الأخرى بأن الخدمات التي كانت تقدمها تلك العقدة لم تعد متاحة.</li><li>عندما يعود الرابط أو العقدة للعمل (التعافي Recovery)، يجب بث هذه المعلومات مجدداً لجميع العقد لتحديث حالة النظام وإعادة دمج العقدة.</li></ol><p>لتحقيق <b>الشفافية (Transparency)</b> عملياً، تستخدم الأنظمة أدوات مثل نظام ملفات الشبكة (NFS) لإخفاء مواقع الملفات، و<span class="smart-term" data-term-en="LDAP" data-ar="بروتوكول الوصول الخفيف للدليل" data-en-def="A protocol used to access and maintain distributed directory information services, often used for user authentication and mobility.">بروتوكول الوصول الخفيف للدليل<span class="smart-term-tooltip"></span></span> (LDAP) المدمج مع المحاكاة الافتراضية لسطح المكتب لتمكين تنقل المستخدم (تسجيل الدخول إلى أي جهاز ورؤية بيئته الخاصة). أما بالنسبة لـ <b>قابلية التوسع (Scalability)</b>، فتُستخدم تقنيات مثل ضغط البيانات و<span class="smart-term" data-term-en="Deduplication" data-ar="إلغاء التكرار" data-en-def="A data compression technique that eliminates redundant copies of data to save storage and network bandwidth.">إلغاء التكرار<span class="smart-term-tooltip"></span></span> (Deduplication) لتقليل استهلاك موارد التخزين والشبكة عند إضافة أحمال جديدة، مما يمنع توليد أحمال غير مباشرة على الموارد الأخرى.</p></template>
+    <template class="content-en"><p><strong>Reasons for Distributed Systems:</strong></p><ul><li>Resource sharing (files, printers, databases),</li><li>computation speedup (distributing subcomputations),</li><li>load balancing,</li><li>and reliability (detecting and recovering from site failure).</li></ul><p><strong>Design Issues:</strong></p><ol><li><strong>Robustness:</strong> Ability to withstand failures. Involves failure detection (via heartbeat protocol), reconfiguration, and recovery.</li><li><strong>Transparency:</strong> The system should appear as a conventional, centralized system to the user (e.g., hiding file locations).</li><li><strong>Scalability:</strong> The system should easily accept the addition of new resources to accommodate increased demand gracefully.</li></ol><p>When a node detects a failure (like a link or node crash), it must <b>Reconfigure</b> the system through these steps:</p><ol><li>If a link fails, this failure must be <span class="smart-term" data-term-en="Broadcast" data-ar="بث" data-en-def="Sending a message to all nodes in the distributed system simultaneously.">broadcast<span class="smart-term-tooltip"></span></span> to every site in the system.</li><li>If a site fails, every other site must be notified that the services offered by the failed site are no longer available.</li><li>When the link or site becomes available again (Recovery), this information must be broadcast again to all other sites to update the system state and reintegrate the node.</li></ol><p>To achieve <b>Transparency</b> in practice, systems use tools like the Network File System (NFS) to hide file locations, and Lightweight Directory Access Protocol (<span class="smart-term" data-term-en="LDAP" data-ar="بروتوكول الوصول الخفيف للدليل" data-en-def="A protocol used to access and maintain distributed directory information services, often used for user authentication and mobility.">LDAP<span class="smart-term-tooltip"></span></span>) combined with desktop virtualization to enable user mobility (logging into any machine and seeing their environment). For <b>Scalability</b>, techniques like data compression and <span class="smart-term" data-term-en="Deduplication" data-ar="إلغاء التكرار" data-en-def="A data compression technique that eliminates redundant copies of data to save storage and network bandwidth.">deduplication<span class="smart-term-tooltip"></span></span> are employed to reduce the storage and network resources used when adding new loads, preventing indirect load generation on other resources.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -739,8 +744,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p><strong>نماذج DFS:</strong></p><ol><li><strong>نموذج الخادم والعميل (Client-Server):</strong> يخزن الخادم الملفات والبيانات الوصفية (Metadata). يتصل العملاء بالخادم لطلب الملفات. يعاني من نقطة فشل واحدة (Single point of failure) وعنق زجاجة في الأداء (مثل NFS).</li><li><strong>النموذج القائم على الكتلة (Cluster-based):</strong> أكثر متانة وقابلية للتوسع (مثل GFS و HDFS). يتصل العملاء بخادم بيانات وصفية رئيسي (Master metadata server) وعدة خوادم بيانات تحتفظ بـ 'أجزاء' (Chunks) من الملفات. يتم نسخ الأجزاء عدة مرات لضمان الموثوقية.</li></ol></template>
-    <template class="content-en"><p><strong>DFS Models:</strong></p><ol><li><strong>Client-Server Model:</strong> Server stores files and metadata. Clients contact the server to request files. Suffers from a single point of failure and bottleneck issues (e.g., NFS).</li><li><strong>Cluster-Based Model:</strong> Built to be more fault-tolerant and scalable (e.g., GFS, HDFS). Clients connect to a master metadata server and several data servers holding file 'chunks'. Chunks are replicated n times for reliability.</li></ol></template>
+    <template class="content-ar"><p><strong>نماذج DFS:</strong></p><ol><li><strong>نموذج الخادم والعميل (Client-Server):</strong> يخزن الخادم الملفات والبيانات الوصفية (Metadata). يتصل العملاء بالخادم لطلب الملفات. يعاني من نقطة فشل واحدة (Single point of failure) وعنق زجاجة في الأداء (مثل NFS).</li><li><strong>النموذج القائم على الكتلة (Cluster-based):</strong> أكثر متانة وقابلية للتوسع (مثل GFS و HDFS). يتصل العملاء بخادم بيانات وصفية رئيسي (Master metadata server) وعدة خوادم بيانات تحتفظ بـ 'أجزاء' (Chunks) من الملفات. يتم نسخ الأجزاء عدة مرات لضمان الموثوقية.</li></ol><p>بمجرد تحديد موقع الملف، يجب أن تتم عملية <b>الوصول للملف عن بُعد (Remote File Access)</b>. النهج الشائع هو آلية الخدمة عن بُعد، والتي تُنفذ غالباً باستخدام نموذج <span class="smart-term" data-term-en="Remote Procedure Call (RPC)" data-ar="استدعاء الإجراء عن بُعد" data-en-def="A protocol that allows a computer program to cause a subroutine to execute in another address space (commonly on another computer on a shared network).">استدعاء الإجراء عن بُعد<span class="smart-term-tooltip"></span></span> (RPC). في هذا النموذج، يتم تسليم طلبات الوصول إلى الخادم، ويقوم الخادم بتنفيذ العمليات المطلوبة، ثم يتم إعادة توجيه النتائج مرة أخرى إلى المستخدم.</p></template>
+    <template class="content-en"><p><strong>DFS Models:</strong></p><ol><li><strong>Client-Server Model:</strong> Server stores files and metadata. Clients contact the server to request files. Suffers from a single point of failure and bottleneck issues (e.g., NFS).</li><li><strong>Cluster-Based Model:</strong> Built to be more fault-tolerant and scalable (e.g., GFS, HDFS). Clients connect to a master metadata server and several data servers holding file 'chunks'. Chunks are replicated n times for reliability.</li></ol><p>Once a file is located, <b>Remote File Access</b> must occur. A common approach is the remote-service mechanism, often implemented using the <span class="smart-term" data-term-en="Remote Procedure Call (RPC)" data-ar="استدعاء الإجراء عن بُعد" data-en-def="A protocol that allows a computer program to cause a subroutine to execute in another address space (commonly on another computer on a shared network).">Remote Procedure Call (RPC)<span class="smart-term-tooltip"></span></span> paradigm. In this model, access requests are delivered to the server, the server machine performs the accesses, and their results are forwarded back to the user.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -982,14 +987,57 @@
   </details>
 </section>
 
+<section id="system-models-virtualization" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> نماذج النظام: الآلات غير الافتراضية مقابل الافتراضية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> System Models: Non-virtual vs. Virtual Machines</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>في الآلة غير الافتراضية، تعمل النواة (Kernel) مباشرة على العتاد. أما في الآلة الافتراضية، فيتم إدراج طبقة مدير الآلة الافتراضية (VMM) بين العتاد وأنظمة التشغيل الضيفة.</p></template>
+    <template class="content-en"><p>In a non-virtual machine, the kernel runs directly on the hardware. In a virtual machine, a Virtual Machine Manager (VMM) layer is inserted between the hardware and the guest OS kernels.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لفهم المحاكاة الافتراضية، يجب مقارنة هيكلية النظامين:</p><ul><li><b>الآلة غير الافتراضية (Non-virtual machine):</b> تتكون من ثلاث طبقات أساسية: العتاد (Hardware) في الأسفل، ثم النواة (Kernel)، ثم العمليات (Processes) في الأعلى.</li><li><b>الآلة الافتراضية (Virtual machine):</b> يتم إضافة طبقة جديدة. العتاد في الأسفل، يعلوه مدير الآلة الافتراضية (VMM). يوفر VMM <b>واجهة برمجة (Programming Interface)</b> لعدة آلات افتراضية (VM1, VM2, VM3). كل آلة افتراضية تحتوي على نواتها الخاصة وعملياتها، وتعتقد أنها تمتلك العتاد بالكامل.</li></ul></template>
+    <template class="content-en"><p>To understand virtualization, we compare the two system architectures:</p><ul><li><b>Non-virtual machine:</b> Consists of three basic layers: Hardware at the bottom, then the Kernel, and Processes on top.</li><li><b>Virtual machine:</b> A new layer is introduced. Hardware is at the bottom, topped by the Virtual Machine Manager (VMM). The VMM provides a <b><span class="smart-term" data-term-en="Programming Interface" data-ar="واجهة البرمجة" data-en-def="The boundary provided by the VMM that mimics physical hardware, allowing guest kernels to interact with it.">Programming Interface<span class="smart-term-tooltip"></span></span></b> to multiple virtual machines (VM1, VM2, VM3). Each VM has its own kernel and processes, operating under the illusion that it owns the hardware.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السر في هذا النموذج هو <span class="smart-term" data-term-en="Programming Interface" data-ar="واجهة البرمجة" data-en-def="The boundary provided by the VMM that mimics physical hardware, allowing guest kernels to interact with it.">واجهة البرمجة<span class="smart-term-tooltip"></span></span> التي يوفرها VMM. يجب أن تكون هذه الواجهة مطابقة تماماً لواجهة العتاد المادي (Hardware Interface) لكي تعمل أنظمة التشغيل الضيفة دون الحاجة لتعديلها (في حالة المحاكاة الافتراضية الكاملة).</p><p>هذا الفصل يتيح عزل الموارد بشكل آمن، بحيث إذا انهارت نواة أحد الضيوف، فلن تتأثر الآلات الافتراضية الأخرى ولا نظام VMM الأساسي.</p></template>
+    <template class="content-en"><p>The secret to this model is the programming interface provided by the VMM. This interface must perfectly mimic the physical hardware interface so that guest OSes can run without modification (in full virtualization).</p><p>This separation allows for secure resource isolation; if one <span class="smart-term" data-term-en="Guest Kernel" data-ar="نواة الضيف" data-en-def="The operating system kernel running inside a virtual machine, managed by the hypervisor.">guest kernel<span class="smart-term-tooltip"></span></span> crashes, it does not affect the other virtual machines or the underlying VMM.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في نموذج الآلة الافتراضية، ماذا يحدث عندما تحاول عملية (Process) داخل VM1 تنفيذ تعليمة عتاد حساسة (Privileged instruction)؟</template>
+      <template class="content-en">In the virtual machine model, what happens when a process inside VM1 tries to execute a privileged hardware instruction?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتم اعتراض التعليمة (Trapped) بواسطة VMM. يقوم VMM بالتحقق من الصلاحيات، ثم يحاكي تأثير هذه التعليمة للضيف VM1 دون السماح له بالوصول المباشر للعتاد الفعلي، مما يحافظ على أمان وعزل النظام.</p></template>
+      <template class="content-en"><p>The instruction is trapped by the VMM. The VMM checks permissions, then emulates the effect of this instruction for VM1 without allowing direct access to the actual hardware, maintaining system security and isolation.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الدسمة. إذا أردنا تلخيص هذه الوحدة، فهي تدور حول 'الوهم الجميل'. في الجزء الأول (الأجهزة الافتراضية)، نحن نوهم أنظمة التشغيل بأنها تمتلك عتاداً كاملاً مخصصاً لها، بينما في الواقع هناك VMM يوزع الموارد بذكاء (ويسرق الدورات أحياناً!). ركزوا جيداً في الامتحان على الفروق بين Type 0 و 1 و 2، وكيف يعمل الترحيل الحي عبر نقل 'الصفحات المتسخة'. في الجزء الثاني (الأنظمة الموزعة)، نعكس الآية؛ نحن نوهم المستخدم بأنه يتعامل مع جهاز واحد قوي، بينما في الواقع هو يتعامل مع شبكة من الأجهزة المترابطة. هنا، الشفافية واكتشاف الفشل (نبض القلب) هما مفتاح الحل. لا تنسوا مقارنة Client-Server مع Cluster-based DFS، وتذكروا دائماً معضلة التخزين المؤقت: السرعة (Delayed-write) مقابل الموثوقية (Write-through). بالتوفيق!</template>
-    <template class="content-en">Welcome, my friends, to this dense module. If we summarize this unit, it's all about the 'beautiful illusion'. In the first part (VMs), we trick OSes into believing they have dedicated hardware, while a VMM cleverly distributes resources (and sometimes steals cycles!). For the exam, focus heavily on the differences between Type 0, 1, and 2, and how Live Migration works via 'dirty pages'. In the second part (Distributed Systems), we reverse the illusion; we trick the user into thinking they are using a single powerful machine, when it's actually a network of nodes. Here, transparency and failure detection (heartbeats) are key. Don't forget to compare Client-Server with Cluster-based DFS, and always remember the caching dilemma: speed (Delayed-write) vs. reliability (Write-through). Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الدسمة. إذا أردنا تلخيص هذه الوحدة، فهي تدور حول 'الوهم الجميل'. في الجزء الأول (الأجهزة الافتراضية)، نحن نوهم أنظمة التشغيل بأنها تمتلك عتاداً كاملاً مخصصاً لها، بينما في الواقع هناك VMM يوزع الموارد بذكاء (ويسرق الدورات أحياناً!). ركزوا جيداً في الامتحان على الفروق بين Type 0 و 1 و 2، وكيف يعمل الترحيل الحي عبر نقل 'الصفحات المتسخة'. في الجزء الثاني (الأنظمة الموزعة)، نعكس الآية؛ نحن نوهم المستخدم بأنه يتعامل مع جهاز واحد قوي، بينما في الواقع هو يتعامل مع شبكة من الأجهزة المترابطة. هنا، الشفافية واكتشاف الفشل (نبض القلب) هما مفتاح الحل. لا تنسوا مقارنة Client-Server مع Cluster-based DFS، وتذكروا دائماً معضلة التخزين المؤقت: السرعة (Delayed-write) مقابل الموثوقية (Write-through). بالتوفيق!<p>بينما نتعمق في المحاكاة الافتراضية والأنظمة الموزعة، ركزوا جيداً على كيفية تفاعل الطبقات. فهمكم لكيفية استخدام نداءات المشرف (Hypercalls) في المحاكاة شبه الافتراضية، وكيفية بث الأعطال لإعادة تكوين الأنظمة الموزعة، سيكون حاسماً في أسئلة الامتحان التي تقيس الفهم المعماري العميق.</p><p>مع انتقالنا من إدارة آلة افتراضية واحدة إلى بناء أنظمة موزعة ضخمة، تصبح كيفية تسمية الموارد والوصول إليها أمراً بالغ الأهمية. سواء كنا نستخدم JVM لتجريد نظام التشغيل لتطبيق Java، أو نعتمد مخطط تسمية عالمي لإخفاء الموقع المادي لملف، فإن الهدف النهائي هو تحقيق شفافية سلسة وقابلية توسع مرنة.</p></template>
+    <template class="content-en">Welcome, my friends, to this dense module. If we summarize this unit, it's all about the 'beautiful illusion'. In the first part (VMs), we trick OSes into believing they have dedicated hardware, while a VMM cleverly distributes resources (and sometimes steals cycles!). For the exam, focus heavily on the differences between Type 0, 1, and 2, and how Live Migration works via 'dirty pages'. In the second part (Distributed Systems), we reverse the illusion; we trick the user into thinking they are using a single powerful machine, when it's actually a network of nodes. Here, transparency and failure detection (heartbeats) are key. Don't forget to compare Client-Server with Cluster-based DFS, and always remember the caching dilemma: speed (Delayed-write) vs. reliability (Write-through). Good luck!<p>As we dive deeper into virtualization and distributed systems, focus closely on how layers interact. Understanding how Hypercalls are used in paravirtualization, and how failures are broadcast to reconfigure distributed systems, will be crucial for exam questions testing deep architectural comprehension.</p><p>As we transition from managing a single virtual machine to building massive distributed systems, how we name and access resources becomes critical. Whether we use a JVM to abstract the OS for a Java application, or rely on a global naming scheme to hide a file's physical location, the ultimate goal is seamless transparency and resilient scalability.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1163,6 +1211,76 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">يبسط المشكلة من خلال السماح بعمليات الكتابة الإلحاقية فقط (Append-only) وكاتب واحد للملف، مما يمنع تعارض البيانات العشوائي.</template>
           <template class="content-en">It simplifies the problem by allowing only append-only writes and a single file writer, preventing random data conflicts.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحقق Xen أداءً عالياً في عمليات الإدخال والإخراج (I/O) مقارنة بالمحاكاة الافتراضية الكاملة؟</template>
+          <template class="content-en">How does Xen achieve high I/O performance compared to full virtualization?</template>
+          <span class="content-target">كيف يحقق Xen أداءً عالياً في عمليات الإدخال والإخراج (I/O) مقارنة بالمحاكاة الافتراضية الكاملة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>بدلاً من محاكاة أجهزة العتاد بالكامل (وهو أمر بطيء)، يستخدم Xen مخازن مؤقتة دائرية مشتركة (Shared Circular Buffers) في الذاكرة. يضع نظام التشغيل الضيف طلبات الإدخال/الإخراج في هذا المخزن، ويقرأها VMM مباشرة، مما يقلل من عمليات نسخ البيانات والانتقالات بين السياقات (Context switches).</p></template>
+          <template class="content-en"><p>Instead of fully emulating hardware devices (which is slow), Xen uses Shared Circular Buffers in memory. The guest OS places I/O requests in this buffer, and the VMM reads them directly, minimizing data copying and context switches.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في الأنظمة الموزعة، لماذا نعتبر عملية 'إعادة التكوين' (Reconfiguration) مكلفة من حيث أداء الشبكة؟</template>
+          <template class="content-en">In distributed systems, why is 'Reconfiguration' considered expensive in terms of network performance?</template>
+          <span class="content-target">في الأنظمة الموزعة، لماذا نعتبر عملية 'إعادة التكوين' (Reconfiguration) مكلفة من حيث أداء الشبكة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها تتطلب عملية بث (Broadcast) شاملة. عند تعطل عقدة أو رابط، أو حتى عند تعافيها، يجب إرسال رسائل تحديث إلى كل عقدة في النظام لضمان اتساق الحالة العالمية، مما يولد حركة مرور (Traffic) كثيفة ومفاجئة في الشبكة.</p></template>
+          <template class="content-en"><p>Because it requires a comprehensive Broadcast. When a node or link fails, or even recovers, update messages must be sent to every single node in the system to ensure global state consistency, generating sudden and heavy network traffic.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر أن استخدام Amazon S3 يمثل نهجاً مختلفاً عن أنظمة الملفات الموزعة التقليدية (DFS) الملتزمة بمعايير POSIX؟</template>
+          <template class="content-en">Why do we consider using Amazon S3 a different approach from traditional POSIX-compliant Distributed File Systems (DFS)?</template>
+          <span class="content-target">لماذا نعتبر أن استخدام Amazon S3 يمثل نهجاً مختلفاً عن أنظمة الملفات الموزعة التقليدية (DFS) الملتزمة بمعايير POSIX؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن Amazon S3 لا يوفر هيكل أدلة هرمي تقليدي (POSIX)، بل يوفر تخزيناً كائنياً (Object Storage) عبر واجهات برمجة التطبيقات (APIs). هذا يسمح بوضع البيانات ديناميكياً ونقلها بشفافية تامة، مما يوفر قابلية توسع هائلة على حساب التوافق مع التطبيقات القديمة التي تتوقع نظام ملفات قياسي.</p></template>
+          <template class="content-en"><p>Because Amazon S3 does not provide a traditional hierarchical directory structure (POSIX); rather, it provides Object Storage via APIs. This allows data to be placed dynamically and moved with complete transparency, offering massive scalability at the cost of compatibility with legacy applications expecting a standard file system.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يساهم بروتوكول LDAP في تحقيق 'الشفافية' في الأنظمة الموزعة؟</template>
+          <template class="content-en">How does the LDAP protocol contribute to achieving 'Transparency' in distributed systems?</template>
+          <span class="content-target">كيف يساهم بروتوكول LDAP في تحقيق 'الشفافية' في الأنظمة الموزعة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يساهم LDAP في تحقيق شفافية تنقل المستخدم (User Mobility). من خلال مركزية بيانات المصادقة وملفات تعريف المستخدمين، يمكن للمستخدم تسجيل الدخول إلى أي جهاز مادي في الشبكة ورؤية بيئة سطح المكتب والملفات الخاصة به وكأنه يستخدم جهازه الشخصي، مما يخفي الطبيعة الموزعة للنظام.</p></template>
+          <template class="content-en"><p>LDAP contributes to user mobility transparency. By centralizing authentication data and user profiles, a user can log into any physical machine on the network and see their own desktop environment and files as if they were on their personal device, hiding the distributed nature of the system.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1447,6 +1565,91 @@
         "en": "The Master server in GFS."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "نداء المشرف (Hypercall)",
+      "en": "Hypercall"
+    },
+    "back": {
+      "definition": {
+        "ar": "استدعاء برمجي يقوم به نظام التشغيل الضيف لطلب خدمة أو تعديل (مثل تغيير جدول الصفحات) من الـ Hypervisor.",
+        "en": "A software call made by a guest OS to request a service or modification (like a page-table change) from the Hypervisor."
+      },
+      "example": {
+        "ar": "استخدام Hypercall في Xen لتحديث الذاكرة بدلاً من الوصول المباشر للعتاد.",
+        "en": "Using a Hypercall in Xen to update memory instead of direct hardware access."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "المخزن المؤقت الدائري المشترك (Shared Circular Buffer)",
+      "en": "Shared Circular Buffer"
+    },
+    "back": {
+      "definition": {
+        "ar": "آلية تستخدم في المحاكاة شبه الافتراضية لتسريع الإدخال/الإخراج، حيث يتشارك الضيف و VMM الذاكرة لتمرير الطلبات والاستجابات.",
+        "en": "A mechanism used in paravirtualization to speed up I/O, where the guest and VMM share memory to pass requests and responses."
+      },
+      "example": {
+        "ar": "تمرير بيانات الشبكة بين Xen ونظام الضيف دون الحاجة لنسخ البيانات.",
+        "en": "Passing network data between Xen and the guest OS without copying the data."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "آلة جافا الافتراضية (JVM)",
+      "en": "Java Virtual Machine (JVM)"
+    },
+    "back": {
+      "definition": {
+        "ar": "مثال على المحاكاة الافتراضية لبيئة البرمجة، حيث توفر واجهات برمجة (APIs) لتشغيل برامج Java على أي نظام أساسي.",
+        "en": "An example of programming-environment virtualization, providing APIs to run Java programs on any underlying system."
+      },
+      "example": {
+        "ar": "تشغيل نفس تطبيق Java على نظامي Windows و Linux دون إعادة تجميع (Recompiling).",
+        "en": "Running the same Java application on Windows and Linux without recompiling."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "إلغاء التكرار (Deduplication)",
+      "en": "Deduplication"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية لزيادة قابلية التوسع (Scalability) عن طريق إزالة النسخ المكررة من البيانات لتقليل استهلاك التخزين والشبكة.",
+        "en": "A technique to increase scalability by eliminating redundant copies of data to reduce storage and network consumption."
+      },
+      "example": {
+        "ar": "تخزين نسخة واحدة فقط من ملف نظام تشغيل مشترك بين عدة أجهزة افتراضية.",
+        "en": "Storing only one copy of a shared OS file across multiple virtual machines."
+      }
+    },
+    "id": 20
+  },
+  {
+    "front": {
+      "ar": "استدعاء الإجراء عن بُعد (RPC)",
+      "en": "Remote Procedure Call (RPC)"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج يُستخدم لتنفيذ الوصول للملفات عن بُعد، حيث تُرسل الطلبات للخادم وتُنفذ هناك ثم تُعاد النتائج.",
+        "en": "A paradigm used to implement remote file access, where requests are sent to the server, executed there, and results are returned."
+      },
+      "example": {
+        "ar": "عميل يطلب قراءة كتلة بيانات من خادم ملفات، فيقوم الخادم بقراءتها وإرسالها عبر الشبكة.",
+        "en": "A client requests to read a data block from a file server, the server reads it and sends it over the network."
+      }
+    },
+    "id": 21
   }
 ]
 </script>
@@ -1456,7 +1659,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 14</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1472,7 +1675,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 14</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1797,6 +2000,134 @@
     },
     "difficulty": "hard",
     "conceptId": "distributed-file-systems"
+  },
+  {
+    "conceptId": "alternative-virtualization",
+    "question": {
+      "ar": "كيف يتعامل نظام Xen (المحاكاة شبه الافتراضية) مع إدارة الذاكرة وتغييرات جدول الصفحات؟",
+      "en": "How does Xen (paravirtualization) handle memory management and page-table changes?"
+    },
+    "options": {
+      "ar": [
+        "يستخدم جداول صفحات متداخلة (Nested page tables) يديرها العتاد.",
+        "يسمح للضيف بالكتابة المباشرة على جداول الصفحات المادية.",
+        "يمنح الضيف جداول للقراءة فقط ويستخدم نداءات المشرف (Hypercalls) للتعديل.",
+        "يستخدم المحاكاة (Emulation) لترجمة كل تعليمة ذاكرة."
+      ],
+      "en": [
+        "It uses hardware-managed nested page tables.",
+        "It allows the guest to write directly to physical page tables.",
+        "It gives the guest read-only tables and uses Hypercalls for modifications.",
+        "It uses Emulation to translate every memory instruction."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في المحاكاة شبه الافتراضية، لا توجد جداول متداخلة. الضيف يقرأ الجداول محلياً، ولكنه يطلب من VMM إجراء أي تعديلات عبر Hypercall.",
+      "en": "In paravirtualization, there are no nested tables. The guest reads tables locally but asks the VMM to make any modifications via a Hypercall."
+    },
+    "hint": {
+      "ar": "الضيف لا يملك صلاحية التعديل المباشر، بل يطلب الإذن.",
+      "en": "The guest doesn't have direct modification rights; it asks for permission."
+    },
+    "difficulty": "hard",
+    "id": 11
+  },
+  {
+    "conceptId": "distributed-systems-overview",
+    "question": {
+      "ar": "ما هو الإجراء الصحيح الذي يجب على العقدة اتخاذه عند اكتشاف فشل رابط في نظام موزع؟",
+      "en": "What is the correct action a node must take upon detecting a link failure in a distributed system?"
+    },
+    "options": {
+      "ar": [
+        "إيقاف تشغيل نفسها لمنع تلف البيانات.",
+        "بث (Broadcast) رسالة الفشل إلى جميع العقد الأخرى في النظام.",
+        "الانتظار بصمت حتى يتم إصلاح الرابط.",
+        "إرسال رسالة فقط إلى العقدة المجاورة المتأثرة."
+      ],
+      "en": [
+        "Shut itself down to prevent data corruption.",
+        "Broadcast the failure message to all other nodes in the system.",
+        "Wait silently until the link is repaired.",
+        "Send a message only to the affected neighboring node."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "لإعادة تكوين النظام بشكل صحيح، يجب أن تكون جميع العقد على دراية بالفشل لتحديث جداول التوجيه وحالة النظام، لذا يجب بث المعلومة.",
+      "en": "To properly reconfigure the system, all nodes must be aware of the failure to update routing tables and system state, hence it must be broadcast."
+    },
+    "hint": {
+      "ar": "الجميع يحتاج إلى معرفة التغيير في الشبكة.",
+      "en": "Everyone needs to know about the network change."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "alternative-virtualization",
+    "question": {
+      "ar": "أي من التقنيات التالية لا تقوم بمحاكاة عتاد حقيقي، بل تنشئ نظاماً افتراضياً محسناً للغة برمجة معينة؟",
+      "en": "Which of the following techniques does not virtualize real hardware, but instead creates an optimized virtual system for a specific programming language?"
+    },
+    "options": {
+      "ar": [
+        "المحاكاة شبه الافتراضية (Paravirtualization)",
+        "المحاكاة الافتراضية لبيئة البرمجة (مثل JVM)",
+        "احتواء التطبيقات (Application Containment)",
+        "النوع 1 Hypervisor"
+      ],
+      "en": [
+        "Paravirtualization",
+        "Programming-environment virtualization (e.g., JVM)",
+        "Application Containment",
+        "Type 1 Hypervisor"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المحاكاة الافتراضية لبيئة البرمجة (مثل JVM) توفر واجهات برمجة تطبيقات (APIs) لتشغيل لغة معينة، ولا تحاكي العتاد المادي.",
+      "en": "Programming-environment virtualization (like JVM) provides APIs to run a specific language and does not emulate physical hardware."
+    },
+    "hint": {
+      "ar": "فكر في كيفية عمل لغة Java على أنظمة مختلفة.",
+      "en": "Think about how the Java language runs on different systems."
+    },
+    "difficulty": "medium",
+    "id": 13
+  },
+  {
+    "conceptId": "distributed-systems-overview",
+    "question": {
+      "ar": "كيف تساهم تقنية إلغاء التكرار (Deduplication) في قابلية التوسع (Scalability) للأنظمة الموزعة؟",
+      "en": "How does Deduplication contribute to the Scalability of distributed systems?"
+    },
+    "options": {
+      "ar": [
+        "من خلال تسريع سرعة المعالج المركزي (CPU).",
+        "عبر تقليل استهلاك موارد التخزين والشبكة عند إضافة أحمال جديدة.",
+        "من خلال إخفاء مواقع الملفات عن المستخدمين.",
+        "عبر اكتشاف فشل العقد باستخدام بروتوكول نبض القلب."
+      ],
+      "en": [
+        "By accelerating CPU speed.",
+        "By reducing storage and network resource consumption when adding new loads.",
+        "By hiding file locations from users.",
+        "By detecting node failures using the heartbeat protocol."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "إلغاء التكرار يزيل البيانات المكررة، مما يوفر مساحة التخزين وعرض النطاق الترددي للشبكة، ويسمح للنظام باستيعاب المزيد من المستخدمين والبيانات بكفاءة.",
+      "en": "Deduplication removes redundant data, saving storage space and network bandwidth, allowing the system to accommodate more users and data efficiently."
+    },
+    "hint": {
+      "ar": "إلغاء التكرار يعني عدم تخزين نفس الشيء مرتين.",
+      "en": "Deduplication means not storing the same thing twice."
+    },
+    "difficulty": "medium",
+    "id": 14
   }
 ]
 </script>
@@ -1846,6 +2177,38 @@
       <template class="content-ar">في أنظمة الملفات الموزعة القائمة على الكتلة (Cluster-based DFS)، يتم فصل البيانات الوصفية (Metadata) عن البيانات الفعلية (Chunks) لتجنب عنق الزجاجة وتحقيق قابلية توسع هائلة.</template>
       <template class="content-en">In Cluster-based DFS, Metadata is separated from actual data (Chunks) to avoid bottlenecks and achieve massive scalability.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في المحاكاة شبه الافتراضية (Paravirtualization)، لا يستخدم الضيف جداول صفحات متداخلة، بل يعتمد على نداءات المشرف (Hypercalls) لتعديل جداول القراءة فقط، مما يقلل من العبء (Overhead) بشكل كبير.</template>
+    <template class="content-en">In Paravirtualization, the guest does not use nested page tables. Instead, it relies on Hypercalls to modify read-only tables, significantly reducing overhead.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن إعادة التكوين (Reconfiguration) بعد الفشل تتطلب فقط إبلاغ العقدة المجاورة. في الواقع، يجب بث (Broadcast) الفشل والتعافي إلى جميع العقد في النظام الموزع لضمان تحديث الحالة العالمية.</template>
+    <template class="content-en">Believing that reconfiguration after a failure only requires notifying the neighboring node. In reality, failures and recoveries must be broadcast to ALL nodes in the distributed system to ensure global state is updated.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن 'هيكل الاسم العالمي' يحمي النظام من الأعطال. في الواقع، إذا تعطل خادم في هذا المخطط، فإن مجموعة عشوائية من الأدلة المرتبطة به ستصبح غير متاحة، مما قد يربك المستخدمين.</template>
+    <template class="content-en">Believing that a 'Single Global Name Structure' protects the system from crashes. In reality, if a server goes down in this scheme, an arbitrary set of directories tied to it becomes unavailable, which can confuse users.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">استقلالية الموقع (Location Independence) هي مستوى أعلى وأصعب في التحقيق من شفافية الموقع (Location Transparency). الشفافية تخفي المكان، لكن الاستقلالية تسمح للمكان بالتغير دون كسر الروابط.</template>
+    <template class="content-en">Location Independence is a higher and harder-to-achieve level than Location Transparency. Transparency hides the location, but Independence allows the location to change without breaking links.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

@@ -101,6 +101,11 @@
         <template class="content-en">Towers of Hanoi</template>
         <span class="content-target">مشكلة أبراج هانوي</span>
       </a>
+      <a href="#tracing-debugging-recursion" class="toc-link" data-bilingual>
+        <template class="content-ar">تتبع وتصحيح أخطاء العودية</template>
+        <template class="content-en">Tracing and Debugging Recursion</template>
+        <span class="content-target">تتبع وتصحيح أخطاء العودية</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -276,8 +281,8 @@ public double B() {
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يُعرّف مضروب العدد الصحيح الموجب n رياضياً بأنه n * (n-1) * (n-2) ... * 1.</p><p>برمجياً باستخدام العودية، نحدد حالة الأساس بأنها 1! = 1 (أو 0! = 1). أما الخطوة العودية فهي n! = n * (n-1)!.</p><p>عند استدعاء الدالة، يتم تعليق العمليات الحسابية في المكدس (Stack) حتى يتم الوصول إلى حالة الأساس، ثم تبدأ القيم بالعودة (Return) ليتم ضربها تباعاً.</p></template>
-    <template class="content-en"><p>The factorial of a positive integer n is mathematically defined as n * (n-1) * (n-2) ... * 1.</p><p>Programmatically using recursion, we define the base case as 1! = 1 (or 0! = 1). The recursive step is n! = n * (n-1)!.</p><p>When the method is called, calculations are suspended in the call stack until the base case is reached, then values are returned and multiplied sequentially.</p></template>
+    <template class="content-ar"><p>يُعرّف مضروب العدد الصحيح الموجب n رياضياً بأنه n * (n-1) * (n-2) ... * 1.</p><p>برمجياً باستخدام العودية، نحدد حالة الأساس بأنها 1! = 1 (أو 0! = 1). أما الخطوة العودية فهي n! = n * (n-1)!.</p><p>عند استدعاء الدالة، يتم تعليق العمليات الحسابية في المكدس (Stack) حتى يتم الوصول إلى حالة الأساس، ثم تبدأ القيم بالعودة (Return) ليتم ضربها تباعاً.</p><p>دعونا نتتبع تنفيذ <code>factorial(3)</code> خطوة بخطوة لفهم كيف يعمل المكدس:</p><ol><li>أولاً، يتم استدعاء <code>factorial(3)</code>. بما أن 3 أكبر من 1، فإنها تُرجع <code>3 * factorial(2)</code>. يتوقف التنفيذ مؤقتاً هنا بانتظار النتيجة.</li><li>بعد ذلك، يتم تقييم <code>factorial(2)</code>. تُرجع <code>2 * factorial(1)</code>. وهذا يتوقف مؤقتاً أيضاً.</li><li>ثم يتم استدعاء <code>factorial(1)</code>. هذا يصل إلى حالة الأساس (1 &lt;= 1)، لذا فإنه يُرجع <code>1</code> فوراً دون استدعاءات إضافية.</li><li>الآن، تُستأنف الاستدعاءات المتوقفة (تتراجع أو Unwind). تحسب <code>factorial(2)</code> القيمة <code>2 * 1 = 2</code> وتُرجعها.</li><li>أخيراً، تستلم <code>factorial(3)</code> النتيجة وتحسب <code>3 * 2 = 6</code> وتُرجع النتيجة النهائية.</li></ol><p>يوضح هذا كيف يتم بناء مكدس الاستدعاءات للأسفل ثم تفريغه للأعلى لإنتاج الإجابة النهائية.</p></template>
+    <template class="content-en"><p>The factorial of a positive integer n is mathematically defined as n * (n-1) * (n-2) ... * 1.</p><p>Programmatically using recursion, we define the base case as 1! = 1 (or 0! = 1). The recursive step is n! = n * (n-1)!.</p><p>When the method is called, calculations are suspended in the call stack until the base case is reached, then values are returned and multiplied sequentially.</p><p>Let's trace the execution of <code>factorial(3)</code> step-by-step to understand how the stack works:</p><ol><li>First, <code>factorial(3)</code> is called. Since 3 is greater than 1, it returns <code>3 * factorial(2)</code>. The execution pauses here waiting for the result.</li><li>Next, <code>factorial(2)</code> is evaluated. It returns <code>2 * factorial(1)</code>. This also pauses.</li><li>Then, <code>factorial(1)</code> is called. This hits the base case (1 &lt;= 1), so it immediately returns <code>1</code> without further calls.</li><li>Now, the paused calls resume (unwind). <code>factorial(2)</code> calculates <code>2 * 1 = 2</code> and returns it.</li><li>Finally, <code>factorial(3)</code> receives the result, calculates <code>3 * 2 = 6</code>, and returns the final answer.</li></ol><p>This shows how the call stack builds up downwards and then unwinds upwards to produce the final answer.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -460,8 +465,8 @@ public double B() {
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تبدأ سلسلة فيبوناتشي بالأرقام: 0, 1, 1, 2, 3, 5, 8, 13, 21... يمكن تعريفها عودياً كالتالي:</p><ul><li><strong>حالة الأساس</strong> هي fibonacci(0) = 0 و fibonacci(1) = 1.</li><li><strong>الخطوة العودية</strong> هي fibonacci(n) = fibonacci(n-1) + fibonacci(n-2).</li></ul><p>هذا يعني أن كل استدعاء للدالة يولد استدعاءين جديدين، مما يخلق شجرة استدعاءات (Call Tree) تنمو بشكل أسي.</p></template>
-    <template class="content-en"><p>The Fibonacci series begins with: 0, 1, 1, 2, 3, 5, 8, 13, 21... It can be defined recursively as follows:</p><ul><li><strong>Base cases</strong> are fibonacci(0) = 0 and fibonacci(1) = 1.</li><li><strong>The recursive step</strong> is fibonacci(n) = fibonacci(n-1) + fibonacci(n-2).</li></ul><p>This means each function call generates two new calls, creating an exponentially growing call tree.</p></template>
+    <template class="content-ar"><p>تبدأ سلسلة فيبوناتشي بالأرقام: 0, 1, 1, 2, 3, 5, 8, 13, 21... يمكن تعريفها عودياً كالتالي:</p><ul><li><strong>حالة الأساس</strong> هي fibonacci(0) = 0 و fibonacci(1) = 1.</li><li><strong>الخطوة العودية</strong> هي fibonacci(n) = fibonacci(n-1) + fibonacci(n-2).</li></ul><p>هذا يعني أن كل استدعاء للدالة يولد استدعاءين جديدين، مما يخلق شجرة استدعاءات (Call Tree) تنمو بشكل أسي.</p><p>دعونا نتتبع تنفيذ <code>fibonacci(3)</code> لرؤية شجرة الاستدعاءات:</p><ol><li>يتفرع استدعاء <code>fibonacci(3)</code> إلى استدعاءين منفصلين: <code>fibonacci(2)</code> و <code>fibonacci(1)</code>.</li><li>يتفرع استدعاء <code>fibonacci(2)</code> بدوره إلى <code>fibonacci(1)</code> و <code>fibonacci(0)</code>.</li><li>الآن نصل إلى حالات الأساس: تُرجع <code>fibonacci(1)</code> القيمة 1، وتُرجع <code>fibonacci(0)</code> القيمة 0.</li><li>يجمع استدعاء <code>fibonacci(2)</code> هذه العوائد (1 + 0) ويُرجع 1.</li><li>يصل استدعاء <code>fibonacci(1)</code> الأصلي (من الخطوة 1) إلى حالة الأساس ويُرجع 1.</li><li>أخيراً، يجمع <code>fibonacci(3)</code> نتائج فرعيه (1 + 1) ليُرجع الإجابة النهائية: 2.</li></ol><p>يسلط هذا التنفيذ الشبيه بالشجرة الضوء على سبب عدم كفاءة العودية البسيطة، حيث يتم حساب <code>fibonacci(1)</code> مرتين.</p></template>
+    <template class="content-en"><p>The Fibonacci series begins with: 0, 1, 1, 2, 3, 5, 8, 13, 21... It can be defined recursively as follows:</p><ul><li><strong>Base cases</strong> are fibonacci(0) = 0 and fibonacci(1) = 1.</li><li><strong>The recursive step</strong> is fibonacci(n) = fibonacci(n-1) + fibonacci(n-2).</li></ul><p>This means each function call generates two new calls, creating an exponentially growing call tree.</p><p>Let's trace the execution of <code>fibonacci(3)</code> to see the call tree:</p><ol><li>Calling <code>fibonacci(3)</code> branches into two separate calls: <code>fibonacci(2)</code> and <code>fibonacci(1)</code>.</li><li>The call to <code>fibonacci(2)</code> further branches into <code>fibonacci(1)</code> and <code>fibonacci(0)</code>.</li><li>Now we hit the base cases: <code>fibonacci(1)</code> returns 1, and <code>fibonacci(0)</code> returns 0.</li><li>The <code>fibonacci(2)</code> call adds these returns (1 + 0) and returns 1.</li><li>The original <code>fibonacci(1)</code> call (from step 1) hits the base case and returns 1.</li><li>Finally, <code>fibonacci(3)</code> adds the results of its two branches (1 + 1) to return the final answer: 2.</li></ol><p>This tree-like execution highlights why naive recursion is inefficient, as <code>fibonacci(1)</code> is calculated twice.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -891,14 +896,57 @@ public long factorial(long number) {
   </details>
 </section>
 
+<section id="tracing-debugging-recursion" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> تتبع وتصحيح أخطاء العودية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Tracing and Debugging Recursion</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تتبع الدوال العودية باستخدام المصحح (Debugger) يكشف كيف يتم تكديس الاستدعاءات في الذاكرة قبل الوصول إلى حالة الأساس، مما يساعد في فهم تدفق البرنامج واكتشاف الأخطاء.</p></template>
+    <template class="content-en"><p>Tracing recursive methods using a debugger reveals how calls are stacked in memory before reaching the base case, helping to understand program flow and discover errors.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عند استخدام أدوات تصحيح الأخطاء (مثل BlueJ أو Eclipse) ووضع نقطة توقف (Breakpoint) داخل دالة عودية، يمكننا رؤية تسلسل الاستدعاءات (Call Sequence) بوضوح.</p><p>على سبيل المثال، عند حساب <code>factorial(5)</code>، في نسخة المحاضرة التي حالةُ أساسها <code>n == 0</code> يُظهر المصحح 6 استدعاءات متتالية (للقيم 5، 4، 3، 2، 1، وأخيراً 0). أمّا النسخة السابقة (<code>number &lt;= 1</code>) فتتوقّف عند 1، فتكون الاستدعاءات 5.</p><p>كل استدعاء يحتفظ بنسخته الخاصة من المتغيرات المحلية (مثل المتغير <code>n</code>) في إطار منفصل داخل مكدس الاستدعاءات.</p></template>
+    <template class="content-en"><p>When using debugging tools (like BlueJ or Eclipse) and setting a <span class="smart-term" data-term-en="Breakpoint" data-ar="نقطة التوقف" data-en-def="An intentional stopping or pausing place in a program, put in place for debugging purposes.">breakpoint<span class="smart-term-tooltip"></span></span> inside a recursive method, we can clearly observe the call sequence.</p><p>For example, when calculating <code>factorial(5)</code>, the <span class="smart-term" data-term-en="Debugger" data-ar="مصحح الأخطاء" data-en-def="A tool used to test and debug target programs, allowing step-by-step execution and variable inspection.">debugger<span class="smart-term-tooltip"></span></span>, in the lecture's version whose base case is <code>n == 0</code>, shows 6 consecutive calls (for 5, 4, 3, 2, 1 and finally 0). The earlier version (<code>number &lt;= 1</code>) stops at 1, so it makes 5 calls.</p><p>Each call maintains its own copy of local variables (like the variable <code>n</code>) in a separate frame within the call stack.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>فهم هذا التكديس أمر بالغ الأهمية لتجنب أخطاء الذاكرة. إذا كانت المشكلة تتطلب آلاف الاستدعاءات العودية، فقد يمتلئ المكدس وتنهار العملية.</p><p>عملية العودة من هذه الاستدعاءات (Unwinding) تبدأ فقط بعد الوصول إلى حالة الأساس، حيث يتم تمرير القيم المحسوبة من الإطار الأعلى في المكدس إلى الإطار الذي يليه نزولاً حتى نصل إلى الاستدعاء الأصلي.</p></template>
+    <template class="content-en"><p>Understanding this stacking is crucial to avoid memory errors. If a problem requires thousands of recursive calls, the stack might overflow and crash the process.</p><p>The process of returning from these calls (<span class="smart-term" data-term-en="Unwinding" data-ar="تفريغ المكدس" data-en-def="The process of returning from recursive function calls, popping frames off the call stack.">unwinding<span class="smart-term-tooltip"></span></span>) only begins after the base case is reached, where calculated values are passed from the top frame in the stack down to the next one until the original call is reached.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا وضعنا نقطة توقف عند الخطوة العودية لدالة <code>factorial(3)</code>، كم عدد الإطارات (Frames) التي سنراها في المكدس قبل أن تبدأ الدالة بالعودة؟</template>
+      <template class="content-en">If we place a breakpoint at the recursive step of <code>factorial(3)</code>, how many frames will we see in the stack before the method starts returning?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سنرى 4 إطارات: الاستدعاء الأصلي (غالباً من دالة main)، ثم إطارات لـ factorial(3)، و factorial(2)، و factorial(1).</p></template>
+      <template class="content-en"><p>We will see 4 frames: the original call (often from main), then frames for factorial(3), factorial(2), and factorial(1).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبطال البرمجة في الأسبوع الخامس عشر. اليوم نغوص في واحد من أجمل وأقوى المفاهيم في علوم الحاسب: العودية (Recursion). تخيل أنك تقف أمام مرآة تعكس مرآة أخرى، هذا هو الاستدعاء الذاتي! في الامتحان، ركزوا جيداً على التمييز بين 'حالة الأساس' التي توقف النزيف، و'الخطوة العودية' التي تقسم المشكلة. لا تنسوا مقارنة العودية بالتكرار (Iteration)؛ فبينما التكرار يوفر الذاكرة، العودية توفر علينا كتابة كود معقد في مشاكل مثل 'أبراج هانوي' أو 'فيبوناتشي'. تذكروا دائماً: دالة بدون حالة أساس هي كسيارة بدون مكابح، ستصطدم حتماً بجدار الـ StackOverflow! راجعوا أمثلة المضروب وفيبوناتشي جيداً، وتأكدوا من فهمكم لكيفية تتبع الكود (Debugging) خطوة بخطوة. بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome, programming champions, to Module 13. Today we dive into one of the most beautiful and powerful concepts in computer science: Recursion. Imagine standing between two mirrors reflecting each other—that's self-calling! For the exam, focus heavily on distinguishing between the 'Base Case' that stops the bleeding, and the 'Recursive Step' that divides the problem. Don't forget to compare Recursion with Iteration; while iteration saves memory, recursion saves us from writing complex code in problems like 'Towers of Hanoi' or 'Fibonacci'. Always remember: a recursive method without a base case is like a car without brakes; it will inevitably crash into the StackOverflow wall! Review the Factorial and Fibonacci examples thoroughly, and make sure you understand how to trace (debug) the code step by step. Good luck with your studies!</template>
+    <template class="content-ar">أهلاً بكم يا أبطال البرمجة في الأسبوع الخامس عشر. اليوم نغوص في واحد من أجمل وأقوى المفاهيم في علوم الحاسب: العودية (Recursion). تخيل أنك تقف أمام مرآة تعكس مرآة أخرى، هذا هو الاستدعاء الذاتي! في الامتحان، ركزوا جيداً على التمييز بين 'حالة الأساس' التي توقف النزيف، و'الخطوة العودية' التي تقسم المشكلة. لا تنسوا مقارنة العودية بالتكرار (Iteration)؛ فبينما التكرار يوفر الذاكرة، العودية توفر علينا كتابة كود معقد في مشاكل مثل 'أبراج هانوي' أو 'فيبوناتشي'. تذكروا دائماً: دالة بدون حالة أساس هي كسيارة بدون مكابح، ستصطدم حتماً بجدار الـ StackOverflow! راجعوا أمثلة المضروب وفيبوناتشي جيداً، وتأكدوا من فهمكم لكيفية تتبع الكود (Debugging) خطوة بخطوة. بالتوفيق في دراستكم!<p>إن فهم العودية لا يقتصر على كتابة الكود فحسب، بل يتعلق بتخيل مكدس الاستدعاءات غير المرئي. من خلال تتبع التنفيذ خطوة بخطوة واستخدام أدوات تصحيح الأخطاء، فإنك تنتقل من مجرد تخمين كيفية عمل الدالة العودية إلى رؤية بصمتها في الذاكرة فعلياً. هذه المهارة حيوية لمنع أخطاء طفح المكدس في التطبيقات المعقدة.</p></template>
+    <template class="content-en">Welcome, programming champions, to Module 13. Today we dive into one of the most beautiful and powerful concepts in computer science: Recursion. Imagine standing between two mirrors reflecting each other—that's self-calling! For the exam, focus heavily on distinguishing between the 'Base Case' that stops the bleeding, and the 'Recursive Step' that divides the problem. Don't forget to compare Recursion with Iteration; while iteration saves memory, recursion saves us from writing complex code in problems like 'Towers of Hanoi' or 'Fibonacci'. Always remember: a recursive method without a base case is like a car without brakes; it will inevitably crash into the StackOverflow wall! Review the Factorial and Fibonacci examples thoroughly, and make sure you understand how to trace (debug) the code step by step. Good luck with your studies!<p>Understanding recursion isn't just about writing the code; it's about visualizing the invisible call stack. By tracing execution step-by-step and using debugging tools, you transition from merely guessing how a recursive method works to actually seeing its memory footprint. This skill is vital for preventing stack overflow errors in complex applications.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1072,6 +1120,24 @@ public long factorial(long number) {
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">تعتمد على هياكل الاختيار (Selection structures) مثل if و if...else.</template>
           <template class="content-en">It relies on selection structures like if and if...else.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نرى المتغير <code>n</code> بقيم مختلفة في نفس الوقت عند استخدام المصحح (Debugger) مع دالة عودية؟</template>
+          <template class="content-en">Why do we see the variable <code>n</code> with different values at the same time when using a debugger with a recursive method?</template>
+          <span class="content-target">لماذا نرى المتغير <code>n</code> بقيم مختلفة في نفس الوقت عند استخدام المصحح (Debugger) مع دالة عودية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن كل استدعاء عودي ينشئ إطاراً (Frame) جديداً ومستقلاً في مكدس الاستدعاءات. كل إطار يحتوي على نسخته المحلية الخاصة من المتغير <code>n</code>، ولا تتداخل هذه النسخ مع بعضها البعض.</p></template>
+          <template class="content-en"><p>Because each recursive call creates a new, independent frame in the call stack. Each frame contains its own local copy of the variable <code>n</code>, and these copies do not interfere with each other.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1339,6 +1405,40 @@ public long factorial(long number) {
         "en": "Factorial can be written using a for loop instead of self-calling."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو الغرض من استخدام نقطة التوقف (Breakpoint) في دالة عودية؟",
+      "en": "What is the purpose of using a Breakpoint in a recursive method?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لإيقاف تنفيذ البرنامج مؤقتاً وفحص تسلسل الاستدعاءات (Call Sequence) وقيم المتغيرات المحلية في كل إطار من إطارات المكدس.",
+        "en": "To pause program execution and inspect the call sequence and local variable values in each stack frame."
+      },
+      "example": {
+        "ar": "رؤية كيف تتغير قيمة n في كل استدعاء لدالة المضروب.",
+        "en": "Seeing how the value of n changes in each call to the factorial method."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ماذا يعني مصطلح تفريغ المكدس (Unwinding) في العودية؟",
+      "en": "What does the term Unwinding mean in recursion?"
+    },
+    "back": {
+      "definition": {
+        "ar": "هي العملية التي تبدأ بعد الوصول إلى حالة الأساس، حيث تبدأ الدوال العودية بإرجاع قيمها وإزالة إطاراتها من المكدس واحداً تلو الآخر.",
+        "en": "The process that starts after reaching the base case, where recursive methods begin returning their values and popping their frames off the stack one by one."
+      },
+      "example": {
+        "ar": "عندما تُرجع factorial(1) القيمة 1 إلى factorial(2).",
+        "en": "When factorial(1) returns 1 to factorial(2)."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1348,7 +1448,7 @@ public long factorial(long number) {
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1364,7 +1464,7 @@ public long factorial(long number) {
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1629,8 +1729,8 @@ public long factorial(long number) {
   {
     "id": 9,
     "question": {
-      "ar": "في كود جافا لسلسلة فيبوناتشي، لماذا تم استخدام الكلاس <code>BigInteger</code>؟",
-      "en": "In the Java code for the Fibonacci series, why was the <code>BigInteger</code> class used?"
+      "ar": "في كود جافا لسلسلة فيبوناتشي، لماذا تم استخدام الكلاس <code>BigInteger<\/code>؟",
+      "en": "In the Java code for the Fibonacci series, why was the <code>BigInteger<\/code> class used?"
     },
     "options": {
       "ar": [
@@ -1648,8 +1748,8 @@ public long factorial(long number) {
     },
     "correctIndex": 2,
     "explanation": {
-      "ar": "أرقام فيبوناتشي تصبح ضخمة جداً بسرعة، و<code>BigInteger</code> يمنع حدوث طفح البيانات (Overflow) الذي قد يحدث مع <code>int</code> أو <code>long</code>.",
-      "en": "Fibonacci numbers become extremely large very quickly, and <code>BigInteger</code> prevents data overflow that would occur with <code>int</code> or <code>long</code>."
+      "ar": "أرقام فيبوناتشي تصبح ضخمة جداً بسرعة، و<code>BigInteger<\/code> يمنع حدوث طفح البيانات (Overflow) الذي قد يحدث مع <code>int<\/code> أو <code>long<\/code>.",
+      "en": "Fibonacci numbers become extremely large very quickly, and <code>BigInteger<\/code> prevents data overflow that would occur with <code>int<\/code> or <code>long<\/code>."
     },
     "hint": {
       "ar": "فكر في حجم الأرقام الناتجة.",
@@ -1661,8 +1761,8 @@ public long factorial(long number) {
   {
     "id": 10,
     "question": {
-      "ar": "ما هي نتيجة استدعاء <code>factorial(3)</code> بناءً على الكود العودي؟",
-      "en": "What is the result of calling <code>factorial(3)</code> based on the recursive code?"
+      "ar": "ما هي نتيجة استدعاء <code>factorial(3)<\/code> بناءً على الكود العودي؟",
+      "en": "What is the result of calling <code>factorial(3)<\/code> based on the recursive code?"
     },
     "options": {
       "ar": [
@@ -1689,6 +1789,38 @@ public long factorial(long number) {
     },
     "difficulty": "easy",
     "conceptId": "recursion-factorials"
+  },
+  {
+    "conceptId": "tracing-debugging-recursion",
+    "question": {
+      "ar": "عند تتبع تنفيذ الدالة العودية <code>factorial(5)<\/code> في عرض المصحح في المحاضرة (حالةُ الأساس n == 0)، كم عدد المرات الإجمالية التي سيتم فيها استدعاء الدالة <code>factorial<\/code> (بما في ذلك الاستدعاء الأولي)؟",
+      "en": "When tracing the execution of the recursive method <code>factorial(5)<\/code> in the lecture's debugger demo (base case n == 0), how many total times will the <code>factorial<\/code> method be called (including the initial call)?"
+    },
+    "options": {
+      "ar": [
+        "4 مرات",
+        "5 مرات",
+        "6 مرات",
+        "120 مرة"
+      ],
+      "en": [
+        "4 times",
+        "5 times",
+        "6 times",
+        "120 times"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "سيتم استدعاؤها للقيم 5، 4، 3، 2، 1، وأخيراً 0 (حالة الأساس)، مما يجعل المجموع 6 استدعاءات.",
+      "en": "It will be called for values 5, 4, 3, 2, 1, and finally 0 (the base case), making a total of 6 calls."
+    },
+    "hint": {
+      "ar": "لا تنسَ الاستدعاء الخاص بحالة الأساس.",
+      "en": "Don't forget the call for the base case."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>

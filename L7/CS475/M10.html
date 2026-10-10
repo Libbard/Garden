@@ -213,6 +213,55 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React, { Component } from 'react';
+
+export default class MyComponent extends Component {
+  // Setting the initial state as an object
+  state = {
+    heading: 'React Awesomesauce (Busy)',
+    content: 'Loading...'
+  };
+
+  render() {
+    // Destructuring state values for use in JSX
+    const { heading, content } = this.state;
+
+    return (
+      &lt;main&gt;
+        &lt;h1&gt;{heading}&lt;/h1&gt;
+        &lt;p&gt;{content}&lt;/p&gt;
+      &lt;/main&gt;
+    );
+  }
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React from 'react';
+import { render } from 'react-dom';
+import MyComponent from './MyComponent';
+
+// Initial render of the component
+const myComponent = render(&lt;MyComponent /&gt;, document.getElementById('root'));
+
+// Updating specific state properties over time
+setTimeout(() =&gt; {
+  myComponent.setState({
+    heading: 'React Awesomesauce',
+    content: 'Done!'
+  });
+}, 3000);</code></pre>
+  </div>
+
   <!-- DIAGRAM[2]: Detailed SVG generation prompt: Flowchart showing Component State lifecycle. Top box labeled 'Component'. Inside, a box 'Initial State' points down to 'State'. A side box 'setState()' points left into 'State'. 'State' points down to 'render()'. Style: educational, dark background #0d1117, accent color #61dafb, viewBox 0 0 800 400, English labels. -->
 <div class="svg-diagram" data-diagram-id="2">
 <svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
@@ -533,6 +582,19 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React from 'react';
+
+// A functional component receiving props as arguments
+export default ({ disabled, text }) =&gt; (
+  &lt;button disabled={disabled}&gt;{text}&lt;/button&gt;
+);</code></pre>
+  </div>
+
   <table class="comparison-table">
     <thead>
       <tr>
@@ -630,6 +692,38 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React, { Component } from 'react';
+import MyList from './MyList';
+
+// Mock data fetching function
+function fetchData() {
+  return new Promise(resolve =&gt; {
+    setTimeout(() =&gt; {
+      resolve(['First', 'Second', 'Third']);
+    }, 2000);
+  });
+}
+
+export default class MyContainer extends Component {
+  state = { items: [] };
+
+  // Fetching data when the component mounts
+  componentDidMount() {
+    fetchData().then(items =&gt; this.setState({ items }));
+  }
+
+  render() {
+    // Passing the container's state as props to the child component
+    return &lt;MyList {...this.state} /&gt;;
+  }
+}</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">كيف يساهم نمط مكونات الحاوية في تحسين قابلية صيانة الكود؟</template>
@@ -673,6 +767,74 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React, { Component, createContext } from 'react';
+
+// 1. Create the context
+const { Provider, Consumer } = createContext('permissions');
+
+// 2. Create a Provider component to hold and supply the data
+export class PermissionProvider extends Component {
+  state = {
+    first: true,
+    second: false,
+    third: true
+  };
+
+  render() {
+    return (
+      &lt;Provider value={this.state}&gt;{this.props.children}&lt;/Provider&gt;
+    );
+  }
+}
+
+// 3. Create a Consumer component to use the data
+export const PermissionConsumer = ({ name, children }) =&gt; (
+  &lt;Consumer&gt;{value =&gt; value[name] &amp;&amp; children}&lt;/Consumer&gt;
+);</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React from 'react';
+import { render } from 'react-dom';
+import { PermissionProvider } from './PermissionContext';
+import App from './App';
+
+// Wrapping the top-level App component with the Provider
+render(
+  &lt;PermissionProvider&gt;
+    &lt;App /&gt;
+  &lt;/PermissionProvider&gt;,
+  document.getElementById('root')
+);</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React from 'react';
+import { PermissionConsumer } from './PermissionContext';
+
+// Using the Consumer inside a deeply nested component
+export default () =&gt; (
+  &lt;PermissionConsumer name="first"&gt;
+    &lt;div&gt;
+      &lt;button&gt;First&lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/PermissionConsumer&gt;
+);</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">متى يجب تجنب استخدام السياق (Context)؟</template>
@@ -693,8 +855,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه المراجعة السريعة. تخيلوا أن مكون React هو شخص؛ 'الحالة' (State) هي أفكاره وذكرياته الداخلية التي تتغير بمرور الوقت وتجعله يتصرف بشكل مختلف (إعادة التصيير). أما 'الخصائص' (Props) فهي التعليمات التي يتلقاها من مديره (المكون الأب) ولا يمكنه تغييرها. في الامتحان، تذكروا دائماً: لا نغير الحالة مباشرة، بل نستخدم <code>setState()</code> لدمج التغييرات. لتنظيم الكود، نستخدم 'مكونات الحاوية' لجلب البيانات، ونمررها كخصائص لـ 'مكونات وظيفية' نقية وظيفتها العرض فقط. وإذا كان لدينا بيانات يحتاجها الجميع (مثل صلاحيات المستخدم)، بدلاً من تمريرها عبر كل المستويات، نستخدم 'السياق' (Context) مع الـ Provider والـ Consumer. ركزوا على هذه الفروق المعمارية، فهي مفتاح فهم React بعمق!</template>
-    <template class="content-en">Welcome friends to this quick review. Imagine a React component as a person; 'State' is their internal thoughts and memories that change over time and make them react differently (re-render). 'Props' are the instructions they receive from their boss (parent component) which they cannot change. For the exam, always remember: never mutate state directly, use <code>setState()</code> to merge changes. To organize code, we use 'Container Components' to fetch data, and pass it as props to pure 'Functional Components' that only handle rendering. And if we have data everyone needs (like user permissions), instead of passing it down every level, we use 'Context' with a Provider and Consumer. Focus on these architectural distinctions; they are the key to mastering React!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه المراجعة السريعة. تخيلوا أن مكون React هو شخص؛ 'الحالة' (State) هي أفكاره وذكرياته الداخلية التي تتغير بمرور الوقت وتجعله يتصرف بشكل مختلف (إعادة التصيير). أما 'الخصائص' (Props) فهي التعليمات التي يتلقاها من مديره (المكون الأب) ولا يمكنه تغييرها. في الامتحان، تذكروا دائماً: لا نغير الحالة مباشرة، بل نستخدم <code>setState()</code> لدمج التغييرات. لتنظيم الكود، نستخدم 'مكونات الحاوية' لجلب البيانات، ونمررها كخصائص لـ 'مكونات وظيفية' نقية وظيفتها العرض فقط. وإذا كان لدينا بيانات يحتاجها الجميع (مثل صلاحيات المستخدم)، بدلاً من تمريرها عبر كل المستويات، نستخدم 'السياق' (Context) مع الـ Provider والـ Consumer. ركزوا على هذه الفروق المعمارية، فهي مفتاح فهم React بعمق!<p>في هذا الجزء، ركزنا على الجانب العملي لمفاهيم React الأساسية. من خلال الأمثلة البرمجية، رأينا كيف تتفاعل الحالة (State) مع دورة حياة المكون لتحديث واجهة المستخدم ديناميكياً، وكيف يسهل نمط الحاوية (Container) فصل جلب البيانات عن العرض. كما استعرضنا التطبيق الفعلي لواجهة برمجة تطبيقات السياق (Context API) لتمرير البيانات بسلاسة عبر شجرة المكونات، مما يمنحك أدوات قوية لبناء تطبيقات قابلة للتوسع.</p></template>
+    <template class="content-en">Welcome friends to this quick review. Imagine a React component as a person; 'State' is their internal thoughts and memories that change over time and make them react differently (re-render). 'Props' are the instructions they receive from their boss (parent component) which they cannot change. For the exam, always remember: never mutate state directly, use <code>setState()</code> to merge changes. To organize code, we use 'Container Components' to fetch data, and pass it as props to pure 'Functional Components' that only handle rendering. And if we have data everyone needs (like user permissions), instead of passing it down every level, we use 'Context' with a Provider and Consumer. Focus on these architectural distinctions; they are the key to mastering React!<p>In this section, we focused on the practical application of core React concepts. Through code examples, we saw how State interacts with the component lifecycle to dynamically update the UI, and how the Container pattern cleanly separates data fetching from rendering. We also explored the actual implementation of the Context API to pass data seamlessly across the component tree, giving you powerful tools to build scalable applications.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -868,6 +1030,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">الـ Consumer هو المكون الذي يشترك في السياق ويقرأ القيمة التي يوفرها الـ Provider الأقرب إليه في الشجرة لاستخدامها في العرض.</template>
           <template class="content-en">The Consumer is the component that subscribes to the context and reads the value provided by the nearest Provider in the tree to use it in rendering.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في مثال مكون الحاوية (Container Component)، لماذا نستخدم دالة <code>componentDidMount</code> لجلب البيانات بدلاً من وضعها مباشرة في دالة <code>render</code>؟</template>
+          <template class="content-en">In the Container Component example, why do we use the <code>componentDidMount</code> method to fetch data instead of placing it directly in the <code>render</code> method?</template>
+          <span class="content-target">في مثال مكون الحاوية (Container Component)، لماذا نستخدم دالة <code>componentDidMount</code> لجلب البيانات بدلاً من وضعها مباشرة في دالة <code>render</code>؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>دالة <code>render</code> يجب أن تكون نقية (Pure) ولا تحتوي على آثار جانبية (Side effects) مثل طلبات الشبكة، لأنها قد تُستدعى عدة مرات. استخدام <code>componentDidMount</code> يضمن أن جلب البيانات يحدث مرة واحدة فقط بعد إدراج المكون في شجرة DOM، مما يمنع تسرب الذاكرة والأخطاء.</p></template>
+          <template class="content-en"><p>The <code>render</code> method should be pure and free of side effects like network requests, as it can be called multiple times. Using <code>componentDidMount</code> ensures that data fetching happens only once after the component is inserted into the DOM, preventing memory leaks and errors.</p></template>
           <div class="content-target"></div>
         </div>
       </div>

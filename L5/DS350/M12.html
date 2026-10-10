@@ -114,6 +114,11 @@
         <template class="content-en">Domain-Key Normal Form (DKNF)</template>
         <span class="content-target">نموذج المجال والمفتاح العياري (DKNF)</span>
       </a>
+      <a href="#relational-synthesis-algorithms" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزميات التوليف العلائقي (11.2 و 11.4)</template>
+        <template class="content-en">Relational Synthesis Algorithms (11.2 &amp; 11.4)</template>
+        <span class="content-target">خوارزميات التوليف العلائقي (11.2 و 11.4)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -227,10 +232,10 @@
   <div class="depth-layer" data-layer="full" data-bilingual>
     <template class="content-ar"><p>يكون مخطط العلاقة R في نموذج بويس-كود العياري (BCNF) إذا كان لكل اعتمادية دالية X -&gt; A متحققة في R، فإن X هو مفتاح مرشح (Superkey) لـ R.</p>
 <p>كل علاقة في BCNF هي بالضرورة في 3NF، ولكن العكس غير صحيح.</p>
-<p>الهدف هو الوصول إلى BCNF، ولكن قد نضطر أحياناً للتضحية بخاصية حفظ الاعتماديات لتحقيق ذلك.</p></template>
+<p>الهدف هو الوصول إلى BCNF، ولكن قد نضطر أحياناً للتضحية بخاصية حفظ الاعتماديات لتحقيق ذلك.</p><p><b>خوارزمية 11.3 (التفكيك إلى BCNF):</b> تهدف إلى تفكيك العلاقة للوصول إلى BCNF مع ضمان الربط غير الفاقد.</p><ol><li>ابدأ بمجموعة التفكيك $D = \{R\}$.</li><li>طالما يوجد مخطط علاقة $Q$ في $D$ ليس في BCNF:</li><li>ابحث عن اعتمادية دالية $X \rightarrow Y$ في $Q$ تنتهك شرط BCNF.</li><li>استبدل $Q$ في $D$ بمخططين جديدين: $(Q - Y)$ و $(X \cup Y)$.</li></ol><p>ملاحظة: هذه الخوارزمية تضمن الربط غير الفاقد ولكنها قد تضحي بخاصية حفظ الاعتماديات.</p></template>
     <template class="content-en"><p>A relation schema R is in Boyce-Codd Normal Form (BCNF) if whenever an FD X -&gt; A holds in R, then X is a superkey of R.</p>
 <p>Every BCNF relation is in 3NF, but there exist relations in 3NF that are not in BCNF.</p>
-<p>The goal is to have each relation in BCNF, though sometimes dependency preservation must be sacrificed.</p></template>
+<p>The goal is to have each relation in BCNF, though sometimes dependency preservation must be sacrificed.</p><p><b>Algorithm 11.3 (Relational Decomposition into BCNF):</b> Aims to decompose a relation into BCNF while guaranteeing the lossless join property.</p><ol><li>Set $D = \{R\}$.</li><li>While there is a relation schema $Q$ in $D$ that is not in BCNF:</li><li>Find a functional dependency $X \rightarrow Y$ in $Q$ that violates BCNF.</li><li>Replace $Q$ in $D$ by two relation schemas: $(Q - Y)$ and $(X \cup Y)$.</li></ol><p>Note: This algorithm guarantees a lossless (non-additive) join but may sacrifice dependency preservation.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -439,13 +444,13 @@
 <li><strong>حفظ السمات (Attribute Preservation)</strong> — يجب أن تظهر كل سمة في علاقة واحدة على الأقل.</li>
 <li><strong>حفظ الاعتماديات (Dependency Preservation)</strong> — يجب أن يكون اتحاد إسقاطات الاعتماديات على الجداول الجديدة مكافئاً للاعتماديات الأصلية.</li>
 <li><strong>الربط غير الفاقد (Lossless Join)</strong> — وهو شرط إلزامي، يعني أن ربط الجداول المفككة يجب أن يعيد الجدول الأصلي تماماً دون إضافة صفوف وهمية (Spurious Tuples).</li>
-</ol></template>
+</ol><p><b>خوارزمية 11.1 (اختبار الربط غير الفاقد):</b> تستخدم مصفوفة للتحقق مما إذا كان تفكيك $D = \{R_1, ..., R_m\}$ لعلاقة $R$ يحقق الربط غير الفاقد بالنسبة لمجموعة اعتماديات $F$.</p><ol><li>أنشئ مصفوفة $S$ بصفوف $i$ لكل علاقة $R_i$ وأعمدة $j$ لكل سمة $A_j$.</li><li>قم بتهيئة كل خلية $S(i,j)$ بالرمز $b_{ij}$.</li><li>لكل صف $i$ وعمود $j$، إذا كانت السمة $A_j$ موجودة في $R_i$، غيّر القيمة إلى $a_j$.</li><li>كرر ما يلي حتى لا تتغير المصفوفة: لكل اعتمادية $X \rightarrow Y$ في $F$، ابحث عن الصفوف التي تتطابق قيمها في أعمدة $X$. اجعل هذه الصفوف تتطابق في أعمدة $Y$ (إذا كان أحدها $a_j$، اجعل البقية $a_j$، وإلا اختر أحد رموز $b$ ووحدها).</li><li>إذا أصبح أي صف يحتوي بالكامل على رموز $a$، فإن التفكيك غير فاقد.</li></ol></template>
     <template class="content-en"><p>When decomposing a Universal Relation Schema into a set of schemas, three properties are evaluated:</p>
 <ol>
 <li><strong>Attribute Preservation</strong> — Each attribute must appear in at least one relation.</li>
 <li><strong>Dependency Preservation</strong> — The union of the projections of FDs on the decomposed relations must be equivalent to the original FDs.</li>
 <li><strong>Lossless (Non-additive) Join</strong> — A MUST-have property ensuring that joining the decomposed tables reconstructs the exact original table without generating spurious tuples.</li>
-</ol></template>
+</ol><p><b>Algorithm 11.1 (Testing for Lossless Join Property):</b> Uses a matrix to test if a decomposition $D = \{R_1, ..., R_m\}$ of relation $R$ has the lossless join property with respect to dependencies $F$.</p><ol><li>Create a matrix $S$ with a row $i$ for each relation $R_i$ and a column $j$ for each attribute $A_j$.</li><li>Initialize each cell $S(i,j)$ with the symbol $b_{ij}$.</li><li>For each row $i$ and column $j$, if attribute $A_j$ is in $R_i$, change the value to $a_j$.</li><li>Repeat until the matrix doesn't change: For each FD $X \rightarrow Y$ in $F$, find rows that have the same symbols in columns $X$. Make these rows agree in columns $Y$ (if any is $a_j$, set the rest to $a_j$; otherwise, pick one $b$ symbol and unify).</li><li>If any row is made up entirely of $a$ symbols, the decomposition is lossless.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -710,14 +715,66 @@
   </details>
 </section>
 
+<section id="relational-synthesis-algorithms" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> خوارزميات التوليف العلائقي (11.2 و 11.4)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Relational Synthesis Algorithms (11.2 &amp; 11.4)</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزميات تبني جداول قاعدة البيانات من الأسفل إلى الأعلى (Bottom-up) باستخدام الاعتماديات الدالية، لضمان الوصول إلى 3NF مع حفظ الاعتماديات.</p></template>
+    <template class="content-en"><p>Algorithms that build database tables from the bottom up using functional dependencies, ensuring 3NF and dependency preservation.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>خوارزمية 11.2 (<span class="smart-term" data-term-en="Relational Synthesis" data-ar="التوليف العلائقي" data-en-def="A bottom-up database design approach that constructs relations directly from a set of functional dependencies.">التوليف العلائقي<span class="smart-term-tooltip"></span></span> إلى 3NF):</b></p><ol><li>أوجد <span class="smart-term" data-term-en="Minimal Cover" data-ar="الغطاء الأدنى" data-en-def="A simplified, equivalent set of functional dependencies with no redundancies, used as the starting point for synthesis algorithms.">الغطاء الأدنى<span class="smart-term-tooltip"></span></span> (Minimal Cover) $G$ للاعتماديات $F$.</li><li>لكل طرف أيسر $X$ في $G$، أنشئ مخطط علاقة يحتوي على $X$ وجميع السمات التي يحددها: $\{X \cup A_1 \cup ... \cup A_k\}$.</li><li>ضع أي سمات متبقية لم تُخصص في مخطط علاقة منفرد.</li></ol><p><b>خوارزمية 11.4 (3NF مع الربط غير الفاقد):</b></p><ol><li>طبق الخوارزمية 11.2 للحصول على مجموعة علاقات في 3NF.</li><li>إذا لم تكن أي من العلاقات الناتجة تحتوي على مفتاح مرشح للعلاقة الأصلية $R$، قم بإنشاء علاقة إضافية تحتوي على سمات مفتاح لـ $R$.</li></ol><p><b>خوارزمية 11.4a (إيجاد المفتاح):</b> ابدأ بـ $K = R$. لكل سمة $A$ في $K$، احسب الانغلاق $(K - A)^+$. إذا كان الانغلاق يحتوي على جميع سمات $R$، احذف $A$ من $K$. كرر حتى يصبح $K$ أصغرياً.</p></template>
+    <template class="content-en"><p><b>Algorithm 11.2 (<span class="smart-term" data-term-en="Relational Synthesis" data-ar="التوليف العلائقي" data-en-def="A bottom-up database design approach that constructs relations directly from a set of functional dependencies.">Relational Synthesis<span class="smart-term-tooltip"></span></span> into 3NF):</b></p><ol><li>Find a <span class="smart-term" data-term-en="Minimal Cover" data-ar="الغطاء الأدنى" data-en-def="A simplified, equivalent set of functional dependencies with no redundancies, used as the starting point for synthesis algorithms.">minimal cover<span class="smart-term-tooltip"></span></span> $G$ for the functional dependencies $F$.</li><li>For each left-hand-side $X$ in $G$, create a relation schema containing $X$ and all attributes it determines: $\{X \cup A_1 \cup ... \cup A_k\}$.</li><li>Place any remaining unassigned attributes in a single relation schema.</li></ol><p><b>Algorithm 11.4 (3NF with Lossless Join):</b></p><ol><li>Apply Algorithm 11.2 to get a set of 3NF relations.</li><li>If none of the created relations contains a candidate key of the universal relation $R$, create one additional relation containing the attributes of a key for $R$.</li></ol><p><b>Algorithm 11.4a (Finding a Key):</b> Start with $K = R$. For each attribute $A$ in $K$, compute the closure $(K - A)^+$. If the closure contains all attributes of $R$, remove $A$ from $K$. Repeat until $K$ is minimal.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>نهج التوليف (Synthesis) يتناقض مع نهج التفكيك (Decomposition). التوليف يضمن حفظ الاعتماديات لأنه يبني الجداول مباشرة من الغطاء الأدنى.</p><p>الخوارزمية 11.4 ذات قيمة عالية جداً لأنها تحقق 3NF، وتحفظ الاعتماديات، وتضمن الربط غير الفاقد (بإضافة المفتاح) — وهو مزيج لا يمكن ضمانه دائماً عند محاولة الوصول إلى BCNF.</p></template>
+    <template class="content-en"><p>The synthesis approach contrasts with decomposition. Synthesis guarantees dependency preservation because it builds tables directly from the minimal cover.</p><p>Algorithm 11.4 is highly valuable because it achieves 3NF, preserves dependencies, AND guarantees a lossless join (by adding the key)—a combination not always guaranteed when aiming for BCNF.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>شرط إزالة سمة أثناء البحث عن المفتاح (خوارزمية 11.4a)</strong></template>
+      <template class="content-en"><strong>Condition to remove an attribute while finding a key (Alg 11.4a)</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$(K - A)^+ = R$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تقوم الخوارزمية 11.4 بإضافة علاقة جديدة تحتوي على المفتاح الأساسي إذا لم يكن موجوداً؟</template>
+      <template class="content-en">Why does Algorithm 11.4 add a new relation containing the primary key if it is missing?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لضمان خاصية الربط غير الفاقد (Lossless Join). وجود المفتاح الأساسي للعلاقة الشاملة يضمن إمكانية إعادة ربط الجداول المفككة دون توليد صفوف وهمية.</p></template>
+      <template class="content-en"><p>To guarantee the lossless join property. Having the primary key of the universal relation ensures that the decomposed tables can be joined back together without generating spurious tuples.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي البيانات في الجزء الثاني والأكثر عمقاً من تصميم قواعد البيانات. في هذه الوحدة، ننتقل من الأساسيات إلى الاحتراف. لقد تعلمنا سابقاً عن 3NF، لكننا سنكتشف اليوم أنه ليس كافياً دائماً؛ هنا يتدخل نموذج بويس-كود (BCNF) ليكون أكثر صرامة، حيث يمنع أي محدد من أن يكون غير مفتاح. لكن تذكروا الفخ الأكبر: الوصول لـ BCNF قد يكلفنا فقدان بعض الاعتماديات! ثم ننتقل إلى مشاكل لا تحلها الاعتماديات الدالية، وهي 'الاعتماديات متعددة القيم' حيث تتكرر البيانات بشكل مستقل، وهنا يأتي دور 4NF لإنقاذ الموقف. وإذا واجهنا تعقيدات تتطلب تقسيم الجدول لأكثر من جزأين، نلجأ لـ 5NF. ركزوا جيداً على خصائص التفكيك: 'الربط غير الفاقد' هو شرط حياة أو موت لقاعدة البيانات، بينما 'حفظ الاعتماديات' هو رفاهية قد نضحي بها أحياناً. هذه المفاهيم هي ما يميز مصمم قواعد البيانات المبتدئ عن الخبير.</template>
-    <template class="content-en">Welcome, data engineers, to the deeper end of database design. In this module, we move from basics to mastery. We previously learned about 3NF, but today we discover its flaws; enter Boyce-Codd Normal Form (BCNF), which strictly demands every determinant be a superkey. But beware the ultimate trap: achieving BCNF might cost us dependency preservation! We then tackle issues functional dependencies can't solve: 'Multivalued Dependencies', where independent facts multiply redundantly, calling for 4NF. For even more complex n-way splits, we look at 5NF. Pay close attention to decomposition properties: 'Lossless Join' is a matter of life and death for your data integrity, while 'Dependency Preservation' is a luxury we sometimes sacrifice. Mastering these trade-offs is what separates a novice from an expert database architect.</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي البيانات في الجزء الثاني والأكثر عمقاً من تصميم قواعد البيانات. في هذه الوحدة، ننتقل من الأساسيات إلى الاحتراف. لقد تعلمنا سابقاً عن 3NF، لكننا سنكتشف اليوم أنه ليس كافياً دائماً؛ هنا يتدخل نموذج بويس-كود (BCNF) ليكون أكثر صرامة، حيث يمنع أي محدد من أن يكون غير مفتاح. لكن تذكروا الفخ الأكبر: الوصول لـ BCNF قد يكلفنا فقدان بعض الاعتماديات! ثم ننتقل إلى مشاكل لا تحلها الاعتماديات الدالية، وهي 'الاعتماديات متعددة القيم' حيث تتكرر البيانات بشكل مستقل، وهنا يأتي دور 4NF لإنقاذ الموقف. وإذا واجهنا تعقيدات تتطلب تقسيم الجدول لأكثر من جزأين، نلجأ لـ 5NF. ركزوا جيداً على خصائص التفكيك: 'الربط غير الفاقد' هو شرط حياة أو موت لقاعدة البيانات، بينما 'حفظ الاعتماديات' هو رفاهية قد نضحي بها أحياناً. هذه المفاهيم هي ما يميز مصمم قواعد البيانات المبتدئ عن الخبير.<p>فهم هذه الخوارزميات يحول تصميم قواعد البيانات من مجرد تخمين إلى علم منهجي دقيق. بينما يزيل التفكيك إلى BCNF (خوارزمية 11.3) التكرار بصرامة، يقدم التوليف إلى 3NF (خوارزمية 11.4) توازناً عملياً رائعاً، مما يضمن عدم فقداننا للقيود الحيوية أو سلامة البيانات أثناء عملية التطبيع.</p></template>
+    <template class="content-en">Welcome, data engineers, to the deeper end of database design. In this module, we move from basics to mastery. We previously learned about 3NF, but today we discover its flaws; enter Boyce-Codd Normal Form (BCNF), which strictly demands every determinant be a superkey. But beware the ultimate trap: achieving BCNF might cost us dependency preservation! We then tackle issues functional dependencies can't solve: 'Multivalued Dependencies', where independent facts multiply redundantly, calling for 4NF. For even more complex n-way splits, we look at 5NF. Pay close attention to decomposition properties: 'Lossless Join' is a matter of life and death for your data integrity, while 'Dependency Preservation' is a luxury we sometimes sacrifice. Mastering these trade-offs is what separates a novice from an expert database architect.<p>Understanding these algorithms transforms database design from guesswork into a systematic science. While BCNF decomposition (Algorithm 11.3) strictly eliminates redundancy, 3NF synthesis (Algorithm 11.4) offers a pragmatic balance, ensuring we don't lose vital constraints or data integrity during the normalization process.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -891,6 +948,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">التوليف (Bottom-up) يبدأ بالاعتماديات ويبني الجداول منها (مثل خوارزمية 11.2 لـ 3NF). التفكيك (Top-down) يبدأ بجدول عملاق ويقسمه بناءً على المشاكل (مثل خوارزمية 11.3 لـ BCNF).</template>
           <template class="content-en">Synthesis (Bottom-up) starts with dependencies and builds tables from them (e.g., Alg 11.2 for 3NF). Decomposition (Top-down) starts with a giant table and splits it based on violations (e.g., Alg 11.3 for BCNF).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في خوارزمية المصفوفة (11.1)، لماذا نفضل الرمز 'a' على الرمز 'b' عند توحيد القيم في عمود معين؟</template>
+          <template class="content-en">In the matrix algorithm (11.1), why do we prefer the 'a' symbol over the 'b' symbol when unifying values in a column?</template>
+          <span class="content-target">في خوارزمية المصفوفة (11.1)، لماذا نفضل الرمز 'a' على الرمز 'b' عند توحيد القيم في عمود معين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الرمز 'a' يمثل حقيقة مؤكدة: أن السمة موجودة فعلياً في الجدول المفكك ويمكن استرجاع قيمتها الأصلية بدقة. الرمز 'b' يمثل قيمة غير مؤكدة أو مفقودة في ذلك الجدول. توحيد القيم إلى 'a' يحاكي كيف يقوم الربط الطبيعي (Natural Join) باستعادة البيانات الصحيحة عبر الجداول.</p></template>
+          <template class="content-en"><p>The 'a' symbol represents a confirmed fact: the attribute actually exists in the decomposed table and its original value can be accurately retrieved. The 'b' symbol represents an unconfirmed or missing value. Unifying to 'a' simulates how a Natural Join successfully recovers true data across tables.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">إذا كانت الخوارزمية 11.4 تضمن حفظ الاعتماديات والربط غير الفاقد، فلماذا ندرس خوارزمية التفكيك إلى BCNF (11.3) أصلاً؟</template>
+          <template class="content-en">If Algorithm 11.4 guarantees dependency preservation and lossless join, why do we even study BCNF decomposition (Algorithm 11.3)?</template>
+          <span class="content-target">إذا كانت الخوارزمية 11.4 تضمن حفظ الاعتماديات والربط غير الفاقد، فلماذا ندرس خوارزمية التفكيك إلى BCNF (11.3) أصلاً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن الخوارزمية 11.4 تتوقف عند 3NF، مما يعني أنها قد تترك بعض التكرار (Redundancy) إذا كان هناك محدد ليس مفتاحاً مرشحاً. خوارزمية BCNF (11.3) تُستخدم عندما يكون التخلص التام من التكرار أولوية قصوى تفوق أهمية حفظ الاعتماديات.</p></template>
+          <template class="content-en"><p>Because Algorithm 11.4 stops at 3NF, meaning it might leave some redundancy if a determinant is not a superkey. The BCNF algorithm (11.3) is used when strict elimination of redundancy is a higher priority than preserving dependencies.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1158,6 +1250,57 @@
         "en": "Tuple-generating templates."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في الخوارزمية 11.1 (المصفوفة)، ماذا يعني أن يصبح أحد الصفوف مكوناً بالكامل من الرمز 'a'؟",
+      "en": "In Algorithm 11.1 (Matrix), what does it mean if a row becomes entirely composed of 'a' symbols?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يعني أن التفكيك يحقق خاصية الربط غير الفاقد (Lossless Join).",
+        "en": "It means the decomposition satisfies the lossless (non-additive) join property."
+      },
+      "example": {
+        "ar": "الرمز 'a' يمثل البيانات الأصلية الصحيحة التي يمكن استعادتها.",
+        "en": "The 'a' symbol represents the true original data that can be reconstructed."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "عند استخدام الخوارزمية 11.3 لتفكيك علاقة Q بسبب اعتمادية منتهكة X -> Y، ما هما المخططان الناتجان؟",
+      "en": "When using Algorithm 11.3 to decompose relation Q due to a violating FD X -> Y, what are the two resulting schemas?"
+    },
+    "back": {
+      "definition": {
+        "ar": "المخططان هما: (Q - Y) و (X ∪ Y).",
+        "en": "The two schemas are: (Q - Y) and (X ∪ Y)."
+      },
+      "example": {
+        "ar": "إذا كان Q={A,B,C} والانتهاك B->C، النتيجة: {A,B} و {B,C}.",
+        "en": "If Q={A,B,C} and violation is B->C, result: {A,B} and {B,C}."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "ما هو الغرض الأساسي من الخوارزمية 11.4a؟",
+      "en": "What is the primary purpose of Algorithm 11.4a?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إيجاد مفتاح مرشح (Candidate Key) لعلاقة R بناءً على مجموعة من الاعتماديات الدالية F.",
+        "en": "To find a candidate key for a relation R given a set of functional dependencies F."
+      },
+      "example": {
+        "ar": "تُستخدم كخطوة مساعدة داخل الخوارزمية 11.4 لضمان الربط غير الفاقد.",
+        "en": "Used as a helper step within Algorithm 11.4 to guarantee lossless join."
+      }
+    },
+    "id": 18
   }
 ]
 </script>
@@ -1167,7 +1310,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1183,7 +1326,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1508,6 +1651,70 @@
     },
     "difficulty": "medium",
     "conceptId": "boyce-codd-normal-form"
+  },
+  {
+    "conceptId": "properties-of-decomposition",
+    "question": {
+      "ar": "في خوارزمية اختبار الربط غير الفاقد (11.1)، ما هو المؤشر النهائي على أن التفكيك غير فاقد؟",
+      "en": "In the lossless join testing algorithm (11.1), what is the final indicator that the decomposition is lossless?"
+    },
+    "options": {
+      "ar": [
+        "أن يصبح أحد الصفوف في المصفوفة مكوناً بالكامل من الرموز 'a'",
+        "أن تصبح المصفوفة متماثلة تماماً",
+        "أن تختفي جميع الرموز 'b' من المصفوفة",
+        "أن يحتوي كل عمود على رمز 'a' واحد على الأقل"
+      ],
+      "en": [
+        "A row in the matrix becomes entirely composed of 'a' symbols",
+        "The matrix becomes perfectly symmetric",
+        "All 'b' symbols disappear from the matrix",
+        "Every column contains at least one 'a' symbol"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "الرمز 'a' يمثل السمة الأصلية. إذا امتلأ صف بالكامل بـ 'a'، فهذا يثبت أن عملية الربط الطبيعي (Natural Join) قادرة على إعادة بناء الصف الأصلي بالكامل دون فقدان أو إضافة.",
+      "en": "The 'a' symbol represents the original attribute. If a row is entirely 'a's, it proves the natural join can perfectly reconstruct the original tuple without loss or addition."
+    },
+    "hint": {
+      "ar": "ابحث عن الصف المثالي.",
+      "en": "Look for the perfect row."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "relational-synthesis-algorithms",
+    "question": {
+      "ar": "لماذا تعتبر الخوارزمية 11.4 (التوليف إلى 3NF) حلاً عملياً ممتازاً مقارنة بالتفكيك إلى BCNF؟",
+      "en": "Why is Algorithm 11.4 (Synthesis into 3NF) considered an excellent practical solution compared to BCNF decomposition?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تضمن الوصول إلى BCNF دائماً",
+        "لأنها تضمن كلاً من حفظ الاعتماديات والربط غير الفاقد معاً",
+        "لأنها تتجاهل الاعتماديات متعددة القيم",
+        "لأنها لا تتطلب حساب الغطاء الأدنى"
+      ],
+      "en": [
+        "Because it always guarantees achieving BCNF",
+        "Because it guarantees BOTH dependency preservation and lossless join",
+        "Because it ignores multivalued dependencies",
+        "Because it does not require computing the minimal cover"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الخوارزمية 11.4 تحقق التوازن المثالي: فهي تبني جداول 3NF تحفظ جميع الاعتماديات (عبر 11.2) وتضمن الربط غير الفاقد (بإضافة المفتاح إذا لزم الأمر)، وهو ما قد تفشل فيه خوارزمية BCNF.",
+      "en": "Algorithm 11.4 strikes the perfect balance: it builds 3NF tables that preserve all dependencies (via 11.2) and guarantees a lossless join (by adding the key if needed), which BCNF algorithms might fail to do."
+    },
+    "hint": {
+      "ar": "إنها تقدم أفضل ما في العالمين (Best of both worlds).",
+      "en": "It offers the best of both worlds."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1552,6 +1759,14 @@
       <template class="content-ar">اعتماديات التضمين (Inclusion Dependencies) هي الأساس النظري الذي تُبنى عليه المفاتيح الأجنبية (Foreign Keys) في قواعد البيانات العلائقية.</template>
       <template class="content-en">Inclusion Dependencies are the theoretical foundation upon which Foreign Keys are built in relational databases.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين الخوارزمية 11.2 والخوارزمية 11.4. الخوارزمية 11.2 تضمن حفظ الاعتماديات فقط، بينما الخوارزمية 11.4 تضيف خطوة التأكد من وجود المفتاح لضمان الربط غير الفاقد أيضاً.</template>
+    <template class="content-en">Confusing Algorithm 11.2 with 11.4. Algorithm 11.2 only guarantees dependency preservation, whereas 11.4 adds a step to ensure the key is present, thereby also guaranteeing a lossless join.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

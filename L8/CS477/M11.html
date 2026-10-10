@@ -108,6 +108,16 @@
         <template class="content-en">Dead Code Detection and Elimination</template>
         <span class="content-target">اكتشاف وإزالة الكود الميت</span>
       </a>
+      <a href="#optimization-abstraction-levels" class="toc-link" data-bilingual>
+        <template class="content-ar">مستويات التجريد في التحسين</template>
+        <template class="content-en">Abstraction Levels in Optimization</template>
+        <span class="content-target">مستويات التجريد في التحسين</span>
+      </a>
+      <a href="#profiling-and-measurement" class="toc-link" data-bilingual>
+        <template class="content-ar">قياس الأداء وتحليل البرنامج</template>
+        <template class="content-en">Profiling and Performance Measurement</template>
+        <span class="content-target">قياس الأداء وتحليل البرنامج</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -867,14 +877,121 @@ return 30;</code></pre>
   </details>
 </section>
 
+<section id="optimization-abstraction-levels" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> مستويات التجريد في التحسين</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Abstraction Levels in Optimization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>من الأفضل دائماً حل مشاكل التحسين في أعلى مستوى ممكن من التجريد (Abstraction) قبل الوصول إلى كود الآلة المنخفض.</p></template>
+    <template class="content-en"><p>It is usually best to solve an optimization problem at the highest possible level of abstraction before reaching low-level machine code.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يعتمد نوع التحسين الذي يمكن تطبيقه بشكل كبير على <span class="smart-term" data-term-en="Abstraction Level" data-ar="مستوى التجريد" data-en-def="The degree to which complex implementation details are hidden, ranging from high-level source code to low-level machine code.">مستوى التجريد<span class="smart-term-tooltip"></span></span> الحالي للبرنامج داخل المترجم:</p><ul><li><strong>مستوى شجرة AST أو DAG (أعلى تجريد):</strong> في هذا المستوى، يمتلك المترجم فهماً كاملاً لهيكل البرنامج، مما يسمح له بالتخلص من أجزاء كاملة من الكود غير المستخدم (Unused code).</li><li><strong>مستوى <span class="smart-term" data-term-en="Linear IR" data-ar="الكود الوسيط الخطي" data-en-def="A flat, sequential intermediate representation of code, similar to assembly but machine-independent.">الكود الوسيط الخطي<span class="smart-term-tooltip"></span></span> (Linear IR):</strong> هنا، يمكن للمترجم تسريع تسلسل طويل من الكود من خلال التخصيص الذكي للسجلات (Smart register allocation).</li><li><strong>مستوى كود التجميع (Assembly - أدنى تجريد):</strong> بمجرد توليد كود التجميع الملموس، يكون أقصى ما يمكن فعله هو إزالة بعض التعليمات المكررة أو الزائدة (Redundant instructions).</li></ul></template>
+    <template class="content-en"><p>The type of optimization that can be applied depends heavily on the current <span class="smart-term" data-term-en="Abstraction Level" data-ar="مستوى التجريد" data-en-def="The degree to which complex implementation details are hidden, ranging from high-level source code to low-level machine code.">abstraction level<span class="smart-term-tooltip"></span></span> of the program within the compiler:</p><ul><li><strong>AST or DAG level (Highest abstraction):</strong> At this level, the compiler understands the full structure, allowing it to eliminate entire chunks of unused code.</li><li><strong><span class="smart-term" data-term-en="Linear IR" data-ar="الكود الوسيط الخطي" data-en-def="A flat, sequential intermediate representation of code, similar to assembly but machine-independent.">Linear IR<span class="smart-term-tooltip"></span></span> level:</strong> Here, the compiler can speed up a long code sequence with smart register allocation.</li><li><strong>Assembly code level (Lowest abstraction):</strong> Once concrete assembly code is generated, about the most we can do is eliminate a few <span class="smart-term" data-term-en="Redundant Instructions" data-ar="التعليمات الزائدة" data-en-def="Assembly or machine code instructions that do not change the program&#x27;s state and can be safely removed.">redundant instructions<span class="smart-term-tooltip"></span></span>.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السبب وراء هذه القاعدة هو فقدان السياق (Context) كلما انخفضنا في مستوى التجريد. في مستوى AST، تكون بنية التحكم (مثل الحلقات والشروط) واضحة تماماً، مما يسهل اتخاذ قرارات جذرية وآمنة.</p><p>بينما في مستوى لغة التجميع، يرى المترجم مجرد قائمة مسطحة من التعليمات. محاولة اكتشاف حلقة معقدة أو كود ميت في هذا المستوى تتطلب تحليلاً عكسياً معقداً جداً ومكلفاً حسابياً.</p><p>لذلك، تصمم المترجمات الحديثة لتطبيق سلسلة من التحسينات المتدرجة، تبدأ بالتحسينات الهيكلية الكبيرة وتنتهي بالتحسينات الدقيقة الخاصة بالمعالج الهدف.</p></template>
+    <template class="content-en"><p>The reasoning behind this rule is the loss of context as we move down abstraction levels. At the AST level, control structures (like loops and branches) are perfectly clear, making radical and safe decisions easier.</p><p>Conversely, at the assembly level, the compiler sees only a flat list of instructions. Attempting to discover a complex loop or dead code at this stage requires highly complex and computationally expensive reverse analysis.</p><p>Therefore, modern compilers are designed to apply a cascading series of optimizations, starting with large structural improvements and ending with fine-grained, architecture-specific tweaks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نقوم بتخصيص السجلات (Register Allocation) في مستوى شجرة AST؟</template>
+      <template class="content-en">Why don't we perform Register Allocation at the AST level?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن شجرة AST تمثل البنية المنطقية للبرنامج ولا تحتوي على مفهوم الذاكرة الخطية أو السجلات. تخصيص السجلات يتطلب تمثيلاً خطياً (مثل Linear IR) يعكس كيفية تنفيذ التعليمات تسلسلياً في المعالج.</p></template>
+      <template class="content-en"><p>Because the AST represents the logical structure of the program and lacks the concept of linear memory or registers. Register allocation requires a linear representation (like Linear IR) that reflects how instructions are executed sequentially by the CPU.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="profiling-and-measurement" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> قياس الأداء وتحليل البرنامج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Profiling and Performance Measurement</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>قبل تطبيق تحسينات المترجم، يجب قياس أداء البرنامج باستخدام أدوات متخصصة لمعرفة أين يقضي البرنامج معظم وقته، وتجنب قياس العبء الإضافي للحلقات.</p></template>
+    <template class="content-en"><p>Before applying compiler optimizations, program performance must be measured using profiling tools to find where it spends most of its time, avoiding measuring loop overhead.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>إذا كان البرنامج بطيئاً، يجب استخدام أداة قياس أداء (Profiling tool) قياسية مثل <code>gprof</code> لتحديد الأجزاء الدقيقة التي تستهلك الوقت، ثم تركيز جهود التحسين عليها.</p><p>عند قياس وقت تنفيذ عملية سريعة جداً، نضطر لوضعها داخل حلقة تدور ملايين المرات باستخدام دوال مثل <code>gettimeofday()</code>.</p><p><strong>تحذير هام:</strong> المؤقت سيحسب وقت العملية بالإضافة إلى وقت تنفيذ تعليمات الحلقة نفسها. للحصول على نتيجة دقيقة، يجب قياس وقت تنفيذ "حلقة فارغة" (Empty loop) وطرحه من النتيجة الإجمالية (Normalization).</p></template>
+    <template class="content-en"><p>If a program is slow, use a standard <span class="smart-term" data-term-en="Profiling" data-ar="قياس الأداء" data-en-def="A form of dynamic program analysis that measures the memory or time complexity of a program, the usage of particular instructions, or the frequency and duration of function calls.">profiling<span class="smart-term-tooltip"></span></span> tool like <code>gprof</code> to pinpoint exactly where the program spends its time, then focus optimization efforts there.</p><p>When timing a very fast operation, we must place it inside a loop running millions of times using functions like <code>gettimeofday()</code>.</p><p><strong>Important Caution:</strong> The timer counts both the operation and the loop's control instructions. To get an accurate result, you must measure the runtime of an "empty loop" and subtract it from the total result (<span class="smart-term" data-term-en="Normalization" data-ar="التسوية" data-en-def="Adjusting measured values to a common scale or removing systematic errors, such as subtracting loop overhead from a timing measurement.">Normalization<span class="smart-term-tooltip"></span></span>).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في لغة C، تُستخدم دالة <code>gettimeofday()</code> للحصول على الوقت الحالي بالثواني والميكروثانية منذ بداية <span class="smart-term" data-term-en="Epoch" data-ar="حقبة يونكس" data-en-def="The date and time relative to which a computer&#x27;s clock and timestamp values are determined (typically Jan 1, 1970).">حقبة يونكس<span class="smart-term-tooltip"></span></span> (Epoch).</p><p>لحساب الفرق بين وقت البداية والنهاية، تُستخدم الماكرو <code>timersub(a, b, res)</code> التي تطرح الوقت <code>b</code> من <code>a</code> وتضع النتيجة في <code>res</code>، مع تسوية النتيجة (Normalized) بحيث تكون قيمة الميكروثانية بين 0 و 999,999.</p><p>تجاهل طرح وقت الحلقة الفارغة هو خطأ شائع يؤدي إلى استنتاجات خاطئة حول فعالية التحسينات منخفضة المستوى، حيث قد يبدو التحسين غير فعال لأن عبء الحلقة يطغى على وقت العملية الأصلية.</p></template>
+    <template class="content-en"><p>In C, the <code>gettimeofday()</code> function obtains the current time expressed as seconds and microseconds since the <span class="smart-term" data-term-en="Epoch" data-ar="حقبة يونكس" data-en-def="The date and time relative to which a computer&#x27;s clock and timestamp values are determined (typically Jan 1, 1970).">Epoch<span class="smart-term-tooltip"></span></span>.</p><p>To calculate the elapsed time, the <code>timersub(a, b, res)</code> macro is used to subtract time <code>b</code> from <code>a</code>, storing the result in <code>res</code>. The result is normalized so the microseconds value is strictly between 0 and 999,999.</p><p>Failing to subtract the empty loop overhead is a common pitfall that leads to false conclusions about low-level optimizations, as the loop overhead can easily dwarf the actual operation time, making optimizations appear ineffective.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>c</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>#include &lt;time.h&gt;
+
+struct timeval start, stop, elapsed;
+gettimeofday(&amp;start, 0);
+
+for(i=0; i&lt;1000000; i++) {
+    x = x * y; // Fast operation to measure
+}
+
+gettimeofday(&amp;stop, 0);
+timersub(&amp;stop, &amp;start, &amp;elapsed);
+
+printf("elapsed: %d.%06d sec", elapsed.tv_sec, elapsed.tv_usec);
+// Note: To be accurate, repeat this for an empty loop and subtract the difference.</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم حلقة تدور مليون مرة لقياس عملية ضرب بسيطة بدلاً من قياسها مرة واحدة؟</template>
+      <template class="content-en">Why do we use a loop running a million times to measure a simple multiplication instead of measuring it just once?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن العمليات الفردية (مثل الضرب) تستغرق أجزاء من النانوثانية، وهي فترة أقصر من دقة معظم مؤقتات نظام التشغيل. تكرارها ملايين المرات يجعل الوقت الإجمالي قابلاً للقياس بدقة.</p></template>
+      <template class="content-en"><p>Because individual operations (like multiplication) take fractions of a nanosecond, which is shorter than the resolution of most OS timers. Repeating it millions of times makes the total elapsed time large enough to be measured accurately.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في عالم 'تحسين الكود'. تخيل أنك كتبت برنامجاً يعمل بشكل صحيح، لكنه يستهلك الكثير من الذاكرة والوقت. هنا يتدخل المترجم كساحر خفي. في هذه الوحدة، تعلمنا أن التحسين له قاعدة ذهبية: 'لا تغير المعنى أبداً'. بدأنا بتقنيات بسيطة مثل 'طي الثوابت' حيث نحسب (3*4) أثناء الترجمة بدلاً من وقت التنفيذ. ثم انتقلنا إلى 'تقليل التكلفة'، حيث نستبدل العمليات الباهظة مثل الضرب بإزاحة البتات (Bitwise shift). ركزوا جيداً في الامتحان على المفاضلات (Trade-offs)؛ فمثلاً 'فك الحلقات' يقلل من القفزات لكنه قد يدمر أداء الـ Cache إذا زاد حجم الكود. و'تضمين الدوال' يزيل عبء الاستدعاء لكنه يضخم حجم البرنامج. تذكروا دائماً: الخوارزمية الجيدة (O(log n)) تهزم دائماً الكود السيئ المحسن. بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome, future engineers, to the world of 'Code Optimization'. Imagine writing a correct program that is just too slow or memory-hungry. Here, the compiler steps in like a hidden wizard. In this module, we learned the golden rule: 'Never change the meaning'. We started with 'Constant Folding', computing (3*4) at compile-time. Then 'Strength Reduction', replacing expensive math like multiplication with bitwise shifts. For the exam, focus heavily on trade-offs! 'Loop Unrolling' reduces branches but can thrash the Instruction Cache if overdone. 'Function Inlining' removes call overhead but causes code bloat. Always remember: a good algorithm (O(log n)) will always beat an optimized bad algorithm. Good luck studying!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في عالم 'تحسين الكود'. تخيل أنك كتبت برنامجاً يعمل بشكل صحيح، لكنه يستهلك الكثير من الذاكرة والوقت. هنا يتدخل المترجم كساحر خفي. في هذه الوحدة، تعلمنا أن التحسين له قاعدة ذهبية: 'لا تغير المعنى أبداً'. بدأنا بتقنيات بسيطة مثل 'طي الثوابت' حيث نحسب (3*4) أثناء الترجمة بدلاً من وقت التنفيذ. ثم انتقلنا إلى 'تقليل التكلفة'، حيث نستبدل العمليات الباهظة مثل الضرب بإزاحة البتات (Bitwise shift). ركزوا جيداً في الامتحان على المفاضلات (Trade-offs)؛ فمثلاً 'فك الحلقات' يقلل من القفزات لكنه قد يدمر أداء الـ Cache إذا زاد حجم الكود. و'تضمين الدوال' يزيل عبء الاستدعاء لكنه يضخم حجم البرنامج. تذكروا دائماً: الخوارزمية الجيدة (O(log n)) تهزم دائماً الكود السيئ المحسن. بالتوفيق في دراستكم!<p>تذكروا دائماً أن التحسين ليس مجرد تطبيق أعمى للقواعد. يجب أن تكونوا استراتيجيين: استخدموا أدوات القياس (Profiling) لمعرفة أين تكمن المشكلة الحقيقية، وافهموا أن المترجم يطبق تحسيناته بذكاء عبر مستويات التجريد المختلفة—بدءاً من الهيكل العام في AST وصولاً إلى أدق تفاصيل السجلات في الكود الوسيط.</p></template>
+    <template class="content-en">Welcome, future engineers, to the world of 'Code Optimization'. Imagine writing a correct program that is just too slow or memory-hungry. Here, the compiler steps in like a hidden wizard. In this module, we learned the golden rule: 'Never change the meaning'. We started with 'Constant Folding', computing (3*4) at compile-time. Then 'Strength Reduction', replacing expensive math like multiplication with bitwise shifts. For the exam, focus heavily on trade-offs! 'Loop Unrolling' reduces branches but can thrash the Instruction Cache if overdone. 'Function Inlining' removes call overhead but causes code bloat. Always remember: a good algorithm (O(log n)) will always beat an optimized bad algorithm. Good luck studying!<p>Always remember that optimization is not just a blind application of rules. You must be strategic: use profiling tools to find the real bottlenecks, and understand that the compiler smartly applies its optimizations across different abstraction levels—from the broad structure in the AST down to the finest register details in the Linear IR.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1052,6 +1169,41 @@ return 30;</code></pre>
         </div>
       </div>
     </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا ننتظر حتى يتم توليد كود التجميع (Assembly) لتطبيق جميع التحسينات دفعة واحدة؟</template>
+          <template class="content-en">Why don't we wait until assembly code is generated to apply all optimizations at once?</template>
+          <span class="content-target">لماذا لا ننتظر حتى يتم توليد كود التجميع (Assembly) لتطبيق جميع التحسينات دفعة واحدة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأننا نفقد 'السياق' (Context) في مستوى التجميع. في مستوى AST، يعرف المترجم أين تبدأ الحلقة وتنتهي، مما يسهل إزالة الكود الميت أو رفع الكود. في مستوى التجميع، يرى المترجم مجرد قفزات (Jumps) وتعليمات مسطحة، مما يجعل اكتشاف هذه الهياكل المنطقية أمراً بالغ الصعوبة.</p></template>
+          <template class="content-en"><p>Because we lose 'Context' at the assembly level. At the AST level, the compiler knows exactly where a loop starts and ends, making dead code elimination or code hoisting easy. At the assembly level, it only sees flat instructions and jumps, making it extremely difficult to rediscover those logical structures.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">طالب يقول: 'لقد قمت بتحسين دالة رياضية معقدة في برنامجي لتصبح أسرع بـ 10 مرات، لكن وقت التنفيذ الكلي للبرنامج لم يتغير'. ما هو الخطأ الذي ارتكبه الطالب؟</template>
+          <template class="content-en">A student says: 'I optimized a complex math function in my program to be 10x faster, but the overall program execution time didn't change'. What mistake did the student make?</template>
+          <span class="content-target">طالب يقول: 'لقد قمت بتحسين دالة رياضية معقدة في برنامجي لتصبح أسرع بـ 10 مرات، لكن وقت التنفيذ الكلي للبرنامج لم يتغير'. ما هو الخطأ الذي ارتكبه الطالب؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الخطأ هو أنه لم يقم بـ 'قياس الأداء' (Profiling) أولاً. من المحتمل أن هذه الدالة الرياضية كانت تستهلك أقل من 1% من وقت البرنامج الكلي. يجب دائماً استخدام أدوات مثل gprof لمعرفة عنق الزجاجة الحقيقي قبل إهدار الجهد في تحسين أجزاء غير مؤثرة.</p></template>
+          <template class="content-en"><p>The mistake is failing to 'Profile' the code first. It's highly likely this math function consumed less than 1% of the total program time. One must always use tools like gprof to find the actual bottleneck before wasting effort optimizing non-critical parts.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1158,8 +1310,8 @@ return 30;</code></pre>
         "en": "Converting a special case of an expensive operation into a less expensive operation."
       },
       "example": {
-        "ar": "استبدال x^2 بـ x*x.",
-        "en": "Replacing x^2 with x*x."
+        "ar": "استبدال \\(x^2\\) بـ x*x.",
+        "en": "Replacing \\(x^2\\) with x*x."
       }
     }
   },
@@ -1315,6 +1467,57 @@ return 30;</code></pre>
         "en": "A sequence of consecutive assignment statements."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "تحسين مستوى AST / DAG",
+      "en": "AST / DAG Level Optimization"
+    },
+    "back": {
+      "definition": {
+        "ar": "أعلى مستوى تجريد، يُستخدم للتخلص من أجزاء كاملة من الكود غير المستخدم بفضل وضوح الهيكل المنطقي.",
+        "en": "The highest abstraction level, used to eliminate entire chunks of unused code due to the clear logical structure."
+      },
+      "example": {
+        "ar": "إزالة فرع if كامل لا يمكن الوصول إليه.",
+        "en": "Removing an entire unreachable if-branch."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "تحسين مستوى Linear IR",
+      "en": "Linear IR Level Optimization"
+    },
+    "back": {
+      "definition": {
+        "ar": "مستوى تجريد متوسط، مثالي لتسريع تسلسلات الكود الطويلة من خلال التخصيص الذكي للسجلات.",
+        "en": "A medium abstraction level, ideal for speeding up long code sequences via smart register allocation."
+      },
+      "example": {
+        "ar": "تخصيص السجلات للمتغيرات الأكثر استخداماً.",
+        "en": "Allocating registers to the most frequently used variables."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "تسوية وقت الحلقة (Loop Normalization)",
+      "en": "Loop Normalization (Timing)"
+    },
+    "back": {
+      "definition": {
+        "ar": "طرح وقت تنفيذ 'الحلقة الفارغة' من الوقت الإجمالي لقياس عملية سريعة بدقة.",
+        "en": "Subtracting the execution time of an 'empty loop' from the total time to accurately measure a fast operation."
+      },
+      "example": {
+        "ar": "وقت العملية = وقت الحلقة الكاملة - وقت الحلقة الفارغة.",
+        "en": "Operation Time = Full Loop Time - Empty Loop Time."
+      }
+    },
+    "id": 18
   }
 ]
 </script>
@@ -1324,7 +1527,7 @@ return 30;</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1340,7 +1543,7 @@ return 30;</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1665,6 +1868,70 @@ return 30;</code></pre>
     },
     "difficulty": "medium",
     "conceptId": "strength-reduction"
+  },
+  {
+    "conceptId": "optimization-abstraction-levels",
+    "question": {
+      "ar": "في أي مستوى من مستويات التجريد يكون 'التخصيص الذكي للسجلات' (Smart register allocation) هو الأكثر فعالية؟",
+      "en": "At which level of abstraction is 'Smart register allocation' most effectively applied?"
+    },
+    "options": {
+      "ar": [
+        "مستوى شجرة البنية المجردة (AST)",
+        "مستوى الكود الوسيط الخطي (Linear IR)",
+        "مستوى كود التجميع (Assembly)",
+        "مستوى الكود المصدري (Source Code)"
+      ],
+      "en": [
+        "Abstract Syntax Tree (AST) level",
+        "Linear Intermediate Representation (Linear IR) level",
+        "Assembly code level",
+        "Source Code level"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الكود الوسيط الخطي يوفر تمثيلاً تسلسلياً للبرنامج يسمح للمترجم بتتبع دورة حياة المتغيرات وتخصيص السجلات بكفاءة، وهو ما لا يتوفر في AST.",
+      "en": "Linear IR provides a sequential representation that allows the compiler to track variable lifespans and allocate registers efficiently, which is not available in the AST."
+    },
+    "hint": {
+      "ar": "مستوى يقع بين الهيكل الشجري وكود الآلة النهائي.",
+      "en": "A level situated between the tree structure and the final machine code."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "profiling-and-measurement",
+    "question": {
+      "ar": "عند استخدام حلقة لقياس أداء عملية تستغرق نانوثانية، لماذا يجب قياس وقت 'الحلقة الفارغة'؟",
+      "en": "When using a loop to benchmark a nanosecond operation, why must you measure the time of an 'empty loop'?"
+    },
+    "options": {
+      "ar": [
+        "للتأكد من أن المعالج لا ينام أثناء التنفيذ.",
+        "لطرح العبء الإضافي لتعليمات التحكم في الحلقة من النتيجة النهائية.",
+        "لمنع المترجم من إزالة الكود الميت.",
+        "لزيادة درجة حرارة المعالج قبل القياس الفعلي."
+      ],
+      "en": [
+        "To ensure the CPU does not sleep during execution.",
+        "To subtract the overhead of the loop's control instructions from the final result.",
+        "To prevent the compiler from eliminating dead code.",
+        "To warm up the CPU before the actual measurement."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الحلقة نفسها تحتوي على تعليمات (زيادة العداد، التحقق من الشرط، القفز) تستهلك وقتاً. طرح هذا الوقت يضمن أننا نقيس العملية المطلوبة فقط.",
+      "en": "The loop itself contains instructions (increment, condition check, branch) that consume time. Subtracting this ensures we only measure the target operation."
+    },
+    "hint": {
+      "ar": "أنت تريد قياس العملية فقط، وليس الكود المحيط بها.",
+      "en": "You want to measure ONLY the operation, not the surrounding code."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1709,6 +1976,14 @@ return 30;</code></pre>
       <template class="content-ar">إزالة الكود الميت تعتمد كلياً على 'إمكانية الوصول' (Reachability) في الرسم البياني لتدفق التحكم (CFG). إذا لم يكن هناك مسار من نقطة البداية إلى العقدة، فهي ميتة.</template>
       <template class="content-en">Dead code elimination relies entirely on 'Reachability' in the Control Flow Graph (CFG). If there is no path from the entry point to a node, it is dead.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">يجب دائماً محاولة حل مشاكل التحسين في أعلى مستوى تجريد ممكن. إزالة الكود الميت تكون سهلة جداً في مستوى AST، لكنها شبه مستحيلة في مستوى كود التجميع (Assembly).</template>
+    <template class="content-en">Always attempt to solve optimization problems at the highest possible abstraction level. Dead code elimination is trivial at the AST level, but nearly impossible at the Assembly level.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

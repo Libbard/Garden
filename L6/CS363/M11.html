@@ -542,8 +542,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>ابتكرها Dijkstra عام 1965. السيمافور هو هيكل بيانات يتكون من عداد وطابور لتخزين واصفات المهام (Task descriptors).</p><p>يمتلك عمليتين فقط:</p><ul><li><strong>wait</strong> (تسمى أصلاً P)</li><li>و <strong>release</strong> (تسمى أصلاً V).</li></ul><p>يجب أن تكون هاتان العمليتان ذريتين (Atomic). يمكن استخدام السيمافورات لتوفير كل من مزامنة التنافس (باستخدام <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization (mutual exclusion).">سيمافور ثنائي - Binary Semaphore</span> بقيم 0 و 1) ومزامنة التعاون.</p></template>
-    <template class="content-en"><p>Introduced by Dijkstra in 1965. A semaphore is a data structure consisting of a counter and a queue for storing task descriptors.</p><p>It has only two operations:</p><ul><li><strong>wait</strong> (originally P)</li><li>and <strong>release</strong> (originally V).</li></ul><p>These operations MUST be atomic. Semaphores can provide both competition synchronization (using a <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization (mutual exclusion).">binary semaphore</span> with values 0 and 1) and cooperation synchronization.</p></template>
+    <template class="content-ar"><p>ابتكرها Dijkstra عام 1965. السيمافور هو هيكل بيانات يتكون من عداد وطابور لتخزين واصفات المهام (Task descriptors).</p><p>يمتلك عمليتين فقط:</p><ul><li><strong>wait</strong> (تسمى أصلاً P)</li><li>و <strong>release</strong> (تسمى أصلاً V).</li></ul><p>يجب أن تكون هاتان العمليتان ذريتين (Atomic). يمكن استخدام السيمافورات لتوفير كل من مزامنة التنافس (باستخدام <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization (mutual exclusion).">سيمافور ثنائي - Binary Semaphore</span> بقيم 0 و 1) ومزامنة التعاون.</p><p>لتوضيح مزامنة التعاون والتنافس معاً، نأخذ <strong>مشكلة المنتج والمستهلك</strong> كمثال. نستخدم ثلاثة سيمافورات:</p><ol><li><code>emptyspots</code>: سيمافور تعاون يتتبع الأماكن الفارغة في الذاكرة المؤقتة (يبدأ بحجم الذاكرة).</li><li><code>fullspots</code>: سيمافور تعاون يتتبع الأماكن الممتلئة (يبدأ بـ 0).</li><li><code>access</code>: سيمافور تنافس (ثنائي) لضمان الوصول الحصري للذاكرة المؤقتة (يبدأ بـ 1).</li></ol><p>يجب على المنتج الانتظار حتى يتوفر مكان فارغ (<code>wait(emptyspots)</code>)، ثم الانتظار للوصول الحصري (<code>wait(access)</code>)، وبعد الإيداع يحرر الوصول (<code>release(access)</code>) ويزيد عدد الأماكن الممتلئة (<code>release(fullspots)</code>). المستهلك يقوم بالعملية العكسية.</p></template>
+    <template class="content-en"><p>Introduced by Dijkstra in 1965. A semaphore is a data structure consisting of a counter and a queue for storing task descriptors.</p><p>It has only two operations:</p><ul><li><strong>wait</strong> (originally P)</li><li>and <strong>release</strong> (originally V).</li></ul><p>These operations MUST be atomic. Semaphores can provide both competition synchronization (using a <span class="smart-term" data-term-en="Binary Semaphore" data-ar="السيمافور الثنائي" data-en-def="A semaphore whose counter can only have the values 0 and 1, used for competition synchronization (mutual exclusion).">binary semaphore</span> with values 0 and 1) and cooperation synchronization.</p><p>To illustrate both cooperation and competition synchronization, consider the <strong>Producer-Consumer problem</strong>. We use three semaphores:</p><ol><li><code>emptyspots</code>: A cooperation semaphore tracking empty spots in the buffer (initialized to buffer length).</li><li><code>fullspots</code>: A cooperation semaphore tracking filled spots (initialized to 0).</li><li><code>access</code>: A competition (binary) semaphore ensuring mutually exclusive access to the buffer (initialized to 1).</li></ol><p>The producer must wait for an empty spot (<code>wait(emptyspots)</code>), then wait for exclusive access (<code>wait(access)</code>). After depositing, it relinquishes access (<code>release(access)</code>) and increments the filled spots (<code>release(fullspots)</code>). The consumer does the reverse.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -569,6 +569,32 @@ release(aSemaphore)
     put the calling task in the task ready queue
     transfer control to a task from aSemaphore’s queue
 end</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>ada</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>-- Producer Task
+loop
+  -- produce VALUE
+  wait(emptyspots);   -- wait for space
+  wait(access);       -- wait for access
+  DEPOSIT(VALUE);
+  release(access);    -- relinquish access
+  release(fullspots); -- increase filled
+end loop;
+
+-- Consumer Task
+loop
+  wait(fullspots);    -- wait till not empty
+  wait(access);       -- wait for access
+  FETCH(VALUE);
+  release(access);    -- relinquish access
+  release(emptyspots);-- increase empty
+  -- consume VALUE
+end loop;</code></pre>
   </div>
 
   <details class="thinking-question">
@@ -799,8 +825,8 @@ end</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تمرير الرسائل هو نموذج عام يمكنه محاكاة كل من السيمافورات والشاشات. الفكرة المركزية هي أن تواصل المهام يشبه زيارة الطبيب: إما أن تنتظر أنت الطبيب، أو ينتظرك الطبيب، وعندما يكون كلاكما جاهزاً، تلتقيان <span class="smart-term" data-term-en="Rendezvous" data-ar="اللقاء (نقطة التلاقي)" data-en-def="The actual message transmission event when a sender task's message is accepted by a receiver task.">(Rendezvous)</span>.</p><p>في لغة Ada، تمتلك المهام مواصفات (spec) وجسم (body). تحتوي المواصفات على نقاط الدخول (entry points). يتم وصف نقاط الدخول في الجسم باستخدام جمل <code>accept</code>.</p></template>
-    <template class="content-en"><p>Message passing is a general model that can model both semaphores and monitors. The central idea is that task communication is like seeing a doctor: one waits for the other, and when both are ready, they get together, called a <strong><span class="smart-term" data-term-en="Rendezvous" data-ar="اللقاء (نقطة التلاقي)" data-en-def="The actual message transmission event when a sender task's message is accepted by a receiver task.">rendezvous</span></strong>.</p><p>In Ada, tasks have specifications (interfaces with entry points) and bodies. Entry points are described with <code>accept</code> clauses in the body.</p></template>
+    <template class="content-ar"><p>تمرير الرسائل هو نموذج عام يمكنه محاكاة كل من السيمافورات والشاشات. الفكرة المركزية هي أن تواصل المهام يشبه زيارة الطبيب: إما أن تنتظر أنت الطبيب، أو ينتظرك الطبيب، وعندما يكون كلاكما جاهزاً، تلتقيان <span class="smart-term" data-term-en="Rendezvous" data-ar="اللقاء (نقطة التلاقي)" data-en-def="The actual message transmission event when a sender task's message is accepted by a receiver task.">(Rendezvous)</span>.</p><p>في لغة Ada، تمتلك المهام مواصفات (spec) وجسم (body). تحتوي المواصفات على نقاط الدخول (entry points). يتم وصف نقاط الدخول في الجسم باستخدام جمل <code>accept</code>.</p><p>في لغة Ada، يمكن أن تحتوي المهام على نقاط دخول متعددة. للتعامل معها، يوضع كل <code>accept</code> داخل جملة <code>select</code> في حلقة، وهو ما يسمى <strong><span class="smart-term" data-term-en="Selective Wait" data-ar="الانتظار الانتقائي" data-en-def="A construct in Ada using a select clause that allows a task to wait for messages on multiple entry points simultaneously.">الانتظار الانتقائي<span class="smart-term-tooltip"></span></span> (Selective wait)</strong>. إذا كان هناك أكثر من طابور دخول يحتوي على رسائل، يتم اختيار واحد بشكل غير حتمي. الكود الذي يلي جملة <code>accept</code> وقبل الجملة التالية يسمى <strong><span class="smart-term" data-term-en="Extended Accept Clause" data-ar="جملة القبول الممتدة" data-en-def="Code in an Ada task body that follows an accept clause and executes concurrently with the calling task.">جملة القبول الممتدة<span class="smart-term-tooltip"></span></span> (Extended accept clause)</strong>، ويتم تنفيذه بالتزامن مع المهمة المستدعية.</p></template>
+    <template class="content-en"><p>Message passing is a general model that can model both semaphores and monitors. The central idea is that task communication is like seeing a doctor: one waits for the other, and when both are ready, they get together, called a <strong><span class="smart-term" data-term-en="Rendezvous" data-ar="اللقاء (نقطة التلاقي)" data-en-def="The actual message transmission event when a sender task's message is accepted by a receiver task.">rendezvous</span></strong>.</p><p>In Ada, tasks have specifications (interfaces with entry points) and bodies. Entry points are described with <code>accept</code> clauses in the body.</p><p>In Ada, tasks can have multiple entry points. To handle this, each <code>accept</code> clause is placed in a <code>select</code> clause within a loop, known as a <strong><span class="smart-term" data-term-en="Selective Wait" data-ar="الانتظار الانتقائي" data-en-def="A construct in Ada using a select clause that allows a task to wait for messages on multiple entry points simultaneously.">Selective wait<span class="smart-term-tooltip"></span></span></strong>. If more than one entry queue is nonempty, one is chosen nondeterministically. The code following the <code>accept</code> clause but before the next clause is called the <strong><span class="smart-term" data-term-en="Extended Accept Clause" data-ar="جملة القبول الممتدة" data-en-def="Code in an Ada task body that follows an accept clause and executes concurrently with the calling task.">Extended accept clause<span class="smart-term-tooltip"></span></span></strong>, and it is executed concurrently with the caller.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1179,8 +1205,8 @@ FORALL (index = 1:1000)
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في واحدة من أهم وحدات علوم الحاسب: التزامن (Concurrency). تخيلوا أنكم تديرون مطعماً مزدحماً؛ لا يمكن لطباخ واحد أن يفعل كل شيء بالتسلسل. نحتاج لعدة طباخين (معالجات متعددة أو خيوط) يعملون معاً. لكن ماذا لو حاول طباخان استخدام نفس السكين في نفس اللحظة؟ هنا تبرز الحاجة لـ 'مزامنة التنافس' (Competition Synchronization). وماذا لو كان طباخ ينتظر تقطيع الخضار ليبدأ الطبخ؟ هذه 'مزامنة التعاون' (Cooperation). في هذه الوحدة، درسنا كيف تطورت لغات البرمجة لحل هذه المشاكل. بدأنا بالسيمافورات (Semaphores) وهي قوية لكنها خطيرة إذا نسينا إغلاقها أو فتحها. ثم انتقلنا للشاشات (Monitors) التي توفر حماية تلقائية، وصولاً إلى تمرير الرسائل (Message Passing) في لغة Ada والذي يشبه تحديد موعد للقاء (Rendezvous). أخيراً، رأينا كيف تطبق Java و C# هذه المفاهيم عملياً باستخدام خيوط المعالجة (Threads) والكلمات المفتاحية مثل synchronized و lock. ركزوا جيداً على الفرق بين التعاون والتنافس، وكيفية عمل السيمافورات، فهذه المفاهيم هي قلب أنظمة التشغيل والبرمجة الحديثة. بالتوفيق في الامتحان!</template>
-    <template class="content-en">Welcome, future engineers, to one of the most critical modules in Computer Science: Concurrency. Imagine running a busy restaurant; one chef doing everything sequentially is too slow. We need multiple chefs (multiple processors or threads) working together. But what if two chefs try to use the exact same knife at the exact same time? That's where 'Competition Synchronization' comes in. And what if a chef is waiting for vegetables to be chopped before cooking? That's 'Cooperation Synchronization'. In this module, we explored how programming languages evolved to solve these issues. We started with Semaphores—powerful but dangerous if you forget a wait or release. Then we looked at Monitors, which provide automatic mutual exclusion, and Message Passing in Ada, which relies on the elegant concept of a Rendezvous. Finally, we saw practical implementations in Java and C# using Threads, 'synchronized', and 'lock'. For the exam, focus heavily on the difference between cooperation and competition, and understand exactly how semaphores and monitors prevent race conditions. These concepts are the beating heart of modern OS and software design. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في واحدة من أهم وحدات علوم الحاسب: التزامن (Concurrency). تخيلوا أنكم تديرون مطعماً مزدحماً؛ لا يمكن لطباخ واحد أن يفعل كل شيء بالتسلسل. نحتاج لعدة طباخين (معالجات متعددة أو خيوط) يعملون معاً. لكن ماذا لو حاول طباخان استخدام نفس السكين في نفس اللحظة؟ هنا تبرز الحاجة لـ 'مزامنة التنافس' (Competition Synchronization). وماذا لو كان طباخ ينتظر تقطيع الخضار ليبدأ الطبخ؟ هذه 'مزامنة التعاون' (Cooperation). في هذه الوحدة، درسنا كيف تطورت لغات البرمجة لحل هذه المشاكل. بدأنا بالسيمافورات (Semaphores) وهي قوية لكنها خطيرة إذا نسينا إغلاقها أو فتحها. ثم انتقلنا للشاشات (Monitors) التي توفر حماية تلقائية، وصولاً إلى تمرير الرسائل (Message Passing) في لغة Ada والذي يشبه تحديد موعد للقاء (Rendezvous). أخيراً، رأينا كيف تطبق Java و C# هذه المفاهيم عملياً باستخدام خيوط المعالجة (Threads) والكلمات المفتاحية مثل synchronized و lock. ركزوا جيداً على الفرق بين التعاون والتنافس، وكيفية عمل السيمافورات، فهذه المفاهيم هي قلب أنظمة التشغيل والبرمجة الحديثة. بالتوفيق في الامتحان!<p>لقد أضفنا تفاصيل حاسمة حول قضايا تصميم التزامن وتطور لغة Ada في إصدار 95. فهم كيفية دمج الكائنات المحمية (Protected Objects) يوضح لك كيف تسعى لغات البرمجة دائماً لتقليل العبء (Overhead) مع الحفاظ على الأمان. انتبه جيداً لمثال المنتج والمستهلك باستخدام السيمافورات، فهو سؤال كلاسيكي في الامتحانات يختبر فهمك العميق للفرق بين التعاون والتنافس.</p></template>
+    <template class="content-en">Welcome, future engineers, to one of the most critical modules in Computer Science: Concurrency. Imagine running a busy restaurant; one chef doing everything sequentially is too slow. We need multiple chefs (multiple processors or threads) working together. But what if two chefs try to use the exact same knife at the exact same time? That's where 'Competition Synchronization' comes in. And what if a chef is waiting for vegetables to be chopped before cooking? That's 'Cooperation Synchronization'. In this module, we explored how programming languages evolved to solve these issues. We started with Semaphores—powerful but dangerous if you forget a wait or release. Then we looked at Monitors, which provide automatic mutual exclusion, and Message Passing in Ada, which relies on the elegant concept of a Rendezvous. Finally, we saw practical implementations in Java and C# using Threads, 'synchronized', and 'lock'. For the exam, focus heavily on the difference between cooperation and competition, and understand exactly how semaphores and monitors prevent race conditions. These concepts are the beating heart of modern OS and software design. Good luck!<p>We've added crucial details on concurrency design issues and the evolution of Ada in its 95 revision. Understanding Protected Objects shows how languages strive to reduce overhead while maintaining safety. Pay close attention to the Producer-Consumer semaphore example; it's a classic exam question that tests your deep understanding of the difference between cooperation and competition.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1354,6 +1380,41 @@ FORALL (index = 1:1000)
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">هو توجيه المترجم (Compiler) لتنفيذ جمل برمجية معينة في نفس الوقت على معالجات متعددة. مثال على ذلك جملة FORALL في High-Performance Fortran، والتي تسمح بتقييم مئات العمليات الحسابية المستقلة في مصفوفة بالتوازي التام.</template>
           <template class="content-en">It involves instructing the compiler to execute specific statements simultaneously across multiple processors. An example is the FORALL statement in High-Performance Fortran, which allows hundreds of independent array calculations to be evaluated in massive parallel.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر مشكلة 'المنتج والمستهلك' المثال الكلاسيكي لشرح التزامن؟</template>
+          <template class="content-en">Why is the 'Producer-Consumer' problem considered the classic example for explaining concurrency?</template>
+          <span class="content-target">لماذا تعتبر مشكلة 'المنتج والمستهلك' المثال الكلاسيكي لشرح التزامن؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها تجسد بوضوح الحاجة إلى كلا نوعي المزامنة معاً. نحتاج إلى 'مزامنة التعاون' لضمان عدم محاولة المستهلك القراءة من ذاكرة فارغة وعدم محاولة المنتج الكتابة في ذاكرة ممتلئة. وفي نفس الوقت، نحتاج إلى 'مزامنة التنافس' لضمان عدم قيام المنتج والمستهلك بتعديل مؤشرات الذاكرة المؤقتة في نفس اللحظة، مما قد يفسد البيانات.</p></template>
+          <template class="content-en"><p>Because it clearly embodies the need for both types of synchronization together. We need 'cooperation synchronization' to ensure the consumer doesn't read from an empty buffer and the producer doesn't write to a full one. Simultaneously, we need 'competition synchronization' to ensure the producer and consumer don't modify the buffer pointers at the exact same moment, which could corrupt the data.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف حسنت لغة Ada 95 من أداء البرامج المتزامنة مقارنة بـ Ada 83؟</template>
+          <template class="content-en">How did Ada 95 improve the performance of concurrent programs compared to Ada 83?</template>
+          <span class="content-target">كيف حسنت لغة Ada 95 من أداء البرامج المتزامنة مقارنة بـ Ada 83؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>في Ada 83، كانت الطريقة الوحيدة لحماية البيانات المشتركة هي وضعها داخل مهمة واستخدام تمرير الرسائل (Rendezvous)، وهو أمر مكلف من حيث الأداء (يتطلب تبديل السياق وتعليق المهام). جاءت Ada 95 بـ 'الكائنات المحمية' (Protected Objects) التي تعمل كشاشات (Monitors) سريعة وفعالة، مما سمح بحماية البيانات المشتركة بعبء (overhead) أقل بكثير.</p></template>
+          <template class="content-en"><p>In Ada 83, the only way to protect shared data was to encapsulate it in a task and use message passing (Rendezvous), which is performance-heavy (requires context switching and task suspension). Ada 95 introduced 'Protected Objects' that act as fast, efficient monitors, allowing shared data protection with significantly less overhead.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1660,7 +1721,7 @@ FORALL (index = 1:1000)
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1676,7 +1737,7 @@ FORALL (index = 1:1000)
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2001,6 +2062,38 @@ FORALL (index = 1:1000)
     },
     "difficulty": "hard",
     "conceptId": "message-passing"
+  },
+  {
+    "conceptId": "java-threads",
+    "question": {
+      "ar": "في جافا، ما هي الأولوية الافتراضية لخيط جديد تم إنشاؤه بواسطة الدالة main؟",
+      "en": "In Java, what is the default priority of a new thread created by the main method?"
+    },
+    "options": {
+      "ar": [
+        "MAX_PRIORITY",
+        "MIN_PRIORITY",
+        "NORM_PRIORITY",
+        "أولوية عشوائية يحددها نظام التشغيل."
+      ],
+      "en": [
+        "MAX_PRIORITY",
+        "MIN_PRIORITY",
+        "NORM_PRIORITY",
+        "A random priority determined by the OS."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الخيط الجديد يرث أولوية الخيط الذي أنشأه. بما أن خيط main له الأولوية NORM_PRIORITY، فإن الخيوط المنشأة منه تأخذ نفس الأولوية افتراضياً.",
+      "en": "A new thread inherits the priority of the thread that created it. Since the main thread has NORM_PRIORITY, threads created from it default to the same."
+    },
+    "hint": {
+      "ar": "إنها الأولوية 'الطبيعية' أو 'العادية'.",
+      "en": "It is the 'normal' priority."
+    },
+    "difficulty": "easy",
+    "id": 11
   }
 ]
 </script>

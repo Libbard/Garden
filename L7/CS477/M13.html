@@ -390,8 +390,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لا يتحكم نظام التشغيل في التنظيم الداخلي للكومة، بل تديره المكتبة القياسية. عندما يطلب المستخدم ذاكرة، تبحث <code>malloc()</code> عن كتلة فارغة مناسبة. إذا كانت الكتلة كبيرة جداً، يتم تقسيمها.</p><p>إذا نفدت مساحة الكومة، يجب على البرنامج طلب المزيد من نظام التشغيل باستخدام استدعاء النظام <code>brk</code> في أنظمة Unix، والذي يوسع الكومة إلى عنوان جديد.</p><p>عند استدعاء <code>free()</code>، يتم تمييز الكتلة كـ 'فارغة' ودمجها مع الكتل المجاورة إذا كانت فارغة أيضاً.</p></template>
-    <template class="content-en"><p>The OS does not control the internal organization of the heap; it is managed by the standard library. When memory is requested, <code>malloc()</code> finds a suitable free chunk. If it's too large, it splits it.</p><p>If the heap is exhausted, the program must request more from the OS using the <code>brk</code> system call (on Unix), which extends the heap segment.</p><p>When <code>free()</code> is called, the chunk is marked as FREE and merged with adjacent free nodes.</p></template>
+    <template class="content-ar"><p>لا يتحكم نظام التشغيل في التنظيم الداخلي للكومة، بل تديره المكتبة القياسية. عندما يطلب المستخدم ذاكرة، تبحث <code>malloc()</code> عن كتلة فارغة مناسبة. إذا كانت الكتلة كبيرة جداً، يتم تقسيمها.</p><p>إذا نفدت مساحة الكومة، يجب على البرنامج طلب المزيد من نظام التشغيل باستخدام استدعاء النظام <code>brk</code> في أنظمة Unix، والذي يوسع الكومة إلى عنوان جديد.</p><p>عند استدعاء <code>free()</code>، يتم تمييز الكتلة كـ 'فارغة' ودمجها مع الكتل المجاورة إذا كانت فارغة أيضاً.</p><p>داخلياً، تُدار الكومة ك<span class="smart-term" data-term-en="Linked List" data-ar="قائمة مرتبطة" data-en-def="A linear data structure where each element points to the next, used internally to manage free and used heap chunks.">قائمة مرتبطة<span class="smart-term-tooltip"></span></span> (Linked List) من كتل الذاكرة. تحتوي كل كتلة على <b>ترويسة (Header)</b> تسجل حالتها (مستخدمة USED أو فارغة FREE) وحجمها، بالإضافة إلى مؤشرات للكتلة السابقة والتالية. على سبيل المثال، إذا طلب المستخدم <code>malloc(100)</code> ووجدت الدالة كتلة فارغة بحجم 1000 بايت، فإنها تقسمها بكتابة ترويسة جديدة بعد 100 بايت، لإنشاء كتلة مستخدمة (100 بايت) وكتلة فارغة متبقية (900 بايت). تُرجع <code>malloc</code> عنوان البيانات للمستخدم، وليس عقدة القائمة المرتبطة نفسها.</p></template>
+    <template class="content-en"><p>The OS does not control the internal organization of the heap; it is managed by the standard library. When memory is requested, <code>malloc()</code> finds a suitable free chunk. If it's too large, it splits it.</p><p>If the heap is exhausted, the program must request more from the OS using the <code>brk</code> system call (on Unix), which extends the heap segment.</p><p>When <code>free()</code> is called, the chunk is marked as FREE and merged with adjacent free nodes.</p><p>Internally, the heap is managed as a <span class="smart-term" data-term-en="Linked List" data-ar="قائمة مرتبطة" data-en-def="A linear data structure where each element points to the next, used internally to manage free and used heap chunks.">linked list<span class="smart-term-tooltip"></span></span> of memory chunks. Each chunk has a <b>header</b> recording its state (USED or FREE) and size, along with pointers to the previous and next chunks. For example, if a user calls <code>malloc(100)</code> and the allocator finds a 1000-byte FREE chunk, it splits it by writing a new header after 100 bytes, creating a 100-byte USED chunk and a 900-byte FREE remainder. <code>malloc</code> returns the address of the data element to the user, not the linked list node itself.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -869,8 +869,8 @@ CALL f</code></pre>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. تخيلوا أن ذاكرة الحاسوب هي مدينة كبيرة، والتقسيم المنطقي هو تخطيط هذه المدينة. لدينا حي 'الكود' الصارم الذي لا يُسمح بتعديله، وحي 'البيانات' للمتغيرات العالمية. لكن الأكشن الحقيقي يحدث في 'الكومة' (Heap) و'المكدس' (Stack). الكومة هي المنطقة العشوائية التي نطلب فيها مساحات ديناميكية عبر malloc، وهنا تكمن مشكلة 'التجزئة' (Fragmentation) التي لا يمكننا حلها في لغة C لأننا لا نستطيع نقل المباني (البيانات) بعد بنائها! أما المكدس، فهو منظم جداً وينمو لأسفل، ويستخدم 'صفحة حماية' (Guard Page) كجرس إنذار قبل أن يصطدم بالكومة. للامتحان، ركزوا جيداً على اتجاهات نمو الذاكرة، والفرق بين استراتيجيات تخصيص الكومة (Best Fit مقابل First Fit)، وكيف يحدد المترجم مواقع البيانات (مطلقة للعالمية، ونسبية للمحلية). ولا تنسوا تنسيق ELF الحديث الذي جعل تحميل البرامج أكثر مرونة. بالتوفيق!</template>
-    <template class="content-en">Welcome, my friends, to this crucial module. Imagine computer memory as a large city, and logical segmentation is its zoning plan. We have the strict 'Code' district that cannot be modified, and the 'Data' district for global variables. But the real action happens in the Heap and Stack. The Heap is the dynamic area where we request space via malloc, and this is where 'Fragmentation' occurs—a problem we can't fix in C because we can't move buildings (data) once they're built! The Stack, on the other hand, is highly organized, grows downwards, and uses a 'Guard Page' as an alarm before it crashes into the Heap. For the exam, focus heavily on memory growth directions, the differences between heap allocation strategies (Best Fit vs. First Fit), and how the compiler locates data (absolute for global, relative for local). Don't forget the modern ELF format that made program loading so flexible. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة. تخيلوا أن ذاكرة الحاسوب هي مدينة كبيرة، والتقسيم المنطقي هو تخطيط هذه المدينة. لدينا حي 'الكود' الصارم الذي لا يُسمح بتعديله، وحي 'البيانات' للمتغيرات العالمية. لكن الأكشن الحقيقي يحدث في 'الكومة' (Heap) و'المكدس' (Stack). الكومة هي المنطقة العشوائية التي نطلب فيها مساحات ديناميكية عبر malloc، وهنا تكمن مشكلة 'التجزئة' (Fragmentation) التي لا يمكننا حلها في لغة C لأننا لا نستطيع نقل المباني (البيانات) بعد بنائها! أما المكدس، فهو منظم جداً وينمو لأسفل، ويستخدم 'صفحة حماية' (Guard Page) كجرس إنذار قبل أن يصطدم بالكومة. للامتحان، ركزوا جيداً على اتجاهات نمو الذاكرة، والفرق بين استراتيجيات تخصيص الكومة (Best Fit مقابل First Fit)، وكيف يحدد المترجم مواقع البيانات (مطلقة للعالمية، ونسبية للمحلية). ولا تنسوا تنسيق ELF الحديث الذي جعل تحميل البرامج أكثر مرونة. بالتوفيق!<p>إن فهم نموذج الذاكرة المسطح التاريخي يوضح لنا *السبب* الحقيقي وراء حاجتنا للتقسيم المنطقي اليوم. علاوة على ذلك، فإن إلقاء نظرة تحت الغطاء على هيكل القائمة المرتبطة للكومة يزيل الغموض عن كيفية عمل <code>malloc</code> و <code>free</code> فعلياً، مما يسد الفجوة بين مفاهيم الذاكرة المجردة والتنفيذ الفعلي في مكتبات لغة C.</p></template>
+    <template class="content-en">Welcome, my friends, to this crucial module. Imagine computer memory as a large city, and logical segmentation is its zoning plan. We have the strict 'Code' district that cannot be modified, and the 'Data' district for global variables. But the real action happens in the Heap and Stack. The Heap is the dynamic area where we request space via malloc, and this is where 'Fragmentation' occurs—a problem we can't fix in C because we can't move buildings (data) once they're built! The Stack, on the other hand, is highly organized, grows downwards, and uses a 'Guard Page' as an alarm before it crashes into the Heap. For the exam, focus heavily on memory growth directions, the differences between heap allocation strategies (Best Fit vs. First Fit), and how the compiler locates data (absolute for global, relative for local). Don't forget the modern ELF format that made program loading so flexible. Good luck!<p>Understanding the historical flat memory model highlights exactly *why* we need logical segmentation today. Furthermore, peering under the hood of the heap to see its linked-list structure demystifies how <code>malloc</code> and <code>free</code> actually operate, bridging the gap between abstract memory concepts and concrete C library implementations.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1044,6 +1044,41 @@ CALL f</code></pre>
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">ELF قابل للتوسيع (Extensible)، يدعم عدداً غير محدود من الأقسام، ويسهل التعامل مع المكتبات المشتركة الديناميكية وبيانات تصحيح الأخطاء المعقدة.</template>
           <template class="content-en">ELF is extensible, supports an arbitrary number of sections, and easily handles dynamic shared libraries and complex debugging data.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تعرف دالة <code>free()</code> حجم الذاكرة التي يجب تحريرها رغم أننا نمرر لها مؤشراً فقط؟</template>
+          <template class="content-en">How does the <code>free()</code> function know the size of the memory to deallocate even though we only pass it a pointer?</template>
+          <span class="content-target">كيف تعرف دالة <code>free()</code> حجم الذاكرة التي يجب تحريرها رغم أننا نمرر لها مؤشراً فقط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>المؤشر الذي نمرره لـ <code>free()</code> يشير إلى بداية البيانات. تقوم الدالة بالنظر إلى الذاكرة التي تسبق هذا المؤشر مباشرة (بمقدار حجم الترويسة) لقراءة 'ترويسة الكتلة' (Chunk Header)، والتي تحتوي على الحجم الدقيق للكتلة وحالتها.</p></template>
+          <template class="content-en"><p>The pointer passed to <code>free()</code> points to the start of the data. The function looks at the memory immediately preceding this pointer (by the size of the header) to read the 'Chunk Header', which contains the exact size and state of the chunk.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يُعتبر نموذج الذاكرة المسطح (Flat Memory Model) كابوساً أمنياً في أنظمة التشغيل الحديثة؟</template>
+          <template class="content-en">Why is the Flat Memory Model considered a security nightmare in modern operating systems?</template>
+          <span class="content-target">لماذا يُعتبر نموذج الذاكرة المسطح (Flat Memory Model) كابوساً أمنياً في أنظمة التشغيل الحديثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنه لا يفرض أي قيود على الوصول. يمكن لبرنامج خبيث أن يكتب بيانات (مثل كود ضار) في مساحة الذاكرة، ثم يوجه المعالج لتنفيذ تلك البيانات كأنها كود شرعي، وهو ما يُعرف بهجمات حقن الكود. التقسيم المنطقي يمنع ذلك بجعل قسم البيانات غير قابل للتنفيذ.</p></template>
+          <template class="content-en"><p>Because it enforces no access restrictions. A malicious program could write data (like a malicious payload) into memory, then direct the CPU to execute that data as legitimate code (code injection attacks). Logical segmentation prevents this by making the data section non-executable.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1396,6 +1431,23 @@ CALL f</code></pre>
         "en": "The current standard in Linux systems."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ترويسة الكتلة (Chunk Header)",
+      "en": "Chunk Header"
+    },
+    "back": {
+      "definition": {
+        "ar": "بيانات وصفية تُخزن في بداية كل كتلة في الكومة، تحتوي على حالة الكتلة (مستخدمة/فارغة) وحجمها ومؤشرات القائمة.",
+        "en": "Metadata stored at the beginning of each heap chunk, containing its state (USED/FREE), size, and list pointers."
+      },
+      "example": {
+        "ar": "تُقرأ بواسطة <code>free()</code> لمعرفة حجم الكتلة التي يجب تحريرها.",
+        "en": "Read by <code>free()</code> to know the size of the chunk that needs to be deallocated."
+      }
+    },
+    "id": 21
   }
 ]
 </script>
@@ -1405,7 +1457,7 @@ CALL f</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1421,7 +1473,7 @@ CALL f</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1746,6 +1798,38 @@ CALL f</code></pre>
     },
     "difficulty": "hard",
     "conceptId": "heap-management"
+  },
+  {
+    "conceptId": "heap-management",
+    "question": {
+      "ar": "عندما تقوم دالة <code>malloc</code> بتقسيم كتلة ذاكرة كبيرة لتلبية طلب أصغر، ماذا تُرجع للمستخدم؟",
+      "en": "When <code>malloc</code> splits a large memory chunk to satisfy a smaller request, what does it return to the user?"
+    },
+    "options": {
+      "ar": [
+        "عنوان ترويسة الكتلة (Header) الجديدة",
+        "عنوان عقدة القائمة المرتبطة (Linked List Node)",
+        "عنوان عنصر البيانات الفعلي داخل الكتلة",
+        "حجم الكتلة المتبقية"
+      ],
+      "en": [
+        "The address of the new chunk header",
+        "The address of the linked list node",
+        "The address of the actual data element within the chunk",
+        "The size of the remaining chunk"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تُرجع <code>malloc</code> عنوان البيانات الفعلي لكي يتمكن المستخدم من استخدامه مباشرة، وتُخفي تفاصيل التنفيذ (مثل الترويسة والقائمة المرتبطة) عن المبرمج.",
+      "en": "<code>malloc</code> returns the actual data address so the user can access it directly, hiding the implementation details (like the header and linked list) from the programmer."
+    },
+    "hint": {
+      "ar": "المبرمج لا يحتاج (ولا يجب) أن يتلاعب بالبيانات الوصفية للكومة.",
+      "en": "The programmer does not need (and should not) manipulate the heap's metadata."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -1790,6 +1874,14 @@ CALL f</code></pre>
       <template class="content-ar">اصطلاحات الاستدعاء (Calling Conventions) هي العقد الذي يضمن أن الكود المكتوب بلغات مختلفة أو المترجم بمترجمات مختلفة يمكنه العمل معاً بسلاسة من خلال الاتفاق على مكان وضع المعاملات (المكدس أم السجلات).</template>
       <template class="content-en">Calling Conventions are the contract that ensures code written in different languages or compiled by different compilers can interoperate seamlessly by agreeing on where to place arguments (stack vs. registers).</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من الاعتقاد بأن <code>malloc</code> تُرجع عنوان ترويسة الكتلة (Header). هي تُرجع عنوان بداية منطقة البيانات الفعلية داخل الكتلة، بحيث لا يحتاج المبرمج لمعرفة تفاصيل التنفيذ الداخلي للقائمة المرتبطة.</template>
+    <template class="content-en">Beware of thinking that <code>malloc</code> returns the address of the chunk header. It returns the starting address of the actual data area within the chunk, so the programmer doesn't need to know the internal linked list implementation details.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

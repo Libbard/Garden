@@ -95,6 +95,11 @@
         <template class="content-en">TCP Flow and Error Control</template>
         <span class="content-target">التحكم في التدفق والأخطاء في TCP</span>
       </a>
+      <a href="#tcp-ack-rules-scenarios" class="toc-link" data-bilingual>
+        <template class="content-ar">قواعد وسيناريوهات الإقرار في TCP</template>
+        <template class="content-en">TCP Acknowledgment Rules and Scenarios</template>
+        <span class="content-target">قواعد وسيناريوهات الإقرار في TCP</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -205,8 +210,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>بروتوكول UDP هو بروتوكول نقل <span class="smart-term" data-term-en="Connectionless" data-ar="غير متصل" data-en-def="A communication method where data is sent without establishing a dedicated end-to-end connection first.">غير متصل (Connectionless)<span class="smart-term-tooltip"></span></span> وغير موثوق (Unreliable). غير موثوق تعني أن البيانات قد تصل خارج الترتيب، أو بها أخطاء، أو قد تُفقد أو تتكرر.</p><p>يمتلك ترويسة ثابتة بحجم 8 بايت تتكون من أربعة حقول (2 بايت لكل منها):</p><ul><li>رقم منفذ المصدر،</li><li>رقم منفذ الوجهة،</li><li>الطول الإجمالي،</li><li>والمجموع الاختباري (Checksum).</li></ul><p>يُفضل استخدامه عندما يكون حجم الرسالة صغيراً (مثل استعلامات DNS) أو في التطبيقات التفاعلية في الوقت الفعلي (مثل Skype) حيث يكون التأخير أسوأ من فقدان بعض البيانات.</p></template>
-    <template class="content-en"><p>UDP is a <span class="smart-term" data-term-en="Connectionless" data-ar="غير متصل" data-en-def="A communication method where data is sent without establishing a dedicated end-to-end connection first.">connectionless<span class="smart-term-tooltip"></span></span>, unreliable transport protocol. Unreliable means packets may arrive out of order, with errors, lost, or duplicated.</p><p>It has a fixed-size 8-byte header made of four 2-byte fields:</p><ul><li>Source port,</li><li>Destination port,</li><li>Total length,</li><li>and Checksum.</li></ul><p>It is preferred for small messages (like DNS queries) or real-time interactive applications (like Skype) where delay is worse than minor data loss.</p></template>
+    <template class="content-ar"><p>بروتوكول UDP هو بروتوكول نقل <span class="smart-term" data-term-en="Connectionless" data-ar="غير متصل" data-en-def="A communication method where data is sent without establishing a dedicated end-to-end connection first.">غير متصل (Connectionless)<span class="smart-term-tooltip"></span></span> وغير موثوق (Unreliable). غير موثوق تعني أن البيانات قد تصل خارج الترتيب، أو بها أخطاء، أو قد تُفقد أو تتكرر.</p><p>يمتلك ترويسة ثابتة بحجم 8 بايت تتكون من أربعة حقول (2 بايت لكل منها):</p><ul><li>رقم منفذ المصدر،</li><li>رقم منفذ الوجهة،</li><li>الطول الإجمالي،</li><li>والمجموع الاختباري (Checksum).</li></ul><p>يُفضل استخدامه عندما يكون حجم الرسالة صغيراً (مثل استعلامات DNS) أو في التطبيقات التفاعلية في الوقت الفعلي (مثل Skype) حيث يكون التأخير أسوأ من فقدان بعض البيانات.</p><p>مثال عملي: إذا كانت ترويسة UDP بالنظام السداسي العشري هي <code>CB84000D001C001C</code>، يمكننا استخراج المعلومات التالية:</p><ol><li><b>منفذ المصدر:</b> أول 4 أرقام <code>CB84</code> (تساوي 52100 بالنظام العشري).</li><li><b>منفذ الوجهة:</b> الأرقام الأربعة التالية <code>000D</code> (تساوي 13، وهو منفذ خدمة Daytime).</li><li><b>الطول الإجمالي:</b> <code>001C</code> (تساوي 28 بايت).</li><li><b>طول البيانات:</b> 28 - 8 (حجم الترويسة) = 20 بايت.</li></ol><p>بما أن منفذ الوجهة هو 13 (منفذ معروف)، فإن هذه الحزمة متجهة من عميل إلى خادم.</p></template>
+    <template class="content-en"><p>UDP is a <span class="smart-term" data-term-en="Connectionless" data-ar="غير متصل" data-en-def="A communication method where data is sent without establishing a dedicated end-to-end connection first.">connectionless<span class="smart-term-tooltip"></span></span>, unreliable transport protocol. Unreliable means packets may arrive out of order, with errors, lost, or duplicated.</p><p>It has a fixed-size 8-byte header made of four 2-byte fields:</p><ul><li>Source port,</li><li>Destination port,</li><li>Total length,</li><li>and Checksum.</li></ul><p>It is preferred for small messages (like DNS queries) or real-time interactive applications (like Skype) where delay is worse than minor data loss.</p><p>Worked Example: If a UDP header in hexadecimal is <code>CB84000D001C001C</code>, we can extract the following:</p><ol><li><b>Source Port:</b> First 4 digits <code>CB84</code> (52100 in decimal).</li><li><b>Destination Port:</b> Next 4 digits <code>000D</code> (13, the Daytime service port).</li><li><b>Total Length:</b> <code>001C</code> (28 bytes).</li><li><b>Data Length:</b> 28 - 8 (header size) = 20 bytes.</li></ol><p>Since the destination port is 13 (a well-known port), this packet is directed from a client to a server.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -436,8 +441,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>بروتوكول TCP هو بروتوكول موثوق (Reliable) وموجه للاتصال (Connection-oriented).</p><p>يحدد ثلاث مراحل:</p><ul><li>تأسيس الاتصال،</li><li>نقل البيانات،</li><li>وإنهاء الاتصال.</li></ul><p>يقدم خدمة <span class="smart-term" data-term-en="Stream Delivery" data-ar="التوصيل التدفقي" data-en-def="A service provided by TCP where data is treated as a continuous stream of bytes rather than discrete messages.">توصيل تدفقي (Stream Delivery)<span class="smart-term-tooltip"></span></span> حيث تبدو العمليتان متصلتين بأنبوب خيالي ينقل البايتات. يقوم TCP بتجميع البايتات في حزم تسمى (Segments).</p><p>يضمن TCP وصول البيانات بالترتيب، وبدون أخطاء، وبدون فقدان أو تكرار من خلال آليات التحكم في التدفق والتحكم في الأخطاء.</p></template>
-    <template class="content-en"><p>TCP is a reliable, connection-oriented protocol.</p><p>It defines three phases:</p><ul><li>Connection establishment,</li><li>Data transfer,</li><li>and Connection teardown.</li></ul><p>It offers a <span class="smart-term" data-term-en="Stream Delivery" data-ar="التوصيل التدفقي" data-en-def="A service provided by TCP where data is treated as a continuous stream of bytes rather than discrete messages.">Stream Delivery<span class="smart-term-tooltip"></span></span> service where two processes seem connected by an imaginary tube carrying bytes. TCP groups bytes into packets called <span class="smart-term" data-term-en="Segment" data-ar="مقطع" data-en-def="The unit of data transfer in TCP, consisting of a header and a data payload.">Segments<span class="smart-term-tooltip"></span></span>.</p><p>It ensures data arrives in order, without error, loss, or duplication through flow control and error control mechanisms.</p></template>
+    <template class="content-ar"><p>بروتوكول TCP هو بروتوكول موثوق (Reliable) وموجه للاتصال (Connection-oriented).</p><p>يحدد ثلاث مراحل:</p><ul><li>تأسيس الاتصال،</li><li>نقل البيانات،</li><li>وإنهاء الاتصال.</li></ul><p>يقدم خدمة <span class="smart-term" data-term-en="Stream Delivery" data-ar="التوصيل التدفقي" data-en-def="A service provided by TCP where data is treated as a continuous stream of bytes rather than discrete messages.">توصيل تدفقي (Stream Delivery)<span class="smart-term-tooltip"></span></span> حيث تبدو العمليتان متصلتين بأنبوب خيالي ينقل البايتات. يقوم TCP بتجميع البايتات في حزم تسمى (Segments).</p><p>يضمن TCP وصول البيانات بالترتيب، وبدون أخطاء، وبدون فقدان أو تكرار من خلال آليات التحكم في التدفق والتحكم في الأخطاء.</p><p>مثال على حساب أرقام التسلسل: لنفترض أن اتصال TCP ينقل ملفاً بحجم 5000 بايت، ورقم البايت الأول هو 10,001. إذا تم إرسال البيانات في 5 مقاطع، كل منها يحمل 1000 بايت، ستكون أرقام التسلسل كالتالي:</p><ol><li><b>المقطع الأول:</b> رقم التسلسل 10,001 (يغطي البايتات من 10,001 إلى 11,000).</li><li><b>المقطع الثاني:</b> رقم التسلسل 11,001 (يغطي من 11,001 إلى 12,000).</li><li><b>المقطع الثالث:</b> رقم التسلسل 12,001 (يغطي من 12,001 إلى 13,000).</li><li><b>المقطع الرابع:</b> رقم التسلسل 13,001 (يغطي من 13,001 إلى 14,000).</li><li><b>المقطع الخامس:</b> رقم التسلسل 14,001 (يغطي من 14,001 إلى 15,000).</li></ol><p>تذكر أن رقم التسلسل يمثل دائماً رقم البايت الأول في المقطع.</p></template>
+    <template class="content-en"><p>TCP is a reliable, connection-oriented protocol.</p><p>It defines three phases:</p><ul><li>Connection establishment,</li><li>Data transfer,</li><li>and Connection teardown.</li></ul><p>It offers a <span class="smart-term" data-term-en="Stream Delivery" data-ar="التوصيل التدفقي" data-en-def="A service provided by TCP where data is treated as a continuous stream of bytes rather than discrete messages.">Stream Delivery<span class="smart-term-tooltip"></span></span> service where two processes seem connected by an imaginary tube carrying bytes. TCP groups bytes into packets called <span class="smart-term" data-term-en="Segment" data-ar="مقطع" data-en-def="The unit of data transfer in TCP, consisting of a header and a data payload.">Segments<span class="smart-term-tooltip"></span></span>.</p><p>It ensures data arrives in order, without error, loss, or duplication through flow control and error control mechanisms.</p><p>Sequence Number Calculation Example: Suppose a TCP connection transfers a 5,000-byte file, and the first byte is numbered 10,001. If data is sent in 5 segments, each carrying 1,000 bytes, the sequence numbers are:</p><ol><li><b>Segment 1:</b> Sequence Number 10,001 (covers bytes 10,001 to 11,000).</li><li><b>Segment 2:</b> Sequence Number 11,001 (covers 11,001 to 12,000).</li><li><b>Segment 3:</b> Sequence Number 12,001 (covers 12,001 to 13,000).</li><li><b>Segment 4:</b> Sequence Number 13,001 (covers 13,001 to 14,000).</li><li><b>Segment 5:</b> Sequence Number 14,001 (covers 14,001 to 15,000).</li></ol><p>Remember, the sequence number always represents the first byte in the segment.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -885,14 +890,57 @@
   </details>
 </section>
 
+<section id="tcp-ack-rules-scenarios" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> قواعد وسيناريوهات الإقرار في TCP</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> TCP Acknowledgment Rules and Scenarios</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مجموعة من القواعد التي تحكم متى وكيف يرسل المستقبل إقرارات (ACKs) للتعامل مع الحالات الطبيعية وفقدان البيانات.</p></template>
+    <template class="content-en"><p>A set of rules governing when and how the receiver sends ACKs to handle normal operations and data loss.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في التشغيل الطبيعي، يتبع TCP قواعد محددة لتحسين كفاءة الشبكة:</p><ol><li><b><span class="smart-term" data-term-en="Delayed ACK" data-ar="تأخير الإقرار" data-en-def="Waiting for a short period (up to 500ms) before sending an ACK, hoping to acknowledge multiple segments at once.">تأخير الإقرار<span class="smart-term-tooltip"></span></span> (Delayed ACK):</b> يؤخر المستقبل إرسال الإقرار (حتى 500 مللي ثانية) إذا كان هناك مقطع واحد فقط غير مقر به، على أمل وصول مقطع آخر لدمج الإقرارات.</li><li><b>الحد الأقصى للمقاطع غير المقرة:</b> يجب ألا يكون هناك أكثر من مقطعين متتاليين غير مقر بهما في أي وقت؛ حيث يجب إرسال إقرار فور وصول المقطع الثاني.</li><li><b><span class="smart-term" data-term-en="Piggybacking" data-ar="التضمين" data-en-def="Including an acknowledgment (ACK) inside a data segment heading in the same direction to save bandwidth.">التضمين<span class="smart-term-tooltip"></span></span> (Piggybacking):</b> إذا كان المستقبل لديه بيانات لإرسالها، فإنه يضمن الإقرار (ACK) داخل مقطع البيانات المتجه للمرسل.</li></ol></template>
+    <template class="content-en"><p>In normal operation, TCP follows specific rules to optimize network efficiency:</p><ol><li><b><span class="smart-term" data-term-en="Delayed ACK" data-ar="تأخير الإقرار" data-en-def="Waiting for a short period (up to 500ms) before sending an ACK, hoping to acknowledge multiple segments at once.">Delayed ACK<span class="smart-term-tooltip"></span></span>:</b> The receiver delays sending an ACK (up to 500 ms) if there is only one outstanding in-order segment, hoping another arrives to combine ACKs.</li><li><b>Max unacknowledged segments:</b> There shouldn't be more than two in-order unacknowledged segments at any time; an ACK must be sent immediately upon the second segment's arrival.</li><li><b><span class="smart-term" data-term-en="Piggybacking" data-ar="التضمين" data-en-def="Including an acknowledgment (ACK) inside a data segment heading in the same direction to save bandwidth.">Piggybacking<span class="smart-term-tooltip"></span></span>:</b> If the receiver has data to send, it includes (piggybacks) the ACK within the outgoing data segment.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>كيف يتعامل TCP مع الأخطاء؟ إذا وصل مقطع يحمل رقم تسلسل أعلى من المتوقع (مما يشير إلى فقدان مقطع سابق)، يقوم المستقبل فوراً بإرسال إقرار برقم المقطع المفقود (الإقرار المتوقع). هذا يؤدي إلى آلية إعادة الإرسال السريع عند المرسل.</p><p>في حالة فقدان الإقرار (Lost ACK)، قد لا يمثل ذلك مشكلة بفضل الإقرار التراكمي. ولكن إذا انتهى مؤقت المرسل (RTO) وأعاد إرسال المقطع، سيستلم المستقبل مقطعاً مكرراً. في هذه الحالة، يتجاهل المستقبل المقطع المكرر ويرسل فوراً إقراراً للمقطع التالي المتوقع لتصحيح حالة المرسل.</p></template>
+    <template class="content-en"><p>How does TCP handle errors? If a segment arrives with an out-of-order sequence number higher than expected (indicating a lost segment), the receiver immediately sends an ACK for the missing expected segment. This triggers the Fast Retransmission mechanism at the sender.</p><p>In the case of a Lost ACK, it might not be an issue due to cumulative acknowledgment. However, if the sender's timer (RTO) expires and it resends the segment, the receiver gets a duplicate. The receiver discards the duplicate segment and immediately sends an ACK for the next expected segment to correct the sender's state.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يتجاهل المستقبل المقطع المكرر بدلاً من معالجته؟</template>
+      <template class="content-en">Why does the receiver discard a duplicate segment instead of processing it?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن معالجة المقطع المكرر ستؤدي إلى تكرار البيانات في التطبيق النهائي، مما يفسد سلامة تدفق البيانات (Stream Delivery).</p></template>
+      <template class="content-en"><p>Because processing a duplicate segment would result in duplicated data in the final application, corrupting the integrity of the stream delivery.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في ليلة الامتحان! ركزوا معي جيداً في هذا الفصل الحاسم عن طبقة النقل. لدينا بطلان هنا: UDP و TCP. تذكروا دائماً أن UDP هو السريع والخفيف، لا يهتم إذا ضاعت رسالة في الطريق، ولذلك نستخدمه في الـ DNS و Skype. أما TCP فهو الموظف الدقيق والموثوق؛ ينشئ اتصالاً رسمياً (المصافحة الثلاثية)، ويتأكد من وصول كل بايت بترتيبه الصحيح باستخدام أرقام التسلسل. في الامتحان، ركزوا جداً على كيفية حساب أرقام التسلسل (تذكروا أنها تعد البايتات وليس المقاطع!)، وكيفية حساب البيانات المسموح إرسالها باستخدام 'حجم النافذة' (التحكم في التدفق). ولا تنسوا القاعدة الذهبية لإعادة الإرسال السريع: 3 إقرارات مكررة تعني أن هناك مقطعاً مفقوداً يجب إرساله فوراً دون انتظار المؤقت. بالتوفيق!</template>
-    <template class="content-en">Welcome, future engineers, to exam eve! Pay close attention to this crucial chapter on the Transport Layer. We have two heroes here: UDP and TCP. Always remember that UDP is fast and lightweight; it doesn't care if a message gets lost, which is why we use it for DNS and Skype. TCP, on the other hand, is the meticulous and reliable worker; it establishes a formal connection (3-way handshake) and ensures every byte arrives in order using Sequence Numbers. For the exam, focus heavily on how to calculate sequence numbers (remember, they count bytes, not segments!), and how to calculate allowed data using 'Window Size' (Flow Control). And don't forget the golden rule of Fast Retransmission: 3 duplicate ACKs mean a segment is lost and must be sent immediately without waiting for the timer. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في ليلة الامتحان! ركزوا معي جيداً في هذا الفصل الحاسم عن طبقة النقل. لدينا بطلان هنا: UDP و TCP. تذكروا دائماً أن UDP هو السريع والخفيف، لا يهتم إذا ضاعت رسالة في الطريق، ولذلك نستخدمه في الـ DNS و Skype. أما TCP فهو الموظف الدقيق والموثوق؛ ينشئ اتصالاً رسمياً (المصافحة الثلاثية)، ويتأكد من وصول كل بايت بترتيبه الصحيح باستخدام أرقام التسلسل. في الامتحان، ركزوا جداً على كيفية حساب أرقام التسلسل (تذكروا أنها تعد البايتات وليس المقاطع!)، وكيفية حساب البيانات المسموح إرسالها باستخدام 'حجم النافذة' (التحكم في التدفق). ولا تنسوا القاعدة الذهبية لإعادة الإرسال السريع: 3 إقرارات مكررة تعني أن هناك مقطعاً مفقوداً يجب إرساله فوراً دون انتظار المؤقت. بالتوفيق!<p>لقد أضفنا أمثلة حسابية هامة حول كيفية قراءة ترويسة UDP وحساب أرقام التسلسل في TCP، وهي مهارات أساسية تُختبر غالباً في الامتحانات. كما تعمقنا في سيناريوهات الإقرار (ACK) وكيفية تعامل TCP بذكاء مع تأخير الإقرارات وفقدان الحزم لضمان استقرار الشبكة.</p></template>
+    <template class="content-en">Welcome, future engineers, to exam eve! Pay close attention to this crucial chapter on the Transport Layer. We have two heroes here: UDP and TCP. Always remember that UDP is fast and lightweight; it doesn't care if a message gets lost, which is why we use it for DNS and Skype. TCP, on the other hand, is the meticulous and reliable worker; it establishes a formal connection (3-way handshake) and ensures every byte arrives in order using Sequence Numbers. For the exam, focus heavily on how to calculate sequence numbers (remember, they count bytes, not segments!), and how to calculate allowed data using 'Window Size' (Flow Control). And don't forget the golden rule of Fast Retransmission: 3 duplicate ACKs mean a segment is lost and must be sent immediately without waiting for the timer. Good luck!<p>We've added crucial calculation examples on how to read a UDP header and calculate TCP sequence numbers, which are core skills often tested in exams. We also dove deeper into ACK scenarios and how TCP smartly handles delayed acknowledgments and packet loss to ensure network stability.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1066,6 +1114,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">طول البيانات = الطول الإجمالي (Total Length) المذكور في الترويسة ناقص 8 بايت (حجم ترويسة UDP الثابت).</template>
           <template class="content-en">Data Length = Total Length specified in the header minus 8 bytes (the fixed UDP header size).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يتعامل TCP مع حالة فقدان مقطع، بينما تصل المقاطع اللاحقة بنجاح؟</template>
+          <template class="content-en">How does TCP handle a situation where a segment is lost, but the subsequent segments arrive successfully?</template>
+          <span class="content-target">كيف يتعامل TCP مع حالة فقدان مقطع، بينما تصل المقاطع اللاحقة بنجاح؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>عندما تصل المقاطع اللاحقة (خارج الترتيب)، يلاحظ المستقبل الفجوة ويرسل فوراً إقرارات مكررة (Duplicate ACKs) تطلب المقطع المفقود. بمجرد أن يستلم المرسل 3 إقرارات مكررة، يقوم بإعادة الإرسال السريع للمقطع المفقود دون انتظار انتهاء المؤقت.</p></template>
+          <template class="content-en"><p>When subsequent segments arrive (out of order), the receiver notices the gap and immediately sends duplicate ACKs requesting the missing segment. Once the sender receives 3 duplicate ACKs, it performs a Fast Retransmission of the lost segment without waiting for the timer to expire.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1350,6 +1416,40 @@
         "en": "When RTO expires, the lost segment is retransmitted."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو التضمين (Piggybacking) في TCP؟",
+      "en": "What is Piggybacking in TCP?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إرسال الإقرار (ACK) مدمجاً داخل مقطع بيانات متجه إلى نفس الوجهة لتقليل العبء.",
+        "en": "Sending an ACK embedded within a data segment heading to the same destination to reduce overhead."
+      },
+      "example": {
+        "ar": "بدلاً من إرسال مقطع ACK فارغ، يتم وضعه مع بيانات الرد.",
+        "en": "Instead of sending an empty ACK segment, it is attached to the response data."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "ما هي قاعدة تأخير الإقرار (Delayed ACK)؟",
+      "en": "What is the Delayed ACK rule?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تأخير إرسال الإقرار لمقطع واحد (حتى 500ms) على أمل وصول مقطع آخر لدمج الإقرارات.",
+        "en": "Delaying the ACK for a single segment (up to 500ms) hoping another segment arrives to combine ACKs."
+      },
+      "example": {
+        "ar": "يقلل من عدد حزم الإقرار في الشبكة.",
+        "en": "Reduces the number of ACK packets in the network."
+      }
+    },
+    "id": 18
   }
 ]
 </script>
@@ -1359,7 +1459,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1375,7 +1475,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1700,6 +1800,70 @@
     },
     "difficulty": "medium",
     "conceptId": "tcp-connection-management"
+  },
+  {
+    "conceptId": "tcp-ack-rules-scenarios",
+    "question": {
+      "ar": "ما هو الحد الأقصى للوقت الذي يمكن للمستقبل فيه تأخير إرسال الإقرار (ACK) لمقطع واحد في TCP؟",
+      "en": "What is the maximum time a receiver can delay sending an ACK for a single segment in TCP?"
+    },
+    "options": {
+      "ar": [
+        "100 مللي ثانية",
+        "500 مللي ثانية",
+        "1 ثانية",
+        "لا يمكن تأخيره أبداً"
+      ],
+      "en": [
+        "100 ms",
+        "500 ms",
+        "1 second",
+        "It can never be delayed"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تنص قواعد TCP على إمكانية تأخير الإقرار لمدة تصل إلى 500 مللي ثانية لانتظار مقطع آخر أو بيانات لتضمين الإقرار معها.",
+      "en": "TCP rules state an ACK can be delayed up to 500 ms to wait for another segment or data to piggyback the ACK."
+    },
+    "hint": {
+      "ar": "نصف ثانية.",
+      "en": "Half a second."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "tcp-ack-rules-scenarios",
+    "question": {
+      "ar": "ماذا يفعل مستقبل TCP عندما يصله مقطع مكرر (Duplicate Segment)؟",
+      "en": "What does a TCP receiver do when it receives a duplicate segment?"
+    },
+    "options": {
+      "ar": [
+        "يعالجه كبيانات جديدة",
+        "يتجاهله ولا يفعل شيئاً",
+        "يتجاهله ويرسل فوراً إقراراً للمقطع التالي المتوقع",
+        "يقطع الاتصال"
+      ],
+      "en": [
+        "Processes it as new data",
+        "Discards it and does nothing",
+        "Discards it and immediately sends an ACK for the next expected segment",
+        "Drops the connection"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتجاهل المستقبل المقطع المكرر لمنع تكرار البيانات، ولكنه يرسل إقراراً فورياً لتحديث حالة المرسل وإخباره بما يتوقعه تالياً.",
+      "en": "The receiver discards the duplicate to prevent data duplication, but immediately sends an ACK to update the sender's state on what it expects next."
+    },
+    "hint": {
+      "ar": "يجب أن يخبر المرسل بموقفه الحالي.",
+      "en": "It must inform the sender of its current state."
+    },
+    "difficulty": "hard",
+    "id": 12
   }
 ]
 </script>
@@ -1744,6 +1908,14 @@
       <template class="content-ar">إعادة الإرسال السريع (Fast Retransmission) تحدث قبل انتهاء المؤقت (RTO) بمجرد استلام 3 إقرارات مكررة، مما يسرع من عملية استرداد البيانات المفقودة.</template>
       <template class="content-en">Fast Retransmission occurs before the RTO timer expires as soon as 3 duplicate ACKs are received, speeding up the recovery of lost data.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن كل مقطع TCP يصل يجب أن يُرد عليه بإقرار (ACK) فوري. في الواقع، يستخدم TCP 'تأخير الإقرار' (Delayed ACK) لتقليل الازدحام، حيث ينتظر قليلاً لدمج الإقرارات.</template>
+    <template class="content-en">Believing that every arriving TCP segment must be answered with an immediate ACK. In reality, TCP uses 'Delayed ACK' to reduce congestion, waiting briefly to combine acknowledgments.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

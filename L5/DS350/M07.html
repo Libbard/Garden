@@ -108,6 +108,11 @@
         <template class="content-en">Specifying DOMAIN Constraints Using CHECK and CREATE DOMAIN</template>
         <span class="content-target">قيود المجال باستخدام CHECK و CREATE DOMAIN</span>
       </a>
+      <a href="#company-database-ddl-example" class="toc-link" data-bilingual>
+        <template class="content-ar">مثال متكامل: مخطط قاعدة بيانات COMPANY</template>
+        <template class="content-en">Integrated Example: COMPANY Database Schema</template>
+        <span class="content-target">مثال متكامل: مخطط قاعدة بيانات COMPANY</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -706,14 +711,127 @@
   </details>
 </section>
 
+<section id="company-database-ddl-example" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> مثال متكامل: مخطط قاعدة بيانات COMPANY</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Integrated Example: COMPANY Database Schema</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يجمع هذا المثال المتكامل جميع مفاهيم تعريف البيانات (DDL) لإنشاء الجداول، تحديد أنواع البيانات، وتطبيق قيود التكامل المرجعي لقاعدة بيانات COMPANY.</p></template>
+    <template class="content-en"><p>This integrated example combines all Data Definition Language (DDL) concepts to create tables, specify data types, and apply referential integrity constraints for the COMPANY database.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لبناء مخطط قاعدة بيانات COMPANY بالكامل، نقوم بتعريف الجداول الأساسية وربطها ببعضها البعض باستخدام المفاتيح الأجنبية. يوضح السكريبت التالي كيفية تكامل الجداول:</p><ol><li><b>EMPLOYEE و DEPARTMENT:</b> يمثلان الكيانات الأساسية. يحتوي كل منهما على مفتاح أجنبي يشير للآخر (مشكلة المرجع الدائري)، ويتم استخدام قيود مسماة مع خيارات <code>ON DELETE SET DEFAULT</code> و <code>ON UPDATE CASCADE</code>.</li><li><b>DEPT_LOCATIONS:</b> يمثل سمة متعددة القيم (Multivalued Attribute) للقسم، ويستخدم مفتاحاً أساسياً مركباً (Composite Primary Key) يتكون من رقم القسم والموقع.</li><li><b>PROJECT:</b> يرتبط بالقسم الذي يديره.</li><li><b>WORKS_ON:</b> جدول وسيط يربط الموظفين بالمشاريع (علاقة Many-to-Many)، ويستخدم مفتاحاً أساسياً مركباً من رقم الموظف ورقم المشروع.</li><li><b>DEPENDENT:</b> كيان ضعيف (Weak Entity) يعتمد على الموظف، ومفتاحه الأساسي مركب من رقم الموظف واسم التابع.</li></ol></template>
+    <template class="content-en"><p>To build the complete COMPANY database schema, we define the base tables and link them using foreign keys. The following script demonstrates how the tables integrate:</p><ol><li><b>EMPLOYEE and DEPARTMENT:</b> Represent the core entities. They have foreign keys pointing to each other (circular reference), using named constraints with <code>ON DELETE SET DEFAULT</code> and <code>ON UPDATE CASCADE</code> options.</li><li><b>DEPT_LOCATIONS:</b> Represents a multivalued attribute of a department, using a <span class="smart-term" data-term-en="Composite Primary Key" data-ar="المفتاح الأساسي المركب" data-en-def="A primary key that consists of two or more attributes to uniquely identify a tuple, often used in associative tables or weak entities.">composite primary key<span class="smart-term-tooltip"></span></span> consisting of the department number and location.</li><li><b>PROJECT:</b> Linked to the controlling department.</li><li><b>WORKS_ON:</b> An intermediate table linking employees to projects (Many-to-Many relationship), using a composite primary key of employee SSN and project number.</li><li><b>DEPENDENT:</b> A weak entity dependent on the employee, with a composite primary key of the employee SSN and dependent name.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في التطبيق العملي للسكريبت أدناه، يجب الانتباه إلى مشكلة المرجع الدائري بين <code>EMPLOYEE</code> و <code>DEPARTMENT</code>. لتنفيذ هذا الكود بنجاح في نظام إدارة قواعد البيانات، يجب إنشاء جدول <code>EMPLOYEE</code> أولاً بدون قيد <code>EMPDEPTFK</code>، ثم إنشاء جدول <code>DEPARTMENT</code>، وأخيراً استخدام <code>ALTER TABLE</code> لإضافة القيد المفقود إلى <code>EMPLOYEE</code>.</p><p>لاحظ أيضاً الاختلاف في خيارات التكامل المرجعي: تم استخدام <code>ON DELETE CASCADE</code> في <code>DEPT_LOCATIONS</code> لأن الموقع لا يمكن أن يوجد بدون القسم، بينما تم استخدام <code>ON DELETE SET NULL</code> للمشرف في جدول <code>EMPLOYEE</code> لأن الموظف يمكن أن يبقى في الشركة حتى لو غادر مشرفه.</p></template>
+    <template class="content-en"><p>In the practical application of the script below, pay attention to the circular reference between <code>EMPLOYEE</code> and <code>DEPARTMENT</code>. To execute this successfully in a DBMS, you must create the <code>EMPLOYEE</code> table first without the <code>EMPDEPTFK</code> constraint, then create <code>DEPARTMENT</code>, and finally use <code>ALTER TABLE</code> to add the missing constraint to <code>EMPLOYEE</code>.</p><p>Also, note the difference in referential integrity options: <code>ON DELETE CASCADE</code> is used in <code>DEPT_LOCATIONS</code> because a location cannot exist without its department, whereas <code>ON DELETE SET NULL</code> is used for the supervisor in <code>EMPLOYEE</code> because an employee can remain in the company even if their supervisor leaves.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>SQL</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>-- Note: To resolve circular reference, create EMPLOYEE without EMPDEPTFK first, then ALTER TABLE later.
+
+CREATE TABLE EMPLOYEE (
+  Fname VARCHAR(15) NOT NULL,
+  Minit CHAR,
+  Lname VARCHAR(15) NOT NULL,
+  Ssn CHAR(9) NOT NULL,
+  Bdate DATE,
+  Address VARCHAR(30),
+  Sex CHAR,
+  Salary DECIMAL(10,2),
+  Super_ssn CHAR(9),
+  Dno INT NOT NULL DEFAULT 1,
+  CONSTRAINT EMPPK PRIMARY KEY (Ssn),
+  CONSTRAINT EMPSUPERFK FOREIGN KEY (Super_ssn) REFERENCES EMPLOYEE(Ssn) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT EMPDEPTFK FOREIGN KEY (Dno) REFERENCES DEPARTMENT(Dnumber) ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+CREATE TABLE DEPARTMENT (
+  Dname VARCHAR(15) NOT NULL,
+  Dnumber INT NOT NULL,
+  Mgr_ssn CHAR(9) NOT NULL DEFAULT '888665555',
+  Mgr_start_date DATE,
+  CONSTRAINT DEPTPK PRIMARY KEY (Dnumber),
+  CONSTRAINT DEPTSK UNIQUE (Dname),
+  CONSTRAINT DEPTMGRFK FOREIGN KEY (Mgr_ssn) REFERENCES EMPLOYEE(Ssn) ON DELETE SET DEFAULT ON UPDATE CASCADE
+);
+
+CREATE TABLE DEPT_LOCATIONS (
+  Dnumber INT NOT NULL,
+  Dlocation VARCHAR(15) NOT NULL,
+  PRIMARY KEY (Dnumber, Dlocation),
+  FOREIGN KEY (Dnumber) REFERENCES DEPARTMENT(Dnumber) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE PROJECT (
+  Pname VARCHAR(15) NOT NULL,
+  Pnumber INT NOT NULL,
+  Plocation VARCHAR(15),
+  Dnum INT NOT NULL,
+  PRIMARY KEY (Pnumber),
+  UNIQUE (Pname),
+  FOREIGN KEY (Dnum) REFERENCES DEPARTMENT(Dnumber)
+);
+
+CREATE TABLE WORKS_ON (
+  Essn CHAR(9) NOT NULL,
+  Pno INT NOT NULL,
+  Hours DECIMAL(3,1) NOT NULL,
+  PRIMARY KEY (Essn, Pno),
+  FOREIGN KEY (Essn) REFERENCES EMPLOYEE(Ssn),
+  FOREIGN KEY (Pno) REFERENCES PROJECT(Pnumber)
+);
+
+CREATE TABLE DEPENDENT (
+  Essn CHAR(9) NOT NULL,
+  Dependent_name VARCHAR(15) NOT NULL,
+  Sex CHAR,
+  Bdate DATE,
+  Relationship VARCHAR(8),
+  PRIMARY KEY (Essn, Dependent_name),
+  FOREIGN KEY (Essn) REFERENCES EMPLOYEE(Ssn)
+);</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تم استخدام مفتاح أساسي مركب (Essn, Pno) في جدول WORKS_ON بدلاً من إنشاء عمود جديد كمفتاح أساسي؟</template>
+      <template class="content-en">Why was a composite primary key (Essn, Pno) used in the WORKS_ON table instead of creating a new column as a primary key?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن جدول WORKS_ON يمثل علاقة Many-to-Many بين الموظفين والمشاريع. المفتاح المركب يضمن عدم تكرار تعيين نفس الموظف لنفس المشروع أكثر من مرة، مما يحافظ على سلامة البيانات بشكل طبيعي.</p></template>
+      <template class="content-en"><p>Because the WORKS_ON table represents a Many-to-Many relationship between employees and projects. The composite key ensures that the same employee cannot be assigned to the same project more than once, naturally maintaining data integrity.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في عالم SQL! تخيلوا أن قاعدة البيانات هي مدينة ضخمة، ولغة DDL هي المهندس المعماري الذي يرسم المخططات (CREATE SCHEMA) ويبني العمارات (CREATE TABLE). في هذه الوحدة، تعلمنا كيف نضع القواعد الصارمة لهذه المدينة؛ لا يمكن لأحد أن يسكن في شقة غير موجودة (التكامل المرجعي - Foreign Key)، ولا يمكن أن يكون رقم القسم سالباً (قيد CHECK). ركزوا جيداً في الامتحان على مشكلة 'المرجع الدائري' وكيف نستخدم ALTER TABLE كحل سحري لها. وتذكروا دائماً الفرق بين CHAR الذي يحجز مساحة ثابتة كصندوق صلب، و VARCHAR الذي يتمدد وينكمش حسب الحاجة. الخيارات الافتراضية مثل RESTRICT هي فخاخ شائعة في الاختبارات، فاحذروها! بالتوفيق.</template>
-    <template class="content-en">Welcome to the world of SQL, my friends! Imagine the database as a massive city, and DDL is the architect drawing the blueprints (CREATE SCHEMA) and building the structures (CREATE TABLE). In this module, we learned how to set strict rules for this city; no one can live in an apartment that doesn't exist (Referential Integrity - Foreign Key), and a department number cannot be negative (CHECK constraint). For the exam, pay close attention to the 'Circular Reference' problem and how ALTER TABLE acts as our magic fix. Always remember the difference between CHAR (a rigid box) and VARCHAR (flexible space). Default options like RESTRICT are common exam traps, so watch out! Good luck.</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في عالم SQL! تخيلوا أن قاعدة البيانات هي مدينة ضخمة، ولغة DDL هي المهندس المعماري الذي يرسم المخططات (CREATE SCHEMA) ويبني العمارات (CREATE TABLE). في هذه الوحدة، تعلمنا كيف نضع القواعد الصارمة لهذه المدينة؛ لا يمكن لأحد أن يسكن في شقة غير موجودة (التكامل المرجعي - Foreign Key)، ولا يمكن أن يكون رقم القسم سالباً (قيد CHECK). ركزوا جيداً في الامتحان على مشكلة 'المرجع الدائري' وكيف نستخدم ALTER TABLE كحل سحري لها. وتذكروا دائماً الفرق بين CHAR الذي يحجز مساحة ثابتة كصندوق صلب، و VARCHAR الذي يتمدد وينكمش حسب الحاجة. الخيارات الافتراضية مثل RESTRICT هي فخاخ شائعة في الاختبارات، فاحذروها! بالتوفيق.<p>الآن بعد أن استعرضنا الأوامر الفردية، فإن رؤية السكريبت المتكامل لقاعدة بيانات COMPANY يضع كل شيء في نصابه. في الامتحان، قد يُطلب منك كتابة كود لإنشاء جدولين مرتبطين مع تحديد القيود المناسبة، لذا تأكد من فهمك لكيفية دمج المفاتيح الأساسية المركبة وخيارات التكامل المرجعي معاً في سياق واحد.</p></template>
+    <template class="content-en">Welcome to the world of SQL, my friends! Imagine the database as a massive city, and DDL is the architect drawing the blueprints (CREATE SCHEMA) and building the structures (CREATE TABLE). In this module, we learned how to set strict rules for this city; no one can live in an apartment that doesn't exist (Referential Integrity - Foreign Key), and a department number cannot be negative (CHECK constraint). For the exam, pay close attention to the 'Circular Reference' problem and how ALTER TABLE acts as our magic fix. Always remember the difference between CHAR (a rigid box) and VARCHAR (flexible space). Default options like RESTRICT are common exam traps, so watch out! Good luck.<p>Now that we've covered individual commands, seeing the integrated COMPANY database script puts everything into perspective. On the exam, you may be asked to write code to create two related tables with appropriate constraints, so ensure you understand how composite primary keys and referential integrity options blend together in a single context.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -887,6 +1005,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">باستخدام نوع البيانات BLOB (Binary Large Object) المخصص لتخزين البيانات الثنائية الكبيرة مثل الصوت والصور والفيديو.</template>
           <template class="content-en">By using the BLOB (Binary Large Object) data type, which is designed to store large binary data like audio, images, and video.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في السكريبت المتكامل لقاعدة بيانات COMPANY، كيف تم التعامل مع الكيان الضعيف (Weak Entity) DEPENDENT برمجياً؟</template>
+          <template class="content-en">In the integrated COMPANY database script, how was the weak entity DEPENDENT handled programmatically?</template>
+          <span class="content-target">في السكريبت المتكامل لقاعدة بيانات COMPANY، كيف تم التعامل مع الكيان الضعيف (Weak Entity) DEPENDENT برمجياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>تم التعامل معه من خلال إنشاء جدول DEPENDENT بمفتاح أساسي مركب يتكون من المفتاح الأجنبي الذي يشير إلى الموظف (Essn) بالإضافة إلى المفتاح الجزئي للكيان الضعيف (Dependent_name). هذا يضمن أن اسم التابع فريد فقط لكل موظف، وليس على مستوى الجدول بأكمله.</p></template>
+          <template class="content-en"><p>It was handled by creating the DEPENDENT table with a composite primary key consisting of the foreign key referencing the employee (Essn) combined with the weak entity's partial key (Dependent_name). This ensures the dependent's name is unique only per employee, not across the entire table.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1239,6 +1375,40 @@
         "en": "CREATE DOMAIN D_NUM AS INTEGER CHECK (...);"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يتم تعريف المفتاح الأساسي المركب (Composite Primary Key) في جملة CREATE TABLE؟",
+      "en": "How is a Composite Primary Key defined in a CREATE TABLE statement?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تعريفه بوضع أسماء الأعمدة المتعددة مفصولة بفواصل داخل قوسين بعد عبارة PRIMARY KEY.",
+        "en": "It is defined by placing multiple column names separated by commas inside parentheses after the PRIMARY KEY phrase."
+      },
+      "example": {
+        "ar": "PRIMARY KEY (Essn, Pno)",
+        "en": "PRIMARY KEY (Essn, Pno)"
+      }
+    },
+    "id": 21
+  },
+  {
+    "front": {
+      "ar": "لماذا نستخدم ON DELETE CASCADE في جدول DEPT_LOCATIONS؟",
+      "en": "Why do we use ON DELETE CASCADE in the DEPT_LOCATIONS table?"
+    },
+    "back": {
+      "definition": {
+        "ar": "لأن مواقع القسم تعتمد كلياً على القسم نفسه؛ فإذا تم حذف القسم، يجب حذف جميع مواقعه تلقائياً.",
+        "en": "Because department locations are entirely dependent on the department itself; if the department is deleted, all its locations must be automatically deleted."
+      },
+      "example": {
+        "ar": "FOREIGN KEY (Dnumber) REFERENCES DEPARTMENT(Dnumber) ON DELETE CASCADE",
+        "en": "FOREIGN KEY (Dnumber) REFERENCES DEPARTMENT(Dnumber) ON DELETE CASCADE"
+      }
+    },
+    "id": 22
   }
 ]
 </script>
@@ -1248,7 +1418,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1264,7 +1434,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1589,6 +1759,38 @@
     },
     "difficulty": "easy",
     "conceptId": "domain-constraints-check"
+  },
+  {
+    "conceptId": "company-database-ddl-example",
+    "question": {
+      "ar": "في مخطط قاعدة بيانات COMPANY، أي من الجداول التالية يتطلب مفتاحاً أساسياً مركباً (Composite Primary Key) لضمان فرادة السجلات؟",
+      "en": "In the COMPANY database schema, which of the following tables requires a composite primary key to ensure record uniqueness?"
+    },
+    "options": {
+      "ar": [
+        "WORKS_ON",
+        "EMPLOYEE",
+        "DEPARTMENT",
+        "PROJECT"
+      ],
+      "en": [
+        "WORKS_ON",
+        "EMPLOYEE",
+        "DEPARTMENT",
+        "PROJECT"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "جدول WORKS_ON يربط بين الموظف والمشروع، ويحتاج إلى مفتاح مركب (رقم الموظف ورقم المشروع) لضمان عدم تكرار نفس التعيين.",
+      "en": "The WORKS_ON table links an employee and a project, requiring a composite key (Employee SSN and Project Number) to ensure the same assignment isn't duplicated."
+    },
+    "hint": {
+      "ar": "ابحث عن الجدول الذي يمثل علاقة بين كيانين (Many-to-Many).",
+      "en": "Look for the table that represents a relationship between two entities (Many-to-Many)."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>

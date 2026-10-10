@@ -284,8 +284,31 @@
     types: set('dec hex org end'), literals: {},
     fold: true, number: /^[0-9A-Fa-f]+/, ident: /[A-Za-z_]/, identPart: /[A-Za-z0-9_]/
   });
+  /*@4.LAPSJ3.33*/
+  LANG.lmc = rules({
+    line: [';', '//', '#'], block: [], strings: [],
+    keywords: set('lda sta sto add sub inp in out otc hlt cob bra br brz brp load store input output halt'),
+    types: set('dat'), literals: {}, fold: true, number: /^-?\d+/
+  });
+  var X86_OPS = 'mov movq movl movw movb movabs movabsq movzx movsx movsxd movzbl movzbq movzwl movsbl movsbq movslq lea leaq leal add addq addl adc sub subq subl sbb imul imulq imull mul mulq idiv idivq idivl div divq inc incq incl dec decq decl neg negq not notq and andq andl or orq orl xor xorq xorl shl shlq sal shr shrq sar sarq rol ror cmp cmpq cmpl cmpb test testq testl jmp je jz jne jnz jl jle jg jge jb jbe ja jae js jns jo jno call callq ret retq push pushq pop popq leave leaveq nop syscall int xchg cqo cqto cdq cltd cdqe cltq sete setne setl setle setg setge setz setnz cmove cmovne cmovl cmovg hlt endbr64';
+  LANG.x86 = rules({
+    line: ['#', ';', '//'], block: [['/*', '*/']], strings: [DQ, SQ],
+    keywords: set(X86_OPS),
+    types: set('.data .text .bss .rodata .section .globl .global .string .asciz .ascii .byte .word .short .long .int .quad .zero .space .skip .equ .set .align .p2align .type .size .file .intel_syntax .att_syntax section global extern db dw dd dq resb resw resd resq equ byte word dword qword ptr offset rel'),
+    builtins: set('rax rbx rcx rdx rsi rdi rsp rbp rip r8 r9 r10 r11 r12 r13 r14 r15 eax ebx ecx edx esi edi esp ebp r8d r9d r10d r11d ax bx cx dx si di sp bp al bl cl dl ah bh ch dh sil dil spl bpl printf puts putchar scanf exit malloc strlen'),
+    literals: {}, fold: true, sigil: '%', number: NUM_PLAIN,
+    ident: /[A-Za-z_.$]/, identPart: /[A-Za-z0-9_.$@]/
+  });
+  LANG.arm = rules({
+    line: ['@', '//', ';'], block: [['/*', '*/']], strings: [DQ, SQ],
+    keywords: set('mov movs mvn add adds adc sub subs sbc rsb mul mla sdiv udiv and ands orr eor bic lsl lsr asr ror cmp cmn tst teq ldr ldrb ldrh ldrsb ldrsh str strb strh push pop stmfd ldmfd stmdb ldmia adr b bl bx blx beq bne blt ble bgt bge bhi bls bcs bcc bmi bpl bvs bvc moveq movne movlt movgt movle movge addeq addne subeq subne svc swi nop'),
+    types: set('.data .text .bss .rodata .section .global .globl .word .long .int .hword .short .byte .asciz .ascii .string .space .skip .zero .equ .set .align .balign .type .size .syntax .arm .cpu'),
+    builtins: set('r0 r1 r2 r3 r4 r5 r6 r7 r8 r9 r10 r11 r12 r13 r14 r15 sp lr pc fp ip printf puts putchar scanf exit malloc'),
+    literals: {}, fold: true, number: NUM_PLAIN,
+    ident: /[A-Za-z_.]/, identPart: /[A-Za-z0-9_.]/
+  });
 
-  var HTML = { line: [], block: [['<!--', '-->']] };
+  var HTML ={ line: [], block: [['<!--', '-->']] };
 
   /*@4.LAPSJ3.9*/
   function scan(source, R) {
@@ -618,7 +641,7 @@
     });
 
     /*@4.LAPSJ3.26*/
-    if (langId !== 'web' && langId !== 'marie') {
+    if (langId !== 'web' && langId !== 'marie' && langId !== 'lmc') {
       var stack = [];
       result.tokens.forEach(function (token) {
         if (token.t !== 'punc' && token.t !== 'op') return;

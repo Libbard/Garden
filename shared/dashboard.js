@@ -307,7 +307,11 @@
                 'style="background:none;border:1px solid var(--border-color);border-radius:4px;width:15px;height:15px;cursor:pointer;flex-shrink:0" ' +
                 'aria-label="' + esc(tx('إتمام: ', 'Complete: ') + title) + '"></button>'
               : '<span style="width:15px;flex-shrink:0"></span>') +
-            '<span class="widget-item-name">' + (x.course ? '<bdi class="dash-up-code">' + esc(x.course) + '</bdi> ' : '') + esc(title) + '</span>' +
+            (noteLink(x)
+              ? '<a class="widget-item-name widget-item-note" href="' + esc(noteLink(x)) + '" title="' + esc(tx('افتحِ الملاحظة', 'Open the note')) + '">' +
+                '<i class="fa-solid fa-note-sticky" aria-hidden="true"></i> ' +
+                (x.course ? '<bdi class="dash-up-code">' + esc(x.course) + '</bdi> ' : '') + esc(title) + '</a>'
+              : '<span class="widget-item-name">' + (x.course ? '<bdi class="dash-up-code">' + esc(x.course) + '</bdi> ' : '') + esc(title) + '</span>') +
             '<span style="color:' + u.color + ';font-size:.66rem;font-weight:800">' + esc(label) + '</span></div>';
         }).join('');
         /*@3.DASJ.160*/
@@ -1129,8 +1133,12 @@
     task:   ['مهامي', 'My tasks'],
     course: ['بطاقة المادة', 'Course card'],
     exam:   ['الجدول', 'Schedule'],
-    bb:     ['بلاك بورد', 'Blackboard']
+    bb:     ['بلاك بورد', 'Blackboard'],
+    note:   ['ملاحظاتي', 'My notes']
   };
+  function noteLink(t) {
+    return (t && t.origin && t.origin.type === 'note' && D.noteHref) ? D.noteHref(t.origin) : '';
+  }
   /*@3.DASJ.150*/
   var PENDING_COURSE = ['المادّةُ غيرُ معروفةٍ بعد', 'Course not known yet'];
 
@@ -1177,7 +1185,7 @@
     { k: 'later', ar: 'لاحقاً',      en: 'Later' },
     { k: 'none',  ar: 'بلا تاريخ',   en: 'No date' }
   ];
-  var SRC_ICON = { task: 'fa-list-check', course: 'fa-book-open', exam: 'fa-file-pen', bb: 'fa-calendar-days' };
+  var SRC_ICON = { task: 'fa-list-check', course: 'fa-book-open', exam: 'fa-file-pen', bb: 'fa-calendar-days', note: 'fa-note-sticky' };
 
   function tkBucket(days) {
     if (days === null) return 'none';
@@ -1218,7 +1226,7 @@
     var days = D.daysUntil(t.due);
     var u = urgency(days, t.done);
     var title = dlTitle(t);
-    var srcKey = t.pending_course ? 'bb' : (SRC_LABEL[t.source] ? t.source : 'task');
+    var srcKey = t.pending_course ? 'bb' : noteLink(t) ? 'note' : (SRC_LABEL[t.source] ? t.source : 'task');
     var src = SRC_LABEL[srcKey];
     var color = tkColor(t.course);
 
@@ -1236,7 +1244,7 @@
     } else if (t.pending_course) {
       meta += '<span class="tk-pend">' + esc(tx(PENDING_COURSE[0], PENDING_COURSE[1])) + '</span>';
     }
-    meta += '<span class="tk-type">' + esc(typeLabel(t.type)) + '</span>';
+    meta += '<span class="tk-type">' + esc(typeLabel(noteLink(t) ? 'note' : t.type)) + '</span>';
     meta += '<span class="tk-src"><i class="fa-solid ' + SRC_ICON[srcKey] + '" aria-hidden="true"></i>' + esc(tx(src[0], src[1])) + '</span>';
 
     var acts = t.editable
@@ -1423,7 +1431,7 @@
   var sheetTask = null;
 
   var SHEET_ICON = {
-    task: 'fa-list-check', course: 'fa-book-open', exam: 'fa-file-pen'
+    task: 'fa-list-check', course: 'fa-book-open', exam: 'fa-file-pen', note: 'fa-note-sticky'
   };
 
   function fmtDue(due) {
@@ -1468,9 +1476,10 @@
     var box = m.querySelector('.tk-sheet-box');
     if (box) box.style.setProperty('--ev-color', color);
 
+    var nHref = noteLink(t);
     el('tk-sheet-kind').innerHTML =
-      '<i class="fa-solid ' + (SHEET_ICON[t.source] || SHEET_ICON.task) + '" aria-hidden="true"></i> ' +
-      esc(typeLabel(t.type));
+      '<i class="fa-solid ' + (nHref ? SHEET_ICON.note : (SHEET_ICON[t.source] || SHEET_ICON.task)) + '" aria-hidden="true"></i> ' +
+      esc(typeLabel(nHref ? 'note' : t.type));
     el('tk-sheet-title').textContent = dlTitle(t);
     var ce = el('tk-sheet-course');
     ce.textContent = t.course ? (t.course + (info ? ' · ' + (isAr() ? info.name_ar : info.name_en) : '')) : '';
@@ -1484,7 +1493,12 @@
     rows += '<div class="tk-sheet-row"><i class="fa-solid fa-hourglass-half" aria-hidden="true"></i>' +
       '<span class="tk-sheet-l">' + esc(tx('المتبقّي', 'Remaining')) + '</span>' +
       '<span class="tk-sheet-v" style="color:' + u.color + ';font-weight:800">' + esc(dueLabel(days)) + '</span></div>';
-    if (t.source === 'exam' || t.source === 'course') {
+    if (nHref) {
+      rows += '<div class="tk-sheet-row"><i class="fa-solid fa-inbox" aria-hidden="true"></i>' +
+        '<span class="tk-sheet-l">' + esc(tx('المصدر', 'Source')) + '</span>' +
+        '<a class="tk-sheet-v tk-sheet-link" href="' + esc(nHref) + '">' + esc(tx('ملاحظةٌ كتبتَها', 'A note you wrote')) +
+        ' <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i></a></div>';
+    } else if (t.source === 'exam' || t.source === 'course') {
       var href = t.source === 'exam' ? 'hub/schedule.html'
                : 'hub/course.html?code=' + encodeURIComponent(t.course || '');
       rows += '<div class="tk-sheet-row"><i class="fa-solid fa-inbox" aria-hidden="true"></i>' +
@@ -1500,6 +1514,10 @@
 
     /*@3.DASJ.67*/
     var b = '';
+    if (nHref) {
+      b += '<a class="tk-btn tk-btn-note" href="' + esc(nHref) + '">' +
+        '<i class="fa-solid fa-note-sticky" aria-hidden="true"></i> ' + tx('افتحِ الملاحظة', 'Open the note') + '</a>';
+    }
     if (t.editable) {
       if (!autoDone(t)) {
         b += '<button class="tk-btn tk-btn-primary" data-act="sheet-done">' +
@@ -1654,7 +1672,10 @@
       return;
     }
 
-    if (n) { n.body = body; n.remind_at = null; n.updated_at = Date.now(); }
+    if (n) {
+      if (n.remind_at && D.unlinkNoteTask) D.unlinkNoteTask(n.id);
+      n.body = body; n.remind_at = null; n.updated_at = Date.now();
+    }
     else {
       /*@3.DASJ.76*/
       var now = Date.now();

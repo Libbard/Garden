@@ -2756,6 +2756,12 @@
       btns += '<button class="sch-btn sch-btn-secondary" id="sheet-revert" title="' + escapeH(rvT) + '" aria-label="' + escapeH(rvT) + '">' +
         '<i class="fa-solid fa-rotate-left"></i> ' + (isAr() ? 'الأصل' : 'Original') + '</button>';
     }
+    var noteHref = (ev.src === 'task' && ev.raw && window.GardenData && GardenData.noteHref)
+      ? GardenData.noteHref(ev.raw.origin) : '';
+    if (noteHref) {
+      btns += '<a class="sch-btn sch-btn-secondary" id="sheet-note" href="../' + escapeH(noteHref) + '">' +
+        '<i class="fa-solid fa-note-sticky"></i> ' + (isAr() ? 'افتحِ الملاحظة' : 'Open the note') + '</a>';
+    }
     if (ev.src === 'exam' || ev.src === 'general' || ev.src === 'task' || ev.src === 'course') {
       btns += '<button class="sch-btn sch-btn-secondary" id="sheet-copy">' +
         '<i class="fa-solid fa-copy"></i> ' + (isAr() ? 'انسخْها' : 'Copy') + '</button>';
@@ -2772,6 +2778,7 @@
     bindSheetBtn('sheet-del', function () { closeSheet(); deleteEvent(ev); });
     bindSheetBtn('sheet-revert', function () { closeSheet(); if (bbl) revertIcs(bbl.uid); });
     bindSheetBtn('sheet-copy', function () { closeSheet(); copyAsNew(ev); });
+    bindSheetBtn('sheet-note', function () { closeSheet(); });
     bindSheetBtn('sheet-module', function () {
       if (window.GardenSchedulePlan && window.GardenSchedulePlan.openModule) window.GardenSchedulePlan.openModule(ev.course_code, ev.module);
     });

@@ -86,6 +86,15 @@
   ];
 
   function penButtons() {
+    var out = { barrel: 'none', tip: 'none', second: 'none' };
+    devProfile().binds.forEach(function (x) {
+      var m = /^pen:(barrel|tip|second)$/.exec(x.t);
+      if (m) out[m[1]] = x.a || 'none';
+    });
+    return out;
+  }
+
+  function penButtons0() {
     var out = { barrel: BTN_DEFAULT.barrel, tip: BTN_DEFAULT.tip, second: BTN_DEFAULT.second };
     try {
       var a = JSON.parse(localStorage.getItem(BTN_KEY) || 'null');
@@ -150,6 +159,330 @@
     return '';
   }
 
+  var DEV_ID_LS = 'garden_device_id';
+  var DEV_PREFIX = 'garden_ink_dev_';
+  var DBL_MS = 380, DBL_PX = 8, TAP_MS = 320, TAP_PX = 10;
+
+  var TOOL_ACTS = { pen: 1, hi: 1, era: 1, 'era:part': 1, 'era:whole': 1, sel: 1, lasso: 1, hand: 1, text: 1, rect: 1, ell: 1, line: 1, arr: 1 };
+  var ACT_LIST = [
+    { k: 'pen', g: 'tool', ar: 'قلم', en: 'Pen' },
+    { k: 'hi', g: 'tool', ar: 'تظليل', en: 'Highlighter' },
+    { k: 'era', g: 'tool', ar: 'ممحاة', en: 'Eraser' },
+    { k: 'era:part', g: 'tool', ar: 'ممحاةٌ جزئيّة', en: 'Partial eraser' },
+    { k: 'era:whole', g: 'tool', ar: 'ممحاةُ الخطِّ كلِّه', en: 'Whole-stroke eraser' },
+    { k: 'sel', g: 'tool', ar: 'تحديد', en: 'Select' },
+    { k: 'lasso', g: 'tool', ar: 'لاسو', en: 'Lasso' },
+    { k: 'hand', g: 'tool', ar: 'تمرير', en: 'Scroll' },
+    { k: 'line', g: 'tool', ar: 'خطٌّ مستقيم', en: 'Straight line' },
+    { k: 'rect', g: 'tool', ar: 'مستطيل', en: 'Rectangle' },
+    { k: 'ell', g: 'tool', ar: 'دائرة', en: 'Ellipse' },
+    { k: 'arr', g: 'tool', ar: 'سهم', en: 'Arrow' },
+    { k: 'undo', g: 'cmd', ar: 'تراجع', en: 'Undo' },
+    { k: 'redo', g: 'cmd', ar: 'إعادة', en: 'Redo' },
+    { k: 'dial', g: 'cmd', ar: 'افتحِ اللوحةَ الدائريّة أو أغلقْها', en: 'Open or close the dial' },
+    { k: 'panel', g: 'cmd', ar: 'افتحْ أدواتِ الرسم كاملة', en: 'Open all drawing tools' },
+    { k: 'color:next', g: 'cmd', ar: 'اللونُ التالي', en: 'Next colour' },
+    { k: 'color:prev', g: 'cmd', ar: 'اللونُ السابق', en: 'Previous colour' },
+    { k: 'width:up', g: 'cmd', ar: 'أسمكُ', en: 'Thicker' },
+    { k: 'width:down', g: 'cmd', ar: 'أرفعُ', en: 'Thinner' },
+    { k: 'tools', g: 'cmd', ar: 'أخفِ أدواتِ الرسم أو أظهِرْها', en: 'Hide or show drawing tools' },
+    { k: 'none', g: 'none', ar: 'بلا فعل', en: 'Nothing' }
+  ];
+  function isTool(act) { return !!TOOL_ACTS[act]; }
+  function isCmd(act) { return !!act && act !== 'none' && !TOOL_ACTS[act]; }
+
+  function devId() {
+    var d = '';
+    try { d = localStorage.getItem(DEV_ID_LS) || ''; } catch (e) {}
+    if (!/^d[0-9a-f]{16}$/.test(d)) {
+      var b = new Uint8Array(8);
+      try { crypto.getRandomValues(b); } catch (e2) { for (var i = 0; i < 8; i++) b[i] = Math.floor(Math.random() * 256); }
+      d = 'd';
+      for (var j = 0; j < 8; j++) d += (b[j] < 16 ? '0' : '') + b[j].toString(16);
+      try { localStorage.setItem(DEV_ID_LS, d); } catch (e3) {}
+    }
+    return d;
+  }
+
+  function devGuess() {
+    var ua = navigator.userAgent || '', tp = navigator.maxTouchPoints || 0;
+    var os = /Android/.test(ua) ? 'android'
+           : (/iPhone|iPod/.test(ua) ? 'iphone'
+           : ((/iPad/.test(ua) || (/Macintosh/.test(ua) && tp > 1)) ? 'ipad'
+           : (/Windows/.test(ua) ? 'windows' : (/Mac OS X/.test(ua) ? 'mac' : (/CrOS/.test(ua) ? 'chromebook' : 'other')))));
+    var wide = Math.max(screen.width || 0, screen.height || 0);
+    var big = Math.min(screen.width || 0, screen.height || 0) >= 600;
+    var kind = (os === 'android' && big) ? 'tablet' : (os === 'android' || os === 'iphone') ? 'phone'
+             : os === 'ipad' ? 'tablet' : (tp > 0 ? 'twoinone' : 'computer');
+    var N = {
+      windows: ['ويندوز', 'Windows'], android: ['أندرويد', 'Android'], iphone: ['آيفون', 'iPhone'],
+      ipad: ['آيباد', 'iPad'], mac: ['ماك', 'Mac'], chromebook: ['كروم بوك', 'Chromebook'], other: ['جهاز', 'Device']
+    };
+    var K = { tablet: ['لوحيّ', 'tablet'], phone: ['جوّال', 'phone'], twoinone: ['٢ في ١', '2-in-1'], computer: ['حاسوب', 'computer'] };
+    return { os: os, kind: kind, wide: wide,
+             ar: K[kind][0] + ' ' + N[os][0], en: N[os][1] + ' ' + K[kind][1] };
+  }
+
+  var _prof = null, _profKey = '';
+  function devKey(id) { return DEV_PREFIX + (id || devId()); }
+
+  function legacyBinds() {
+    var out = [], b = penButtons0(), m = penKeys();
+    ['barrel', 'tip', 'second'].forEach(function (s) { if (b[s] && b[s] !== 'none') out.push({ t: 'pen:' + s, a: b[s] }); });
+    for (var k in m) {
+      if (!Object.prototype.hasOwnProperty.call(m, k)) continue;
+      var c = /^[a-z]$/.test(k) ? 'Key' + k.toUpperCase() : (/^[0-9]$/.test(k) ? 'Digit' + k : '');
+      if (c && m[k] && m[k] !== 'none') out.push({ t: 'key:' + c, a: m[k] });
+    }
+    return out;
+  }
+
+  function devProfile() {
+    var k = devKey();
+    if (_prof && _profKey === k) return _prof;
+    var p = null;
+    try { p = JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) {}
+    if (!p || typeof p !== 'object' || !Array.isArray(p.binds)) {
+      var g = devGuess();
+      p = { v: 1, name: '', os: g.os, kind: g.kind, src: { mouse: 'draw', touch: 'auto' }, touchSet: 0, binds: legacyBinds(), at: 0 };
+    }
+    if (!p.src) p.src = { mouse: 'draw', touch: 'auto' };
+    _prof = p; _profKey = k;
+    return p;
+  }
+
+  function saveProfile(p) {
+    p.at = Date.now();
+    if (!p.os) { var g = devGuess(); p.os = g.os; p.kind = g.kind; }
+    _prof = p; _profKey = devKey();
+    try { localStorage.setItem(_profKey, JSON.stringify(p)); } catch (e) {}
+    var pb = { barrel: 'none', tip: 'none', second: 'none' };
+    p.binds.forEach(function (x) { var m = /^pen:(barrel|tip|second)$/.exec(x.t); if (m) pb[m[1]] = x.a; });
+    try { localStorage.setItem(BTN_KEY, JSON.stringify(pb)); } catch (e2) {}
+    if (p.touchSet) {
+      var pm = { auto: 'auto', pan: 'always', draw: 'never', off: 'always' }[p.src.touch] || 'auto';
+      try { localStorage.setItem(PALM_KEY, pm); } catch (e3) {}
+    }
+    fire('profile', { profile: p });
+    return p;
+  }
+
+  function devName(p) {
+    p = p || devProfile();
+    if (p.name) return p.name;
+    var g = devGuess();
+    return (document.documentElement.lang === 'en') ? g.en : g.ar;
+  }
+
+  function otherDevices() {
+    var out = [], me = devKey();
+    try {
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i);
+        if (!k || k.indexOf(DEV_PREFIX) !== 0 || k === me) continue;
+        var p = null;
+        try { p = JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) {}
+        if (p && Array.isArray(p.binds)) out.push({ id: k.slice(DEV_PREFIX.length), p: p });
+      }
+    } catch (e2) {}
+    out.sort(function (a, b) { return (b.p.at || 0) - (a.p.at || 0); });
+    return out;
+  }
+
+  function actFor(trig) {
+    if (!trig) return null;
+    var b = devProfile().binds;
+    for (var i = 0; i < b.length; i++) if (b[i].t === trig) return b[i].a || null;
+    return null;
+  }
+  function bindOf(trig) {
+    var b = devProfile().binds;
+    for (var i = 0; i < b.length; i++) if (b[i].t === trig) return b[i];
+    return null;
+  }
+
+  function setBind(trig, act, how) {
+    var p = devProfile(), b = p.binds.filter(function (x) { return x.t !== trig; });
+    if (act && act !== 'none') b.push({ t: trig, a: act, h: how || 'auto' });
+    p.binds = b;
+    return saveProfile(p);
+  }
+
+  var BUS = [];
+  function on(fn) { BUS.push(fn); return function () { BUS = BUS.filter(function (f) { return f !== fn; }); }; }
+  function fire(act, info) {
+    BUS.slice().forEach(function (fn) { try { fn(act, info || {}); } catch (e) {} });
+  }
+
+  var MB = { 1: 'middle', 2: 'right', 3: 'back', 4: 'forward' };
+  function trigOf(e) {
+    var t = e.pointerType || 'mouse';
+    if (t === 'pen') { var m = penMods(e); return m ? 'pen:' + m : null; }
+    if (t === 'mouse' && MB[e.button]) return 'mouse:' + MB[e.button];
+    return null;
+  }
+
+  var MODS_RE = /^(Control|Shift|Alt|Meta|OS|AltGraph|CapsLock|Fn)(Left|Right)?$/;
+  function comboOf(e) {
+    var code = e.code || '';
+    if (!code || MODS_RE.test(code) || MODS_RE.test(e.key || '')) return '';
+    var s = '';
+    if (e.ctrlKey) s += 'Ctrl+';
+    if (e.altKey) s += 'Alt+';
+    if (e.shiftKey) s += 'Shift+';
+    if (e.metaKey) s += 'Meta+';
+    return 'key:' + s + code;
+  }
+
+  var KEY_NAMES = { Space: 'Space', Enter: 'Enter', Tab: 'Tab', Backspace: 'Backspace', Delete: 'Delete',
+    ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→', Escape: 'Esc', PageUp: 'PgUp', PageDown: 'PgDn',
+    Home: 'Home', End: 'End', Insert: 'Ins', Minus: '-', Equal: '=', BracketLeft: '[', BracketRight: ']',
+    Backslash: '\\', Semicolon: ';', Quote: "'", Comma: ',', Period: '.', Slash: '/', Backquote: '`' };
+  function codeName(c) {
+    var m = /^Key([A-Z])$/.exec(c) || /^Digit([0-9])$/.exec(c) || /^Numpad([0-9])$/.exec(c);
+    if (m) return m[1];
+    return KEY_NAMES[c] || c.replace(/^Numpad/, 'Num ');
+  }
+
+  var TRIG_NAMES = {
+    'pen:barrel': ['زرُّ القلم الجانبيّ', 'Pen side button'],
+    'pen:tip': ['طرفُ الممحاة في القلم', 'Pen eraser end'],
+    'pen:second': ['زرُّ القلم الثاني', 'Pen second button'],
+    'pen:dbl-left': ['نقرتان بطرف القلم', 'Double tap with the pen'],
+    'pen:dbl-barrel': ['نقرتان بزرِّ القلم الجانبيّ', 'Double press of the side button'],
+    'mouse:right': ['زرُّ الفأرة الأيمن', 'Right mouse button'],
+    'mouse:middle': ['زرُّ الفأرة الأوسط', 'Middle mouse button'],
+    'mouse:back': ['زرُّ «رجوع» في الفأرة', 'Mouse back button'],
+    'mouse:forward': ['زرُّ «تقدّم» في الفأرة', 'Mouse forward button'],
+    'mouse:dbl-left': ['نقرٌ مزدوجٌ بالزرِّ الأيسر', 'Left double-click'],
+    'mouse:dbl-right': ['نقرٌ مزدوجٌ بالزرِّ الأيمن', 'Right double-click'],
+    'mouse:dbl-middle': ['نقرٌ مزدوجٌ بالزرِّ الأوسط', 'Middle double-click'],
+    'touch:2tap': ['نقرةٌ بإصبعين', 'Two-finger tap'],
+    'touch:3tap': ['نقرةٌ بثلاثة أصابع', 'Three-finger tap']
+  };
+  function trigLabel(t) {
+    var ar = document.documentElement.lang !== 'en';
+    if (TRIG_NAMES[t]) return TRIG_NAMES[t][ar ? 0 : 1];
+    if (t && t.indexOf('key:') === 0) {
+      var parts = t.slice(4).split('+'), code = parts.pop();
+      return parts.concat([codeName(code)]).join(' + ');
+    }
+    return t || '';
+  }
+  function actLabel(a) {
+    var ar = document.documentElement.lang !== 'en';
+    for (var i = 0; i < ACT_LIST.length; i++) if (ACT_LIST[i].k === a) return ar ? ACT_LIST[i].ar : ACT_LIST[i].en;
+    return a || '';
+  }
+  function trigIcon(t) {
+    if (!t) return 'fa-circle-question';
+    if (t.indexOf('pen:') === 0) return 'fa-pen-clip';
+    if (t.indexOf('mouse:') === 0) return 'fa-computer-mouse';
+    if (t.indexOf('touch:') === 0) return 'fa-hand-pointer';
+    return 'fa-keyboard';
+  }
+
+  function captureAny(cb, opt) {
+    var done = false, lastL = null, touches = {}, tStart = 0, tMax = 0, tMoved = 0, timer = 0;
+    var o = opt || {};
+    function stop() {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      window.removeEventListener('pointerdown', onDown, true);
+      window.removeEventListener('pointermove', onMove, true);
+      window.removeEventListener('pointerup', onUp, true);
+      window.removeEventListener('keydown', onKey, true);
+      window.removeEventListener('contextmenu', onCtx, true);
+    }
+    function got(t) { stop(); cb({ trig: t, label: trigLabel(t) }); }
+    function inUi(e) { return o.ignore && e.target && e.target.closest && e.target.closest(o.ignore); }
+    function onCtx(e) { e.preventDefault(); }
+    function onDown(e) {
+      if (inUi(e)) return;
+      var t = e.pointerType || 'mouse';
+      if (t === 'touch') {
+        touches[e.pointerId] = { x: e.clientX, y: e.clientY };
+        var n = Object.keys(touches).length;
+        if (n === 1) { tStart = Date.now(); tMax = 1; tMoved = 0; }
+        if (n > tMax) tMax = n;
+        e.preventDefault();
+        return;
+      }
+      var trig = trigOf(e);
+      if (trig) { e.preventDefault(); e.stopPropagation(); got(trig); return; }
+      if (e.button === 0) {
+        e.preventDefault(); e.stopPropagation();
+        var now0 = Date.now();
+        if (lastL && now0 - lastL.t < DBL_MS && Math.abs(e.clientX - lastL.x) < DBL_PX && Math.abs(e.clientY - lastL.y) < DBL_PX) {
+          got((t === 'pen' ? 'pen' : 'mouse') + ':dbl-left');
+          return;
+        }
+        lastL = { t: now0, x: e.clientX, y: e.clientY };
+        if (o.onHint) o.onHint('single');
+      }
+    }
+    function onMove(e) {
+      var s = touches[e.pointerId];
+      if (!s) return;
+      var d = Math.abs(e.clientX - s.x) + Math.abs(e.clientY - s.y);
+      if (d > tMoved) tMoved = d;
+    }
+    function onUp(e) {
+      if (!touches[e.pointerId]) return;
+      delete touches[e.pointerId];
+      if (Object.keys(touches).length) return;
+      if (tMax >= 2 && Date.now() - tStart < TAP_MS * 1.6 && tMoved < TAP_PX * 2) got(tMax >= 3 ? 'touch:3tap' : 'touch:2tap');
+    }
+    function onKey(e) {
+      if (e.key === 'Escape' && !e.ctrlKey && !e.altKey && !e.shiftKey && !e.metaKey) { e.preventDefault(); stop(); cb(null); return; }
+      var c = comboOf(e);
+      if (!c) return;
+      e.preventDefault(); e.stopPropagation();
+      got(c);
+    }
+    window.addEventListener('pointerdown', onDown, true);
+    window.addEventListener('pointermove', onMove, true);
+    window.addEventListener('pointerup', onUp, true);
+    window.addEventListener('keydown', onKey, true);
+    window.addEventListener('contextmenu', onCtx, true);
+    timer = setTimeout(function () { if (!done) { stop(); cb(null); } }, o.timeout || 20000);
+    return stop;
+  }
+
+  function keyEngine(adapter) {
+    var held = {};
+    function down(e) {
+      if (e.defaultPrevented || e.repeat) return;
+      if (adapter.active && !adapter.active()) return;
+      var t = e.target;
+      if (typing(t)) return;
+      if (t && t.closest && t.closest('dialog[open]')) return;
+      var c = comboOf(e);
+      var act = actFor(c);
+      if (!act || act === 'none') return;
+      e.preventDefault();
+      if (isTool(act)) {
+        held[e.code] = { act: act, t: Date.now(), how: (bindOf(c) || {}).h };
+        adapter.apply(act, 'down');
+      } else adapter.apply(act, 'cmd');
+    }
+    function up(e) {
+      var h = held[e.code];
+      if (!h) return;
+      delete held[e.code];
+      var how = h.how;
+      var tap = Date.now() - h.t < 300;
+      adapter.apply(h.act, (how === 'toggle' || (how !== 'hold' && tap)) ? 'tap' : 'up');
+    }
+    window.addEventListener('keydown', down, true);
+    window.addEventListener('keyup', up, true);
+    return function () {
+      window.removeEventListener('keydown', down, true);
+      window.removeEventListener('keyup', up, true);
+    };
+  }
+
   /*@3.NOIJ2.20*/
   var CODE_KEY = /^(?:Key([A-Z])|Digit([0-9]))$/;
   function keyOf(e) {
@@ -206,6 +539,8 @@
   }
 
   function palmMode(def) {
+    var pp = devProfile();
+    if (pp.touchSet) return { auto: 'auto', pan: 'always', draw: 'never', off: 'off' }[pp.src.touch] || 'auto';
     var d = def || 'auto';
     try { return localStorage.getItem(PALM_KEY) || d; }
     catch (e) { return d; }
@@ -378,10 +713,46 @@
     this.mode = o.mode || function () { return 'draw'; };
     this.palmDef = o.palmDefault || '';
     this.profile = o.profile || new Profile();
+    this.onDouble = o.onDouble || null;
     this.live = {};
     this.gest = {};
+    this.swallow = {};
+    this._dbl = null;
+    this._taps = null;
     this.bind();
   }
+
+  Router.prototype.runAct = function (act, trig) {
+    if (!act || act === 'none') return;
+    if (isCmd(act)) { fire(act, { trig: trig, el: this.el }); return; }
+    if (this.onEndMod) this.onEndMod({ mod: trig, act: act, moved: 0, held: 0, tap: true });
+  };
+
+  Router.prototype.dblOf = function (e) {
+    if (e.pointerType === 'touch') return null;
+    var b = e.button, t = now(), prev = this._dbl;
+    var side = b === 0 ? 'left' : (e.pointerType === 'pen' ? (penMods(e) || 'x') : (MB[b] || 'x'));
+    var name = (e.pointerType === 'pen' ? 'pen' : 'mouse') + ':dbl-' + side;
+    this._dbl = { name: name, t: t, x: e.clientX, y: e.clientY };
+    if (!prev || prev.name !== name || t - prev.t > DBL_MS ||
+        Math.abs(e.clientX - prev.x) > DBL_PX || Math.abs(e.clientY - prev.y) > DBL_PX) return null;
+    var a = actFor(name);
+    if (!a || a === 'none') return null;
+    this._dbl = null;
+    return name;
+  };
+
+  Router.prototype.noteTap = function (g) {
+    var T = this._taps;
+    if (!T || now() - T.t0 > TAP_MS * 1.6) T = this._taps = { t0: g.t0 || now(), n: 0, moved: 0 };
+    T.n = Math.max(T.n, this.gestureCount() + 1);
+    if ((g.moved || 0) > T.moved) T.moved = g.moved || 0;
+    if (this.gestureCount() > 0) return;
+    this._taps = null;
+    if (g.src !== 'touch' || T.n < 2 || T.moved > TAP_PX * 2 || now() - T.t0 > TAP_MS * 1.6) return;
+    var trig = T.n >= 3 ? 'touch:3tap' : 'touch:2tap', act = actFor(trig);
+    if (act && act !== 'none') this.runAct(act, trig);
+  };
 
   /*@3.NOIJ2.18*/
   Router.prototype.rect = function (fresh) {
@@ -434,10 +805,14 @@
 
     if (t === 'mouse') {
       if (P.mouseIsTwin()) return 'reject';
+      var ms = devProfile().src.mouse;
+      if (ms === 'off') return 'reject';
+      if (ms === 'pan') return 'gesture';
       return 'draw';
     }
 
     if (t === 'touch') {
+      if (pm === 'off') return 'reject';
       if (pm === 'never') return 'draw';
       if (pm === 'always') return 'gesture';
       if (P.penSeen) return 'gesture';
@@ -530,16 +905,36 @@
       /*@3.NOIJ2.27*/
       self._cr = null;
       /*@3.NOIJ2.13*/
-      var mod = penMods(e);
-      if (e.button > 0 && !mod) return;
+      var dbl = self.dblOf(e);
+      if (dbl) {
+        e.preventDefault();
+        self.swallow[e.pointerId] = 1;
+        if (/dbl-left$/.test(dbl) && self.onDouble) self.onDouble();
+        self.runAct(actFor(dbl), dbl, 'tap');
+        return;
+      }
+      var trig = trigOf(e);
+      var act = trig ? actFor(trig) : null;
+      if (trig && (!act || act === 'none')) {
+        if (e.pointerType !== 'pen') return;
+        act = null;
+      }
+      var mod = trig ? (e.pointerType === 'pen' ? penMods(e) : trig) : null;
+      if (act && isCmd(act)) {
+        e.preventDefault();
+        self.swallow[e.pointerId] = 1;
+        try { el.setPointerCapture(e.pointerId); } catch (errC) {}
+        self.runAct(act, trig, 'cmd');
+        return;
+      }
       var verdict = self.classify(e);
       if (verdict === 'reject') { e.preventDefault(); return; }
 
       /*@3.NOIJ2.22*/
-      if (!mod && (verdict === 'gesture' || self.mode() === 'pan')) {
+      if ((!mod && (verdict === 'gesture' || self.mode() === 'pan')) || act === 'hand') {
         e.preventDefault();
         self.cancelProvisional();
-        self.gest[e.pointerId] = Object.assign(self.gpt(e), { src: e.pointerType });
+        self.gest[e.pointerId] = Object.assign(self.gpt(e), { src: e.pointerType, t0: now(), moved: 0, act: act === 'hand' ? 'hand' : null });
         try { el.setPointerCapture(e.pointerId); } catch (err) {}
         self.emitGesture('start');
         return;
@@ -554,6 +949,7 @@
       self.effTilt(tr, pt, e);
       tr.pts.push(pt);
       tr.mod = mod;
+      tr.act = act;
       tr.t0 = now();
       /*@3.NOIJ2.21*/
       tr.hold = !!mod;
@@ -561,14 +957,19 @@
       if (!tr.hold) { tr.began = 1; self.onBegin(e.pointerId, pt, e.pointerType, null); }
       else if (contact(e, self.profile)) {
         tr.hold = false; tr.began = 1;
-        self.onBegin(e.pointerId, pt, e.pointerType, penButtons()[mod]);
+        self.onBegin(e.pointerId, pt, e.pointerType, tr.act);
       }
     };
 
     this._move = function (e) {
+      if (self.swallow[e.pointerId]) { e.preventDefault(); return; }
       if (self.gest[e.pointerId]) {
         e.preventDefault();
         var g = self.gpt(e);
+        var g0 = self.gest[e.pointerId];
+        if (g0.sx == null) { g0.sx = g0.cx; g0.sy = g0.cy; }
+        var mv = Math.abs(g.cx - g0.sx) + Math.abs(g.cy - g0.sy);
+        if (mv > (g0.moved || 0)) g0.moved = mv;
         self.gest[e.pointerId].x = g.x;
         self.gest[e.pointerId].y = g.y;
         self.gest[e.pointerId].cx = g.cx;
@@ -603,16 +1004,22 @@
         tr.hold = false;
         tr.began = 1;
         tr.start = tr.last;
-        self.onBegin(e.pointerId, tr.last, tr.src, penButtons()[tr.mod]);
+        self.onBegin(e.pointerId, tr.last, tr.src, tr.act);
       }
       self.onMove(e.pointerId, out, tr);
     };
 
     this._up = function (e) {
       self._cr = null;
+      if (self.swallow[e.pointerId]) { delete self.swallow[e.pointerId]; return; }
       if (self.gest[e.pointerId]) {
+        var gg = self.gest[e.pointerId];
         delete self.gest[e.pointerId];
+        self.noteTap(gg);
         self.emitGesture(self.gestureCount() ? 'move' : 'end');
+        if (gg.act === 'hand' && (gg.moved || 0) < TAP_PX && now() - (gg.t0 || 0) < 400 && self.onEndMod) {
+          self.onEndMod({ mod: 'hand', act: 'hand', moved: 0, held: now() - gg.t0, tap: true });
+        }
         return;
       }
       var tr = self.live[e.pointerId];
@@ -625,7 +1032,7 @@
       if (tr.mod && self.onEndMod) {
         self.onEndMod({
           mod: tr.mod,
-          act: penButtons()[tr.mod],
+          act: tr.act,
           moved: tr.moved || 0,
           held: now() - (tr.t0 || 0),
           tap: !tr.began
@@ -686,15 +1093,19 @@
     tiltFromXY: norm2,
     Profile: Profile,
     palmMode: palmMode,
-    setPalmMode: function (m) { try { localStorage.setItem(PALM_KEY, m); } catch (e) {} },
+    setPalmMode: function (m) {
+      try { localStorage.setItem(PALM_KEY, m); } catch (e) {}
+      var p = devProfile();
+      p.src.touch = { auto: 'auto', always: 'pan', never: 'draw', off: 'off' }[m] || 'auto';
+      p.touchSet = 1;
+      saveProfile(p);
+    },
     penButtons: penButtons,
     setPenButtons: function (m) {
-      var cur = penButtons();
-      if (m && typeof m.barrel === 'string') cur.barrel = m.barrel;
-      if (m && typeof m.tip === 'string') cur.tip = m.tip;
-      if (m && typeof m.second === 'string') cur.second = m.second;
-      try { localStorage.setItem(BTN_KEY, JSON.stringify(cur)); } catch (e) {}
-      return cur;
+      ['barrel', 'tip', 'second'].forEach(function (k) {
+        if (m && typeof m[k] === 'string') setBind('pen:' + k, m[k]);
+      });
+      return penButtons();
     },
     penMods: penMods,
     ACTS: ACTS,
@@ -708,6 +1119,27 @@
     clearPenKey: clearPenKey,
     keyFor: keyFor,
     capture: capture,
+    captureAny: captureAny,
+    keyEngine: keyEngine,
+    devId: devId,
+    devGuess: devGuess,
+    devProfile: devProfile,
+    saveProfile: saveProfile,
+    devName: devName,
+    otherDevices: otherDevices,
+    actFor: actFor,
+    bindOf: bindOf,
+    setBind: setBind,
+    trigOf: trigOf,
+    comboOf: comboOf,
+    trigLabel: trigLabel,
+    trigIcon: trigIcon,
+    actLabel: actLabel,
+    ACT_LIST: ACT_LIST,
+    isTool: isTool,
+    isCmd: isCmd,
+    on: on,
+    fire: fire,
     CONST: { MOUSE_TWIN_MS: MOUSE_TWIN_MS, COMMIT_PX: COMMIT_PX, PALM_AREA: PALM_AREA }
   };
 })();

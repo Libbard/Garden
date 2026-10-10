@@ -100,6 +100,11 @@
         <template class="content-en">Binary Adder-Subtractor (Half & Full Adder)</template>
         <span class="content-target">الجامع-الطرح الثنائي (نصف الجامع والجامع الكامل)</span>
       </a>
+      <a href="#worked-examples-analysis" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة محلولة: تحليل الدوائر التوافقية</template>
+        <template class="content-en">Worked Examples: Combinational Analysis</template>
+        <span class="content-target">أمثلة محلولة: تحليل الدوائر التوافقية</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -491,8 +496,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>للتحويل من كود ثنائي A إلى كود ثنائي B، يجب أن توفر خطوط الإدخال تركيبة البتات للكود A وتولد خطوط الإخراج تركيبة البتات للكود B.</p><p>في مثال تحويل BCD إلى Excess-3، نستخدم 4 متغيرات إدخال (A, B, C, D) و 4 متغيرات إخراج (w, x, y, z).</p><p>نظرًا لأن BCD يستخدم فقط الأرقام من 0 إلى 9، فإن الحالات الست المتبقية (10 إلى 15) تعتبر <span class="smart-term" data-term-en="Don't-care condition" data-ar="حالة عدم الاكتراث" data-en-def="Input combinations that will never occur in normal operation, allowing designers to assign them either 0 or 1 to simplify logic.">حالات عدم اكتراث</span> (Don't-care conditions).</p></template>
-    <template class="content-en"><p>To convert from code A to code B, input lines supply the bit combination of code A, and output lines generate code B.</p><p>In the BCD to Excess-3 example, there are 4 inputs (A, B, C, D) and 4 outputs (w, x, y, z).</p><p>Since BCD only represents decimal digits 0-9, the remaining 6 combinations (10-15) are <span class="smart-term" data-term-en="Don't-care condition" data-ar="حالة عدم الاكتراث" data-en-def="Input combinations that will never occur in normal operation, allowing designers to assign them either 0 or 1 to simplify logic.">don't-care conditions</span>.</p></template>
+    <template class="content-ar"><p>للتحويل من كود ثنائي A إلى كود ثنائي B، يجب أن توفر خطوط الإدخال تركيبة البتات للكود A وتولد خطوط الإخراج تركيبة البتات للكود B.</p><p>في مثال تحويل BCD إلى Excess-3، نستخدم 4 متغيرات إدخال (A, B, C, D) و 4 متغيرات إخراج (w, x, y, z).</p><p>نظرًا لأن BCD يستخدم فقط الأرقام من 0 إلى 9، فإن الحالات الست المتبقية (10 إلى 15) تعتبر <span class="smart-term" data-term-en="Don't-care condition" data-ar="حالة عدم الاكتراث" data-en-def="Input combinations that will never occur in normal operation, allowing designers to assign them either 0 or 1 to simplify logic.">حالات عدم اكتراث</span> (Don't-care conditions).</p><p>باستخدام خرائط كارنوف (K-maps) لمحول BCD إلى Excess-3، ومع استغلال حالات عدم الاكتراث (Don't-cares) من 10 إلى 15، نحصل على الدوال المبسطة التالية:</p><ul><li>$z = D'$</li><li>$y = CD + C'D' = CD + (C + D)'$</li><li>$x = B'C + B'D + BC'D' = B'(C + D) + BC'D'$</li><li>$w = A + BC + BD = A + B(C + D)$</li></ul><p>عند رسم المخطط المنطقي النهائي باستخدام هذه المعادلات، نلاحظ إمكانية إعادة استخدام بعض البوابات لتقليل التكلفة. على سبيل المثال، التعبير $(C + D)$ يتم حسابه مرة واحدة باستخدام بوابة OR ويتم تمريره كمدخل لحساب كل من $x$ و $w$ و $y$.</p></template>
+    <template class="content-en"><p>To convert from code A to code B, input lines supply the bit combination of code A, and output lines generate code B.</p><p>In the BCD to Excess-3 example, there are 4 inputs (A, B, C, D) and 4 outputs (w, x, y, z).</p><p>Since BCD only represents decimal digits 0-9, the remaining 6 combinations (10-15) are <span class="smart-term" data-term-en="Don't-care condition" data-ar="حالة عدم الاكتراث" data-en-def="Input combinations that will never occur in normal operation, allowing designers to assign them either 0 or 1 to simplify logic.">don't-care conditions</span>.</p><p>Using K-maps for the BCD to Excess-3 converter, and leveraging the don't-care conditions (10 through 15), we obtain the following simplified functions:</p><ul><li>$z = D'$</li><li>$y = CD + C'D' = CD + (C + D)'$</li><li>$x = B'C + B'D + BC'D' = B'(C + D) + BC'D'$</li><li>$w = A + BC + BD = A + B(C + D)$</li></ul><p>When drawing the final logic diagram using these expressions, we can reuse certain gates to reduce hardware cost. For instance, the term $(C + D)$ is computed once with an OR gate and shared as an input to calculate $x$, $w$, and $y$.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -938,14 +943,57 @@
   </details>
 </section>
 
+<section id="worked-examples-analysis" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> أمثلة محلولة: تحليل الدوائر التوافقية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Worked Examples: Combinational Analysis</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق عملي لخطوات التحليل لاستنتاج الدوال البولينية وجدول الحقيقة من مخطط منطقي يحتوي على متغيرات وسيطة.</p></template>
+    <template class="content-en"><p>Practical application of analysis steps to derive Boolean functions and a truth table from a logic diagram with intermediate variables.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحليل دائرة ذات مدخلات $A, B, C$ ومخرجات $F_1, F_2$:</p><ol><li>نحدد دوال البوابات المرتبطة بالمدخلات مباشرة: $T_2 = ABC$ و $T_1 = A + B + C$ و $F_2 = AB + AC + BC$.</li><li>نحدد دوال البوابات التي تعتمد على البوابات السابقة: $T_3 = F_2' T_1$.</li><li>نستنتج الدالة النهائية $F_1 = T_3 + T_2$.</li><li>ب<span class="smart-term" data-term-en="Repeated Substitution" data-ar="التعويض المتكرر" data-en-def="The process of replacing intermediate variables in a Boolean equation with their corresponding input-based expressions to find the final output function.">التعويض المتكرر<span class="smart-term-tooltip"></span></span>: $F_1 = (AB + AC + BC)'(A + B + C) + ABC$. وبعد التبسيط الجبري نصل إلى: $F_1 = A'BC' + A'B'C + AB'C' + ABC$.</li></ol><p>لاستنتاج جدول الحقيقة مباشرة:</p><ol><li>نكتب المجموعات الثمانية الممكنة للمدخلات (من 000 إلى 111).</li><li>نضيف أعمدة للمتغيرات الوسيطة ($F_2, F_2', T_1, T_2, T_3$) والمخرج النهائي ($F_1$).</li><li>نقيم كل عمود صفاً بصف. مثلاً، $T_2$ يكون 1 فقط عندما تكون $A,B,C=1$. $F_2$ يكون 1 إذا كان هناك على الأقل مدخلان قيمتهما 1.</li><li>نكمل الجدول حتى نصل إلى قيم $F_1$ النهائية لكل صف، مما يعطينا خريطة سلوك كاملة دون الحاجة للتبسيط الجبري.</li></ol></template>
+    <template class="content-en"><p>To analyze a circuit with inputs $A, B, C$ and outputs $F_1, F_2$:</p><ol><li>Identify functions of gates connected directly to inputs: $T_2 = ABC$, $T_1 = A + B + C$, and $F_2 = AB + AC + BC$.</li><li>Identify functions of gates depending on previous gates: $T_3 = F_2' T_1$.</li><li>Derive the final function $F_1 = T_3 + T_2$.</li><li>By <span class="smart-term" data-term-en="Repeated Substitution" data-ar="التعويض المتكرر" data-en-def="The process of replacing intermediate variables in a Boolean equation with their corresponding input-based expressions to find the final output function.">repeated substitution<span class="smart-term-tooltip"></span></span>: $F_1 = (AB + AC + BC)'(A + B + C) + ABC$. After algebraic simplification, we get: $F_1 = A'BC' + A'B'C + AB'C' + ABC$.</li></ol><p>To derive the truth table directly:</p><ol><li>List the 8 possible combinations for the inputs (000 to 111).</li><li>Add columns for <span class="smart-term" data-term-en="Intermediate Variable" data-ar="متغير وسيط" data-en-def="A symbol assigned to the output of an internal logic gate to simplify the step-by-step analysis of a larger circuit.">intermediate variable<span class="smart-term-tooltip"></span></span>s ($F_2, F_2', T_1, T_2, T_3$) and the final output ($F_1$).</li><li>Evaluate each column row by row. For example, $T_2$ is 1 only when $A,B,C=1$. $F_2$ is 1 if at least two inputs are 1.</li><li>Complete the table until final $F_1$ values are found for each row, providing a complete behavioral map without algebraic simplification.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>التبسيط الجبري في الخطوة 4 قد يكون معقداً وعرضة للأخطاء، لذا فإن استنتاج جدول الحقيقة مباشرة يوفر طريقة بديلة وأكثر أماناً للتحقق من سلوك الدائرة.</p><p>بمجرد الحصول على جدول الحقيقة، يمكننا استخدام خرائط كارنوف (K-maps) كطريقة عكسية للوصول إلى دوال مبسطة قد تكون أسهل من التبسيط الجبري اليدوي.</p></template>
+    <template class="content-en"><p>Algebraic simplification in step 4 can be complex and error-prone, so deriving the truth table directly provides a safer, alternative method to verify circuit behavior.</p><p>Once the truth table is obtained, K-maps can be used as a reverse method to reach simplified functions, which is often easier than manual algebraic manipulation.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى حساب $F_2'$ في جدول الحقيقة أثناء التحليل؟</template>
+      <template class="content-en">Why do we need to calculate $F_2'$ in the truth table during analysis?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن البوابة التي تنتج المتغير الوسيط $T_3$ تستخدم معكوس $F_2$ كأحد مدخلاتها، لذا يجب حسابه أولاً لإكمال التقييم.</p></template>
+      <template class="content-en"><p>Because the gate producing the intermediate variable $T_3$ uses the complement of $F_2$ as one of its inputs, so it must be calculated first to complete the evaluation.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في وحدة المنطق التوافقي. هذه الوحدة هي حجر الأساس لكل ما سنبنيه لاحقاً. تخيلوا الدائرة التوافقية كآلة حاسبة بسيطة: تعطيها أرقاماً، تعطيك النتيجة فوراً، ولا تتذكر ما فعلته في العملية السابقة. السر هنا هو 'لا توجد تغذية راجعة'. في الامتحان، ركزوا جيداً على التمييز بين التحليل (حيث نعطيك الرسمة ونطلب المعادلة) والتصميم (حيث نعطيك الفكرة ونطلب الرسمة). لا تنسوا خطوات التصميم الأربع: المدخلات/المخرجات، جدول الحقيقة، التبسيط (وهنا تبرز أهمية حالات عدم الاكتراث كما رأينا في BCD)، وأخيراً الرسم. وأخيراً، الجامعات الثنائية: نصف الجامع هو صديقكم البسيط ببوابتي XOR و AND، لكن تذكروا أنه لا يكفي لجمع أرقام كبيرة لأنه يفتقر لمدخل الحمل السابق، وهنا يأتي دور الجامع الكامل. راجعوا هذه المفاهيم جيداً، فهي مضمونة في الاختبار!</template>
-    <template class="content-en">Welcome, future engineers, to Combinational Logic. This module is the bedrock of digital design. Think of a combinational circuit as a simple calculator: it processes current inputs instantly with zero memory of the past. The golden rule? 'No feedback paths'. For the exam, clearly distinguish between Analysis (we give the diagram, you find the equation) and Design (we give the spec, you draw the diagram). Master the 4 design steps: I/O definition, Truth Table, Simplification (don't-cares are your best friends here, like in BCD), and Logic Diagram. Finally, the adders: the Half Adder is elegant with its XOR and AND gates, but remember its fatal flaw—no carry-in. That's why we need Full Adders for real arithmetic. Review these core concepts; they are guaranteed exam points!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في وحدة المنطق التوافقي. هذه الوحدة هي حجر الأساس لكل ما سنبنيه لاحقاً. تخيلوا الدائرة التوافقية كآلة حاسبة بسيطة: تعطيها أرقاماً، تعطيك النتيجة فوراً، ولا تتذكر ما فعلته في العملية السابقة. السر هنا هو 'لا توجد تغذية راجعة'. في الامتحان، ركزوا جيداً على التمييز بين التحليل (حيث نعطيك الرسمة ونطلب المعادلة) والتصميم (حيث نعطيك الفكرة ونطلب الرسمة). لا تنسوا خطوات التصميم الأربع: المدخلات/المخرجات، جدول الحقيقة، التبسيط (وهنا تبرز أهمية حالات عدم الاكتراث كما رأينا في BCD)، وأخيراً الرسم. وأخيراً، الجامعات الثنائية: نصف الجامع هو صديقكم البسيط ببوابتي XOR و AND، لكن تذكروا أنه لا يكفي لجمع أرقام كبيرة لأنه يفتقر لمدخل الحمل السابق، وهنا يأتي دور الجامع الكامل. راجعوا هذه المفاهيم جيداً، فهي مضمونة في الاختبار!<p>الآن بعد أن فهمنا النظرية، فإن التطبيق العملي هو ما يرسخ المعرفة. لاحظ كيف أن التحليل المنهجي خطوة بخطوة يفكك أعقد الدوائر إلى أجزاء بسيطة، وكيف أن التصميم الذكي لا يكتفي بالمعادلات الصحيحة، بل يبحث عن مشاركة البوابات لتقليل التكلفة، كما رأينا في محول BCD.</p></template>
+    <template class="content-en">Welcome, future engineers, to Combinational Logic. This module is the bedrock of digital design. Think of a combinational circuit as a simple calculator: it processes current inputs instantly with zero memory of the past. The golden rule? 'No feedback paths'. For the exam, clearly distinguish between Analysis (we give the diagram, you find the equation) and Design (we give the spec, you draw the diagram). Master the 4 design steps: I/O definition, Truth Table, Simplification (don't-cares are your best friends here, like in BCD), and Logic Diagram. Finally, the adders: the Half Adder is elegant with its XOR and AND gates, but remember its fatal flaw—no carry-in. That's why we need Full Adders for real arithmetic. Review these core concepts; they are guaranteed exam points!<p>Now that we understand the theory, practical application cements the knowledge. Notice how systematic, step-by-step analysis breaks down the most complex circuits into simple parts, and how smart design doesn't stop at correct equations but looks for gate sharing to minimize cost, as seen in the BCD converter.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1119,6 +1167,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">دائرة توافقية تجمع ثلاثة بتات: بتين أساسيين وحمل قادم من مرحلة سابقة.</template>
           <template class="content-en">A combinational circuit that adds three bits: two significant bits and a carry from a previous stage.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا قد يفضل المهندس استنتاج جدول الحقيقة مباشرة من المخطط المنطقي بدلاً من استنتاج الدوال البولينية أولاً؟</template>
+          <template class="content-en">Why might an engineer prefer to derive the truth table directly from the logic diagram instead of deriving the Boolean functions first?</template>
+          <span class="content-target">لماذا قد يفضل المهندس استنتاج جدول الحقيقة مباشرة من المخطط المنطقي بدلاً من استنتاج الدوال البولينية أولاً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>التبسيط الجبري للدوال المعقدة بالتعويض المتكرر عرضة للأخطاء البشرية. استنتاج جدول الحقيقة مباشرة يضمن الحصول على السلوك الدقيق للدائرة صفاً بصف، ويمكن بعد ذلك استخدام خرائط كارنوف لاستخراج دوال مبسطة وموثوقة.</p></template>
+          <template class="content-en"><p>Algebraic simplification of complex functions via repeated substitution is prone to human error. Deriving the truth table directly ensures the exact behavior is captured row by row, and K-maps can then be used to extract reliable, simplified functions.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يساهم استغلال حالات عدم الاكتراث (Don't-cares) في تقليل تكلفة تصنيع محول BCD إلى Excess-3؟</template>
+          <template class="content-en">How does exploiting don't-care conditions contribute to reducing the manufacturing cost of a BCD to Excess-3 converter?</template>
+          <span class="content-target">كيف يساهم استغلال حالات عدم الاكتراث (Don't-cares) في تقليل تكلفة تصنيع محول BCD إلى Excess-3؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>حالات عدم الاكتراث تمنح المصمم حرية اختيار قيمتها (0 أو 1) لتكوين مجموعات أكبر في خرائط كارنوف. المجموعات الأكبر تعني مصطلحات بولينية أقصر وبوابات منطقية أقل، مما يقلل بشكل مباشر من مساحة السيليكون والتكلفة.</p></template>
+          <template class="content-en"><p>Don't-cares give the designer the freedom to assign them as 0 or 1 to form larger groupings in K-maps. Larger groups mean shorter Boolean terms and fewer logic gates, which directly reduces silicon area and cost.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1386,6 +1469,40 @@
         "en": "Using K-maps for simplification."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هي ميزة استنتاج جدول الحقيقة مباشرة من المخطط المنطقي؟",
+      "en": "What is the advantage of deriving the truth table directly from the logic diagram?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تجنب التعقيد والأخطاء المحتملة في التبسيط الجبري للدوال البولينية.",
+        "en": "Avoiding the complexity and potential errors involved in the algebraic simplification of Boolean functions."
+      },
+      "example": {
+        "ar": "تقييم قيم البوابات صفاً بصف بدلاً من حل معادلات طويلة.",
+        "en": "Evaluating gate values row by row instead of solving long equations."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "كيف يتم تقليل تكلفة الأجهزة (Hardware cost) في المخطط المنطقي لمحول BCD إلى Excess-3؟",
+      "en": "How is hardware cost reduced in the logic diagram of the BCD to Excess-3 converter?"
+    },
+    "back": {
+      "definition": {
+        "ar": "من خلال إعادة استخدام البوابات المنطقية للمصطلحات المشتركة بين المعادلات.",
+        "en": "By reusing logic gates for common terms shared across multiple equations."
+      },
+      "example": {
+        "ar": "حساب التعبير $(C+D)$ مرة واحدة واستخدامه كمدخل لـ $w, x, y$.",
+        "en": "Computing the term $(C+D)$ once and using it as an input for $w, x, y$."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1395,7 +1512,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1411,7 +1528,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1736,6 +1853,70 @@
     },
     "difficulty": "medium",
     "conceptId": "analysis-procedure"
+  },
+  {
+    "conceptId": "code-conversion",
+    "question": {
+      "ar": "في تصميم محول BCD إلى Excess-3، أي تعبير يتم حسابه مرة واحدة وإعادة استخدامه لتقليل عدد البوابات؟",
+      "en": "In the BCD to Excess-3 converter design, which expression is computed once and reused to minimize gate count?"
+    },
+    "options": {
+      "ar": [
+        "A + B",
+        "C + D",
+        "B'C",
+        "C'D'"
+      ],
+      "en": [
+        "A + B",
+        "C + D",
+        "B'C",
+        "C'D'"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التعبير $(C+D)$ يظهر في معادلات $w, x, y$، لذا يمكن استخدام بوابة OR واحدة لحسابه وتمرير نتيجتها إلى البوابات الأخرى.",
+      "en": "The term $(C+D)$ appears in the equations for $w, x, y$, so a single OR gate can compute it and feed the result to the other gates."
+    },
+    "hint": {
+      "ar": "ابحث عن العامل المشترك بين المتغيرات الأقل أهمية.",
+      "en": "Look for the common factor among the less significant variables."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "worked-examples-analysis",
+    "question": {
+      "ar": "عند استنتاج جدول الحقيقة مباشرة من مخطط منطقي، ماذا تمثل الرموز العشوائية مثل $T_1$ و $T_2$؟",
+      "en": "When deriving a truth table directly from a logic diagram, what do arbitrary symbols like $T_1$ and $T_2$ represent?"
+    },
+    "options": {
+      "ar": [
+        "المدخلات النهائية للدائرة.",
+        "حالات عدم الاكتراث.",
+        "مخرجات البوابات الداخلية (المتغيرات الوسيطة).",
+        "عناصر الذاكرة."
+      ],
+      "en": [
+        "The final inputs of the circuit.",
+        "Don't-care conditions.",
+        "Outputs of internal gates (intermediate variables).",
+        "Memory elements."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تُستخدم هذه الرموز كمتغيرات وسيطة لتتبع الإشارات عبر الدائرة خطوة بخطوة حتى نصل إلى المخرج النهائي.",
+      "en": "These symbols are used as intermediate variables to track signals through the circuit step-by-step until the final output is reached."
+    },
+    "hint": {
+      "ar": "إنها محطات توقف في منتصف الدائرة.",
+      "en": "They are waypoints in the middle of the circuit."
+    },
+    "difficulty": "easy",
+    "id": 12
   }
 ]
 </script>

@@ -513,7 +513,14 @@
             'Note saved — the linked task could not be created.'));
     };
 
-    if (!rec.remind_at) { done(false); return; }
+    if (!rec.remind_at) {
+      if (!wasEdit) { done(false); return; }
+      needData(function (ok) {
+        if (ok && GardenData.unlinkNoteTask) { try { GardenData.unlinkNoteTask(rec.id); } catch (e5) {} }
+        done(false);
+      });
+      return;
+    }
     needData(function (ok) {
       var linked = false;
       if (ok) {

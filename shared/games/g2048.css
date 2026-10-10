@@ -1,0 +1,121 @@
+.g48 {
+  --g48-board: var(--bg-body);
+  --g48-well: color-mix(in oklab, var(--text-muted) 12%, var(--bg-surface));
+  --g48-l: .8;
+  --g48-c: .16;
+  --gap: clamp(6px, 2.4vw, 12px);
+  inline-size: min(100%, 600px, max(290px, 100dvh - 340px)); display: grid; gap: .7rem; justify-items: center;
+}
+[data-theme="light"] .g48 {
+  --g48-board: #bbada0;
+  --g48-well: #cdc1b4;
+  --g48-l: .66;
+  --g48-c: .17;
+}
+.g48--n5 { --gap: clamp(5px, 2vw, 10px); }
+
+.g48-board {
+  position: relative; inline-size: 100%; aspect-ratio: 1; direction: ltr; touch-action: none; container-type: inline-size;
+  border-radius: var(--radius-lg); background: var(--g48-board); border: 1px solid var(--border-color);
+  user-select: none; -webkit-user-select: none; cursor: grab; outline: none;
+}
+.g48-board:active { cursor: grabbing; }
+.g48-board:focus-visible { outline: 2px solid var(--gm-tint); outline-offset: 3px; }
+.g48-bg {
+  position: absolute; inset: 0; padding: var(--gap); display: grid; gap: var(--gap);
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr)); grid-template-rows: repeat(var(--n), minmax(0, 1fr));
+}
+.g48-cell { border-radius: var(--radius-md); background: var(--g48-well); }
+.g48-layer { position: absolute; inset: var(--gap); }
+
+.g48-tile {
+  position: absolute; inset-block-start: 0; inset-inline-start: 0; z-index: 2;
+  inline-size: calc((100% - (var(--n) - 1) * var(--gap)) / var(--n));
+  block-size: calc((100% - (var(--n) - 1) * var(--gap)) / var(--n));
+  transition: transform 110ms ease-in-out; will-change: transform;
+}
+.g48-tile.g48-gone { z-index: 1; }
+.g48-tile.g48-pop { z-index: 3; }
+.g48-in {
+  --fs: .44;
+  display: grid; place-items: center; inline-size: 100%; block-size: 100%; border-radius: var(--radius-md);
+  background: var(--t, #eee4da);
+  color: #776e65; font-family: 'Inter', 'Cairo', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums;
+  line-height: 1; letter-spacing: -.02em;
+  font-size: calc(min(100vw - 2.5rem, 460px) / var(--n) * var(--fs));
+}
+@supports (font-size: 1cqi) { .g48-in { font-size: calc(100cqi / var(--n) * var(--fs)); } }
+.g48-d3 { --fs: .38; }
+.g48-d4 { --fs: .3; }
+.g48-d5 { --fs: .245; }
+.g48-d6 { --fs: .205; }
+
+.g48-v2 { --t: #eee4da; }
+.g48-v4 { --t: #ede0c8; }
+.g48-v8 { --t: #f2b179; color: #f9f6f2; }
+.g48-v16 { --t: #f59563; color: #f9f6f2; }
+.g48-v32 { --t: #f67c5f; color: #f9f6f2; }
+.g48-v64 { --t: #f65e3b; color: #f9f6f2; }
+.g48-v128 { --t: #edcf72; color: #f9f6f2; }
+.g48-v256 { --t: #edcc61; color: #f9f6f2; }
+.g48-v512 { --t: #edc850; color: #f9f6f2; }
+.g48-v1024 { --t: #edc53f; color: #f9f6f2; }
+.g48-v2048 { --t: #edc22e; color: #f9f6f2; }
+.g48-vx { --t: #3c3a32; color: #f9f6f2; }
+
+.g48-new .g48-in { animation: g48New 160ms ease-out 100ms backwards; }
+.g48-pop .g48-in { animation: g48Pop 200ms ease-out 100ms backwards; }
+.g48-fade .g48-in { animation: g48Fade 160ms ease-out backwards; }
+.g48-bump { animation: g48Bump 180ms ease-out; }
+@keyframes g48New { from { opacity: 0; transform: scale(.35); } }
+@keyframes g48Pop { 0% { transform: scale(0); } 55% { transform: scale(1.16); } 100% { transform: scale(1); } }
+@keyframes g48Fade { from { opacity: 0; transform: scale(.92); } }
+@keyframes g48Bump { 40% { transform: scale(.985); } }
+
+.g48-win {
+  position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 1rem;
+  border-radius: inherit; background: color-mix(in oklab, var(--bg-body) 68%, transparent);
+  backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); animation: g48Fade .25s ease-out both;
+}
+.g48-win[hidden] { display: none; }
+.g48-win-box { display: grid; justify-items: center; gap: .4rem; text-align: center; max-inline-size: 18rem; }
+.g48-win-ico {
+  inline-size: 3.2rem; block-size: 3.2rem; border-radius: 50%; display: grid; place-items: center; font-size: 1.3rem;
+  color: var(--text-primary); background: color-mix(in oklab, oklch(var(--g48-l) var(--g48-c) 80) 30%, transparent);
+}
+.g48-win h3 { margin: .2rem 0 0; font-size: 1.35rem; font-weight: 800; color: var(--text-primary); }
+.g48-win p { margin: 0; color: var(--text-secondary); font-size: .92rem; }
+.g48-go { margin-block-start: .5rem; padding-inline: 1.4rem; min-block-size: 2.75rem; }
+
+.g48-tip { margin: 0; font-size: .8rem; line-height: 1.9; color: var(--text-muted); text-align: center; }
+.g48-keys { display: inline-block; unicode-bidi: isolate; direction: ltr; }
+.g48-tip kbd {
+  display: inline-block; min-inline-size: 1.25rem; padding-inline: .25rem; margin-inline: .08rem; border-radius: 4px; unicode-bidi: isolate; direction: ltr;
+  font-family: 'Inter', sans-serif; font-size: .7rem; line-height: 1.45; text-align: center;
+  border: 1px solid var(--border-color); background: var(--bg-elevated); color: var(--text-secondary);
+}
+.g48-acts { display: flex; justify-content: center; }
+.g48-undo { min-block-size: 2.75rem; padding-inline: 1.1rem; }
+.g48-cnt {
+  display: inline-grid; place-items: center; min-inline-size: 1.45rem; block-size: 1.45rem; padding-inline: .3rem; border-radius: 999px;
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; font-size: .78rem;
+  background: color-mix(in oklab, var(--gm-tint) 16%, transparent); color: var(--text-primary);
+}
+.g48-undo:disabled .g48-cnt { background: color-mix(in oklab, var(--text-muted) 16%, transparent); }
+
+.gm-stat.g48-sc { position: relative; }
+.g48-plus {
+  position: absolute; inset-inline-end: .55rem; inset-block-start: -.15rem; pointer-events: none;
+  font-style: normal; font-weight: 800; font-size: .9rem; color: var(--gm-ok);
+  font-family: 'Inter', sans-serif; font-variant-numeric: tabular-nums; unicode-bidi: isolate; direction: ltr;
+  animation: g48Up 650ms ease-out forwards;
+}
+@keyframes g48Up { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-1.5rem); } }
+
+.g48--still .g48-tile { transition: none; }
+.g48--still .g48-in, .g48--still .g48-win, .g48--still.g48-bump, .g48--still .g48-bump { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .g48-tile { transition: none; }
+  .g48-in, .g48-win, .g48-bump, .g48-plus { animation: none; }
+  .g48-plus { display: none; }
+}

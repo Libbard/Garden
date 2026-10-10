@@ -1,0 +1,2340 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS473" data-module="10" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>اكتشاف الميزات ومطابقتها (الجزء الأول) · DS473 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS473" data-page-title-en="DS473">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M09.html" data-gh-next="M11.html" data-gh-card="../../hub/course.html?code=DS473"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#points-and-patches-stages" class="toc-link" data-bilingual>
+        <template class="content-ar">النقاط والرقع ومراحل الاكتشاف</template>
+        <template class="content-en">Points and Patches &amp; Detection Stages</template>
+        <span class="content-target">النقاط والرقع ومراحل الاكتشاف</span>
+      </a>
+      <a href="#feature-detectors-stage1" class="toc-link" data-bilingual>
+        <template class="content-ar">المرحلة الأولى: مكتشفات الميزات (Feature Detectors)</template>
+        <template class="content-en">Stage 1: Feature Detectors</template>
+        <span class="content-target">المرحلة الأولى: مكتشفات الميزات (Feature Detectors)</span>
+      </a>
+      <a href="#feature-descriptors-stage2" class="toc-link" data-bilingual>
+        <template class="content-ar">المرحلة الثانية: واصفات الميزات (Feature Descriptors)</template>
+        <template class="content-en">Stage 2: Feature Descriptors</template>
+        <span class="content-target">المرحلة الثانية: واصفات الميزات (Feature Descriptors)</span>
+      </a>
+      <a href="#feature-matching-stage3" class="toc-link" data-bilingual>
+        <template class="content-ar">المرحلة الثالثة: مطابقة الميزات (Feature Matching)</template>
+        <template class="content-en">Stage 3: Feature Matching</template>
+        <span class="content-target">المرحلة الثالثة: مطابقة الميزات (Feature Matching)</span>
+      </a>
+      <a href="#edges-and-contours" class="toc-link" data-bilingual>
+        <template class="content-ar">الحواف والخطوط الكنتورية (Edges and Contours)</template>
+        <template class="content-en">Edges and Contours</template>
+        <span class="content-target">الحواف والخطوط الكنتورية (Edges and Contours)</span>
+      </a>
+      <a href="#contour-detection-chain-code" class="toc-link" data-bilingual>
+        <template class="content-ar">اكتشاف الخطوط الكنتورية ورمز السلسلة (Contour Detection &amp; Chain Code)</template>
+        <template class="content-en">Contour Detection &amp; Chain Code</template>
+        <span class="content-target">اكتشاف الخطوط الكنتورية ورمز السلسلة (Contour Detection &amp; Chain Code)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 10</template>
+      <template class="content-en">Module 10</template>
+      <span class="content-target">الوحدة 10</span>
+    </span> · DS473
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">اكتشاف الميزات ومطابقتها (الجزء الأول)</h1>
+      <p class="hero-description">تغطي هذه الوحدة المفاهيم الأساسية لاكتشاف النقاط الرئيسية (Keypoints) والرقع (Patches)، واستخراج واصفات الميزات مثل SIFT، واستراتيجيات المطابقة، بالإضافة إلى اكتشاف الحواف والخطوط الكنتورية.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Feature detection and matching I</h1>
+      <p class="hero-description">This module covers the fundamental concepts of detecting keypoints and patches, extracting feature descriptors like SIFT, matching strategies, and detecting edges and contours.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">الرؤية بالحاسب</span>
+      <span class="tag">اكتشاف الميزات</span>
+      <span class="tag">SIFT</span>
+      <span class="tag">مطابقة الصور</span>
+      <span class="tag">اكتشاف الحواف</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Computer Vision</span>
+      <span class="tag">Feature Detection</span>
+      <span class="tag">SIFT</span>
+      <span class="tag">Image Matching</span>
+      <span class="tag">Edge Detection</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>وصف أهمية النقاط الرئيسية (Keypoints) والرقع (Patches) في تحليل الصور.</span></li>
+      <li><span class="obj-icon">✦</span><span>تنفيذ طرق لاكتشاف ووصف النقاط الرئيسية والرقع.</span></li>
+      <li><span class="obj-icon">✦</span><span>تطبيق اكتشاف النقاط الرئيسية في مهام مثل مطابقة الصور والتعرف على الكائنات.</span></li>
+      <li><span class="obj-icon">✦</span><span>شرح أهمية الحواف والخطوط الكنتورية في فهم بنية الصورة، واستخدام الخوارزميات لاكتشافها.</span></li>
+      <li><span class="obj-icon">✦</span><span>توظيف تقنيات اكتشاف الحواف والخطوط الكنتورية في التطبيقات العملية.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Describe the significance of key points and patches in image analysis.</span></li>
+      <li><span class="obj-icon">✦</span><span>Implement methods for detecting and describing key points and patches.</span></li>
+      <li><span class="obj-icon">✦</span><span>Apply key point and patch detection in tasks such as image matching and object recognition.</span></li>
+      <li><span class="obj-icon">✦</span><span>Explain the importance of edges and contours in understanding image structure, and utilize algorithms to detect them.</span></li>
+      <li><span class="obj-icon">✦</span><span>Employ edge and contour detection techniques in practical applications.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="points-and-patches-stages" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> النقاط والرقع ومراحل الاكتشاف</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Points and Patches &amp; Detection Stages</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>النقاط الرئيسية هي مواقع مميزة في الصورة يمكن العثور عليها ومطابقتها حتى مع وجود تداخل أو تغير في الحجم والاتجاه، تماماً مثل المعالم البارزة في خريطة المدينة.</p></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Keypoints" data-ar="النقاط الرئيسية" data-en-def="Distinctive points in an image that permit matching even in the presence of clutter, scale, and orientation changes.">Keypoints<span class="smart-term-tooltip"></span></span> are distinctive locations in an image that can be matched even with occlusion, scale, or orientation changes, much like prominent landmarks on a city map.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم ميزات النقاط (Point features) للعثور على مجموعة متناثرة من المواقع المتطابقة في صور مختلفة. هناك نهجان رئيسيان للعثور على هذه الميزات:</p><ol><li><b>التتبع (Tracking):</b> العثور على ميزات في صورة واحدة وتتبعها بدقة باستخدام تقنية بحث محلي (مثل الارتباط). مناسب للصور المأخوذة من وجهات نظر متقاربة أو مقاطع الفيديو.</li><li><b>الاكتشاف المستقل (Independent Detection):</b> اكتشاف الميزات بشكل مستقل في جميع الصور ثم مطابقتها بناءً على مظهرها المحلي. مناسب للتغيرات الكبيرة في الحركة أو المظهر (مثل دمج الصور البانورامية).</li></ol><p>تتكون عملية اكتشاف <span class="smart-term" data-term-en="Keypoints" data-ar="النقاط الرئيسية" data-en-def="Distinctive points in an image that permit matching even in the presence of clutter, scale, and orientation changes.">النقاط الرئيسية<span class="smart-term-tooltip"></span></span> من أربع مراحل: الاكتشاف (تحديد نقاط الاهتمام)، الوصف (استخراج متجه يصف المنطقة المحيطة)، المطابقة (تحديد التطابق بين الواصفات)، والتتبع (كبديل للمطابقة في الفيديو).</p></template>
+    <template class="content-en"><p>Point features are used to find a sparse set of corresponding locations in different images. There are two main approaches to finding these features and their correspondences:</p><ol><li><b>Tracking:</b> Find features in one image that can be accurately tracked using a local search technique (e.g., correlation). Suitable when images are taken from nearby viewpoints or in rapid succession (video).</li><li><b>Independent Detection:</b> Independently detect features in all images and then match them based on local appearance. Suitable when a large amount of motion or appearance change is expected (e.g., panoramas).</li></ol><p>The stages of keypoint detection are: 1) Detection (Identify interest points), 2) Description (Extract vector feature descriptor surrounding each point), 3) Matching (Determine correspondence between descriptors), and 4) Tracking (alternative to matching for video).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نفضل الاكتشاف المستقل في الصور البانورامية؟ لأن التتبع المحلي يفشل عندما تكون المسافة بين الكاميرتين (Baseline) كبيرة، مما يؤدي إلى تغير جذري في المنظور لا يمكن للبحث المحلي البسيط التعامل معه.</p><p>تعتبر مرحلة الوصف (Description) حاسمة لأنها يجب أن تحول بكسلات الصورة الخام إلى تمثيل رياضي (متجه) يكون مقاوماً (Invariant) للتغيرات في الإضاءة، الدوران، والمقياس.</p></template>
+    <template class="content-en"><p>Why prefer independent detection for panoramas? Because local tracking fails when the baseline between cameras is large, leading to drastic perspective changes that simple local search cannot handle.</p><p>The Description stage is critical because it must transform raw image pixels into a mathematical representation (vector) that is invariant to changes in lighting, rotation, and scale.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: A flowchart showing the 3 main stages of feature matching: 1. Detection (showing an image with red dots on mountain peaks), 2. Description (showing a zoomed-in patch around a dot converting to a vector x_1), 3. Matching (showing two mountain images with arrows connecting corresponding points). Style: educational, dark background #0d1117, accent color #3b82f6. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Main Flow Arrow Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Muted Internal Arrow Marker -->
+    <marker id="arrow-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-muted)" />
+    </marker>
+
+    <!-- Clip Paths for Image Boundaries -->
+    <clipPath id="clip1">
+      <rect x="90" y="170" width="180" height="140" rx="6" />
+    </clipPath>
+    <clipPath id="clip2">
+      <rect x="390" y="200" width="80" height="80" rx="6" />
+    </clipPath>
+    <clipPath id="clip3A">
+      <rect x="700" y="150" width="110" height="80" rx="6" />
+    </clipPath>
+    <clipPath id="clip3B">
+      <rect x="830" y="250" width="110" height="80" rx="6" />
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Main Diagram Title -->
+  <text x="500" y="45" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="24" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Stages of Feature Matching</text>
+  <text x="500" y="45" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="24" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">مراحل مطابقة الخصائص</text>
+
+  <!-- ==========================================
+       STAGE 1: DETECTION
+       ========================================== -->
+  <!-- Stage Container -->
+  <rect x="40" y="90" width="280" height="320" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <!-- Step Badge & Title -->
+  <circle cx="180" cy="115" r="14" fill="var(--brand-500)" />
+  <text x="180" y="120" text-anchor="middle" fill="var(--on-brand-lo)" font-size="14" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">1</text>
+  <text x="180" y="145" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Detection</text>
+  <text x="180" y="145" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">الاكتشاف</text>
+
+  <!-- Visual: Image with Mountains and Keypoints -->
+  <rect x="90" y="170" width="180" height="140" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <path d="M 70 310 L 130 200 L 170 260 L 210 180 L 250 240 L 280 310 Z" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" clip-path="url(#clip1)" />
+  
+  <!-- Keypoints (Red/Brand Dots) -->
+  <circle cx="130" cy="200" r="5" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="170" cy="260" r="5" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="210" cy="180" r="5" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  <circle cx="250" cy="240" r="5" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1.5" />
+  
+  <!-- Highlight on Target Keypoint -->
+  <circle cx="210" cy="180" r="16" fill="none" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,4" />
+
+  <!-- Description -->
+  <text x="180" y="370" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Identify interest points</text>
+  <text x="180" y="370" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">تحديد نقاط الاهتمام</text>
+
+  <!-- Flow Arrow 1 -> 2 -->
+  <path d="M 320 250 L 350 250" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+
+  <!-- ==========================================
+       STAGE 2: DESCRIPTION
+       ========================================== -->
+  <!-- Stage Container -->
+  <rect x="360" y="90" width="280" height="320" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <!-- Step Badge & Title -->
+  <circle cx="500" cy="115" r="14" fill="var(--brand-500)" />
+  <text x="500" y="120" text-anchor="middle" fill="var(--on-brand-lo)" font-size="14" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">2</text>
+  <text x="500" y="145" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Description</text>
+  <text x="500" y="145" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">الوصف</text>
+
+  <!-- Visual: Zoomed Patch to Vector -->
+  <!-- Patch Box -->
+  <rect x="390" y="200" width="80" height="80" rx="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4,4" />
+  <path d="M 370 300 L 430 220 L 490 300 Z" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" clip-path="url(#clip2)" />
+  <line x1="430" y1="200" x2="430" y2="280" stroke="var(--brand-500)" stroke-width="1" opacity="0.3" />
+  <line x1="390" y1="240" x2="470" y2="240" stroke="var(--brand-500)" stroke-width="1" opacity="0.3" />
+  <circle cx="430" cy="220" r="6" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="2" />
+
+  <!-- Arrow to Vector -->
+  <path d="M 475 240 L 515 240" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-muted)" />
+
+  <!-- Feature Vector Box -->
+  <rect x="525" y="170" width="50" height="140" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <line x1="525" y1="198" x2="575" y2="198" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="525" y1="226" x2="575" y2="226" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="525" y1="254" x2="575" y2="254" stroke="var(--border-color)" stroke-width="1" />
+  <line x1="525" y1="282" x2="575" y2="282" stroke="var(--border-color)" stroke-width="1" />
+  
+  <!-- Vector Values -->
+  <text x="550" y="189" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">v₁</text>
+  <text x="550" y="217" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">v₂</text>
+  <text x="550" y="245" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">v₃</text>
+  <text x="550" y="273" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">⋮</text>
+  <text x="550" y="301" text-anchor="middle" fill="var(--text-primary)" font-size="14" font-family="system-ui, 'Cairo', 'Inter', sans-serif">vₙ</text>
+
+  <!-- Vector Label -->
+  <text x="550" y="330" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Descriptor x₁</text>
+  <text x="550" y="330" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="13" font-family="system-ui, 'Cairo', 'Inter', sans-serif">الوصف x₁</text>
+
+  <!-- Description -->
+  <text x="500" y="370" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Extract feature vector</text>
+  <text x="500" y="370" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">استخراج متجه الخصائص</text>
+
+  <!-- Flow Arrow 2 -> 3 -->
+  <path d="M 640 250 L 670 250" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+
+
+  <!-- ==========================================
+       STAGE 3: MATCHING
+       ========================================== -->
+  <!-- Stage Container -->
+  <rect x="680" y="90" width="280" height="320" rx="12" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <!-- Step Badge & Title -->
+  <circle cx="820" cy="115" r="14" fill="var(--brand-500)" />
+  <text x="820" y="120" text-anchor="middle" fill="var(--on-brand-lo)" font-size="14" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">3</text>
+  <text x="820" y="145" text-anchor="middle" class="gsvg-en" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Matching</text>
+  <text x="820" y="145" text-anchor="middle" class="gsvg-ar" fill="var(--brand-ink)" font-size="18" font-weight="bold" font-family="system-ui, 'Cairo', 'Inter', sans-serif">المطابقة</text>
+
+  <!-- Visual: Two Images with Connecting Lines -->
+  <!-- Image A (Top Left) -->
+  <rect x="700" y="150" width="110" height="80" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <path d="M 690 230 L 730 170 L 760 200 L 790 160 L 820 230 Z" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" clip-path="url(#clip3A)" />
+  <circle cx="730" cy="170" r="4" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1" />
+  <circle cx="760" cy="200" r="4" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1" />
+  <circle cx="790" cy="160" r="4" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1" />
+
+  <!-- Image B (Bottom Right) -->
+  <rect x="830" y="250" width="110" height="80" rx="6" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+  <path d="M 820 330 L 860 280 L 890 300 L 920 260 L 950 330 Z" fill="var(--bg-elevated)" stroke="var(--text-muted)" stroke-width="2" clip-path="url(#clip3B)" />
+  <circle cx="860" cy="280" r="4" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1" />
+  <circle cx="890" cy="300" r="4" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1" />
+  <circle cx="920" cy="260" r="4" fill="var(--brand-500)" stroke="var(--bg-surface)" stroke-width="1" />
+
+  <!-- Matching Lines -->
+  <path d="M 730 170 L 860 280" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="4,4" />
+  <path d="M 760 200 L 890 300" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="4,4" />
+  <path d="M 790 160 L 920 260" stroke="var(--brand-500)" stroke-width="1.5" stroke-dasharray="4,4" />
+
+  <!-- Distance Label -->
+  <rect x="760" y="220" width="100" height="24" rx="12" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+  <text x="810" y="236" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif">d(x₁, x₂) &lt; τ</text>
+  <text x="810" y="236" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="12" font-family="system-ui, 'Cairo', 'Inter', sans-serif">d(x₁, x₂) &lt; τ</text>
+
+  <!-- Description -->
+  <text x="820" y="370" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">Find correspondences</text>
+  <text x="820" y="370" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-size="15" font-family="system-ui, 'Cairo', 'Inter', sans-serif">إيجاد التطابقات</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في نظام تتبع حركة العين، هل تفضل استخدام نهج 'التتبع' أم 'الاكتشاف المستقل'؟ ولماذا؟</template>
+      <template class="content-en">In an eye-tracking system, would you prefer the 'tracking' or 'independent detection' approach? Why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نهج التتبع هو الأفضل، لأن إطارات الفيديو يتم التقاطها بتتابع سريع جداً، والتغيير بين الإطارات يكون صغيراً، مما يجعل البحث المحلي (التتبع) أسرع وأكثر كفاءة من اكتشاف الميزات من الصفر في كل إطار.</p></template>
+      <template class="content-en"><p>The tracking approach is preferred. Video frames are captured in rapid succession, so the change between frames is small. Local search (tracking) is much faster and more efficient than detecting features from scratch in every single frame.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feature-detectors-stage1" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> المرحلة الأولى: مكتشفات الميزات (Feature Detectors)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Stage 1: Feature Detectors</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مكتشفات الميزات تبحث عن مناطق في الصورة يسهل تحديد موقعها بدقة، مثل الزوايا أو المناطق ذات التباين العالي، وتتجنب المناطق المسطحة الخالية من الملمس.</p></template>
+    <template class="content-en"><p>Feature detectors search for image regions that are easy to localize accurately, such as corners or high-contrast areas, avoiding flat, textureless regions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم البحث في كل صورة عن المواقع التي من المحتمل أن تتطابق جيداً. الرقع الخالية من الملمس (Textureless) يكاد يكون من المستحيل تحديد موقعها، بينما الرقع ذات التغيرات الكبيرة في التباين (التدرجات) أسهل.</p><p><b>معيار المطابقة:</b> أبسط معيار هو مجموع الفروق المربعة (Summed Square Difference - SSD).</p><p><b>مصفوفة الارتباط الذاتي (Auto-correlation):</b> تقارن رقعة الصورة بنفسها لحساب مدى استقرار المصفوفة بالنسبة للتغيرات الصغيرة في الموضع. يمكن تفسير هذه المصفوفة كصورة موتر (Tensor).</p><p><b>مكتشف Forstner-Harris:</b> يستخدم القيم القصوى المحلية في مقاييس غير متغيرة الدوران مشتقة من مصفوفة الارتباط الذاتي. يستخدم نافذة وزن غاوسية لجعله غير حساس لدوران الصورة.</p><p><b><span class="smart-term" data-term-en="ANMS" data-ar="القمع غير الأقصى التكيفي" data-en-def="A technique to ensure a uniform spatial distribution of detected feature points across an image.">القمع غير الأقصى التكيفي<span class="smart-term-tooltip"></span></span> (ANMS):</b> يحل مشكلة تركز النقاط في مناطق التباين العالي. يكتشف فقط الميزات التي تكون قيماً قصوى محلية وقيمتها أكبر بـ 10% من جميع جيرانها ضمن نصف قطر معين، مما يعطي توزيعاً مكانياً أكثر تجانساً.</p><p><b>ثبات المقياس والدوران:</b> يتم تحقيق ثبات المقياس (Scale invariance) باستخراج الميزات عبر مقاييس متعددة باستخدام هرم غاوسي. يتم تحقيق ثبات الدوران (Rotational invariance) بتقدير الاتجاه المحلي (عبر مدرج تكراري للاتجاهات) وتدوير الرقعة بناءً عليه.</p></template>
+    <template class="content-en"><p>Each image is searched for locations likely to match well. Textureless patches are nearly impossible to localize, while patches with large contrast changes (gradients) are easier.</p><p><b>Matching Criterion:</b> The simplest is the Summed Square Difference (SSD).</p><p><b>Auto-correlation matrix:</b> Compares an image patch against itself to compute stability with respect to small position variations. This matrix can be interpreted as a tensor image.</p><p><b>Forstner-Harris:</b> Uses local maxima in rotationally invariant scalar measures derived from the auto-correlation matrix. It uses a Gaussian weighting window, making it insensitive to in-plane rotations.</p><p><b>Adaptive Non-Maximal Suppression (<span class="smart-term" data-term-en="ANMS" data-ar="القمع غير الأقصى التكيفي" data-en-def="A technique to ensure a uniform spatial distribution of detected feature points across an image.">ANMS<span class="smart-term-tooltip"></span></span>):</b> Solves the problem of features clustering in high-contrast regions. It only detects features that are local maxima and whose response is significantly (10%) greater than neighbors within radius r, ensuring uniform spatial distribution.</p><p><b>Scale and Rotation Invariance:</b> Scale invariance is achieved by extracting features at multiple resolutions in a Gaussian pyramid. Rotational invariance is achieved by estimating a local orientation (via a histogram of gradients) and orienting the patch accordingly.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مشكلة الفتحة (Aperture Problem): إذا حاولنا تتبع حافة مستقيمة (تغير في اتجاه واحد)، فلن نتمكن من تحديد الحركة الموازية للحافة. لذلك، المكتشفات مثل Harris تبحث عن 'الزوايا' (تغير في اتجاهين) لأنها مستقرة ويمكن تتبعها في جميع الاتجاهات.</p><p>في ANMS، يتم فرز النقاط حسب قوة الاستجابة، ثم يتم إنشاء قائمة ثانية مرتبة حسب نصف قطر القمع التنازلي. هذا يضمن أن النقاط القوية جداً لا تحجب النقاط الجيدة الأخرى البعيدة عنها، مما يضمن تغطية الصورة بأكملها.</p></template>
+    <template class="content-en"><p><strong>The Aperture Problem:</strong> If we try to track a straight edge (1D variation), we cannot determine motion parallel to the edge.</p><p>Therefore, detectors like Harris look for 'corners' (2D variation) because they are stable and trackable in all directions.</p><p>In ANMS, points are sorted by response strength, then a second list is created sorted by decreasing suppression radius.</p><p>This ensures that extremely strong points don't suppress other good points far away, guaranteeing coverage across the entire image.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>مجموع الفروق المرجحة المربعة (WSSD) لمقارنة رقعتين، حيث u هو متجه الإزاحة و w(x) هي دالة الوزن.</strong></template>
+      <template class="content-en"><strong>Weighted Summed Square Difference (WSSD) for comparing two patches, where u is the displacement vector and w(x) is the weighting function.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$E_{WSSD}(\mathbf{u}) = \sum_i w(\mathbf{x}_i) [I_1(\mathbf{x}_i + \mathbf{u}) - I_0(\mathbf{x}_i)]^2$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Illustration of the Aperture Problem: Three circles showing image patches. (a) A corner-like patch with a clear unique displacement vector. (b) A straight edge patch showing ambiguity along the edge (classic aperture problem). (c) A textureless patch showing complete ambiguity. Style: clean, academic, dark mode. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 440" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Arrowhead for solid lines (Unique/Normal Flow) -->
+        <marker id="arrow-solid" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L8,5 L0,9 Z" fill="var(--brand-500)" />
+        </marker>
+        
+        <!-- Arrowhead for dashed lines (Ambiguous Flow) -->
+        <marker id="arrow-dashed" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,1 L8,5 L0,9 Z" fill="var(--brand-400)" />
+        </marker>
+
+        <!-- Clip paths to keep objects inside the circular apertures -->
+        <clipPath id="apertureA">
+            <circle cx="150" cy="190" r="85" />
+        </clipPath>
+        <clipPath id="apertureB">
+            <circle cx="450" cy="190" r="85" />
+        </clipPath>
+        <clipPath id="apertureC">
+            <circle cx="750" cy="190" r="85" />
+        </clipPath>
+
+        <!-- Background grid to emphasize displacement -->
+        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="var(--border-color)" stroke-width="1" opacity="0.3" />
+        </pattern>
+    </defs>
+
+    <!-- Main Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Diagram Title -->
+    <text x="450" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">The Aperture Problem in Feature Detection</text>
+    <text x="450" y="45" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="24" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">مشكلة الفتحة في اكتشاف الميزات (Aperture Problem)</text>
+
+    <!-- ========================================== -->
+    <!-- PATCH A: CORNER (UNIQUE MATCH)             -->
+    <!-- ========================================== -->
+    <g>
+        <!-- Aperture Background & Grid -->
+        <circle cx="150" cy="190" r="85" fill="var(--bg-elevated)" />
+        <circle cx="150" cy="190" r="85" fill="url(#grid)" />
+        
+        <!-- Original Object (Corner) -->
+        <polygon points="110,290 110,150 250,150 250,290" fill="var(--text-muted)" opacity="0.2" clip-path="url(#apertureA)" />
+        <path d="M 110,290 L 110,150 L 250,150" fill="none" stroke="var(--text-primary)" stroke-width="2" opacity="0.8" clip-path="url(#apertureA)" />
+        
+        <!-- Moved Object (Dashed Outline) -->
+        <path d="M 150,310 L 150,170 L 290,170" fill="none" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" clip-path="url(#apertureA)" />
+        
+        <!-- Motion Vector -->
+        <line x1="110" y1="150" x2="147" y2="168" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-solid)" />
+        <circle cx="110" cy="150" r="4" fill="var(--brand-500)" />
+
+        <!-- Aperture Border -->
+        <circle cx="150" cy="190" r="85" fill="none" stroke="var(--border-color)" stroke-width="3" />
+
+        <!-- Labels -->
+        <text x="150" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">(a) Corner</text>
+        <text x="150" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">(أ) زاوية</text>
+        
+        <text x="150" y="340" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Gradients in 2+ directions</text>
+        <text x="150" y="340" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">تدرجات في اتجاهين أو أكثر</text>
+        
+        <text x="150" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Unique Match</text>
+        <text x="150" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">تطابق فريد</text>
+
+        <!-- Eigenvalue Hint -->
+        <text x="150" y="395" text-anchor="middle" font-family="monospace" font-size="14" fill="var(--text-primary)">λ₁ > 0, λ₂ > 0</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- PATCH B: EDGE (APERTURE PROBLEM)           -->
+    <!-- ========================================== -->
+    <g>
+        <!-- Aperture Background & Grid -->
+        <circle cx="450" cy="190" r="85" fill="var(--bg-elevated)" />
+        <circle cx="450" cy="190" r="85" fill="url(#grid)" />
+        
+        <!-- Original Object (Edge) -->
+        <polygon points="350,290 550,90 600,90 600,290" fill="var(--text-muted)" opacity="0.2" clip-path="url(#apertureB)" />
+        <line x1="350" y1="290" x2="550" y2="90" stroke="var(--text-primary)" stroke-width="2" opacity="0.8" clip-path="url(#apertureB)" />
+        
+        <!-- Moved Object Constraint Line (Infinite Edge) -->
+        <line x1="350" y1="350" x2="650" y2="50" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="2,2" clip-path="url(#apertureB)" />
+        
+        <!-- Moved Object (Dashed Outline) -->
+        <line x1="380" y1="320" x2="580" y2="120" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="4,4" clip-path="url(#apertureB)" />
+        
+        <!-- Motion Vectors -->
+        <!-- Ambiguous Flow (Parallel to edge) -->
+        <line x1="450" y1="190" x2="507" y2="190" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        <line x1="450" y1="190" x2="450" y2="247" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        
+        <!-- Normal Flow (Perpendicular to edge) -->
+        <line x1="450" y1="190" x2="477" y2="217" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-solid)" />
+        <circle cx="450" cy="190" r="4" fill="var(--brand-500)" />
+
+        <!-- Aperture Border -->
+        <circle cx="450" cy="190" r="85" fill="none" stroke="var(--border-color)" stroke-width="3" />
+
+        <!-- Labels -->
+        <text x="450" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">(b) Straight Edge</text>
+        <text x="450" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">(ب) حافة مستقيمة</text>
+        
+        <text x="450" y="340" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Gradient in 1 direction</text>
+        <text x="450" y="340" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">تدرج في اتجاه واحد</text>
+        
+        <text x="450" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Ambiguous (Aperture Problem)</text>
+        <text x="450" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">غامض (مشكلة الفتحة)</text>
+
+        <!-- Eigenvalue Hint -->
+        <text x="450" y="395" text-anchor="middle" font-family="monospace" font-size="14" fill="var(--text-primary)">λ₁ > 0, λ₂ ≈ 0</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- PATCH C: FLAT REGION (COMPLETELY AMBIGUOUS)-->
+    <!-- ========================================== -->
+    <g>
+        <!-- Aperture Background & Grid -->
+        <circle cx="750" cy="190" r="85" fill="var(--bg-elevated)" />
+        <circle cx="750" cy="190" r="85" fill="url(#grid)" />
+        
+        <!-- Original Object (Flat Textureless Region) -->
+        <rect x="650" y="90" width="200" height="200" fill="var(--text-muted)" opacity="0.2" clip-path="url(#apertureC)" />
+        
+        <!-- Ambiguity Circle -->
+        <circle cx="750" cy="190" r="35" fill="none" stroke="var(--brand-400)" stroke-width="1" stroke-dasharray="3,3" />
+        
+        <!-- Motion Vectors (Radiating in all directions) -->
+        <line x1="750" y1="190" x2="782" y2="190" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        <line x1="750" y1="190" x2="718" y2="190" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        <line x1="750" y1="190" x2="750" y2="222" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        <line x1="750" y1="190" x2="750" y2="158" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        <line x1="750" y1="190" x2="773" y2="213" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        <line x1="750" y1="190" x2="727" y2="167" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        <line x1="750" y1="190" x2="773" y2="167" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        <line x1="750" y1="190" x2="727" y2="213" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow-dashed)" />
+        
+        <circle cx="750" cy="190" r="4" fill="var(--brand-500)" />
+
+        <!-- Aperture Border -->
+        <circle cx="750" cy="190" r="85" fill="none" stroke="var(--border-color)" stroke-width="3" />
+
+        <!-- Labels -->
+        <text x="750" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">(c) Flat Region</text>
+        <text x="750" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">(ج) منطقة مسطحة</text>
+        
+        <text x="750" y="340" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">No gradients (Textureless)</text>
+        <text x="750" y="340" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">لا توجد تدرجات (بدون نسيج)</text>
+        
+        <text x="750" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Completely Ambiguous</text>
+        <text x="750" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">غامض تماماً</text>
+
+        <!-- Eigenvalue Hint -->
+        <text x="750" y="395" text-anchor="middle" font-family="monospace" font-size="14" fill="var(--text-primary)">λ₁ ≈ 0, λ₂ ≈ 0</text>
+    </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا نستخدم دائمًا أدق مقياس (أعلى دقة) لاكتشاف الميزات؟</template>
+      <template class="content-en">Why don't we always use the finest scale (highest resolution) to detect features?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن بعض الصور (مثل السحب) تفتقر إلى التفاصيل الدقيقة عالية التردد. إذا بحثنا فقط في المقياس الدقيق، فقد لا نجد أي ميزات مستقرة. استخدام أهرامات المقياس يحل هذه المشكلة.</p></template>
+      <template class="content-en"><p>Because some images (like clouds) lack high-frequency fine details. If we only look at the finest scale, fine-scale features may not exist. Using scale pyramids solves this.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feature-descriptors-stage2" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> المرحلة الثانية: واصفات الميزات (Feature Descriptors)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Stage 2: Feature Descriptors</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الواصف هو بصمة رقمية (متجه) تلخص شكل المنطقة المحيطة بالنقطة الرئيسية، بحيث يمكن مقارنتها رياضياً مع نقاط أخرى.</p></template>
+    <template class="content-en"><p>A descriptor is a digital fingerprint (vector) that summarizes the appearance of the region around a keypoint, allowing it to be compared mathematically with other points.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يتم تحويل كل منطقة حول مواقع النقاط المكتشفة إلى واصف أكثر إحكاما واستقرارا (غير متغير). من أمثلة الواصفات:</p><ul><li><b>SIFT (<span class="smart-term" data-term-en="SIFT" data-ar="تحويل الميزات غير المتغير للمقياس" data-en-def="A feature descriptor that computes a 128-dimensional vector based on gradient orientation histograms in a local neighborhood.">تحويل الميزات غير المتغير للمقياس<span class="smart-term-tooltip"></span></span>):</b> يحسب التدرج في نافذة 16×16. يتم تقليل تأثير التدرجات البعيدة باستخدام دالة غاوسية. تُقسم النافذة إلى 4×4 أرباع، وفي كل ربع يتم إنشاء مدرج تكراري للاتجاهات بـ 8 صناديق (Bins). النتيجة: 4×4×8 = 128 قيمة. يتم تسويته (Normalized) لطول الوحدة.</li><li><b>PCA-SIFT:</b> يحسب مشتقات التدرج على رقعة 39×39 ثم يقلل المتجه الناتج (3042 بُعد) إلى 36 بُعداً باستخدام تحليل المكونات الرئيسية (PCA).</li><li><b>RootSIFT:</b> يقوم بإعادة تسوية واصفات SIFT باستخدام مقياس L1 ثم أخذ الجذر التربيعي لكل مكون، مما يزيد من القدرة التمييزية بشكل كبير.</li><li><b>GLOH:</b> متغير من SIFT يستخدم بنية تجميع لوغاريتمية قطبية (Log-polar) بدلاً من الأرباع الأربعة. يتفوق على SIFT بهامش صغير.</li><li><b>المرشحات القابلة للتوجيه (Steerable filters):</b> تركيبات من مشتقات مرشحات غاوس تسمح بحساب سريع للميزات في جميع الاتجاهات الممكنة.</li></ul></template>
+    <template class="content-en"><p>Each region around detected keypoints is converted into a compact, invariant descriptor. Examples include:</p><ul><li><b><span class="smart-term" data-term-en="SIFT" data-ar="تحويل الميزات غير المتغير للمقياس" data-en-def="A feature descriptor that computes a 128-dimensional vector based on gradient orientation histograms in a local neighborhood.">SIFT<span class="smart-term-tooltip"></span></span> (Scale Invariant Feature Transform):</b> Computes gradients in a 16x16 window. Gradient magnitudes are down-weighted by a Gaussian function. The window is divided into a 4x4 grid. In each quadrant, an 8-bin orientation histogram is formed. Result: 4x4x8 = 128-dimensional vector. It is normalized to unit length.</li><li><b>PCA-SIFT:</b> Computes gradient derivatives over a 39x39 patch and reduces the 3042D vector to 36D using Principal Component Analysis (PCA).</li><li><b><span class="smart-term" data-term-en="RootSIFT" data-ar="جذر SIFT" data-en-def="An enhancement to SIFT applying L1 normalization and square root to improve matching accuracy.">RootSIFT<span class="smart-term-tooltip"></span></span>:</b> Re-normalizes SIFT using an L1 measure and takes the square root of each component, dramatically increasing discriminability.</li><li><b>GLOH:</b> A SIFT variant using a log-polar binning structure instead of four quadrants. Outperforms SIFT slightly.</li><li><b>Steerable filters:</b> Combinations of Gaussian derivatives permitting rapid computation of features at all possible orientations.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا يتم تسوية متجه SIFT إلى طول الوحدة (Unit length)؟ هذه الخطوة ضرورية لجعل الواصف مقاوماً للتغيرات الخطية في الإضاءة (التباين). إذا زاد سطوع الصورة، تزداد قيم التدرج، لكن التسوية تعيد المتجه إلى نفس المقياس.</p><p>تكمن قوة RootSIFT في أنه يحول المسافة الإقليدية (Euclidean) القياسية المستخدمة في المطابقة إلى مسافة هيلينجر (Hellinger distance)، والتي تعتبر رياضياً أفضل بكثير لمقارنة المدرجات التكرارية (Histograms) مثل تلك الموجودة في SIFT.</p></template>
+    <template class="content-en"><p>Why is the SIFT vector normalized to unit length? This step is crucial to make the descriptor invariant to linear illumination changes (contrast). If image brightness increases, gradient magnitudes increase, but normalization scales the vector back.</p><p>The power of RootSIFT lies in the fact that it implicitly converts the standard Euclidean distance used in matching into the Hellinger distance, which is mathematically much better suited for comparing histograms (which SIFT essentially is).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Diagram showing the creation of a SIFT descriptor. Left: A 16x16 grid of image gradients (arrows) with a blue circular Gaussian fall-off window. Right: A 2x2 array (simplified from 4x4) of star-like shapes representing the 8-bin gradient orientation histograms for each subregion. Style: technical, clear arrows, dark background. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <!-- Main Flow Arrow -->
+        <marker id="arrow-main" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+        
+        <!-- Histogram Arrow -->
+        <marker id="arrow-hist" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/>
+        </marker>
+        
+        <!-- Image Gradient Arrow (Data points) -->
+        <marker id="arrow-grad" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-primary)"/>
+        </marker>
+        
+        <!-- Gaussian Weighting Window -->
+        <radialGradient id="gaussian" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="var(--brand-500)" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="var(--brand-500)" stop-opacity="0"/>
+        </radialGradient>
+        
+        <!-- 16x16 Grid Pattern (Represented visually as 10px cells) -->
+        <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse" x="120" y="140">
+            <rect width="10" height="10" fill="none" stroke="var(--border-color)" stroke-width="0.5" stroke-opacity="0.7"/>
+        </pattern>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- Title -->
+    <text x="400" y="40" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">SIFT Descriptor Generation</text>
+    <text x="400" y="40" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">إنشاء واصف SIFT</text>
+
+    <!-- Left Section: Image Gradients -->
+    <text x="200" y="90" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Image Gradients</text>
+    <text x="200" y="90" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">تدرجات الصورة</text>
+    
+    <text x="200" y="110" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">(16x16 window, Gaussian weighted)</text>
+    <text x="200" y="110" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">(نافذة 16×16، موزونة بدالة جاوس)</text>
+
+    <!-- Grid Box -->
+    <rect x="120" y="140" width="160" height="160" fill="url(#grid)" stroke="var(--border-color)" stroke-width="2"/>
+    
+    <!-- Gaussian Circle -->
+    <circle cx="200" cy="220" r="80" fill="url(#gaussian)"/>
+    
+    <!-- Subregion Dividers (2x2) -->
+    <line x1="200" y1="140" x2="200" y2="300" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4"/>
+    <line x1="120" y1="220" x2="280" y2="220" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="4 4"/>
+
+    <!-- Gradient Arrows (Representative Sample) -->
+    <g stroke="var(--text-primary)" stroke-width="1.5" marker-end="url(#arrow-grad)">
+        <!-- Top-Left Quadrant -->
+        <line x1="155" y1="165" x2="145" y2="165"/>
+        <line x1="175" y1="155" x2="185" y2="155"/>
+        <line x1="165" y1="195" x2="155" y2="195"/>
+        <line x1="185" y1="185" x2="175" y2="185"/>
+        <line x1="135" y1="205" x2="145" y2="205"/>
+        <line x1="155" y1="155" x2="147" y2="147"/>
+        
+        <!-- Top-Right Quadrant -->
+        <line x1="225" y1="155" x2="225" y2="165"/>
+        <line x1="255" y1="165" x2="263" y2="173"/>
+        <line x1="235" y1="195" x2="235" y2="205"/>
+        <line x1="265" y1="195" x2="273" y2="203"/>
+        <line x1="215" y1="175" x2="215" y2="185"/>
+        <line x1="245" y1="155" x2="255" y2="155"/>
+        
+        <!-- Bottom-Left Quadrant -->
+        <line x1="155" y1="245" x2="147" y2="237"/>
+        <line x1="185" y1="255" x2="175" y2="255"/>
+        <line x1="145" y1="275" x2="137" y2="267"/>
+        <line x1="175" y1="285" x2="165" y2="285"/>
+        <line x1="165" y1="265" x2="157" y2="257"/>
+        <line x1="135" y1="235" x2="135" y2="225"/>
+        
+        <!-- Bottom-Right Quadrant -->
+        <line x1="225" y1="245" x2="233" y2="237"/>
+        <line x1="255" y1="255" x2="265" y2="255"/>
+        <line x1="235" y1="275" x2="243" y2="267"/>
+        <line x1="265" y1="285" x2="275" y2="285"/>
+        <line x1="215" y1="265" x2="223" y2="257"/>
+        <line x1="245" y1="235" x2="245" y2="225"/>
+    </g>
+
+    <!-- Legend for Left Section -->
+    <g transform="translate(200, 330)">
+        <circle cx="-75" cy="-4" r="6" fill="var(--brand-500)" opacity="0.5"/>
+        <text x="0" y="0" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Gaussian weighting</text>
+        <text x="0" y="0" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">دالة الوزن (جاوس)</text>
+    </g>
+    <g transform="translate(200, 350)">
+        <line x1="-80" y1="-4" x2="-65" y2="-4" stroke="var(--text-primary)" stroke-width="1.5" marker-end="url(#arrow-grad)"/>
+        <text x="0" y="0" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">Image gradient</text>
+        <text x="0" y="0" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-secondary)">تدرج الصورة</text>
+    </g>
+
+    <!-- Middle Section: Process Arrow -->
+    <line x1="300" y1="220" x2="500" y2="220" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow-main)"/>
+    <text x="400" y="205" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">Compute Histograms</text>
+    <text x="400" y="205" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--brand-ink)">حساب المدرجات</text>
+
+    <!-- Right Section: Keypoint Descriptor -->
+    <text x="600" y="90" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">Keypoint Descriptor</text>
+    <text x="600" y="90" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">واصف النقطة الرئيسية</text>
+    
+    <text x="600" y="110" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">(2x2 array of 8-bin histograms)</text>
+    <text x="600" y="110" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)">(مصفوفة 2×2 لمدرجات بـ 8 صناديق)</text>
+
+    <!-- Histogram Box -->
+    <rect x="520" y="140" width="160" height="160" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2"/>
+    
+    <!-- Subregion Dividers -->
+    <line x1="600" y1="140" x2="600" y2="300" stroke="var(--border-color)" stroke-width="2"/>
+    <line x1="520" y1="220" x2="680" y2="220" stroke="var(--border-color)" stroke-width="2"/>
+
+    <!-- 8-Bin Histograms -->
+    <g stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-hist)">
+        <!-- Star 1 (Top-Left) -->
+        <line x1="560" y1="180" x2="585" y2="180"/>
+        <line x1="560" y1="180" x2="570.6" y2="190.6"/>
+        <line x1="560" y1="180" x2="560" y2="190"/>
+        <line x1="560" y1="180" x2="545.9" y2="194.1"/>
+        <line x1="560" y1="180" x2="530" y2="180"/>
+        <line x1="560" y1="180" x2="552.9" y2="172.9"/>
+        <line x1="560" y1="180" x2="560" y2="175"/>
+        <line x1="560" y1="180" x2="570.6" y2="169.4"/>
+        
+        <!-- Star 2 (Top-Right) -->
+        <line x1="640" y1="180" x2="650" y2="180"/>
+        <line x1="640" y1="180" x2="657.7" y2="197.7"/>
+        <line x1="640" y1="180" x2="640" y2="210"/>
+        <line x1="640" y1="180" x2="629.4" y2="190.6"/>
+        <line x1="640" y1="180" x2="635" y2="180"/>
+        <line x1="640" y1="180" x2="632.9" y2="172.9"/>
+        <line x1="640" y1="180" x2="640" y2="160"/>
+        <line x1="640" y1="180" x2="650.6" y2="169.4"/>
+        
+        <!-- Star 3 (Bottom-Left) -->
+        <line x1="560" y1="260" x2="575" y2="260"/>
+        <line x1="560" y1="260" x2="567.1" y2="267.1"/>
+        <line x1="560" y1="260" x2="560" y2="265"/>
+        <line x1="560" y1="260" x2="552.9" y2="267.1"/>
+        <line x1="560" y1="260" x2="535" y2="260"/>
+        <line x1="560" y1="260" x2="538.8" y2="238.8"/>
+        <line x1="560" y1="260" x2="560" y2="245"/>
+        <line x1="560" y1="260" x2="574.1" y2="245.9"/>
+        
+        <!-- Star 4 (Bottom-Right) -->
+        <line x1="640" y1="260" x2="670" y2="260"/>
+        <line x1="640" y1="260" x2="654.1" y2="274.1"/>
+        <line x1="640" y1="260" x2="640" y2="270"/>
+        <line x1="640" y1="260" x2="636.5" y2="263.5"/>
+        <line x1="640" y1="260" x2="625" y2="260"/>
+        <line x1="640" y1="260" x2="632.9" y2="252.9"/>
+        <line x1="640" y1="260" x2="640" y2="235"/>
+        <line x1="640" y1="260" x2="664.7" y2="235.3"/>
+    </g>
+
+    <!-- Histogram Center Anchors -->
+    <circle cx="560" cy="180" r="2.5" fill="var(--brand-500)"/>
+    <circle cx="640" cy="180" r="2.5" fill="var(--brand-500)"/>
+    <circle cx="560" cy="260" r="2.5" fill="var(--brand-500)"/>
+    <circle cx="640" cy="260" r="2.5" fill="var(--brand-500)"/>
+
+    <!-- Resulting Vector Representation -->
+    <g stroke="var(--border-color)" stroke-width="1">
+        <!-- Left part of vector -->
+        <rect x="480" y="320" width="80" height="20" fill="var(--bg-elevated)"/>
+        <line x1="500" y1="320" x2="500" y2="340"/>
+        <line x1="520" y1="320" x2="520" y2="340"/>
+        <line x1="540" y1="320" x2="540" y2="340"/>
+        
+        <!-- Ellipsis -->
+        <text x="600" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-secondary)" stroke="none">. . .</text>
+        
+        <!-- Right part of vector -->
+        <rect x="640" y="320" width="80" height="20" fill="var(--bg-elevated)"/>
+        <line x1="660" y1="320" x2="660" y2="340"/>
+        <line x1="680" y1="320" x2="680" y2="340"/>
+        <line x1="700" y1="320" x2="700" y2="340"/>
+    </g>
+
+    <!-- Result Text -->
+    <text x="600" y="365" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">Result: 128D Vector (4x4x8)</text>
+    <text x="600" y="365" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--text-primary)">النتيجة: متجه بـ 128 بُعد (4×4×8)</text>
+    
+    <text x="600" y="385" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">*Diagram shows 2x2 simplification of the actual 4x4 grid</text>
+    <text x="600" y="385" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="12" fill="var(--text-muted)">*يوضح المخطط تبسيط 2×2 للشبكة الفعلية 4×4</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>SIFT</th><th>PCA-SIFT</th><th>RootSIFT</th><th>GLOH</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">الأبعاد (Dimensionality)</template>
+          <template class="content-en">Dimensionality</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">128 بُعد</template>
+          <template class="content-en">128 dimensions</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">36 بُعد (مخفض)</template>
+          <template class="content-en">36 dimensions (reduced)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">128 بُعد</template>
+          <template class="content-en">128 dimensions</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">متغير (عادة أكبر قبل PCA)</template>
+          <template class="content-en">Variable (usually larger before PCA)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">القدرة التمييزية (Discriminability)</template>
+          <template class="content-en">Discriminability</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية</template>
+          <template class="content-en">High</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">جيدة (ولكن قد تفقد بعض التفاصيل)</template>
+          <template class="content-en">Good (but may lose details)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية جداً (أفضل من SIFT)</template>
+          <template class="content-en">Very High (better than SIFT)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">أعلى قليلاً من SIFT</template>
+          <template class="content-en">Slightly higher than SIFT</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يقلل PCA-SIFT من وقت المطابقة مقارنة بـ SIFT العادي؟</template>
+      <template class="content-en">How does PCA-SIFT reduce matching time compared to standard SIFT?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يقلل PCA-SIFT من أبعاد المتجه من 128 (في SIFT) إلى 36 بُعداً فقط. نظراً لأن المطابقة تتطلب حساب المسافة الإقليدية بين المتجهات، فإن المتجهات الأقصر تعني حسابات رياضية أقل ومطابقة أسرع بكثير.</p></template>
+      <template class="content-en"><p>PCA-SIFT reduces the vector dimensionality from 128 (in SIFT) to just 36 dimensions. Since matching requires computing the Euclidean distance between vectors, shorter vectors mean fewer mathematical operations and significantly faster matching.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="feature-matching-stage3" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> المرحلة الثالثة: مطابقة الميزات (Feature Matching)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Stage 3: Feature Matching</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المطابقة هي عملية البحث عن أقرب واصف مشابه في الصورة الأخرى باستخدام مسافة رياضية، مع وضع حد أقصى (Threshold) لرفض التطابقات الخاطئة.</p></template>
+    <template class="content-en"><p>Matching is the process of finding the closest similar descriptor in another image using a mathematical distance, applying a threshold to reject false matches.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تبحث هذه المرحلة بكفاءة عن المرشحين المحتملين للمطابقة في الصور الأخرى. أبسط استراتيجية هي استخدام مقياس المسافة الإقليدية (Euclidean distance) وتعيين حد أقصى (Threshold).</p><ul><li><b>الحد المرتفع جداً:</b> يؤدي إلى الكثير من الإيجابيات الخاطئة (False Positives - FP)، أي إرجاع تطابقات غير صحيحة.</li><li><b>الحد المنخفض جداً:</b> يؤدي إلى الكثير من السلبيات الخاطئة (False Negatives - FN)، أي تفويت تطابقات صحيحة.</li></ul><p><b>مقاييس الأداء:</b></p><ul><li>معدل الإيجابية الحقيقية (TPR) = TP / (TP + FN)</li><li>معدل الإيجابية الخاطئة (FPR) = FP / (FP + TN)</li><li>القيمة التنبؤية الإيجابية (PPV / Precision) = TP / (TP + FP)</li><li>الدقة (Accuracy) = (TP + TN) / (P + N)</li></ul><p><b>منحنى ROC:</b> يرسم TPR مقابل FPR. كلما اقترب المنحنى من الزاوية العلوية اليسرى (مساحة أكبر تحت المنحنى AUC)، كان الأداء أفضل.</p><p><b>التحقق (Verification):</b> بمجرد الحصول على تطابقات مرشحة، نستخدم المحاذاة الهندسية (Geometric alignment) للتحقق من التطابقات الصحيحة (Inliers) واستبعاد الخاطئة (Outliers) باستخدام خوارزميات مثل RANSAC.</p></template>
+    <template class="content-en"><p>This stage efficiently searches for likely matching candidates in other images. The simplest strategy uses a Euclidean distance metric and sets a maximum threshold.</p><ul><li><b>Threshold too high:</b> Leads to too many false positives (FP), i.e., incorrect matches returned.</li><li><b>Threshold too low:</b> Leads to too many false negatives (FN), i.e., correct matches missed.</li></ul><p><b>Performance Metrics:</b></p><ul><li>True Positive Rate (TPR) = TP / (TP + FN)</li><li>False Positive Rate (FPR) = FP / (FP + TN)</li><li>Positive Predictive Value (PPV / Precision) = TP / (TP + FP)</li><li>Accuracy (ACC) = (TP + TN) / (P + N)</li></ul><p><b><span class="smart-term" data-term-en="ROC Curve" data-ar="منحنى خصائص تشغيل المستقبل" data-en-def="A graphical plot that illustrates the diagnostic ability of a binary classifier system as its discrimination threshold is varied.">ROC Curve<span class="smart-term-tooltip"></span></span>:</b> Plots TPR against FPR. The closer the curve is to the upper left corner (larger Area Under Curve - AUC), the better the performance.</p><p><b>Verification:</b> Once we have candidate matches, we use geometric alignment to verify inliers and outliers. The process of randomly sampling seed matches to verify a larger set is called <span class="smart-term" data-term-en="RANSAC" data-ar="الإجماع العشوائي للعينات" data-en-def="An iterative method to estimate parameters of a mathematical model from a set of observed data that contains outliers.">RANSAC<span class="smart-term-tooltip"></span></span>.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى RANSAC إذا كانت الواصفات قوية؟ لأن الواصفات تعتمد على المظهر المحلي فقط.</p><p>في صورة تحتوي على أنماط متكررة (مثل نوافذ مبنى)، ستبدو الواصفات متطابقة تماماً، مما يخدع خوارزمية المطابقة.</p><p>RANSAC يحل هذه المشكلة بفرض قيود هندسية عالمية (Global geometric constraints) على جميع النقاط معاً.</p><p>في منحنى ROC، النقطة المثالية هي (0,1) حيث FPR=0 و TPR=1.</p><p>المساحة تحت المنحنى (AUC) توفر رقماً واحداً يلخص جودة خوارزمية المطابقة بغض النظر عن الحد (Threshold) المختار.</p></template>
+    <template class="content-en"><p>Why do we need RANSAC if descriptors are robust? Because descriptors only capture local appearance.</p><p>In an image with repetitive patterns (like building windows), descriptors will look identical, fooling the matching algorithm.</p><p>RANSAC solves this by enforcing global geometric constraints across all points simultaneously.</p><p>On an ROC curve, the ideal point is (0,1) where FPR=0 and TPR=1.</p><p>The Area Under the Curve (AUC) provides a single scalar value summarizing the matching algorithm's quality independent of the chosen threshold.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلات حساب معدل الإيجابية الحقيقية ومعدل الإيجابية الخاطئة.</strong></template>
+      <template class="content-en"><strong>Formulas for calculating True Positive Rate and False Positive Rate.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$TPR = \frac{TP}{TP + FN}, \quad FPR = \frac{FP}{FP + TN}$$</div>
+  </div>
+
+  <!-- DIAGRAM[4]: A graph showing an ROC curve. The X-axis is 'false positive rate' (0 to 1) and the Y-axis is 'true positive rate' (0 to 1). A green curve bows towards the top-left corner. A dashed diagonal line represents 'random chance'. The area under the green curve is shaded. Style: academic, clear axes, dark theme. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 550" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--text-primary)" />
+        </marker>
+        <linearGradient id="auc-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-500)" stop-opacity="0.3" />
+            <stop offset="100%" stop-color="var(--brand-500)" stop-opacity="0.05" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Title -->
+    <text x="400" y="50" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">ROC Curve (Receiver Operating Characteristic)</text>
+    <text x="400" y="50" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)">منحنى خاصية تشغيل المستقبل (ROC)</text>
+
+    <!-- Grid Lines -->
+    <g stroke="var(--border-color)" stroke-width="1" stroke-dasharray="4 4">
+        <!-- Vertical Grid Lines -->
+        <line x1="250" y1="150" x2="250" y2="450" />
+        <line x1="350" y1="150" x2="350" y2="450" />
+        <line x1="450" y1="150" x2="450" y2="450" />
+        <line x1="550" y1="150" x2="550" y2="450" />
+        <line x1="650" y1="150" x2="650" y2="450" />
+        <!-- Horizontal Grid Lines -->
+        <line x1="150" y1="390" x2="650" y2="390" />
+        <line x1="150" y1="330" x2="650" y2="330" />
+        <line x1="150" y1="270" x2="650" y2="270" />
+        <line x1="150" y1="210" x2="650" y2="210" />
+        <line x1="150" y1="150" x2="650" y2="150" />
+    </g>
+
+    <!-- Shaded AUC Area -->
+    <path d="M 150 450 C 150 200, 250 150, 650 150 L 650 450 Z" fill="url(#auc-grad)" />
+
+    <!-- ROC Curve -->
+    <path d="M 150 450 C 150 200, 250 150, 650 150" fill="none" stroke="var(--brand-500)" stroke-width="4" />
+
+    <!-- Random Chance Line -->
+    <line x1="150" y1="450" x2="650" y2="150" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="8 8" />
+
+    <!-- Axes -->
+    <g stroke="var(--text-primary)" stroke-width="2">
+        <line x1="150" y1="450" x2="680" y2="450" marker-end="url(#arrow)" />
+        <line x1="150" y1="450" x2="150" y2="120" marker-end="url(#arrow)" />
+    </g>
+
+    <!-- Tick Labels -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">
+        <!-- X-Axis Ticks -->
+        <text x="150" y="470" text-anchor="middle">0.0</text>
+        <text x="250" y="470" text-anchor="middle">0.2</text>
+        <text x="350" y="470" text-anchor="middle">0.4</text>
+        <text x="450" y="470" text-anchor="middle">0.6</text>
+        <text x="550" y="470" text-anchor="middle">0.8</text>
+        <text x="650" y="470" text-anchor="middle">1.0</text>
+        
+        <!-- Y-Axis Ticks -->
+        <text x="135" y="450" text-anchor="end" dominant-baseline="middle">0.0</text>
+        <text x="135" y="390" text-anchor="end" dominant-baseline="middle">0.2</text>
+        <text x="135" y="330" text-anchor="end" dominant-baseline="middle">0.4</text>
+        <text x="135" y="270" text-anchor="end" dominant-baseline="middle">0.6</text>
+        <text x="135" y="210" text-anchor="end" dominant-baseline="middle">0.8</text>
+        <text x="135" y="150" text-anchor="end" dominant-baseline="middle">1.0</text>
+    </g>
+
+    <!-- Axis Titles -->
+    <text x="400" y="515" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">False Positive Rate (FPR)</text>
+    <text x="400" y="515" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">معدل الإيجابيات الخاطئة (FPR)</text>
+
+    <g transform="translate(80, 285) rotate(-90)">
+        <text x="0" y="0" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">True Positive Rate (TPR)</text>
+        <text x="0" y="0" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)">معدل الإيجابيات الصحيحة (TPR)</text>
+    </g>
+
+    <!-- Annotations -->
+    <!-- AUC Label -->
+    <text x="450" y="350" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">Area Under Curve (AUC)</text>
+    <text x="450" y="350" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--brand-ink)">المساحة تحت المنحنى (AUC)</text>
+
+    <!-- Random Chance Label -->
+    <g transform="translate(420, 290) rotate(-30.96)">
+        <rect x="-65" y="-12" width="130" height="24" fill="var(--bg-surface)" rx="4" />
+        <text x="0" y="4" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">Random Chance</text>
+        <text x="0" y="4" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)">احتمال عشوائي</text>
+    </g>
+
+    <!-- Perfect Classifier -->
+    <circle cx="150" cy="150" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="2" />
+    <text x="150" y="130" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)">Perfect Classifier</text>
+    <text x="150" y="130" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)">مصنف مثالي</text>
+
+    <!-- High Threshold Point -->
+    <circle cx="164" cy="323" r="5" fill="var(--brand-500)" />
+    <line x1="164" y1="323" x2="200" y2="323" stroke="var(--text-secondary)" stroke-width="1" />
+    <text x="270" y="315" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)">High Threshold (Strict)</text>
+    <text x="270" y="315" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)">عتبة عالية (صارمة)</text>
+    <text x="270" y="335" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">Low FPR, Low TPR</text>
+    <text x="270" y="335" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">FPR منخفض، TPR منخفض</text>
+
+    <!-- Low Threshold Point -->
+    <circle cx="444" cy="157" r="5" fill="var(--brand-500)" />
+    <line x1="444" y1="157" x2="444" y2="110" stroke="var(--text-secondary)" stroke-width="1" />
+    <text x="444" y="100" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)">Low Threshold (Loose)</text>
+    <text x="444" y="100" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-secondary)">عتبة منخفضة (متساهلة)</text>
+    <text x="444" y="80" text-anchor="middle" class="gsvg-en" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">High FPR, High TPR</text>
+    <text x="444" y="80" text-anchor="middle" class="gsvg-ar" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">FPR مرتفع، TPR مرتفع</text>
+
+    <!-- Equations Box -->
+    <rect x="660" y="220" width="130" height="80" rx="6" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+    <text x="725" y="245" text-anchor="middle" font-family="monospace" font-size="13" fill="var(--text-primary)">TPR = TP/(TP+FN)</text>
+    <text x="725" y="275" text-anchor="middle" font-family="monospace" font-size="13" fill="var(--text-primary)">FPR = FP/(FP+TN)</text>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان نظام المطابقة الخاص بك يحتوي على AUC يساوي 0.5، فماذا يعني ذلك؟</template>
+      <template class="content-en">If your matching system has an AUC of 0.5, what does that mean?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يعني أن النظام يعادل التخمين العشوائي (Random chance). لا يمتلك أي قدرة تمييزية حقيقية بين التطابقات الصحيحة والخاطئة.</p></template>
+      <template class="content-en"><p>It means the system is equivalent to random guessing. It has no real discriminative power to distinguish between correct and incorrect matches.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="edges-and-contours" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الحواف والخطوط الكنتورية (Edges and Contours)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Edges and Contours</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الحواف هي خطوط في الصورة تمثل تغيراً حاداً في اللون أو الإضاءة، وتساعد في تحديد حدود الكائنات.</p></template>
+    <template class="content-en"><p>Edges are lines in an image representing a sharp change in color or illumination, helping to define object boundaries.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>بينما النقاط مفيدة للمطابقة الدقيقة، فإن نقاط الحواف أكثر وفرة وتحمل دلالات دلالية مهمة (مثل حدود الكائنات، حدود الظلال). تحدث الحواف بسبب:</p><ul><li>انقطاع في العمق (Depth discontinuity)</li><li>انقطاع في لون السطح (Surface color discontinuity)</li><li>انقطاع في الإضاءة (Illumination discontinuity)</li><li>انقطاع في الاتجاه العمودي للسطح (Surface normal discontinuity)</li></ul><p><b>اكتشاف الحواف:</b> تحدث الحواف في مواقع المنحدرات الشديدة في شدة الإضاءة. يتم تعريف ذلك رياضياً من خلال <b><span class="smart-term" data-term-en="Image Gradient" data-ar="تدرج الصورة" data-en-def="A directional change in the intensity or color in an image, pointing in the direction of the steepest ascent.">تدرج الصورة<span class="smart-term-tooltip"></span></span> (Image Gradient)</b>. يشير متجه التدرج إلى اتجاه أسرع زيادة في الشدة. قوة الحافة تُعطى بمقدار التدرج (Gradient magnitude).</p><p><b>مرشحات الفروق المحدودة (Finite difference filters):</b> تُستخدم لحساب التدرج محلياً. من أمثلتها: Prewitt، Sobel، و Roberts.</p></template>
+    <template class="content-en"><p>While interest points are useful for accurate 2D matching, edge points are more plentiful and carry important semantic associations (e.g., object boundaries, shadows). Edges are caused by:</p><ul><li>Depth discontinuity</li><li>Surface color discontinuity</li><li>Illumination discontinuity</li><li>Surface normal discontinuity</li></ul><p><b>Edge Detection:</b> Edges occur at locations of steep slopes in intensity. This is defined mathematically by the <b><span class="smart-term" data-term-en="Image Gradient" data-ar="تدرج الصورة" data-en-def="A directional change in the intensity or color in an image, pointing in the direction of the steepest ascent.">Image Gradient<span class="smart-term-tooltip"></span></span></b>. The gradient vector points in the direction of the most rapid increase in intensity. Edge strength is given by the gradient magnitude.</p><p><b>Finite difference filters:</b> Used to compute the gradient locally. Examples include Prewitt, Sobel, and Roberts filters.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من المهم ملاحظة أن اتجاه التدرج (Gradient direction) يكون دائماً <b>عمودياً</b> على اتجاه الحافة نفسها. إذا كانت الحافة أفقية، فإن التدرج يشير رأسياً (لأعلى أو لأسفل حسب تغير اللون).</p><p>مرشح Sobel مفضل غالباً على Prewitt لأنه يعطي وزناً أكبر للبكسل المركزي (القيم 1, 2, 1 بدلاً من 1, 1, 1)، مما يوفر تأثيراً طفيفاً لتنعيم الصورة (Smoothing) ويجعله أكثر مقاومة للضوضاء أثناء حساب المشتقة.</p></template>
+    <template class="content-en"><p>It is important to note that the gradient direction is always <b>perpendicular</b> to the edge direction itself. If an edge is horizontal, the gradient points vertically.</p><p>The <span class="smart-term" data-term-en="Sobel Filter" data-ar="مرشح سوبل" data-en-def="A discrete differentiation operator used to compute an approximation of the gradient of the image intensity function.">Sobel filter<span class="smart-term-tooltip"></span></span> is often preferred over Prewitt because it gives more weight to the center pixel (values 1, 2, 1 instead of 1, 1, 1), providing a slight smoothing effect that makes the derivative calculation more robust to noise.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>متجه التدرج ومقدار التدرج (قوة الحافة).</strong></template>
+      <template class="content-en"><strong>Gradient vector and gradient magnitude (edge strength).</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\nabla f = \left[ \frac{\partial f}{\partial x}, \frac{\partial f}{\partial y} \right], \quad ||\nabla f|| = \sqrt{\left(\frac{\partial f}{\partial x}\right)^2 + \left(\frac{\partial f}{\partial y}\right)^2}$$</div>
+  </div>
+
+  <!-- DIAGRAM[5]: Diagram showing a 3D cylinder (like a pill bottle) with arrows pointing to different types of edges: 'surface normal discontinuity' (top rim), 'depth discontinuity' (outer boundary), 'surface color discontinuity' (letters printed on the bottle), and 'illumination discontinuity' (shadow cast on the ground). Style: line drawing, educational, dark background. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Illumination Discontinuity: Shadow -->
+    <path d="M 325 370 L 445 330 A 75 28 0 0 1 595 330 L 475 370 A 75 28 0 0 1 325 370 Z" fill="var(--brand-500)" opacity="0.15" />
+    
+    <!-- Highlight: Illumination Discontinuity Edge -->
+    <line x1="595" y1="330" x2="475" y2="370" stroke="var(--brand-500)" stroke-width="5" opacity="0.6" stroke-linecap="round" />
+
+    <!-- Depth Discontinuity: Bottle Body -->
+    <path d="M 325 130 L 325 370 A 75 28 0 0 0 475 370 L 475 130 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <!-- Highlight: Depth Discontinuity Edge -->
+    <line x1="325" y1="130" x2="325" y2="370" stroke="var(--brand-500)" stroke-width="5" opacity="0.6" stroke-linecap="round" />
+
+    <!-- Surface Color Discontinuity: Label and Stripe -->
+    <path d="M 325 180 A 75 28 0 0 0 475 180 L 475 320 A 75 28 0 0 1 325 320 Z" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="1" />
+    <path d="M 325 200 A 75 28 0 0 0 475 200 L 475 220 A 75 28 0 0 1 325 220 Z" fill="var(--brand-500)" opacity="0.8" />
+    
+    <!-- Highlight: Surface Color Discontinuity Edge -->
+    <path d="M 325 220 A 75 28 0 0 0 475 220" fill="none" stroke="var(--brand-500)" stroke-width="5" opacity="0.6" stroke-linecap="round" />
+
+    <!-- Label Text -->
+    <text x="400" y="285" text-anchor="middle" font-size="36" font-weight="bold" fill="var(--brand-ink)">Rx</text>
+
+    <!-- Surface Normal Discontinuity: Cap Body and Top -->
+    <path d="M 315 100 L 315 130 A 85 32 0 0 0 485 130 L 485 100 Z" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+    <ellipse cx="400" cy="100" rx="85" ry="32" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+    
+    <!-- Highlight: Surface Normal Discontinuity Edge -->
+    <ellipse cx="400" cy="100" rx="85" ry="32" fill="none" stroke="var(--brand-500)" stroke-width="5" opacity="0.6" />
+
+    <!-- Pointers and Lines -->
+    <!-- 1. Surface Normal Discontinuity (Top) -->
+    <circle cx="400" cy="45" r="4" fill="var(--brand-500)" />
+    <line x1="400" y1="45" x2="400" y2="60" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- 2. Depth Discontinuity (Left) -->
+    <circle cx="210" cy="245" r="4" fill="var(--brand-500)" />
+    <line x1="210" y1="245" x2="310" y2="245" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- 3. Surface Color Discontinuity (Right Top) -->
+    <circle cx="640" cy="155" r="4" fill="var(--brand-500)" />
+    <line x1="640" y1="155" x2="465" y2="210" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- 4. Illumination Discontinuity (Right Bottom) -->
+    <circle cx="640" cy="425" r="4" fill="var(--brand-500)" />
+    <line x1="640" y1="425" x2="545" y2="355" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Bilingual Labels -->
+    <!-- Label 1: Surface Normal Discontinuity -->
+    <text x="400" y="32" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="600">Surface normal discontinuity</text>
+    <text x="400" y="32" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="600">انقطاع في الناظم السطحي</text>
+
+    <!-- Label 2: Depth Discontinuity -->
+    <text x="120" y="250" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="600">Depth discontinuity</text>
+    <text x="120" y="250" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="600">انقطاع في العمق</text>
+
+    <!-- Label 3: Surface Color Discontinuity -->
+    <text x="640" y="140" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="600">Surface color discontinuity</text>
+    <text x="640" y="140" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="600">انقطاع في لون السطح</text>
+
+    <!-- Label 4: Illumination Discontinuity -->
+    <text x="640" y="445" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-size="16" font-weight="600">Illumination discontinuity</text>
+    <text x="640" y="445" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-size="16" font-weight="600">انقطاع في الإضاءة</text>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Prewitt</th><th>Sobel</th><th>Roberts</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">حجم المصفوفة</template>
+          <template class="content-en">Matrix Size</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">3x3</template>
+          <template class="content-en">3x3</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">3x3</template>
+          <template class="content-en">3x3</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">2x2</template>
+          <template class="content-en">2x2</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">مقاومة الضوضاء (التنعيم)</template>
+          <template class="content-en">Noise Robustness (Smoothing)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">متوسطة (أوزان متساوية)</template>
+          <template class="content-en">Medium (equal weights)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">عالية (وزن أكبر للمركز)</template>
+          <template class="content-en">High (higher center weight)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">منخفضة جداً</template>
+          <template class="content-en">Very Low</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت الصورة تحتوي على ضوضاء عالية (Salt and Pepper noise)، كيف سيؤثر ذلك على اكتشاف الحواف باستخدام التدرج؟</template>
+      <template class="content-en">If an image has high noise (Salt and Pepper noise), how will this affect edge detection using the gradient?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الضوضاء تمثل تغيرات حادة ومفاجئة في شدة الإضاءة، مما سيؤدي إلى قيم تدرج عالية جداً. بالتالي، سيكتشف المرشح نقاط الضوضاء كحواف (إيجابيات خاطئة). لذلك يجب تطبيق مرشح تنعيم (مثل Gaussian) قبل اكتشاف الحواف.</p></template>
+      <template class="content-en"><p>Noise represents sharp, sudden changes in intensity, resulting in very high gradient values. Consequently, the filter will detect noise pixels as edges (false positives). Therefore, a smoothing filter (like Gaussian) must be applied before edge detection.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="contour-detection-chain-code" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> اكتشاف الخطوط الكنتورية ورمز السلسلة (Contour Detection &amp; Chain Code)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Contour Detection &amp; Chain Code</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الخطوط الكنتورية هي ربط لبكسلات الحواف المعزولة لتشكيل منحنى مستمر يحيط بجسم ما، ويتم تشفير هذا المنحنى باستخدام أرقام تمثل الاتجاهات.</p></template>
+    <template class="content-en"><p>Contours are formed by linking isolated edge pixels into a continuous curve surrounding an object, encoded using numbers representing directions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في حين أن الحواف المعزولة مفيدة، إلا أنها تصبح أكثر فائدة عند ربطها في خطوط كنتورية مستمرة (Continuous contours). الخطوط الكنتورية هي بكسلات حدودية لها نفس اللون والشدة.</p><p><b>خطوات الاكتشاف:</b></p><ol><li>قراءة الصورة وتحويلها إلى تدرج الرمادي (Grayscale).</li><li>تطبيق العتبة الثنائية (Binary thresholding) للسماح بتتبع المنحنى.</li><li>تشفير قائمة الحواف المرتبطة باستخدام تمثيل معين، مثل <b><span class="smart-term" data-term-en="Chain Code" data-ar="رمز السلسلة" data-en-def="A lossless compression algorithm for binary images, representing the boundary of an object by a sequence of directional codes.">رمز السلسلة<span class="smart-term-tooltip"></span></span> (Chain code)</b>.</li></ol><p><b>رمز السلسلة:</b> يقوم بتشفير القائمة إلى الاتجاهات الأساسية الثمانية (شمال، شمال شرق، شرق، جنوب شرق، جنوب، جنوب غرب، غرب، شمال غرب) باستخدام الأرقام من 0 إلى 7. يمكن ضغط هذا الرمز لاحقاً باستخدام التشفير التنبؤي أو تشفير طول التشغيل (Run-length coding).</p></template>
+    <template class="content-en"><p>While isolated edges are useful, they become even more useful when linked into continuous <span class="smart-term" data-term-en="Contour" data-ar="الخط الكنتوري" data-en-def="An outline representing or bounding the shape or form of something in an image.">contour<span class="smart-term-tooltip"></span></span>s. Contours are boundary pixels that have the same color and intensity.</p><p><b>Detection Steps:</b></p><ol><li>Read the image and convert it to Grayscale format.</li><li>Apply binary thresholding to allow a curve to be tracked.</li><li>Encode the linked edgel list using a representation, such as <b><span class="smart-term" data-term-en="Chain Code" data-ar="رمز السلسلة" data-en-def="A lossless compression algorithm for binary images, representing the boundary of an object by a sequence of directional codes.">chain code<span class="smart-term-tooltip"></span></span></b>.</li></ol><p><b>Chain Code:</b> Encodes the list to the eight cardinal directions (N, NE, E, SE, S, SW, W, NW) using numbers 0 to 7. This code can be further compressed using predictive and run-length coding.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المشكلة الرئيسية في رمز السلسلة الأساسي هي أنه يعتمد على نقطة البداية. إذا بدأنا تتبع نفس الشكل من نقطة مختلفة، سنحصل على سلسلة أرقام مختلفة.</p><p>لحل ذلك، نستخدم 'الفرق الأول' (First difference) لرمز السلسلة، والذي يجعله غير متغير بالنسبة لنقطة البداية والدوران بزيادات قدرها 45 درجة.</p><p>تُستخدم الخطوط الكنتورية بكثرة في تطبيقات تحرير الصور (مثل التحديد الذكي) والتعرف على الأشكال، حيث يمثل الكنتور حدود الكائن بشكل رياضي مغلق.</p></template>
+    <template class="content-en"><p>A major issue with basic chain code is its dependence on the starting point. Starting from a different pixel yields a different sequence.</p><p>To solve this, we use the 'first difference' of the chain code, making it invariant to the starting point and to rotations in 45-degree increments.</p><p>Contours are heavily used in image editing applications (like smart selection wands) and shape recognition, as the contour represents the object's boundary as a closed mathematical form.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[6]: A grid showing a chain code representation. A central pixel has 8 arrows pointing outwards to its neighbors, labeled 0 to 7 (0 is East, 1 is NE, 2 is North, etc.). Next to it, a continuous contour on a grid is shown, with the corresponding chain code sequence (e.g., 0 1 0 7 6 5) written below it. Style: educational, grid lines visible, dark background. -->
+<div class="svg-diagram" data-diagram-id="6">
+<svg viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Standard Arrowhead -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)"/>
+    </marker>
+    <!-- Thicker Arrowhead for Path -->
+    <marker id="path-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+  <!-- ========================================== -->
+  <!-- LEFT SECTION: 8-Directional Reference      -->
+  <!-- ========================================== -->
+  
+  <!-- Titles -->
+  <text x="190" y="60" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">8-Directional Chain Code</text>
+  <text x="190" y="60" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">رمز السلسلة ذو 8 اتجاهات</text>
+
+  <!-- Compass Background -->
+  <circle cx="190" cy="230" r="105" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+  <circle cx="190" cy="230" r="65" fill="none" stroke="var(--border-color)" stroke-dasharray="4 4" stroke-width="1"/>
+
+  <!-- Center Pixel -->
+  <circle cx="190" cy="230" r="6" fill="var(--brand-500)"/>
+
+  <!-- Directional Arrows -->
+  <g stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)">
+    <line x1="205" y1="230" x2="255" y2="230" /> <!-- 0: E -->
+    <line x1="200.6" y1="219.4" x2="236" y2="184" /> <!-- 1: NE -->
+    <line x1="190" y1="215" x2="190" y2="165" /> <!-- 2: N -->
+    <line x1="179.4" y1="219.4" x2="144" y2="184" /> <!-- 3: NW -->
+    <line x1="175" y1="230" x2="125" y2="230" /> <!-- 4: W -->
+    <line x1="179.4" y1="240.6" x2="144" y2="276" /> <!-- 5: SW -->
+    <line x1="190" y1="245" x2="190" y2="295" /> <!-- 6: S -->
+    <line x1="200.6" y1="240.6" x2="236" y2="276" /> <!-- 7: SE -->
+  </g>
+
+  <!-- Direction Labels -->
+  <g fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" text-anchor="middle">
+    <text x="275" y="235">0</text>
+    <text x="250" y="175">1</text>
+    <text x="190" y="150">2</text>
+    <text x="130" y="175">3</text>
+    <text x="105" y="235">4</text>
+    <text x="130" y="295">5</text>
+    <text x="190" y="320">6</text>
+    <text x="250" y="295">7</text>
+  </g>
+
+  <!-- Divider -->
+  <line x1="360" y1="80" x2="360" y2="380" stroke="var(--border-color)" stroke-dasharray="6 6" stroke-width="2"/>
+
+  <!-- ========================================== -->
+  <!-- RIGHT SECTION: Contour on Grid             -->
+  <!-- ========================================== -->
+
+  <!-- Titles -->
+  <text x="580" y="60" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">Contour on Grid</text>
+  <text x="580" y="60" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold">محيط على شبكة</text>
+
+  <!-- Highlighted Contour Cells (Drawn before grid lines) -->
+  <g fill="var(--brand-500)" opacity="0.15">
+    <rect x="480" y="210" width="40" height="40"/> <!-- Start -->
+    <rect x="520" y="210" width="40" height="40"/>
+    <rect x="560" y="170" width="40" height="40"/>
+    <rect x="600" y="170" width="40" height="40"/>
+    <rect x="640" y="210" width="40" height="40"/>
+    <rect x="640" y="250" width="40" height="40"/>
+    <rect x="600" y="290" width="40" height="40"/>
+    <rect x="560" y="290" width="40" height="40"/>
+    <rect x="520" y="250" width="40" height="40"/>
+    <rect x="480" y="250" width="40" height="40"/>
+  </g>
+
+  <!-- Grid Lines -->
+  <g stroke="var(--border-color)" stroke-width="1">
+    <!-- Vertical Lines -->
+    <line x1="440" y1="90" x2="440" y2="370"/>
+    <line x1="480" y1="90" x2="480" y2="370"/>
+    <line x1="520" y1="90" x2="520" y2="370"/>
+    <line x1="560" y1="90" x2="560" y2="370"/>
+    <line x1="600" y1="90" x2="600" y2="370"/>
+    <line x1="640" y1="90" x2="640" y2="370"/>
+    <line x1="680" y1="90" x2="680" y2="370"/>
+    <line x1="720" y1="90" x2="720" y2="370"/>
+    <!-- Horizontal Lines -->
+    <line x1="440" y1="90" x2="720" y2="90"/>
+    <line x1="440" y1="130" x2="720" y2="130"/>
+    <line x1="440" y1="170" x2="720" y2="170"/>
+    <line x1="440" y1="210" x2="720" y2="210"/>
+    <line x1="440" y1="250" x2="720" y2="250"/>
+    <line x1="440" y1="290" x2="720" y2="290"/>
+    <line x1="440" y1="330" x2="720" y2="330"/>
+    <line x1="440" y1="370" x2="720" y2="370"/>
+  </g>
+
+  <!-- Contour Path Lines (Shortened to prevent overlapping arrowheads) -->
+  <g stroke="var(--brand-500)" stroke-width="3" marker-end="url(#path-arrow)">
+    <line x1="500" y1="230" x2="536" y2="230"/> <!-- 0 -->
+    <line x1="540" y1="230" x2="577" y2="193"/> <!-- 1 -->
+    <line x1="580" y1="190" x2="616" y2="190"/> <!-- 0 -->
+    <line x1="620" y1="190" x2="657" y2="227"/> <!-- 7 -->
+    <line x1="660" y1="230" x2="660" y2="266"/> <!-- 6 -->
+    <line x1="660" y1="270" x2="623" y2="307"/> <!-- 5 -->
+    <line x1="620" y1="310" x2="584" y2="310"/> <!-- 4 -->
+    <line x1="580" y1="310" x2="543" y2="273"/> <!-- 3 -->
+    <line x1="540" y1="270" x2="504" y2="270"/> <!-- 4 -->
+    <line x1="500" y1="270" x2="500" y2="234"/> <!-- 2 -->
+  </g>
+
+  <!-- Start Point Indicator -->
+  <circle cx="500" cy="230" r="6" fill="var(--bg-surface)" stroke="var(--brand-500)" stroke-width="3"/>
+  <text x="460" y="225" text-anchor="middle" class="gsvg-en" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">Start</text>
+  <text x="460" y="225" text-anchor="middle" class="gsvg-ar" fill="var(--text-secondary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600">البداية</text>
+
+  <!-- Path Step Labels (Chain Code Numbers) -->
+  <!-- Using paint-order="stroke" to create a text outline so it's readable over grid lines -->
+  <g fill="var(--brand-ink-strong)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" text-anchor="middle" stroke="var(--bg-surface)" stroke-width="4" paint-order="stroke">
+    <text x="520" y="220">0</text>
+    <text x="550" y="200">1</text>
+    <text x="600" y="180">0</text>
+    <text x="650" y="200">7</text>
+    <text x="675" y="255">6</text>
+    <text x="650" y="305">5</text>
+    <text x="600" y="325">4</text>
+    <text x="550" y="305">3</text>
+    <text x="520" y="285">4</text>
+    <text x="485" y="255">2</text>
+  </g>
+
+  <!-- Sequence Box at Bottom -->
+  <rect x="440" y="390" width="280" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1"/>
+  <text x="580" y="416" text-anchor="middle" class="gsvg-en" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" letter-spacing="1">Chain Code: 0, 1, 0, 7, 6, 5, 4, 3, 4, 2</text>
+  <text x="580" y="416" text-anchor="middle" class="gsvg-ar" fill="var(--text-primary)" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" letter-spacing="1">رمز السلسلة: 0, 1, 0, 7, 6, 5, 4, 3, 4, 2</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا خط مستقيم أفقي يتكون من 5 بكسلات، ماذا سيكون رمز السلسلة الخاص به (بافتراض أن 0 هو الشرق)؟</template>
+      <template class="content-en">If we have a horizontal straight line consisting of 5 pixels, what would its chain code be (assuming 0 is East)?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيكون الرمز: 0 0 0 0 (أربعة تحركات نحو الشرق لربط 5 بكسلات).</p></template>
+      <template class="content-en"><p>The code would be: 0 0 0 0 (four moves to the East to connect 5 pixels).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم في الوحدة العاشرة. هذه الوحدة هي قلب الرؤية بالحاسب الحديثة. تخيل أنك تحاول تجميع صورة بانورامية من عدة صور؛ كيف يعرف الحاسوب أين تتداخل الصور؟ الجواب هو 'اكتشاف الميزات ومطابقتها'. نبدأ أولاً بالبحث عن نقاط مميزة ومستقرة (مثل الزوايا) باستخدام مكتشفات مثل Harris، ونضمن انتشارها في الصورة باستخدام ANMS. لكن العثور عليها لا يكفي، يجب أن نصفها بلغة يفهمها الحاسوب، وهنا يأتي دور واصف SIFT العبقري الذي يحول شكل النقطة إلى متجه من 128 رقماً لا يتأثر بتغير الإضاءة أو الدوران. بعد ذلك، نقوم بمطابقة هذه المتجهات، ونتعلم كيف نقيم جودة هذه المطابقة باستخدام منحنيات ROC. أخيراً، ننتقل من النقاط إلى الخطوط، وندرس كيفية اكتشاف الحواف باستخدام التدرجات ومرشحات مثل Sobel، وكيفية ربطها باستخدام رموز السلسلة. للامتحان، ركزوا بشدة على فهم كيفية عمل SIFT، والفرق بين الإيجابيات الخاطئة والسلبيات الخاطئة في المطابقة، وكيفية حساب التدرج.</template>
+    <template class="content-en">Welcome to Module 10. This module is the heart of modern computer vision. Imagine trying to stitch a panorama; how does the computer know where images overlap? The answer is 'Feature Detection and Matching'. We start by finding stable, distinctive points (like corners) using detectors like Harris, ensuring they are spread out using ANMS. But finding them isn't enough; we must describe them. Enter the brilliant SIFT descriptor, which converts a point's appearance into a 128-number vector invariant to lighting and rotation. Next, we match these vectors and evaluate our success using ROC curves. Finally, we move from points to lines, studying edge detection using gradients and filters like Sobel, and linking them with chain codes. For the exam, focus heavily on how SIFT works, the trade-offs between False Positives and False Negatives in matching thresholds, and how to compute image gradients.</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل نهج 'الاكتشاف المستقل' على 'التتبع' عند دمج الصور البانورامية؟</template>
+          <template class="content-en">Why do we prefer the 'independent detection' approach over 'tracking' when stitching panoramas?</template>
+          <span class="content-target">لماذا نفضل نهج 'الاكتشاف المستقل' على 'التتبع' عند دمج الصور البانورامية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الصور البانورامية غالباً ما تحتوي على تغيرات كبيرة في المنظور والحركة بين اللقطات. التتبع يعتمد على البحث المحلي ويفشل إذا تحركت الكاميرا كثيراً، بينما الاكتشاف المستقل يجد الميزات في كل صورة على حدة ثم يطابقها بناءً على المظهر.</template>
+          <template class="content-en">Because panoramas often involve large perspective and motion changes between shots. Tracking relies on local search and fails if the camera moves too much, whereas independent detection finds features in each image separately and then matches them based on appearance.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي مشكلة الفتحة (Aperture Problem) وكيف نتجنبها؟</template>
+          <template class="content-en">What is the Aperture Problem and how do we avoid it?</template>
+          <span class="content-target">ما هي مشكلة الفتحة (Aperture Problem) وكيف نتجنبها؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هي عدم القدرة على تحديد الحركة الموازية لحافة مستقيمة (لأن الرقعة تبدو متطابقة إذا انزلقت على طول الحافة). نتجنبها بالبحث عن 'الزوايا' (تغير في اتجاهين) بدلاً من الحواف المستقيمة.</template>
+          <template class="content-en">It is the inability to determine motion parallel to a straight edge (because the patch looks identical if slid along the edge). We avoid it by looking for 'corners' (2D variation) instead of straight edges.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور خوارزمية ANMS؟</template>
+          <template class="content-en">What is the role of the ANMS algorithm?</template>
+          <span class="content-target">ما هو دور خوارزمية ANMS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تمنع تركز جميع النقاط المكتشفة في منطقة واحدة ذات تباين عالٍ، وتضمن توزيعاً مكانياً موحداً للميزات عبر الصورة بأكملها.</template>
+          <template class="content-en">It prevents all detected points from clustering in a single high-contrast region, ensuring a uniform spatial distribution of features across the entire image.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحقق SIFT ثبات المقياس (Scale invariance)؟</template>
+          <template class="content-en">How does SIFT achieve scale invariance?</template>
+          <span class="content-target">كيف يحقق SIFT ثبات المقياس (Scale invariance)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">من خلال استخراج الميزات عبر مقاييس متعددة باستخدام هرم غاوسي (تحديداً Difference of Gaussian)، مما يسمح باكتشاف الميزة بغض النظر عن حجمها في الصورة.</template>
+          <template class="content-en">By extracting features across multiple scales using a Gaussian pyramid (specifically Difference of Gaussian), allowing the feature to be detected regardless of its size in the image.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يتم تسوية متجه SIFT إلى طول الوحدة؟</template>
+          <template class="content-en">Why is the SIFT vector normalized to unit length?</template>
+          <span class="content-target">لماذا يتم تسوية متجه SIFT إلى طول الوحدة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لجعله مقاوماً للتغيرات الخطية في الإضاءة (التباين). إذا زاد سطوع الصورة، تزداد قيم التدرج، لكن التسوية تعيد المتجه إلى نفس المقياس المرجعي.</template>
+          <template class="content-en">To make it invariant to linear illumination changes (contrast). If image brightness increases, gradient magnitudes increase, but normalization scales the vector back to a reference scale.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما الفرق بين SIFT و PCA-SIFT؟</template>
+          <template class="content-en">What is the difference between SIFT and PCA-SIFT?</template>
+          <span class="content-target">ما الفرق بين SIFT و PCA-SIFT؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">SIFT ينتج متجهاً من 128 بُعداً. PCA-SIFT يحسب التدرجات على رقعة أكبر ثم يستخدم تحليل المكونات الرئيسية لتقليل المتجه إلى 36 بُعداً فقط، مما يسرع عملية المطابقة.</template>
+          <template class="content-en">SIFT produces a 128-dimensional vector. PCA-SIFT computes gradients over a larger patch and uses Principal Component Analysis to reduce the vector to just 36 dimensions, speeding up matching.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث إذا قمنا بتعيين حد المطابقة (Threshold) مرتفعاً جداً؟</template>
+          <template class="content-en">What happens if we set the matching threshold too high?</template>
+          <span class="content-target">ماذا يحدث إذا قمنا بتعيين حد المطابقة (Threshold) مرتفعاً جداً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">يصبح النظام متساهلاً جداً، مما يؤدي إلى قبول العديد من التطابقات الخاطئة (زيادة معدل الإيجابيات الخاطئة FPR).</template>
+          <template class="content-en">The system becomes too lenient, leading to the acceptance of many incorrect matches (increasing the False Positive Rate, FPR).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا تقيس المساحة تحت منحنى ROC (AUC)؟</template>
+          <template class="content-en">What does the Area Under the ROC Curve (AUC) measure?</template>
+          <span class="content-target">ماذا تقيس المساحة تحت منحنى ROC (AUC)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تقيس الأداء العام لخوارزمية المطابقة بغض النظر عن الحد المختار. كلما اقتربت القيمة من 1.0، كان الأداء أفضل في التمييز بين التطابقات الصحيحة والخاطئة.</template>
+          <template class="content-en">It measures the overall performance of the matching algorithm independent of the chosen threshold. The closer the value is to 1.0, the better the performance in distinguishing between correct and incorrect matches.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي العلاقة بين اتجاه الحافة واتجاه تدرج الصورة؟</template>
+          <template class="content-en">What is the relationship between the edge direction and the image gradient direction?</template>
+          <span class="content-target">ما هي العلاقة بين اتجاه الحافة واتجاه تدرج الصورة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هما متعامدان دائماً. التدرج يشير إلى اتجاه التغير اللوني (أسرع زيادة في الشدة)، بينما الحافة تمتد على طول الخط الفاصل.</template>
+          <template class="content-en">They are always perpendicular. The gradient points in the direction of color change (steepest ascent in intensity), while the edge runs along the dividing line.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم 'الفرق الأول' في رمز السلسلة (Chain code)؟</template>
+          <template class="content-en">Why do we use the 'first difference' in chain code?</template>
+          <span class="content-target">لماذا نستخدم 'الفرق الأول' في رمز السلسلة (Chain code)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لجعل الرمز غير متغير بالنسبة لنقطة البداية على الخط الكنتوري، ولجعله مقاوماً للدوران بزيادات قدرها 45 درجة.</template>
+          <template class="content-en">To make the code invariant to the starting point on the contour, and to make it robust to rotations in 45-degree increments.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "ما هي النقاط الرئيسية (Keypoints)؟",
+      "en": "What are Keypoints?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مواقع في الصورة تسمح بالمطابقة حتى في وجود تداخل أو تغيرات كبيرة في المقياس والاتجاه.",
+        "en": "Locations in an image that permit matching even in the presence of clutter, large scale, and orientation changes."
+      },
+      "example": {
+        "ar": "زوايا مبنى في صورة يمكن التعرف عليها من زوايا تصوير مختلفة.",
+        "en": "Corners of a building in an image that can be recognized from different viewing angles."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "ما هما النهجان الرئيسيان للعثور على ميزات النقاط؟",
+      "en": "What are the two main approaches to finding feature points?"
+    },
+    "back": {
+      "definition": {
+        "ar": "1) التتبع (البحث المحلي)، 2) الاكتشاف المستقل ثم المطابقة.",
+        "en": "1) Tracking (local search), 2) Independent detection followed by matching."
+      },
+      "example": {
+        "ar": "التتبع للفيديو، والاكتشاف المستقل للصور البانورامية.",
+        "en": "Tracking for video sequences, independent detection for panoramas."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "ما هي المراحل الأربع لاكتشاف النقاط الرئيسية؟",
+      "en": "What are the 4 stages of keypoint detection?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الاكتشاف، الوصف، المطابقة، والتتبع (كبديل للمطابقة).",
+        "en": "Detection, Description, Matching, and Tracking (alternative to matching)."
+      },
+      "example": {
+        "ar": "تحديد الزاوية (اكتشاف)، تحويلها لمتجه (وصف)، إيجاد شبيهتها (مطابقة).",
+        "en": "Finding a corner (detection), converting it to a vector (description), finding its pair (matching)."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "ما هو أبسط معيار لمقارنة رقعتين من الصور؟",
+      "en": "What is the simplest criterion for comparing two image patches?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموع الفروق المربعة (SSD).",
+        "en": "Summed Square Difference (SSD)."
+      },
+      "example": {
+        "ar": "طرح قيم البكسلات بين رقعتين، تربيع الناتج، وجمعه.",
+        "en": "Subtracting pixel values between two patches, squaring the result, and summing them."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "ما هي وظيفة مصفوفة الارتباط الذاتي (Auto-correlation matrix)؟",
+      "en": "What is the function of the Auto-correlation matrix?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مقارنة رقعة الصورة بنفسها لحساب مدى استقرارها بالنسبة للتغيرات الصغيرة في الموضع.",
+        "en": "Comparing an image patch against itself to compute how stable it is with respect to small variations in position."
+      },
+      "example": {
+        "ar": "تحديد ما إذا كانت الرقعة زاوية (مستقرة) أو حافة (غير مستقرة على طول الحافة).",
+        "en": "Determining if a patch is a corner (stable) or an edge (unstable along the edge)."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "ما الذي يميز مكتشف Forstner-Harris؟",
+      "en": "What characterizes the Forstner-Harris detector?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يستخدم نافذة وزن غاوسية لجعله غير حساس لدوران الصورة، ويبحث عن القيم القصوى المحلية.",
+        "en": "It uses a Gaussian weighting window to make it insensitive to in-plane image rotations, looking for local maxima."
+      },
+      "example": {
+        "ar": "اكتشاف زوايا طاولة بغض النظر عن كيفية تدوير الكاميرا.",
+        "en": "Detecting table corners regardless of how the camera is rotated."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "ما هي المشكلة التي يحلها ANMS؟",
+      "en": "What problem does ANMS solve?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يحل مشكلة التوزيع غير المتكافئ للنقاط (تجمعها في مناطق التباين العالي) لضمان توزيع مكاني موحد.",
+        "en": "It solves the uneven distribution of feature points (clustering in high-contrast regions) to ensure a uniform spatial distribution."
+      },
+      "example": {
+        "ar": "منع اكتشاف جميع النقاط في منطقة شجرة مليئة بالأوراق وتجاهل باقي الصورة.",
+        "en": "Preventing all points from being detected in a highly textured tree while ignoring the rest of the image."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "كيف يتم تحقيق ثبات المقياس (Scale invariance) في اكتشاف الميزات؟",
+      "en": "How is scale invariance achieved in feature detection?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق استخراج الميزات عبر مقاييس متعددة باستخدام هرم غاوسي (Gaussian pyramid).",
+        "en": "By extracting features at a variety of scales using multiple resolutions in a Gaussian pyramid."
+      },
+      "example": {
+        "ar": "التعرف على سيارة سواء كانت قريبة جداً من الكاميرا أو بعيدة.",
+        "en": "Recognizing a car whether it is very close to the camera or far away."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "ما هو واصف SIFT؟",
+      "en": "What is the SIFT descriptor?"
+    },
+    "back": {
+      "definition": {
+        "ar": "متجه من 128 بُعد يتكون من مدرجات تكرارية لاتجاهات التدرج في نافذة 16x16 مقسمة إلى 4x4 أرباع.",
+        "en": "A 128-dimensional vector formed by gradient orientation histograms in a 16x16 window divided into 4x4 quadrants."
+      },
+      "example": {
+        "ar": "تحويل شكل زاوية العين في الصورة إلى مصفوفة أرقام ثابتة لا تتأثر بالإضاءة.",
+        "en": "Converting the shape of an eye corner in an image into a fixed array of numbers unaffected by lighting."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "كيف يحسن RootSIFT من أداء SIFT؟",
+      "en": "How does RootSIFT improve SIFT performance?"
+    },
+    "back": {
+      "definition": {
+        "ar": "عن طريق إعادة تسوية واصفات SIFT باستخدام مقياس L1 ثم أخذ الجذر التربيعي، مما يزيد من القدرة التمييزية.",
+        "en": "By re-normalizing SIFT descriptors using an L1 measure and taking the square root, dramatically increasing discriminability."
+      },
+      "example": {
+        "ar": "تعديل رياضي بسيط يجعل المطابقة أكثر دقة عند مقارنة المدرجات التكرارية.",
+        "en": "A simple mathematical tweak that makes matching much more accurate when comparing histograms."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "ما هو تأثير تعيين حد المطابقة (Threshold) مرتفعاً جداً؟",
+      "en": "What is the effect of setting the matching threshold too high?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يؤدي إلى الكثير من الإيجابيات الخاطئة (False Positives)، أي إرجاع تطابقات غير صحيحة.",
+        "en": "It leads to too many false positives, i.e., incorrect matches being returned."
+      },
+      "example": {
+        "ar": "مطابقة وجه شخص بوجه شخص آخر مختلف تماماً لأن النظام متساهل.",
+        "en": "Matching a person's face with a completely different person because the system is too lenient."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "ماذا يمثل منحنى ROC؟",
+      "en": "What does the ROC curve represent?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يرسم معدل الإيجابية الحقيقية (TPR) مقابل معدل الإيجابية الخاطئة (FPR) لتقييم أداء المطابقة.",
+        "en": "It plots the True Positive Rate (TPR) against the False Positive Rate (FPR) to evaluate matching performance."
+      },
+      "example": {
+        "ar": "منحنى يوضح مدى جودة الخوارزمية في إيجاد التطابقات الصحيحة دون جلب تطابقات خاطئة.",
+        "en": "A curve showing how good the algorithm is at finding correct matches without bringing in false ones."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "ما هو الغرض من خوارزمية RANSAC في المطابقة؟",
+      "en": "What is the purpose of the RANSAC algorithm in matching?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التحقق من التطابقات المرشحة باستخدام المحاذاة الهندسية لفصل التطابقات الصحيحة (Inliers) عن الخاطئة (Outliers).",
+        "en": "Verifying candidate matches using geometric alignment to separate inliers from outliers."
+      },
+      "example": {
+        "ar": "حذف التطابقات التي تشير إلى اتجاهات عشوائية والاحتفاظ بتلك التي تتوافق مع حركة الكاميرا.",
+        "en": "Discarding matches that point in random directions and keeping those that agree with the camera motion."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "ما هي أسباب ظهور الحواف في الصور؟",
+      "en": "What are the causes of edges in images?"
+    },
+    "back": {
+      "definition": {
+        "ar": "انقطاع في العمق، لون السطح، الإضاءة (الظلال)، أو الاتجاه العمودي للسطح.",
+        "en": "Depth discontinuity, surface color discontinuity, illumination discontinuity, or surface normal discontinuity."
+      },
+      "example": {
+        "ar": "الخط الفاصل بين جسم مضاء وظله على الأرض (انقطاع إضاءة).",
+        "en": "The line between a lit object and its shadow on the ground (illumination discontinuity)."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "إلى ماذا يشير متجه تدرج الصورة (Image Gradient)؟",
+      "en": "Where does the Image Gradient vector point?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يشير إلى اتجاه أسرع زيادة في شدة الإضاءة (ويكون عمودياً على اتجاه الحافة).",
+        "en": "It points in the direction of the most rapid increase in intensity (and is perpendicular to the edge direction)."
+      },
+      "example": {
+        "ar": "عند الانتقال من بكسل أسود إلى أبيض، يشير التدرج نحو البكسل الأبيض.",
+        "en": "When moving from a black pixel to a white pixel, the gradient points towards the white pixel."
+      }
+    }
+  },
+  {
+    "id": 16,
+    "front": {
+      "ar": "ما هو رمز السلسلة (Chain Code)؟",
+      "en": "What is a Chain Code?"
+    },
+    "back": {
+      "definition": {
+        "ar": "طريقة لتشفير الخطوط الكنتورية المستمرة باستخدام أرقام تمثل الاتجاهات الأساسية الثمانية.",
+        "en": "A method to encode continuous contours using numbers representing the eight cardinal directions."
+      },
+      "example": {
+        "ar": "تمثيل مربع بسلسلة من الأرقام مثل 000222444666 بدلاً من حفظ إحداثيات كل بكسل.",
+        "en": "Representing a square with a sequence of numbers like 000222444666 instead of saving every pixel's coordinates."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مرحلة من مراحل اكتشاف النقاط الرئيسية تقوم باستخراج متجه يصف المنطقة المحيطة بنقطة الاهتمام؟",
+      "en": "Which stage of keypoint detection extracts a vector describing the region surrounding the interest point?"
+    },
+    "options": {
+      "ar": [
+        "مرحلة الاكتشاف (Detection)",
+        "مرحلة الوصف (Description)",
+        "مرحلة المطابقة (Matching)",
+        "مرحلة التتبع (Tracking)"
+      ],
+      "en": [
+        "Detection stage",
+        "Description stage",
+        "Matching stage",
+        "Tracking stage"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مرحلة الوصف هي المسؤولة عن أخذ المنطقة المكتشفة وتحويلها إلى واصف رياضي (متجه) يمكن استخدامه للمقارنة.",
+      "en": "The description stage is responsible for taking the detected region and converting it into a mathematical descriptor (vector) that can be used for comparison."
+    },
+    "hint": {
+      "ar": "تذكر أن SIFT هو مثال على هذه المرحلة.",
+      "en": "Remember that SIFT is an example of this stage."
+    },
+    "difficulty": "easy",
+    "conceptId": "points-and-patches-stages"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي المشكلة الرئيسية التي تحلها خوارزمية القمع غير الأقصى التكيفي (ANMS)؟",
+      "en": "What is the main problem solved by the Adaptive Non-Maximal Suppression (ANMS) algorithm?"
+    },
+    "options": {
+      "ar": [
+        "عدم ثبات المقياس في الصور",
+        "التوزيع غير المتكافئ لنقاط الميزات عبر الصورة",
+        "حساسية المكتشف لدوران الصورة",
+        "البطء الشديد في حساب الواصفات"
+      ],
+      "en": [
+        "Lack of scale invariance in images",
+        "Uneven distribution of feature points across the image",
+        "Sensitivity of the detector to image rotation",
+        "Extreme slowness in calculating descriptors"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يضمن ANMS عدم تركز جميع النقاط المكتشفة في منطقة واحدة ذات تباين عالٍ، بل يوزعها بشكل متجانس على كامل الصورة.",
+      "en": "ANMS ensures that not all detected points cluster in a single high-contrast region, but rather distributes them uniformly across the entire image."
+    },
+    "hint": {
+      "ar": "فكر في كلمة 'توزيع' (Distribution).",
+      "en": "Think about the word 'distribution'."
+    },
+    "difficulty": "medium",
+    "conceptId": "feature-detectors-stage1"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "كم عدد الأبعاد في متجه واصف SIFT القياسي؟",
+      "en": "How many dimensions are in a standard SIFT descriptor vector?"
+    },
+    "options": {
+      "ar": [
+        "36",
+        "64",
+        "128",
+        "3042"
+      ],
+      "en": [
+        "36",
+        "64",
+        "128",
+        "3042"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يتكون SIFT من شبكة 4×4، وفي كل خلية يوجد مدرج تكراري بـ 8 اتجاهات. 4 × 4 × 8 = 128.",
+      "en": "SIFT consists of a 4x4 grid, and in each cell, there is an 8-bin orientation histogram. 4 x 4 x 8 = 128."
+    },
+    "hint": {
+      "ar": "اضرب 4 في 4 في 8.",
+      "en": "Multiply 4 by 4 by 8."
+    },
+    "difficulty": "easy",
+    "conceptId": "feature-descriptors-stage2"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "أي من الواصفات التالية يستخدم بنية تجميع لوغاريتمية قطبية (Log-polar) بدلاً من الأرباع الديكارتية؟",
+      "en": "Which of the following descriptors uses a log-polar binning structure instead of Cartesian quadrants?"
+    },
+    "options": {
+      "ar": [
+        "PCA-SIFT",
+        "RootSIFT",
+        "GLOH",
+        "Steerable filters"
+      ],
+      "en": [
+        "PCA-SIFT",
+        "RootSIFT",
+        "GLOH",
+        "Steerable filters"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "GLOH هو متغير من SIFT يستخدم شبكة لوغاريتمية قطبية، مما يجعله يتفوق قليلاً على SIFT القياسي.",
+      "en": "GLOH is a variant of SIFT that uses a log-polar grid, making it slightly outperform standard SIFT."
+    },
+    "hint": {
+      "ar": "يبدأ بحرف G.",
+      "en": "Starts with the letter G."
+    },
+    "difficulty": "medium",
+    "conceptId": "feature-descriptors-stage2"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ماذا يحدث إذا قمت بتعيين حد مسافة المطابقة (Matching threshold) منخفضاً جداً؟",
+      "en": "What happens if you set the matching distance threshold too low?"
+    },
+    "options": {
+      "ar": [
+        "ستحصل على الكثير من الإيجابيات الخاطئة (False Positives)",
+        "ستحصل على الكثير من السلبيات الخاطئة (False Negatives)",
+        "ستزيد المساحة تحت منحنى ROC (AUC)",
+        "ستتطابق جميع الميزات بشكل مثالي"
+      ],
+      "en": [
+        "You will get too many false positives",
+        "You will get too many false negatives",
+        "The Area Under the ROC Curve (AUC) will increase",
+        "All features will match perfectly"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الحد المنخفض جداً يعني أن النظام صارم للغاية، مما سيؤدي إلى رفض العديد من التطابقات الصحيحة (سلبيات خاطئة).",
+      "en": "A threshold that is too low means the system is too strict, which will lead to rejecting many correct matches (false negatives)."
+    },
+    "hint": {
+      "ar": "النظام الصارم يرفض الإجابات الصحيحة.",
+      "en": "A strict system rejects correct answers."
+    },
+    "difficulty": "medium",
+    "conceptId": "feature-matching-stage3"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في منحنى ROC، ماذا يمثل المحور السيني (X-axis) والمحور الصادي (Y-axis) على التوالي؟",
+      "en": "In an ROC curve, what do the X-axis and Y-axis represent respectively?"
+    },
+    "options": {
+      "ar": [
+        "TPR و FPR",
+        "FPR و TPR",
+        "الدقة (Accuracy) و الاستدعاء (Recall)",
+        "TP و FP"
+      ],
+      "en": [
+        "TPR and FPR",
+        "FPR and TPR",
+        "Accuracy and Recall",
+        "TP and FP"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يرسم منحنى ROC معدل الإيجابية الخاطئة (FPR) على المحور السيني مقابل معدل الإيجابية الحقيقية (TPR) على المحور الصادي.",
+      "en": "The ROC curve plots the False Positive Rate (FPR) on the X-axis against the True Positive Rate (TPR) on the Y-axis."
+    },
+    "hint": {
+      "ar": "الخطأ (False) يأتي أولاً على المحور الأفقي.",
+      "en": "False comes first on the horizontal axis."
+    },
+    "difficulty": "hard",
+    "conceptId": "feature-matching-stage3"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي مما يلي ليس من أسباب ظهور الحواف في الصور؟",
+      "en": "Which of the following is NOT a cause of edges in images?"
+    },
+    "options": {
+      "ar": [
+        "انقطاع في العمق (Depth discontinuity)",
+        "انقطاع في الإضاءة (Illumination discontinuity)",
+        "التوزيع الموحد للملمس (Uniform texture distribution)",
+        "انقطاع في لون السطح (Surface color discontinuity)"
+      ],
+      "en": [
+        "Depth discontinuity",
+        "Illumination discontinuity",
+        "Uniform texture distribution",
+        "Surface color discontinuity"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الملمس الموحد لا يخلق حوافاً، بل يخلق مناطق مسطحة. الحواف تتطلب تغيراً حاداً (انقطاع).",
+      "en": "Uniform texture does not create edges; it creates flat regions. Edges require a sharp change (discontinuity)."
+    },
+    "hint": {
+      "ar": "الحافة تعني 'تغيير'.",
+      "en": "An edge means 'change'."
+    },
+    "difficulty": "easy",
+    "conceptId": "edges-and-contours"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "إلى أين يشير متجه تدرج الصورة (Image Gradient)؟",
+      "en": "Where does the image gradient vector point?"
+    },
+    "options": {
+      "ar": [
+        "موازياً لاتجاه الحافة",
+        "في اتجاه أسرع انخفاض في شدة الإضاءة",
+        "في اتجاه أسرع زيادة في شدة الإضاءة",
+        "نحو مركز الصورة دائماً"
+      ],
+      "en": [
+        "Parallel to the edge direction",
+        "In the direction of the most rapid decrease in intensity",
+        "In the direction of the most rapid increase in intensity",
+        "Always towards the center of the image"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "رياضياً، يشير التدرج دائماً إلى اتجاه أسرع صعود (زيادة) في الدالة، وهو في هذه الحالة شدة الإضاءة.",
+      "en": "Mathematically, the gradient always points in the direction of the steepest ascent (increase) in the function, which in this case is intensity."
+    },
+    "hint": {
+      "ar": "التدرج يبحث عن القمة (الزيادة).",
+      "en": "The gradient looks for the peak (increase)."
+    },
+    "difficulty": "medium",
+    "conceptId": "edges-and-contours"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "أي من المرشحات التالية هو مثال على مرشح الفروق المحدودة لاكتشاف الحواف؟",
+      "en": "Which of the following filters is an example of a finite difference filter for edge detection?"
+    },
+    "options": {
+      "ar": [
+        "مرشح غاوس (Gaussian filter)",
+        "مرشح سوبل (Sobel filter)",
+        "مرشح متوسط (Mean filter)",
+        "مرشح الترددات المنخفضة (Low-pass filter)"
+      ],
+      "en": [
+        "Gaussian filter",
+        "Sobel filter",
+        "Mean filter",
+        "Low-pass filter"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مرشح سوبل (إلى جانب Prewitt و Roberts) هو مرشح فروق محدودة يستخدم لحساب تدرج الصورة لاكتشاف الحواف.",
+      "en": "The Sobel filter (along with Prewitt and Roberts) is a finite difference filter used to compute the image gradient for edge detection."
+    },
+    "hint": {
+      "ar": "يبدأ بحرف S.",
+      "en": "Starts with S."
+    },
+    "difficulty": "easy",
+    "conceptId": "edges-and-contours"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "ما هي التقنية المستخدمة لتشفير قائمة الحواف المرتبطة (الخطوط الكنتورية) إلى الاتجاهات الأساسية الثمانية؟",
+      "en": "What technique is used to encode a linked edgel list (contours) into the eight cardinal directions?"
+    },
+    "options": {
+      "ar": [
+        "تحويل هوف (Hough Transform)",
+        "رمز السلسلة (Chain code)",
+        "خوارزمية RANSAC",
+        "تحليل المكونات الرئيسية (PCA)"
+      ],
+      "en": [
+        "Hough Transform",
+        "Chain code",
+        "RANSAC algorithm",
+        "Principal Component Analysis (PCA)"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "رمز السلسلة يمثل المنحنى المستمر كسلسلة من الأرقام (من 0 إلى 7) التي تدل على اتجاه البكسل التالي.",
+      "en": "Chain code represents a continuous curve as a sequence of numbers (0 to 7) indicating the direction to the next pixel."
+    },
+    "hint": {
+      "ar": "تخيل أنك تربط الحلقات معاً.",
+      "en": "Imagine linking links together."
+    },
+    "difficulty": "easy",
+    "conceptId": "contour-detection-chain-code"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن تعيين حد مطابقة (Threshold) مرتفع سيجعل النظام 'أفضل' في إيجاد التطابقات. في الواقع، الحد المرتفع يعني تساهل النظام، مما يؤدي إلى زيادة هائلة في الإيجابيات الخاطئة (False Positives).</template>
+    <template class="content-en">Believing that setting a high matching threshold makes the system 'better' at finding matches. In reality, a high threshold means the system is lenient, leading to a massive increase in False Positives.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">تعديل RootSIFT هو مجرد تغيير رياضي بسيط جداً (تسوية L1 ثم أخذ الجذر التربيعي) على متجه SIFT العادي، ولكنه يغير هندسة الفضاء من المسافة الإقليدية إلى مسافة هيلينجر، مما يحسن دقة المطابقة بشكل سحري تقريباً.</template>
+    <template class="content-en">The RootSIFT modification is just a very simple mathematical tweak (L1 normalization then square root) on the standard SIFT vector, but it changes the space geometry from Euclidean to Hellinger distance, improving matching accuracy almost magically.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مشكلة الفتحة (Aperture Problem) هي السبب الأساسي الذي يجعلنا نبحث عن 'الزوايا' بدلاً من 'الحواف' عند تتبع الميزات. الحافة تعطينا معلومات في اتجاه واحد فقط، بينما الزاوية تعطينا معلومات في اتجاهين، مما يثبت النقطة في مكانها.</template>
+    <template class="content-en">The Aperture Problem is the fundamental reason we look for 'corners' instead of 'edges' when tracking features. An edge only gives us information in one direction, while a corner gives us information in two directions, locking the point in place.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين اتجاه الحافة واتجاه التدرج. تذكر دائماً أنهما متعامدان (Perpendicular). التدرج يشير إلى اتجاه التغير اللوني، وليس على طول الخط الفاصل.</template>
+    <template class="content-en">Confusing the edge direction with the gradient direction. Always remember they are perpendicular. The gradient points in the direction of color change, not along the dividing line.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M09.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="M11.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

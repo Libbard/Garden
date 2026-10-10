@@ -2082,7 +2082,13 @@
     f.origin = { type: 'note', uid: String(note.id || ''), src: 'quick' };
     var prev = tasks().filter(function (t) { return t.id === f.id; })[0];
     /*@3.GADJ.107*/
-    var rec = prev || upsertTask(f);
+    var rec;
+    if (prev) {
+      var g = Object.assign({}, f);
+      delete g.done; delete g.created_at;
+      if (prev.due !== f.due) g.done = false;
+      rec = upsertTask(g);
+    } else rec = upsertTask(f);
     if (note.id) {
       var list = quickNotes(), at = -1, i;
       for (i = 0; i < list.length; i++) if (list[i] && list[i].id === note.id) at = i;
@@ -2111,6 +2117,19 @@
     f.note = '';
     f.origin = { type: 'note', uid: String(note.id), src: 'rich' };
     return upsertTask(f);
+  }
+
+  function unlinkNoteTask(noteId) {
+    return noteId ? deleteTask('task_note_' + noteId) : false;
+  }
+
+  function noteHref(origin) {
+    if (!origin || origin.type !== 'note' || !origin.uid) return '';
+    var uid = String(origin.uid);
+    if (origin.src !== 'quick') return 'hub/notes.html?id=' + encodeURIComponent(uid);
+    var n = quickNotes().filter(function (x) { return x && String(x.id) === uid; })[0];
+    var page = (n && n.origin && n.origin.page) || 'index.html';
+    return page + '#qn-' + uid;
   }
 
   /*@3.GADJ.128*/
@@ -2422,6 +2441,8 @@
     setNoteReminder: setNoteReminder,
     linkNoteToTask: linkNoteToTask,
     linkRichNote: linkRichNote,
+    unlinkNoteTask: unlinkNoteTask,
+    noteHref: noteHref,
     convertNoteToTask: convertNoteToTask,
     migrateTimedNotes: migrateTimedNotes,
     prefs: prefs,

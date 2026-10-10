@@ -7875,6 +7875,7 @@
     if (!rec.o.c) delete rec.o.c;
     if (!rec.o.p) delete rec.o.p;
     if (!rec.o.t) delete rec.o.t;
+    if (src.remind_at) rec.r = String(src.remind_at);
     idxPut(rec);
 
     var St = window.GardenNotesStore;
@@ -7882,6 +7883,8 @@
     var go = function () {
       var rest = arr.filter(function (n) { return !n || String(n.id) !== String(qid); });
       try { localStorage.setItem('quick_notes', JSON.stringify(rest)); } catch (e3) {}
+      if (window.GardenData && GardenData.unlinkNoteTask) { try { GardenData.unlinkNoteTask(qid); } catch (e4) {} }
+      if (rec.r) syncRemindTask(rec);
       reload({ keepOpen: true });
       openNote(id, { focus: true });
     };

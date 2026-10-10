@@ -247,6 +247,44 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>/* The structure of the producer process */
+while (true) {
+    /* produce an item in next_produced */
+    
+    wait(empty); // 1 or more empty -- 0 sleep
+    wait(mutex); // mutex --
+    
+    /* add next produced to the buffer */
+    
+    signal(mutex); // mutex ++
+    signal(full);  // full ++
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>/* The structure of the consumer process */
+while (true) {
+    wait(full);  // full --
+    wait(mutex);
+    
+    /* remove an item from buffer to next_consumed */
+    
+    signal(mutex);
+    signal(empty); // empty ++
+    
+    /* consume the item in next consumed */
+}</code></pre>
+  </div>
+
   <!-- DIAGRAM[4]: Detailed SVG generation prompt: A horizontal array of boxes representing the bounded buffer. Arrows pointing to specific boxes labeled 'Producer1', 'Producer2' (adding items) and 'Cons 1', 'Cons 2' (removing items). Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="4">
 <svg id="dgm-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
@@ -451,6 +489,44 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>/* The structure of a writer process */
+while (true) {
+    wait(rw_mutex); // 0
+    
+    /* writing is performed */
+    
+    signal(rw_mutex); // 1
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>/* The structure of a reader process */
+while (true) {
+    wait(mutex);
+    read_count++;
+    if (read_count == 1) /* first reader */
+        wait(rw_mutex);
+    signal(mutex);
+    
+    /* reading is performed */
+    
+    wait(mutex);
+    read_count--;
+    if (read_count == 0) /* last reader */
+        signal(rw_mutex);
+    signal(mutex);
+}</code></pre>
+  </div>
+
   <!-- DIAGRAM[3]: Detailed SVG generation prompt: A central box labeled 'Shared Data'. Arrows from multiple 'Reader' nodes pointing towards the data simultaneously. A single 'Writer' node with an exclusive bidirectional arrow to the data, indicating exclusive access. Style: educational, dark background #0d1117, accent color #10b981, viewBox 0 0 800 400, Arabic + English labels. -->
 <div class="svg-diagram" data-diagram-id="3">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="auto" font-family="system-ui, sans-serif" preserveAspectRatio="xMidYMid meet">
@@ -634,6 +710,25 @@
 <p>if all 5 philosophers become hungry at the exact same time and each picks up their left chopstick <code>wait(chopstick[i])</code>, all semaphores become 0.</p>
 <p>When they try to pick up the right chopstick, they will wait forever, causing a complete Deadlock.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>/* The structure of Philosopher i */
+while (true) {
+    wait(chopstick[i]);
+    wait(chopstick[(i + 1) % 5]);
+    
+    /* eat for a while */
+    
+    signal(chopstick[i]);
+    signal(chopstick[(i + 1) % 5]);
+    
+    /* think for awhile */
+}</code></pre>
   </div>
 
   <!-- DIAGRAM[2]: Detailed SVG generation prompt: A top-down view of a round table. 5 plates/philosophers arranged in a circle. 5 chopsticks placed between the plates. A central bowl of rice. Style: educational, dark background #0d1117, accent color #f59e0b, viewBox 0 0 800 600, Arabic + English labels. -->
@@ -956,8 +1051,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذا الفصل الحاسم. إذا كنتم تستعدون للامتحان، فهذه الوحدة هي قلب أنظمة التشغيل النابض. لقد انتقلنا من النظريات إلى التطبيق العملي لمشاكل المزامنة. ركزوا بشدة على 'المشاكل الكلاسيكية الثلاث': المخزن المؤقت المحدود (كيف نمنع المنتج من الكتابة فوق بيانات لم تُقرأ؟)، القراء والكتاب (كيف نوازن بين الأداء العالي للقراء والوصول الحصري للكتاب دون التسبب في مجاعة؟)، والفلاسفة المتناولين للطعام (المثال الأبرز لحالة الجمود Deadlock). في الامتحان، غالباً ما أسأل عن ترتيب عمليات wait و signal، وماذا يحدث إذا عكسناها. أخيراً، لا تتجاهلوا شريحة 'ويندوز'؛ معرفة متى يستخدم النظام أقنعة المقاطعة (للمعالج الأحادي) ومتى يستخدم أقفال الدوران (للمعالجات المتعددة) هي معلومة ذهبية لأسئلة الاختيار من متعدد. بالتوفيق!</template>
-    <template class="content-en">Welcome, my friends, to a crucial chapter. If you're prepping for the exam, this module is the beating heart of Operating Systems. We've moved from theory to the practical application of synchronization. Focus heavily on the 'Big Three Classic Problems': Bounded-Buffer (preventing overwrites), Readers-Writers (balancing reader concurrency with writer exclusivity without causing starvation), and Dining Philosophers (the ultimate Deadlock scenario). In exams, I frequently ask about the exact order of wait and signal operations, and what happens if you swap them. Finally, do not ignore the Windows slide; knowing when the OS uses interrupt masks (uniprocessor) versus spinlocks (multiprocessor) is pure gold for MCQ questions. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذا الفصل الحاسم. إذا كنتم تستعدون للامتحان، فهذه الوحدة هي قلب أنظمة التشغيل النابض. لقد انتقلنا من النظريات إلى التطبيق العملي لمشاكل المزامنة. ركزوا بشدة على 'المشاكل الكلاسيكية الثلاث': المخزن المؤقت المحدود (كيف نمنع المنتج من الكتابة فوق بيانات لم تُقرأ؟)، القراء والكتاب (كيف نوازن بين الأداء العالي للقراء والوصول الحصري للكتاب دون التسبب في مجاعة؟)، والفلاسفة المتناولين للطعام (المثال الأبرز لحالة الجمود Deadlock). في الامتحان، غالباً ما أسأل عن ترتيب عمليات wait و signal، وماذا يحدث إذا عكسناها. أخيراً، لا تتجاهلوا شريحة 'ويندوز'؛ معرفة متى يستخدم النظام أقنعة المقاطعة (للمعالج الأحادي) ومتى يستخدم أقفال الدوران (للمعالجات المتعددة) هي معلومة ذهبية لأسئلة الاختيار من متعدد. بالتوفيق!<p>الآن بعد أن فهمنا المفاهيم النظرية لمشاكل المزامنة الكلاسيكية، من الضروري دراسة الهياكل البرمجية الدقيقة لها. ترتيب عمليات <code>wait</code> و <code>signal</code> في الشيفرات البرمجية ليس عشوائياً؛ فأي تغيير بسيط قد يؤدي إلى كوارث مثل الجمود (Deadlock) أو حالة السباق (Race Condition). ركز جيداً على كيفية استخدام السيمافورات لحماية الأقسام الحرجة في الأمثلة البرمجية للمنتج والمستهلك، والقراء والكتاب.</p></template>
+    <template class="content-en">Welcome, my friends, to a crucial chapter. If you're prepping for the exam, this module is the beating heart of Operating Systems. We've moved from theory to the practical application of synchronization. Focus heavily on the 'Big Three Classic Problems': Bounded-Buffer (preventing overwrites), Readers-Writers (balancing reader concurrency with writer exclusivity without causing starvation), and Dining Philosophers (the ultimate Deadlock scenario). In exams, I frequently ask about the exact order of wait and signal operations, and what happens if you swap them. Finally, do not ignore the Windows slide; knowing when the OS uses interrupt masks (uniprocessor) versus spinlocks (multiprocessor) is pure gold for MCQ questions. Good luck!<p>Now that we understand the theoretical concepts of classic synchronization problems, it is crucial to study their exact code structures. The order of <code>wait</code> and <code>signal</code> operations in the code is not random; a slight change can lead to disasters like Deadlocks or Race Conditions. Pay close attention to how semaphores are used to protect critical sections in the code examples for the producer/consumer and readers/writers.</p></template>
     <div class="content-target"></div>
   </div>
 </section>

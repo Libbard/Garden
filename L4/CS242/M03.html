@@ -100,6 +100,21 @@
         <template class="content-en">Applications of Regular Expressions</template>
         <span class="content-target">تطبيقات التعابير النمطية</span>
       </a>
+      <a href="#regex-to-enfa-construction" class="toc-link" data-bilingual>
+        <template class="content-ar">البناء الاستقرائي: من تعبير نمطي إلى $\epsilon$-NFA</template>
+        <template class="content-en">Inductive Construction: RegEx to $\epsilon$-NFA</template>
+        <span class="content-target">البناء الاستقرائي: من تعبير نمطي إلى $\epsilon$-NFA</span>
+      </a>
+      <a href="#fsm-applications-translators" class="toc-link" data-bilingual>
+        <template class="content-ar">الآلات المنتهية كمترجمات ومُعرّفات</template>
+        <template class="content-en">FSM as Recognizer/Translator</template>
+        <span class="content-target">الآلات المنتهية كمترجمات ومُعرّفات</span>
+      </a>
+      <a href="#constructing-state-tables" class="toc-link" data-bilingual>
+        <template class="content-ar">بناء جداول انتقال الحالة للآلات ذات المخرجات</template>
+        <template class="content-en">Constructing State Transition Tables for Automata with Outputs</template>
+        <span class="content-target">بناء جداول انتقال الحالة للآلات ذات المخرجات</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -215,8 +230,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تختلف الآلات ذات المخرجات في كيفية إنتاج المخرجات.</p><ul><li><strong>آلة مور (Moore Machine):</strong> تكون المخرجات مستقلة عن المدخلات، أي يتم إنتاجها من داخل حالة الآلة نفسها. تُعرّف رسمياً كـ 6-tuple: $M = (S, I, O, f, g, s_0)$ حيث $S$ مجموعة الحالات، $I$ أبجدية المدخلات، $O$ أبجدية المخرجات، $f$ دالة الانتقال، $g$ دالة المخرجات، و $s_0$ الحالة الابتدائية.</li><li><strong>آلة ميلي (Mealy Machine):</strong> يتم تحديد المخرجات بواسطة الحالة الحالية والمدخلات الحالية، أي يتم إنتاج المخرجات أثناء انتقال الآلة من حالة إلى أخرى.</li></ul><p>يمكن تحويل أي <span class="smart-term" data-term-en="Moore Machine" data-ar="آلة مور" data-en-def="A finite-state machine whose output values are determined solely by its current state.">آلة مور<span class="smart-term-tooltip"></span></span> إلى <span class="smart-term" data-term-en="Mealy Machine" data-ar="آلة ميلي" data-en-def="A finite-state machine whose output values are determined by the current state and the current inputs.">آلة ميلي<span class="smart-term-tooltip"></span></span> والعكس.</p></template>
-    <template class="content-en"><p>Automata with outputs differ in how outputs are produced.</p><ul><li><strong>Moore Machine:</strong> Outputs are independent of inputs, produced from within the state. Formally defined as a six-tuple $M = (S, I, O, f, g, s_0)$ where $S$ is states, $I$ is input alphabet, $O$ is output alphabet, $f$ is transition function, $g$ is output function, and $s_0$ is start state.</li><li><strong>Mealy Machine:</strong> Outputs are determined by the present state and present inputs, produced as the machine transitions.</li></ul><p>Any Moore machine can be turned into a Mealy machine and vice versa.</p></template>
+    <template class="content-ar"><p>تختلف الآلات ذات المخرجات في كيفية إنتاج المخرجات.</p><ul><li><strong>آلة مور (Moore Machine):</strong> تكون المخرجات مستقلة عن المدخلات، أي يتم إنتاجها من داخل حالة الآلة نفسها. تُعرّف رسمياً كـ 6-tuple: $M = (S, I, O, f, g, s_0)$ حيث $S$ مجموعة الحالات، $I$ أبجدية المدخلات، $O$ أبجدية المخرجات، $f$ دالة الانتقال، $g$ دالة المخرجات، و $s_0$ الحالة الابتدائية.</li><li><strong>آلة ميلي (Mealy Machine):</strong> يتم تحديد المخرجات بواسطة الحالة الحالية والمدخلات الحالية، أي يتم إنتاج المخرجات أثناء انتقال الآلة من حالة إلى أخرى.</li></ul><p>يمكن تحويل أي <span class="smart-term" data-term-en="Moore Machine" data-ar="آلة مور" data-en-def="A finite-state machine whose output values are determined solely by its current state.">آلة مور<span class="smart-term-tooltip"></span></span> إلى <span class="smart-term" data-term-en="Mealy Machine" data-ar="آلة ميلي" data-en-def="A finite-state machine whose output values are determined by the current state and the current inputs.">آلة ميلي<span class="smart-term-tooltip"></span></span> والعكس.</p><p><strong>مثال عملي (إيجاد سلسلة المخرجات لآلة مور):</strong> بفرض أن لدينا آلة مور بحالات $s_0, s_1, s_2, s_3$ ومخرجاتها على التوالي $0, 1, 0, 0$. إذا كانت السلسلة المدخلة هي $101011$، نقوم بتتبع الانتقالات كالتالي:</p><ol><li>نبدأ من الحالة الابتدائية $s_0$ (المخرج $0$).</li><li>نقرأ $1$ فننتقل إلى $s_3$ (المخرج $0$).</li><li>نقرأ $0$ فننتقل إلى $s_1$ (المخرج $1$).</li><li>نقرأ $1$ فننتقل إلى $s_2$ (المخرج $0$).</li><li>نقرأ $0$ فننتقل إلى $s_3$ (المخرج $0$).</li><li>نقرأ $1$ فننتقل إلى $s_0$ (المخرج $0$).</li></ol><p>إذن، سلسلة المخرجات الناتجة هي $001000$.</p></template>
+    <template class="content-en"><p>Automata with outputs differ in how outputs are produced.</p><ul><li><strong>Moore Machine:</strong> Outputs are independent of inputs, produced from within the state. Formally defined as a six-tuple $M = (S, I, O, f, g, s_0)$ where $S$ is states, $I$ is input alphabet, $O$ is output alphabet, $f$ is transition function, $g$ is output function, and $s_0$ is start state.</li><li><strong>Mealy Machine:</strong> Outputs are determined by the present state and present inputs, produced as the machine transitions.</li></ul><p>Any Moore machine can be turned into a Mealy machine and vice versa.</p><p><strong>Worked Example (Finding the output string for a Moore machine):</strong> Suppose we have a Moore machine with states $s_0, s_1, s_2, s_3$ and respective outputs $0, 1, 0, 0$. If the input string is $101011$, we trace the transitions as follows:</p><ol><li>Start at the initial state $s_0$ (output $0$).</li><li>Read $1$, transition to $s_3$ (output $0$).</li><li>Read $0$, transition to $s_1$ (output $1$).</li><li>Read $1$, transition to $s_2$ (output $0$).</li><li>Read $0$, transition to $s_3$ (output $0$).</li><li>Read $1$, transition to $s_0$ (output $0$).</li></ol><p>Thus, the generated output string is $001000$.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -457,8 +472,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>التعبير النمطي $R$ يُعرّف استقرائياً: الحالات الأساسية هي $a$ (حيث $a \in \Sigma$)، $\epsilon$ (السلسلة الفارغة)، و $\emptyset$ (اللغة الفارغة).</p><p>العمليات المسموحة هي:</p><ul><li><strong>الاتحاد (Union):</strong> $R_1 + R_2$،</li><li><strong>التسلسل (Concatenation):</strong> $R_1 R_2$، و</li><li><strong>إغلاق كلين (Kleene Closure):</strong> $R^*$.</li></ul><p>قواعد الأولوية (Precedence) من الأعلى للأدنى هي: الأقواس $()$، ثم النجمة $*$، ثم <span class="smart-term" data-term-en="Concatenation" data-ar="التسلسل" data-en-def="Combining two languages by appending strings of the second to strings of the first.">التسلسل<span class="smart-term-tooltip"></span></span> $.$، وأخيراً الاتحاد $+$.</p></template>
-    <template class="content-en"><p>A regular expression $R$ is defined inductively: Base cases are $a$ (where $a \in \Sigma$), $\epsilon$ (empty string), and $\emptyset$ (empty language).</p><p>The operations are:</p><ul><li><strong>Union:</strong> $R_1 + R_2$,</li><li><strong>Concatenation:</strong> $R_1 R_2$, and</li><li><strong>Kleene Closure:</strong> $R^*$.</li></ul><p>The precedence rules (highest to lowest) are: Parentheses $()$, Star $*$, <span class="smart-term" data-term-en="Concatenation" data-ar="التسلسل" data-en-def="Combining two languages by appending strings of the second to strings of the first.">Concatenation<span class="smart-term-tooltip"></span></span> $.$ , and Union $+$.</p></template>
+    <template class="content-ar"><p>التعبير النمطي $R$ يُعرّف استقرائياً: الحالات الأساسية هي $a$ (حيث $a \in \Sigma$)، $\epsilon$ (السلسلة الفارغة)، و $\emptyset$ (اللغة الفارغة).</p><p>العمليات المسموحة هي:</p><ul><li><strong>الاتحاد (Union):</strong> $R_1 + R_2$،</li><li><strong>التسلسل (Concatenation):</strong> $R_1 R_2$، و</li><li><strong>إغلاق كلين (Kleene Closure):</strong> $R^*$.</li></ul><p>قواعد الأولوية (Precedence) من الأعلى للأدنى هي: الأقواس $()$، ثم النجمة $*$، ثم <span class="smart-term" data-term-en="Concatenation" data-ar="التسلسل" data-en-def="Combining two languages by appending strings of the second to strings of the first.">التسلسل<span class="smart-term-tooltip"></span></span> $.$، وأخيراً الاتحاد $+$.</p><p><strong>مثال عملي (بناء تعبير نمطي):</strong> بناء تعبير نمطي للغة $L$ التي تتكون من السلاسل الثنائية التي لا تحتوي على صفرين متتاليين ($00$) أو واحدين متتاليين ($11$). نقسم المشكلة إلى أربع حالات بناءً على البداية والطول:</p><ol><li>تبدأ بـ $0$ وطولها زوجي: $(01)^*$</li><li>تبدأ بـ $1$ وطولها زوجي: $(10)^*$</li><li>تبدأ بـ $0$ وطولها فردي: $0(10)^*$</li><li>تبدأ بـ $1$ وطولها فردي: $1(01)^*$</li></ol><p>بأخذ اتحاد هذه الحالات الأربع، نحصل على: $(01)^* + (10)^* + 0(10)^* + 1(01)^*$. وبإدخال $\epsilon$ للتبسيط، يصبح التعبير النهائي: $(\epsilon + 1)(01)^*(\epsilon + 0)$.</p><p><strong>أمثلة أساسية على التعابير النمطية واللغات التي تمثلها:</strong></p><ul><li>$L(101) = \{101\}$</li><li>$L((0+1)^*) = \{\epsilon, 0, 1, 00, 01, 10, 11, \dots\}$ (أي $\Sigma^*$)</li><li>$L(1+10^*) = \{1, 10, 100, 1000, \dots\}$</li><li>$L(1^*10^*) = \{1, 11, 110, 1110, 11100, \dots\}$</li><li>$L(1^*01^*) = \{0, 10, 01, 101, 110, 011, \dots\}$ (السلاسل التي تحتوي على صفر واحد بالضبط)</li><li>$L((0(0+1))^*) = \{\epsilon, 00, 01, 0000, 0001, 0100, 0101, \dots\}$</li><li>$L((0+\epsilon)(1+\epsilon)) = \{\epsilon, 0, 1, 01\}$</li></ul></template>
+    <template class="content-en"><p>A regular expression $R$ is defined inductively: Base cases are $a$ (where $a \in \Sigma$), $\epsilon$ (empty string), and $\emptyset$ (empty language).</p><p>The operations are:</p><ul><li><strong>Union:</strong> $R_1 + R_2$,</li><li><strong>Concatenation:</strong> $R_1 R_2$, and</li><li><strong>Kleene Closure:</strong> $R^*$.</li></ul><p>The precedence rules (highest to lowest) are: Parentheses $()$, Star $*$, <span class="smart-term" data-term-en="Concatenation" data-ar="التسلسل" data-en-def="Combining two languages by appending strings of the second to strings of the first.">Concatenation<span class="smart-term-tooltip"></span></span> $.$ , and Union $+$.</p><p><strong>Worked Example (Building a RegEx):</strong> Building a regular expression for language $L$ consisting of binary strings with no consecutive 0s or 1s anywhere. We divide the problem into four cases based on the starting bit and length:</p><ol><li>Starts with $0$, even length: $(01)^*$</li><li>Starts with $1$, even length: $(10)^*$</li><li>Starts with $0$, odd length: $0(10)^*$</li><li>Starts with $1$, odd length: $1(01)^*$</li></ol><p>Taking the union of all 4 cases gives: $(01)^* + (10)^* + 0(10)^* + 1(01)^*$. By introducing $\epsilon$ for simplification, the final expression is: $(\epsilon + 1)(01)^*(\epsilon + 0)$.</p><p><strong>Basic examples of regular expressions and the languages they represent:</strong></p><ul><li>$L(101) = \{101\}$</li><li>$L((0+1)^*) = \{\epsilon, 0, 1, 00, 01, 10, 11, \dots\}$ (i.e., $\Sigma^*$)</li><li>$L(1+10^*) = \{1, 10, 100, 1000, \dots\}$</li><li>$L(1^*10^*) = \{1, 11, 110, 1110, 11100, \dots\}$</li><li>$L(1^*01^*) = \{0, 10, 01, 101, 110, 011, \dots\}$ (Strings with exactly a single 0)</li><li>$L((0(0+1))^*) = \{\epsilon, 00, 01, 0000, 0001, 0100, 0101, \dots\}$</li><li>$L((0+\epsilon)(1+\epsilon)) = \{\epsilon, 0, 1, 01\}$</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -510,8 +525,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لإثبات التكافؤ، نستخدم نظريتين:</p><ul><li><strong>النظرية 1 (DFA إلى RegEx):</strong> لكل DFA يوجد تعبير نمطي $R$ بحيث $L(R) = L(A)$. يتم ذلك بتتبع جميع المسارات المتميزة من حالة البداية إلى حالات النهاية وتعداد التعابير.</li><li><strong>النظرية 2 (RegEx إلى $\epsilon$-NFA):</strong> لكل تعبير نمطي يوجد $\epsilon$-NFA يقبله. يتم البناء بشكل استقرائي (Inductive Construction): نبدأ بالحالات الأساسية ($a, \epsilon, \emptyset$) ثم نبني الهياكل المعقدة للاتحاد، التسلسل، وإغلاق كلين باستخدام انتقالات $\epsilon$.</li></ul></template>
-    <template class="content-en"><p>To show equivalence, we use two theorems (Kleene's Theorem):</p><ul><li><strong>Theorem 1 (DFA to RegEx):</strong> For every DFA $A$, there exists a RegEx $R$ such that $L(R) = L(A)$. Informally, trace all distinct paths from the start state to final states.</li><li><strong>Theorem 2 (RegEx to $\epsilon$-NFA):</strong> For every RegEx $R$, there exists an $\epsilon$-NFA $E$ such that $L(E) = L(R)$. This is done via <span class="smart-term" data-term-en="Inductive Construction" data-ar="البناء الاستقرائي" data-en-def="Building complex automata from simple base cases using defined structural rules.">Inductive Construction<span class="smart-term-tooltip"></span></span>: start with simple basis elements ($a, \epsilon, \emptyset$) and build complex parts for Union, Concatenation, and Kleene Star using $\epsilon$-transitions.</li></ul></template>
+    <template class="content-ar"><p>لإثبات التكافؤ، نستخدم نظريتين:</p><ul><li><strong>النظرية 1 (DFA إلى RegEx):</strong> لكل DFA يوجد تعبير نمطي $R$ بحيث $L(R) = L(A)$. يتم ذلك بتتبع جميع المسارات المتميزة من حالة البداية إلى حالات النهاية وتعداد التعابير.</li><li><strong>النظرية 2 (RegEx إلى $\epsilon$-NFA):</strong> لكل تعبير نمطي يوجد $\epsilon$-NFA يقبله. يتم البناء بشكل استقرائي (Inductive Construction): نبدأ بالحالات الأساسية ($a, \epsilon, \emptyset$) ثم نبني الهياكل المعقدة للاتحاد، التسلسل، وإغلاق كلين باستخدام انتقالات $\epsilon$.</li></ul><p><strong>طريقة تحويل DFA إلى تعبير نمطي:</strong> بشكل غير رسمي، نقوم بتتبع جميع المسارات المتميزة (مع اجتياز الحلقات مرة واحدة فقط) من حالة البداية إلى كل حالة من حالات النهاية، ونقوم بتعداد جميع التعابير على طول الطريق.</p><p><strong>مثال عملي:</strong> لآلة بها حالة بداية $q_0$ تنتقل إلى $q_1$ بالمدخل $0$ (مع حلقة على $q_0$ بالمدخل $1$)، و $q_1$ تنتقل إلى حالة النهاية $q_2$ بالمدخل $1$ (مع حلقة على $q_1$ بالمدخل $0$، وحلقة على $q_2$ بالمدخلين $0,1$). المسار هو كالتالي:</p><ol><li>حلقة $q_0$ تعطي $1^*$</li><li>الانتقال إلى $q_1$ يعطي $0$</li><li>حلقة $q_1$ تعطي $0^*$</li><li>الانتقال إلى $q_2$ يعطي $1$</li><li>حلقة $q_2$ تعطي $(0+1)^*$</li></ol><p>بدمجها بالتسلسل نحصل على التعبير النهائي: $1^*00^*1(0+1)^*$.</p></template>
+    <template class="content-en"><p>To show equivalence, we use two theorems (Kleene's Theorem):</p><ul><li><strong>Theorem 1 (DFA to RegEx):</strong> For every DFA $A$, there exists a RegEx $R$ such that $L(R) = L(A)$. Informally, trace all distinct paths from the start state to final states.</li><li><strong>Theorem 2 (RegEx to $\epsilon$-NFA):</strong> For every RegEx $R$, there exists an $\epsilon$-NFA $E$ such that $L(E) = L(R)$. This is done via <span class="smart-term" data-term-en="Inductive Construction" data-ar="البناء الاستقرائي" data-en-def="Building complex automata from simple base cases using defined structural rules.">Inductive Construction<span class="smart-term-tooltip"></span></span>: start with simple basis elements ($a, \epsilon, \emptyset$) and build complex parts for Union, Concatenation, and Kleene Star using $\epsilon$-transitions.</li></ul><p><strong>Method for DFA to RegEx:</strong> Informally, trace all distinct paths (traversing cycles only once) from the start state to each of the final states and enumerate all the expressions along the way.</p><p><strong>Worked Example:</strong> For a machine with start state $q_0$ transitioning to $q_1$ on $0$ (with a loop on $q_0$ for $1$), and $q_1$ transitioning to final state $q_2$ on $1$ (with a loop on $q_1$ for $0$, and a loop on $q_2$ for $0,1$). The path is traced as follows:</p><ol><li>$q_0$ loop gives $1^*$</li><li>Transition to $q_1$ gives $0$</li><li>$q_1$ loop gives $0^*$</li><li>Transition to $q_2$ gives $1$</li><li>$q_2$ loop gives $(0+1)^*$</li></ol><p>Concatenating these gives the final expression: $1^*00^*1(0+1)^*$.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -726,14 +741,143 @@
   </details>
 </section>
 
+<section id="regex-to-enfa-construction" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> البناء الاستقرائي: من تعبير نمطي إلى $\epsilon$-NFA</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Inductive Construction: RegEx to $\epsilon$-NFA</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية منهجية (تُعرف ب<span class="smart-term" data-term-en="Thompson&#x27;s Construction" data-ar="خوارزمية طومسون" data-en-def="An algorithm for transforming a regular expression into an equivalent NFA using epsilon transitions.">خوارزمية طومسون<span class="smart-term-tooltip"></span></span>) لتحويل أي تعبير نمطي إلى آلة $\epsilon$-NFA مكافئة عن طريق بناء حالات أساسية بسيطة ثم دمجها باستخدام انتقالات $\epsilon$.</p></template>
+    <template class="content-en"><p>A systematic algorithm (<span class="smart-term" data-term-en="Thompson&#x27;s Construction" data-ar="خوارزمية طومسون" data-en-def="An algorithm for transforming a regular expression into an equivalent NFA using epsilon transitions.">Thompson's construction<span class="smart-term-tooltip"></span></span>) to convert any regular expression into an equivalent $\epsilon$-NFA by building simple <span class="smart-term" data-term-en="Base Case" data-ar="الحالة الأساسية" data-en-def="The simplest form of a regular expression (single symbol, epsilon, or empty set) used as a building block.">base case<span class="smart-term-tooltip"></span></span>s and combining them using $\epsilon$-transitions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعتمد الطريقة على القواعد التالية:</p><ol><li><strong>الحالات الأساسية (Basis):</strong> التعبير $a$ يُمثل بحالتي بداية ونهاية بينهما انتقال $a$. التعبير $\epsilon$ يُمثل بانتقال $\epsilon$. التعبير $\emptyset$ يُمثل بحالتين بدون أي انتقال.</li><li><strong>الاتحاد $S+T$:</strong> ننشئ حالة بداية جديدة وحالة نهاية جديدة، ونضيف انتقالات $\epsilon$ من البداية الجديدة إلى بدايات $S$ و $T$، ومن نهايات $S$ و $T$ إلى النهاية الجديدة.</li><li><strong>التسلسل $ST$:</strong> ندمج حالة نهاية $S$ مع حالة بداية $T$ بانتقال $\epsilon$.</li><li><strong>إغلاق كلين $S^*$:</strong> نضيف حالة بداية ونهاية جديدتين، مع انتقالات $\epsilon$ من البداية الجديدة إلى بداية $S$ وإلى النهاية الجديدة، ومن نهاية $S$ إلى بداية $S$ (للتكرار) وإلى النهاية الجديدة.</li></ol><p><strong>مثال عملي خطوة بخطوة (تحويل التعبير $(ab+a)^*$ إلى $\epsilon$-NFA):</strong></p><ol><li><strong>بناء الحالات الأساسية:</strong> ننشئ آلة بسيطة للرمز $a$ (حالتان بينهما انتقال $a$) وآلة أخرى للرمز $b$.</li><li><strong>التسلسل $ab$:</strong> نربط حالة النهاية لآلة $a$ بحالة البداية لآلة $b$ باستخدام انتقال $\epsilon$.</li><li><strong>الاتحاد $ab+a$:</strong> ننشئ حالة بداية جديدة وحالة نهاية جديدة. نضيف انتقالات $\epsilon$ من البداية الجديدة إلى بداية آلة $ab$ وبداية آلة $a$ (الجديدة). ثم نضيف انتقالات $\epsilon$ من نهايات كلتا الآلتين إلى حالة النهاية الجديدة.</li><li><strong>إغلاق كلين $(ab+a)^*$:</strong> ننشئ حالة بداية رئيسية وحالة نهاية رئيسية. نضيف انتقال $\epsilon$ من البداية الرئيسية إلى بداية آلة $ab+a$، وانتقال $\epsilon$ آخر لتخطي الآلة بالكامل والوصول للنهاية الرئيسية (لتمثيل $\epsilon$). أخيراً، نضيف انتقال $\epsilon$ من نهاية آلة $ab+a$ إلى بدايتها (للتكرار)، وانتقال $\epsilon$ إلى النهاية الرئيسية.</li></ol></template>
+    <template class="content-en"><p>The method relies on the following rules:</p><ol><li><strong>Basis:</strong> Expression $a$ is two states with an $a$-transition. Expression $\epsilon$ is an $\epsilon$-transition. Expression $\emptyset$ is two states with no transition.</li><li><strong>Union $S+T$:</strong> Create a new start and final state, add $\epsilon$-transitions from the new start to the starts of $S$ and $T$, and from the ends of $S$ and $T$ to the new final state.</li><li><strong>Concatenation $ST$:</strong> Connect the final state of $S$ to the start state of $T$ with an $\epsilon$-transition.</li><li><strong>Kleene Star $S^*$:</strong> Add new start and final states, with $\epsilon$-transitions from the new start to $S$'s start and the new final state, and from $S$'s end to $S$'s start (for looping) and the new final state.</li></ol><p><strong>Step-by-step worked example (Converting $(ab+a)^*$ to $\epsilon$-NFA):</strong></p><ol><li><strong>Base cases:</strong> Build a simple machine for $a$ (two states with an $a$-transition) and another for $b$.</li><li><strong>Concatenation $ab$:</strong> Connect the final state of the $a$ machine to the start state of the $b$ machine using an $\epsilon$-transition.</li><li><strong>Union $ab+a$:</strong> Create a new start state and a new final state. Add $\epsilon$-transitions from the new start to the start of the $ab$ machine and the start of a new $a$ machine. Then, add $\epsilon$-transitions from the ends of both machines to the new final state.</li><li><strong>Kleene Star $(ab+a)^*$:</strong> Create a main start state and a main final state. Add an $\epsilon$-transition from the main start to the start of the $ab+a$ machine, and another to skip the machine entirely to the main final state (representing $\epsilon$). Finally, add an $\epsilon$-transition from the end of the $ab+a$ machine back to its start (for looping), and one to the main final state.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p><strong>مثال عملي:</strong> لتحويل التعبير $(ab+a)^*$، نبدأ ببناء الآلات الأساسية لـ $a$ و $b$. ثم ندمجهما بالتسلسل لإنشاء $ab$. بعد ذلك، نستخدم قاعدة الاتحاد لدمج آلة $ab$ مع آلة $a$ أخرى لإنشاء $ab+a$. أخيراً، نطبق قاعدة إغلاق كلين بإضافة حالات وانتقالات $\epsilon$ حول آلة $ab+a$ بأكملها.</p><p>تضمن هذه الخوارزمية أن الآلة الناتجة تحتوي دائماً على حالة بداية واحدة وحالة نهاية واحدة فقط، مما يجعل عملية الدمج الاستقرائي آمنة وخالية من التداخلات غير المقصودة.</p></template>
+    <template class="content-en"><p><strong>Worked Example:</strong> To convert $(ab+a)^*$, we start by building base machines for $a$ and $b$. We concatenate them to form $ab$. Next, we use the union rule to combine the $ab$ machine with another $a$ machine to form $ab+a$. Finally, we apply the Kleene star rule by adding states and $\epsilon$-transitions around the entire $ab+a$ machine.</p><p>This algorithm guarantees that the resulting machine always has exactly one start state and one accepting state, making the inductive composition safe and free of unintended side-effects.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نضيف حالات بداية ونهاية جديدة في قاعدة الاتحاد $S+T$ بدلاً من دمج حالات البداية والنهاية لـ S و T مباشرة؟</template>
+      <template class="content-en">Why do we add new start and final states in the Union $S+T$ rule instead of directly merging the start and final states of S and T?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لمنع التداخلات غير المقصودة. إذا دمجنا الحالات مباشرة، قد نسمح بمسارات خاطئة تنتقل من داخل S إلى داخل T، مما يغير اللغة المقبولة.</p></template>
+      <template class="content-en"><p>To prevent unintended interference. If we merged states directly, we might allow incorrect paths that cross from inside S to inside T, altering the accepted language.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="fsm-applications-translators" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> الآلات المنتهية كمترجمات ومُعرّفات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> FSM as Recognizer/Translator</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن استخدام الآلات المنتهية ذات المخرجات للتعرف على الأنماط (مثل التحقق من زوجية عدد الآحاد) أو كمترجمات تؤخر المدخلات (مثل آلة تأخير الوحدة).</p></template>
+    <template class="content-en"><p>Finite State Machines with outputs can be used as recognizers (e.g., checking for an even number of 1s) or <span class="smart-term" data-term-en="Translator" data-ar="مُترجم" data-en-def="A machine that converts an input string into an output string based on specific rules, such as delaying the input.">translator<span class="smart-term-tooltip"></span></span>s that delay inputs (e.g., Unit-Delay Machine).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><strong>مثال 1: <span class="smart-term" data-term-en="Recognizer" data-ar="مُعرّف" data-en-def="A machine that processes an input string and produces a specific output indicating whether the string belongs to a certain language or pattern.">مُعرّف<span class="smart-term-tooltip"></span></span> زوجية الآحاد (Even 1s Recognizer):</strong> آلة تخرج $0$ إذا كان عدد الآحاد المستلمة زوجياً، وتخرج $1$ بخلاف ذلك. تتكون من حالتين: (Even) و (Odd). في آلة مور، ترتبط المخرجات بالحالتين مباشرة (Even تخرج $0$، Odd تخرج $1$). في آلة ميلي، ترتبط المخرجات بالانتقالات.</p><p><strong>مثال 2: <span class="smart-term" data-term-en="Unit-Delay Machine" data-ar="آلة تأخير الوحدة" data-en-def="A finite state machine that outputs the exact sequence of inputs it receives, but delayed by one time step.">آلة تأخير الوحدة<span class="smart-term-tooltip"></span></span> (Unit-Delay Machine):</strong> آلة تنتج كسلسلة مخرجات نفس السلسلة المدخلة ولكن متأخرة بمقدار زمني محدد. إذا كان المدخل $x_1 x_2 x_3 \dots x_n$، يكون المخرج $0 x_1 x_2 x_3 \dots x_{n-1}$. تعتمد الحالات على "المدخل السابق" (هل كان $0$ أم $1$).</p></template>
+    <template class="content-en"><p><strong>Example 1: Even 1s <span class="smart-term" data-term-en="Recognizer" data-ar="مُعرّف" data-en-def="A machine that processes an input string and produces a specific output indicating whether the string belongs to a certain language or pattern.">Recognizer<span class="smart-term-tooltip"></span></span>:</strong> A machine that outputs $0$ if an even number of 1s is received, and outputs $1$ otherwise. It consists of two states: (Even) and (Odd). In a Moore machine, outputs are tied directly to the states (Even outputs $0$, Odd outputs $1$). In a Mealy machine, outputs are tied to the transitions.</p><p><strong>Example 2: <span class="smart-term" data-term-en="Unit-Delay Machine" data-ar="آلة تأخير الوحدة" data-en-def="A finite state machine that outputs the exact sequence of inputs it receives, but delayed by one time step.">Unit-Delay Machine<span class="smart-term-tooltip"></span></span>:</strong> A machine that produces as output the input string delayed by a specific amount of time. If the input is $x_1 x_2 x_3 \dots x_n$, the output is $0 x_1 x_2 x_3 \dots x_{n-1}$. The states depend on the "previous input" (whether it was $0$ or $1$).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تُظهر هذه الأمثلة كيف يمكن نمذجة الذاكرة البسيطة في الآلات المنتهية. في آلة تأخير الوحدة، "تتذكر" الآلة المدخل السابق من خلال حالتها الحالية لإنتاجه في الدورة التالية.</p><p>الفرق في التصميم بين مور وميلي يظهر بوضوح هنا؛ آلة ميلي قد تستجيب للمدخلات فوراً عبر الانتقالات، بينما آلة مور تؤخر الاستجابة حتى تستقر الحالة، وهو ما يفسر استخدامها في تطبيقات التأخير الزمني.</p></template>
+    <template class="content-en"><p>These examples show how simple memory can be modeled in finite automata. In the Unit-Delay Machine, the machine "remembers" the previous input through its current state to produce it in the next cycle.</p><p>The design difference between Moore and Mealy is evident here; a Mealy machine can respond to inputs immediately via transitions, while a Moore machine delays the response until the state settles, which explains its use in time-delay applications.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف تتذكر آلة تأخير الوحدة المدخل السابق لإنتاجه في الخطوة التالية؟</template>
+      <template class="content-en">How does the Unit-Delay Machine remember the previous input to produce it in the next step?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>من خلال الانتقال إلى حالة محددة تمثل المدخل السابق. على سبيل المثال، إذا كان المدخل 1، تنتقل الآلة إلى حالة تُسمى 'المدخل السابق كان 1'، وفي الدورة التالية، تُخرج 1 بغض النظر عن المدخل الجديد.</p></template>
+      <template class="content-en"><p>By transitioning to a specific state that represents the previous input. For example, if the input is 1, the machine transitions to a state named 'previous input was 1', and in the next cycle, it outputs 1 regardless of the new input.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="constructing-state-tables" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> بناء جداول انتقال الحالة للآلات ذات المخرجات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Constructing State Transition Tables for Automata with Outputs</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p><span class="smart-term" data-term-en="State Transition Table" data-ar="جدول انتقال الحالة" data-en-def="A tabular representation of a finite state machine showing what state the machine will move to, and what output it will produce, based on the current state and input.">جدول انتقال الحالة<span class="smart-term-tooltip"></span></span> ينظم معلومات الآلة (الحالات، المدخلات، المخرجات، والانتقالات) في شكل منظم يسهل قراءته وتحليله برمجياً.</p></template>
+    <template class="content-en"><p>A state transition table organizes machine information (states, inputs, outputs, and transitions) into a structured format that is easy to read and analyze programmatically.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتحويل مخطط حالة لآلة ميلي (Mealy Machine) إلى جدول انتقال، نقوم باستخراج البيانات لكل حالة بناءً على المدخلات الممكنة. في آلة ميلي، يعتمد المخرج على المدخل، لذا نخصص عموداً للمخرج لكل رمز مدخل.</p><p><strong>مثال عملي (استخراج جدول من مخطط آلة ميلي):</strong> بفرض أن لدينا آلة بحالات $S = \{s_0, s_1, s_2, s_3, s_4\}$ ومدخلات $I = \{0, 1\}$، والأسهم تحمل التسمية <code>المدخل, المخرج</code>. نتبع الخطوات التالية لبناء الجدول:</p><ol><li><strong>الحالة $s_0$:</strong> نتتبع السهم للمدخل $0$ فنجده يتجه إلى $s_1$ بمخرج $1$. ونتتبع السهم للمدخل $1$ فنجده يتجه إلى $s_3$ بمخرج $0$.</li><li><strong>الحالة $s_1$:</strong> بالمدخل $0$ ننتقل إلى $s_1$ (مخرج $1$)، وبالمدخل $1$ ننتقل إلى $s_2$ (مخرج $1$).</li><li><strong>الحالة $s_2$:</strong> بالمدخل $0$ ننتقل إلى $s_3$ (مخرج $0$)، وبالمدخل $1$ ننتقل إلى $s_4$ (مخرج $0$).</li><li><strong>الحالة $s_3$:</strong> بالمدخل $0$ ننتقل إلى $s_1$ (مخرج $0$)، وبالمدخل $1$ ننتقل إلى $s_0$ (مخرج $0$).</li><li><strong>الحالة $s_4$:</strong> بالمدخل $0$ ننتقل إلى $s_3$ (مخرج $0$)، وبالمدخل $1$ ننتقل إلى $s_4$ (مخرج $0$).</li></ol><p>بهذه الطريقة، نكون قد حوّلنا الرسم البياني المعقد إلى هيكل بيانات دقيق يسهل التعامل معه.</p></template>
+    <template class="content-en"><p>To convert a Mealy machine state diagram into a transition table, we extract data for each state based on possible inputs. In a Mealy machine, the output depends on the input, so we dedicate an output column for each input symbol.</p><p><strong>Worked Example (Extracting a table from a Mealy diagram):</strong> Suppose we have a machine with states $S = \{s_0, s_1, s_2, s_3, s_4\}$ and inputs $I = \{0, 1\}$, where edges are labeled <code>input, output</code>. We build the table using these steps:</p><ol><li><strong>State $s_0$:</strong> Tracing the edge for input $0$, it goes to $s_1$ with output $1$. For input $1$, it goes to $s_3$ with output $0$.</li><li><strong>State $s_1$:</strong> With input $0$, transition to $s_1$ (output $1$); with input $1$, transition to $s_2$ (output $1$).</li><li><strong>State $s_2$:</strong> With input $0$, transition to $s_3$ (output $0$); with input $1$, transition to $s_4$ (output $0$).</li><li><strong>State $s_3$:</strong> With input $0$, transition to $s_1$ (output $0$); with input $1$, transition to $s_0$ (output $0$).</li><li><strong>State $s_4$:</strong> With input $0$, transition to $s_3$ (output $0$); with input $1$, transition to $s_4$ (output $0$).</li></ol><p>In this way, we have transformed a complex graph into a precise data structure that is easy to manipulate.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تكمن أهمية جداول انتقال الحالة في كونها الجسر بين التصميم النظري والتنفيذ العملي. المخططات الرسومية ممتازة للفهم البشري، لكن الحواسيب لا تفهم الرسوميات مباشرة.</p><p>عند برمجة آلة منتهية، يُترجم هذا الجدول مباشرة إلى مصفوفات ثنائية الأبعاد (2D Arrays) حيث يمثل رقم الصف الحالة الحالية، ويمثل رقم العمود المدخل، وتحتوي الخلية على <span class="smart-term" data-term-en="Next State" data-ar="الحالة التالية" data-en-def="The state to which a finite state machine transitions after reading a specific input symbol from its current state.">الحالة التالية<span class="smart-term-tooltip"></span></span> والمخرج.</p><p>في تصميم العتاد (Hardware)، يُستخدم هذا الجدول لبرمجة ذواكر القراءة فقط (ROMs) أو المصفوفات المنطقية القابلة للبرمجة (PLAs) لتنفيذ الدائرة الرقمية المتزامنة.</p></template>
+    <template class="content-en"><p>The importance of <span class="smart-term" data-term-en="State Transition Table" data-ar="جدول انتقال الحالة" data-en-def="A tabular representation of a finite state machine showing what state the machine will move to, and what output it will produce, based on the current state and input.">state transition table<span class="smart-term-tooltip"></span></span>s lies in their role as a bridge between theoretical design and practical implementation. Graphical diagrams are excellent for human comprehension, but computers do not process graphics directly.</p><p>When programming a finite state machine, this table translates directly into 2D arrays where the row index represents the current state, the column index represents the input, and the cell contains the <span class="smart-term" data-term-en="Next State" data-ar="الحالة التالية" data-en-def="The state to which a finite state machine transitions after reading a specific input symbol from its current state.">next state<span class="smart-term-tooltip"></span></span> and output.</p><p>In hardware design, this table is used to program Read-Only Memories (ROMs) or Programmable Logic Arrays (PLAs) to implement the synchronous digital circuit.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يختلف شكل جدول انتقال الحالة لآلة مور عن آلة ميلي؟</template>
+      <template class="content-en">How does the format of a state transition table for a Moore machine differ from a Mealy machine?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في آلة مور، يعتمد المخرج على الحالة فقط، لذا نحتاج إلى عمود مخرجات واحد فقط لكل صف (حالة). أما في آلة ميلي، فيعتمد المخرج على المدخل أيضاً، لذا نحتاج إلى عمود مخرجات منفصل لكل رمز مدخل محتمل.</p></template>
+      <template class="content-en"><p>In a Moore machine, the output depends only on the state, so we only need one output column per row (state). In a Mealy machine, the output also depends on the input, so we need a separate output column for each possible input symbol.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبطال الحوسبة في هذه الوحدة المحورية. تخيلوا أننا ننتقل من عالم 'الآلات' إلى عالم 'اللغات البرمجية'. بدأنا بآلات مور وميلي، وهي آلات لا تكتفي بقبول السلاسل بل تنتج مخرجات (تذكروا: مور = حالة فقط، ميلي = حالة + مدخلات). ثم انتقلنا إلى النجم الحقيقي لهذه الوحدة: التعابير النمطية (RegEx). إنها الطريقة الأنيقة والموجزة لوصف الأنماط بدلاً من رسم دوائر وأسهم معقدة. الأهم هنا هو 'نظرية كلين' التي تخبرنا سراً عظيماً: الآلات المنتهية والتعابير النمطية هما وجهان لعملة واحدة! يمكننا التحويل بينهما باستخدام البناء الاستقرائي. ركزوا جيداً على قوانين الجبر للتعابير النمطية، خاصة قانون الماحق والمحايد، وتذكروا دائماً أولوية العمليات. هذه المفاهيم ليست نظرية فقط، بل هي قلب أدوات البحث (grep) والمترجمات (Lex) التي ستستخدمونها طوال مسيرتكم المهنية. استعدوا جيداً، فالامتحان يحب اختبار فهمكم للتحويلات وأولويات العمليات!</template>
-    <template class="content-en">Welcome, computing champions, to this pivotal module. Imagine transitioning from the world of 'machines' to 'programming languages'. We started with Moore and Mealy machines—automata that don't just accept strings but produce outputs (remember: Moore = state only, Mealy = state + inputs). Then we met the real star: Regular Expressions (RegEx). They are the elegant, concise way to describe patterns without drawing complex circles and arrows. The crown jewel here is Kleene's Theorem, which reveals a great secret: Finite Automata and RegEx are two sides of the same coin! We can convert between them using inductive construction. Pay close attention to the algebraic laws, especially the annihilator and identity laws, and never forget operator precedence. These aren't just theories; they are the beating heart of search tools (grep) and compilers (Lex) you'll use your entire career. Prepare well, as exams love testing your grasp on conversions and precedence rules!</template>
+    <template class="content-ar">أهلاً بكم يا أبطال الحوسبة في هذه الوحدة المحورية. تخيلوا أننا ننتقل من عالم 'الآلات' إلى عالم 'اللغات البرمجية'. بدأنا بآلات مور وميلي، وهي آلات لا تكتفي بقبول السلاسل بل تنتج مخرجات (تذكروا: مور = حالة فقط، ميلي = حالة + مدخلات). ثم انتقلنا إلى النجم الحقيقي لهذه الوحدة: التعابير النمطية (RegEx). إنها الطريقة الأنيقة والموجزة لوصف الأنماط بدلاً من رسم دوائر وأسهم معقدة. الأهم هنا هو 'نظرية كلين' التي تخبرنا سراً عظيماً: الآلات المنتهية والتعابير النمطية هما وجهان لعملة واحدة! يمكننا التحويل بينهما باستخدام البناء الاستقرائي. ركزوا جيداً على قوانين الجبر للتعابير النمطية، خاصة قانون الماحق والمحايد، وتذكروا دائماً أولوية العمليات. هذه المفاهيم ليست نظرية فقط، بل هي قلب أدوات البحث (grep) والمترجمات (Lex) التي ستستخدمونها طوال مسيرتكم المهنية. استعدوا جيداً، فالامتحان يحب اختبار فهمكم للتحويلات وأولويات العمليات!<p>الآن وبعد أن فهمنا النماذج النظرية، من الضروري إتقان الخوارزميات التي تربط بينها. القدرة على تتبع مسارات DFA لاستخراج تعبير نمطي، أو استخدام البناء الاستقرائي لتحويل التعبير إلى آلة، هي مهارات أساسية ستُختبرون فيها بقوة، وهي حجر الأساس لفهم كيف تعمل المترجمات (Compilers) في الواقع.</p><p>من خلال تتبع الأمثلة العملية خطوة بخطوة، مثل بناء آلة تأخير الوحدة أو تحويل التعبير $(ab+a)^*$ إلى آلة $\epsilon$-NFA، ننتقل من الفهم النظري المجرد إلى التطبيق الهندسي الملموس. هذه المهارة في تفكيك الأنماط المعقدة إلى حالات وانتقالات بسيطة هي جوهر تصميم المترجمات والأنظمة الرقمية.</p><p>إن إتقان التحويل بين مخططات الحالة المرئية وجداول انتقال الحالة هو مهارة بالغة الأهمية. فهو يسد الفجوة بين التصميمات التي يسهل على البشر قراءتها والمنطق الذي يمكن للآلة تنفيذه، مما يمهد الطريق لكتابة كود برمجي فعال أو تصميم دوائر رقمية دقيقة.</p></template>
+    <template class="content-en">Welcome, computing champions, to this pivotal module. Imagine transitioning from the world of 'machines' to 'programming languages'. We started with Moore and Mealy machines—automata that don't just accept strings but produce outputs (remember: Moore = state only, Mealy = state + inputs). Then we met the real star: Regular Expressions (RegEx). They are the elegant, concise way to describe patterns without drawing complex circles and arrows. The crown jewel here is Kleene's Theorem, which reveals a great secret: Finite Automata and RegEx are two sides of the same coin! We can convert between them using inductive construction. Pay close attention to the algebraic laws, especially the annihilator and identity laws, and never forget operator precedence. These aren't just theories; they are the beating heart of search tools (grep) and compilers (Lex) you'll use your entire career. Prepare well, as exams love testing your grasp on conversions and precedence rules!<p>Now that we understand the theoretical models, mastering the algorithms that bridge them is crucial. The ability to trace DFA paths to extract a RegEx, or use inductive construction to build a machine, are core skills you will be heavily tested on, and they form the bedrock of understanding how real-world compilers operate.</p><p>By tracing step-by-step worked examples, such as building a Unit-Delay Machine or converting $(ab+a)^*$ into an $\epsilon$-NFA, we bridge the gap between abstract theory and concrete engineering. This skill of decomposing complex patterns into simple states and transitions is the very core of compiler design and digital systems.</p><p>Mastering the conversion between visual state diagrams and tabular state transition tables is a critical skill. It bridges the gap between human-readable designs and machine-implementable logic, setting the stage for writing efficient code or designing precise digital circuits.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -907,6 +1051,60 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">قيمتها $\{\epsilon\}$. لأن إغلاق كلين يتضمن دائماً التكرار صفر من المرات، وتكرار أي شيء صفر من المرات يعطي السلسلة الفارغة.</template>
           <template class="content-en">Its value is $\{\epsilon\}$. Because Kleene closure always includes repeating zero times, and repeating anything zero times yields the empty string.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر خوارزمية طومسون (البناء الاستقرائي) آمنة عند بناء آلات معقدة من تعابير نمطية طويلة؟</template>
+          <template class="content-en">Why is Thompson's construction (inductive construction) considered safe when building complex machines from long regular expressions?</template>
+          <span class="content-target">لماذا نعتبر خوارزمية طومسون (البناء الاستقرائي) آمنة عند بناء آلات معقدة من تعابير نمطية طويلة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها تضمن هيكلاً صارماً: كل آلة جزئية (Sub-machine) تمتلك حالة بداية واحدة وحالة نهاية واحدة فقط. هذا يمنع أي تداخل أو مسارات خاطئة عند دمج الآلات معاً باستخدام عمليات الاتحاد أو التسلسل أو النجمة.</p></template>
+          <template class="content-en"><p>Because it guarantees a strict structure: every sub-machine has exactly one start state and one final state. This prevents any interference or incorrect paths when merging machines together using union, concatenation, or star operations.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نترجم التعبير النمطي $(0+1)^*$ إلى لغة طبيعية؟ ولماذا هو مهم جداً؟</template>
+          <template class="content-en">How do we translate the regular expression $(0+1)^*$ into natural language? And why is it so important?</template>
+          <span class="content-target">كيف نترجم التعبير النمطي $(0+1)^*$ إلى لغة طبيعية؟ ولماذا هو مهم جداً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يُترجم إلى 'مجموعة كل السلاسل الثنائية الممكنة بأي طول، بما في ذلك السلسلة الفارغة'. أهميته تكمن في أنه يمثل الأبجدية الكاملة $\Sigma^*$ للرموز الثنائية، ويُستخدم كعنصر بناء أساسي (Wildcard) عندما نريد السماح بأي تسلسل من الأصفار والآحاد قبل أو بعد نمط معين.</p></template>
+          <template class="content-en"><p>It translates to 'the set of all possible binary strings of any length, including the empty string'. Its importance lies in the fact that it represents the universal language $\Sigma^*$ for binary symbols, acting as a fundamental building block (wildcard) when we want to allow any sequence of 0s and 1s before or after a specific pattern.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل أحياناً تمثيل الآلة بجدول انتقال بدلاً من مخطط الحالة الرسومي؟</template>
+          <template class="content-en">Why do we sometimes prefer representing a machine with a transition table instead of a graphical state diagram?</template>
+          <span class="content-target">لماذا نفضل أحياناً تمثيل الآلة بجدول انتقال بدلاً من مخطط الحالة الرسومي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>المخطط الرسومي ممتاز للفهم البشري وتتبع المسارات بصرياً. لكن الجدول ضروري للتنفيذ الفعلي، حيث يُترجم مباشرة إلى مصفوفات (Arrays) في البرمجة أو جداول بحث (Lookup Tables) في تصميم الدوائر الرقمية، مما يجعله الصيغة الأنسب للآلات.</p></template>
+          <template class="content-en"><p>The graphical diagram is excellent for human understanding and visually tracing paths. However, the table is essential for actual implementation, as it translates directly into arrays in programming or lookup tables in digital circuit design, making it the most suitable format for machines.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1174,6 +1372,91 @@
         "en": "$\\epsilon E = E \\epsilon = E$"
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يتم تمثيل إغلاق كلين ($S^*$) في البناء الاستقرائي (Thompson's Construction)؟",
+      "en": "How is the Kleene Star ($S^*$) represented in Inductive Construction (Thompson's Construction)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بإضافة حالتي بداية ونهاية جديدتين، مع 4 انتقالات $\\epsilon$: من البداية الجديدة إلى بداية $S$ والنهاية الجديدة، ومن نهاية $S$ إلى بداية $S$ (للتكرار) والنهاية الجديدة.",
+        "en": "By adding new start and final states, with 4 $\\epsilon$-transitions: from new start to $S$'s start and new final, and from $S$'s end to $S$'s start (for looping) and new final."
+      },
+      "example": {
+        "ar": "يسمح هذا بتخطي $S$ تماماً (لتمثيل السلسلة الفارغة) أو تكرار $S$ عدة مرات.",
+        "en": "This allows skipping $S$ entirely (to represent the empty string) or repeating $S$ multiple times."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ما هي اللغة التي يمثلها التعبير النمطي $1^*01^*$؟",
+      "en": "What language does the regular expression $1^*01^*$ represent?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مجموعة جميع السلاسل الثنائية التي تحتوي على صفر واحد بالضبط.",
+        "en": "The set of all binary strings that contain exactly a single 0."
+      },
+      "example": {
+        "ar": "مثل: 0, 10, 01, 110, 1011",
+        "en": "Examples: 0, 10, 01, 110, 1011"
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "ما هي وظيفة آلة تأخير الوحدة (Unit-Delay Machine)؟",
+      "en": "What is the function of a Unit-Delay Machine?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تنتج كسلسلة مخرجات نفس السلسلة المدخلة ولكن متأخرة بمقدار زمني واحد (تبدأ بـ 0).",
+        "en": "It produces as output the input string delayed by one time step (starting with a 0)."
+      },
+      "example": {
+        "ar": "إذا كان المدخل 1011، يكون المخرج 0101.",
+        "en": "If the input is 1011, the output is 0101."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "ما هي المكونات الرئيسية لجدول انتقال الحالة لآلة ميلي؟",
+      "en": "What are the main components of a Mealy machine's state transition table?"
+    },
+    "back": {
+      "definition": {
+        "ar": "صفوف تمثل الحالات الحالية، وأعمدة مقسمة حسب المدخلات لتحديد (الحالة التالية) و(المخرج) لكل مدخل.",
+        "en": "Rows representing current states, and columns divided by inputs to specify the (Next State) and (Output) for each input."
+      },
+      "example": {
+        "ar": "صف للحالة s0 يحتوي على عمودين للمدخل 0 (الحالة التالية، المخرج) وعمودين للمدخل 1.",
+        "en": "A row for state s0 containing two columns for input 0 (next state, output) and two for input 1."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "متى يفشل اختبار التجسيد (Concretization Test)؟",
+      "en": "When does the Concretization Test fail?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يفشل عند استخدامه خارج نطاق العمليات الأساسية للتعابير النمطية، مثل تطبيقه على عمليات التقاطع.",
+        "en": "It fails when used outside the basic operations of regular expressions, such as applying it to intersection operations."
+      },
+      "example": {
+        "ar": "استخدامه لإثبات L ∩ M ∩ N = L ∩ M قد يعطي نتيجة إيجابية خاطئة.",
+        "en": "Using it to prove L ∩ M ∩ N = L ∩ M might yield a false positive."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1183,7 +1466,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 13</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1199,7 +1482,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 13</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1524,6 +1807,102 @@
     },
     "difficulty": "medium",
     "conceptId": "algebraic-laws-regex"
+  },
+  {
+    "conceptId": "regex-to-enfa-construction",
+    "question": {
+      "ar": "عند استخدام البناء الاستقرائي لتحويل التعبير النمطي $S+T$ إلى $\\epsilon$-NFA، كم عدد الحالات الجديدة التي يتم إضافتها إلى الآلتين الأصليتين لـ S و T؟",
+      "en": "When using inductive construction to convert the regular expression $S+T$ to an $\\epsilon$-NFA, how many new states are added to the original machines for S and T?"
+    },
+    "options": {
+      "ar": [
+        "لا يتم إضافة أي حالات",
+        "حالة واحدة",
+        "حالتان",
+        "أربع حالات"
+      ],
+      "en": [
+        "No states are added",
+        "One state",
+        "Two states",
+        "Four states"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في قاعدة الاتحاد، يتم إضافة حالة بداية جديدة وحالة نهاية جديدة (حالتان) لربط الآلتين $S$ و $T$ معاً باستخدام انتقالات $\\epsilon$.",
+      "en": "In the union rule, a new start state and a new final state (two states) are added to connect machines $S$ and $T$ together using $\\epsilon$-transitions."
+    },
+    "hint": {
+      "ar": "نحتاج إلى نقطة دخول واحدة ونقطة خروج واحدة للآلة الجديدة بأكملها.",
+      "en": "We need a single entry point and a single exit point for the entire new machine."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "fsm-applications-translators",
+    "question": {
+      "ar": "إذا تم إدخال السلسلة '1101' إلى آلة تأخير الوحدة (Unit-Delay Machine)، فما هي سلسلة المخرجات الناتجة؟",
+      "en": "If the string '1101' is input into a Unit-Delay Machine, what is the resulting output string?"
+    },
+    "options": {
+      "ar": [
+        "1101",
+        "0110",
+        "1011",
+        "0011"
+      ],
+      "en": [
+        "1101",
+        "0110",
+        "1011",
+        "0011"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "آلة تأخير الوحدة تقوم بإزاحة المدخلات خطوة واحدة إلى اليمين وتضيف 0 في البداية. لذا '1101' تصبح '0110' (ويتم تجاهل الـ 1 الأخير).",
+      "en": "A Unit-Delay Machine shifts the inputs one step to the right and adds a 0 at the beginning. So '1101' becomes '0110' (the last 1 is dropped)."
+    },
+    "hint": {
+      "ar": "تذكر أن المخرج الأول دائماً 0، ثم يتبعه المدخل الأول، وهكذا.",
+      "en": "Remember that the first output is always 0, followed by the first input, and so on."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "constructing-state-tables",
+    "question": {
+      "ar": "في جدول انتقال الحالة لآلة ميلي (Mealy Machine)، كم عدد أعمدة المخرجات المطلوبة إذا كان لدينا 3 رموز في أبجدية المدخلات؟",
+      "en": "In a Mealy Machine state transition table, how many output columns are required if we have 3 symbols in the input alphabet?"
+    },
+    "options": {
+      "ar": [
+        "عمود واحد فقط",
+        "عمودان",
+        "3 أعمدة",
+        "يعتمد على عدد الحالات"
+      ],
+      "en": [
+        "Only one column",
+        "Two columns",
+        "3 columns",
+        "Depends on the number of states"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "في آلة ميلي، المخرج يعتمد على المدخل الحالي بالإضافة إلى الحالة. لذلك، لكل رمز مدخل محتمل، يجب أن يكون هناك عمود يحدد المخرج الناتج عن هذا المدخل.",
+      "en": "In a Mealy machine, the output depends on the current input as well as the state. Therefore, for each possible input symbol, there must be a column specifying the resulting output."
+    },
+    "hint": {
+      "ar": "تذكر أن المخرج في آلة ميلي يرافق سهم الانتقال الخاص بكل مدخل.",
+      "en": "Remember that the output in a Mealy machine accompanies the transition edge for each input."
+    },
+    "difficulty": "medium",
+    "id": 13
   }
 ]
 </script>

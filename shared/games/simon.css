@@ -1,0 +1,103 @@
+.gsim {
+  --gsim-g: #16a34a; --gsim-g-hi: #4ade80;
+  --gsim-r: #dc2626; --gsim-r-hi: #f87171;
+  --gsim-y: #ca8a04; --gsim-y-hi: #fde047;
+  --gsim-b: #2563eb; --gsim-b-hi: #60a5fa;
+  --gsim-dim: 55%;
+  inline-size: min(100%, 640px, max(260px, 100dvh - 280px));
+  container-type: inline-size;
+  display: grid; gap: .7rem; justify-items: center;
+}
+[data-theme="light"] .gsim {
+  --gsim-g: #15803d; --gsim-g-hi: #22c55e;
+  --gsim-r: #b91c1c; --gsim-r-hi: #ef4444;
+  --gsim-y: #a16207; --gsim-y-hi: #facc15;
+  --gsim-b: #1d4ed8; --gsim-b-hi: #3b82f6;
+  --gsim-dim: 62%;
+}
+.gsim-board {
+  direction: ltr; position: relative; box-sizing: border-box;
+  inline-size: 100%; aspect-ratio: 1; border-radius: 50%;
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px; gap: 3.6cqi; padding: 10px; padding: 3.6cqi;
+  background: var(--bg-elevated); border: 1px solid var(--border-color);
+  touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity .2s ease;
+}
+.gsim-pad {
+  --gsim-c: var(--gsim-g); --gsim-hi: var(--gsim-g-hi);
+  position: relative; overflow: hidden; padding: 0; margin: 0; border: 0; font: inherit; cursor: default;
+  border-radius: 0;
+  background: color-mix(in oklab, var(--gsim-c) var(--gsim-dim), var(--bg-surface));
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: transform .14s ease;
+}
+.gsim-pad::after {
+  content: ""; position: absolute; inset: 0; background: var(--gsim-hi); opacity: 0; transition: opacity .1s ease;
+}
+.gsim-pad--g { border-start-start-radius: 100%; transform-origin: 100% 100%; }
+.gsim-pad--r { --gsim-c: var(--gsim-r); --gsim-hi: var(--gsim-r-hi); border-start-end-radius: 100%; transform-origin: 0 100%; }
+.gsim-pad--y { --gsim-c: var(--gsim-y); --gsim-hi: var(--gsim-y-hi); border-end-start-radius: 100%; transform-origin: 100% 0; }
+.gsim-pad--b { --gsim-c: var(--gsim-b); --gsim-hi: var(--gsim-b-hi); border-end-end-radius: 100%; transform-origin: 0 0; }
+.gsim--live .gsim-pad { cursor: pointer; }
+.gsim-pad.on { transform: scale(1.035); z-index: 1; }
+.gsim-pad.on::after { opacity: 1; transition-duration: .03s; }
+.gsim-pad:focus-visible { outline: 3px solid var(--text-primary); outline-offset: -7px; z-index: 2; }
+.gsim-pad.no { animation: gsimNo .36s ease; }
+@keyframes gsimNo { 20% { transform: translateX(-5px); } 45% { transform: translateX(5px); } 70% { transform: translateX(-3px); } }
+.gsim-key {
+  position: absolute; z-index: 1; display: none;
+  font-family: 'Inter', sans-serif; font-weight: 800; font-size: max(.75rem, 3.2cqi);
+  color: var(--text-primary); opacity: .5; pointer-events: none;
+}
+.gsim-pad--g .gsim-key { inset-block-start: 34%; inset-inline-start: 34%; }
+.gsim-pad--r .gsim-key { inset-block-start: 34%; inset-inline-end: 34%; }
+.gsim-pad--y .gsim-key { inset-block-end: 34%; inset-inline-start: 34%; }
+.gsim-pad--b .gsim-key { inset-block-end: 34%; inset-inline-end: 34%; }
+.gsim-pad.on .gsim-key { opacity: 0; }
+.gsim-hub {
+  position: absolute; inset: 30%; z-index: 3; box-sizing: border-box; border-radius: 50%;
+  display: grid; place-items: center; align-content: center; gap: 0; text-align: center;
+  background: var(--bg-card); border: max(6px, 2.6cqi) solid var(--bg-elevated);
+  color: var(--text-primary);
+}
+.gsim-hub [hidden] { display: none; }
+.gsim-lbl { font-size: max(.7rem, 2.6cqi); font-weight: 700; color: var(--text-muted); line-height: 1.2; }
+.gsim-num {
+  font-family: 'Inter', 'Cairo', sans-serif; font-variant-numeric: tabular-nums; font-weight: 800;
+  font-size: max(1.6rem, 11cqi); line-height: 1.05;
+}
+.gsim-go {
+  inline-size: 86%; aspect-ratio: 1; border-radius: 50%; cursor: pointer; padding: 0;
+  display: grid; place-items: center; align-content: center; gap: .15em;
+  font: inherit; font-weight: 800; font-size: max(.95rem, 4.4cqi); color: var(--gm-tint);
+  background: color-mix(in oklab, var(--gm-tint) 16%, transparent);
+  border: 2px solid color-mix(in oklab, var(--gm-tint) 55%, transparent);
+  touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+  transition: transform .12s ease, background-color .15s ease;
+}
+.gsim-go i { font-size: 1.25em; }
+.gsim-go:hover { background: color-mix(in oklab, var(--gm-tint) 22%, transparent); }
+.gsim-go:active { transform: scale(.95); }
+.gsim-go:focus-visible { outline: 3px solid var(--gm-tint); outline-offset: 3px; }
+.gsim--idle .gsim-pad { opacity: .9; }
+.gsim--hide .gsim-board { opacity: .35; pointer-events: none; }
+.gsim-tip { display: none; margin: 0; font-size: .8rem; color: var(--text-muted); text-align: center; }
+.gsim-msg b { font-family: inherit; font-size: .95rem; }
+.gsim-msg--input { border-color: color-mix(in oklab, var(--gm-ok) 55%, var(--border-color)); background: color-mix(in oklab, var(--gm-ok) 12%, var(--bg-card)); }
+.gsim-msg--input b { color: var(--gm-ok); }
+.gsim-msg--over { border-color: color-mix(in oklab, var(--gm-bad) 55%, var(--border-color)); background: color-mix(in oklab, var(--gm-bad) 12%, var(--bg-card)); }
+.gsim-msg--over b { color: var(--gm-bad); }
+@media (hover: hover) and (pointer: fine) {
+  .gsim-key { display: block; }
+  .gsim-tip { display: block; }
+}
+.gsim--still .gsim-pad, .gsim--still .gsim-pad.on { transform: none; transition: none; }
+.gsim--still .gsim-pad::after { transition: none; }
+.gsim--still .gsim-pad.no { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .gsim-pad, .gsim-pad.on { transform: none; transition: none; }
+  .gsim-pad::after, .gsim-go, .gsim-board { transition: none; }
+  .gsim-pad.no { animation: none; }
+}

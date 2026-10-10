@@ -104,6 +104,7 @@
     /^garden_ink_palettes$/,
     /*@3.FISJ.246*/
     /^garden_ink_bar$/,
+    /^garden_ink_dev_d[0-9a-f]{16}$/,
     /*@3.FISJ.247*/
     /^garden_[A-Z0-9]+_m(\d+|review)_study$/,
     /*@3.FISJ.248*/

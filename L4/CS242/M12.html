@@ -360,8 +360,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في رسم بياني G، المجموعة المستقلة (Independent Set) هي مجموعة فرعية من العقد حيث لا توجد حافة تربط بين أي عقدتين فيها. مشكلة IS تسأل: هل توجد مجموعة مستقلة بحجم k؟</p><p>من ناحية أخرى، غطاء العقد (Node Cover) هو مجموعة من العقد بحيث أن كل حافة في G لها على الأقل نهاية واحدة في هذه المجموعة.</p><p>المشكلتان NP-Complete.</p></template>
-    <template class="content-en"><p>In a graph G, an Independent Set (IS) is a subset of nodes where no two nodes are connected by an edge. The IS problem asks if there is an IS of size k.</p><p>A Node Cover (NC) is a subset of nodes such that every edge in G has at least one endpoint in the subset.</p><p>Both problems are NP-Complete.</p></template>
+    <template class="content-ar"><p>في رسم بياني G، المجموعة المستقلة (Independent Set) هي مجموعة فرعية من العقد حيث لا توجد حافة تربط بين أي عقدتين فيها. مشكلة IS تسأل: هل توجد مجموعة مستقلة بحجم k؟</p><p>من ناحية أخرى، غطاء العقد (Node Cover) هو مجموعة من العقد بحيث أن كل حافة في G لها على الأقل نهاية واحدة في هذه المجموعة.</p><p>المشكلتان NP-Complete.</p><p>مثال عملي لاختزال 3-SAT إلى غطاء العقد (Node Cover) بناءً على الصيغة: $(x + y + z)(\neg x + \neg y + \neg z)(x + \neg y + z)(\neg x + y + \neg z)$</p><ol><li>لكل قيد من القيود الأربعة، ننشئ "عموداً" يتكون من 3 عقد متصلة عمودياً (تمثل المتغيرات الثلاثة في القيد).</li><li>نضيف حواف أفقية تربط بين أي عقدة تمثل متغيراً (مثل $x$) والعقدة التي تمثل نفيه (مثل $\neg x$) في الأعمدة الأخرى، لمنع اختيارهما معاً.</li><li>نحدد الميزانية (Budget) لتكون ضعف عدد القيود، أي $k = 2 \times 4 = 8$.</li><li>بافتراض تعيين قيم صحيحة للمتغيرات: $x = T, y = T, z = F$. نختار عقدة واحدة "صحيحة" من كل عمود (تمثل المتغير الذي جعل القيد صحيحاً).</li><li>العقد المتبقية (وعددها 8) ستشكل غطاء العقد المطلوب.</li></ol><p>النتيجة: العقد الثمانية المتبقية تشكل غطاء عقد صالح يغطي جميع الحواف العمودية (عقدتان من كل عمود) والحواف الأفقية، مما يثبت إمكانية تحويل مشكلة إرضاء الصيغة إلى إيجاد غطاء عقد.</p></template>
+    <template class="content-en"><p>In a graph G, an Independent Set (IS) is a subset of nodes where no two nodes are connected by an edge. The IS problem asks if there is an IS of size k.</p><p>A Node Cover (NC) is a subset of nodes such that every edge in G has at least one endpoint in the subset.</p><p>Both problems are NP-Complete.</p><p>Worked example of reducing 3-SAT to Node Cover based on the formula: $(x + y + z)(\neg x + \neg y + \neg z)(x + \neg y + z)(\neg x + y + \neg z)$</p><ol><li>For each of the 4 clauses, we construct a "column" of 3 nodes connected vertically (representing the literals in the clause).</li><li>We add horizontal edges connecting any node representing a variable (e.g., $x$) to the node representing its negation (e.g., $\neg x$) in other columns, preventing both from being true simultaneously.</li><li>We set the budget $k$ to twice the number of clauses, so $k = 2 \times 4 = 8$.</li><li>Assuming a satisfying truth assignment: $x = T, y = T, z = F$. We pick one "true" node from each column (the literal that satisfies the clause).</li><li>The remaining nodes (exactly 8) will form the required node cover.</li></ol><p>Result: The 8 remaining nodes form a valid node cover that touches all vertical edges (2 nodes per column) and all horizontal edges, proving the satisfiability problem can be mapped to finding a node cover.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -819,8 +819,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الدسمة. اليوم ننتقل من مجرد الحديث عن الوقت (P و NP) إلى الحديث عن 'المساحة' (الذاكرة). تخيل أنك تحل لغزاً معقداً؛ في مشاكل NP نحن نهتم بمدى سرعة حلك للغز، لكن في مشاكل PS نحن نهتم بمقدار 'الورق المسود' الذي تحتاجه، حتى لو استغرقت مليون سنة! تذكروا جيداً الفرق الجوهري بين 2-SAT (السهلة، في P) و 3-SAT (الصعبة، NP-Complete). ركزوا على 'نظرية سافيتش' للامتحان، فهي تثبت بشكل عبقري أن المساحة غير الحتمية لا تعطيك قوة خارقة مقارنة بالمساحة الحتمية (PS = NPS)، وذلك باستخدام حيلة 'المضاعفة العودية' التي تستهلك مساحة \(O(p^2(n))\). وأخيراً، مشكلة QBF هي 'الوحش' الجديد هنا، فهي PS-Complete لأن تناوب المحددات (لكل، ويوجد) يجعلها تتطلب فحص شجرة احتمالات كاملة. راجعوا الاختزالات جيداً، وتذكروا أن الاختزال يجب أن يكون دائماً في وقت متعدد الحدود!</template>
-    <template class="content-en">Welcome friends to this dense module. Today we shift our focus from Time (P and NP) to Space (Memory). Imagine solving a puzzle; in NP we care how fast you solve it, but in PS we care how much 'scratch paper' you need, even if it takes a million years! Remember the stark contrast between 2-SAT (easy, in P) and 3-SAT (hard, NP-Complete). For the exam, focus heavily on Savitch's Theorem. It brilliantly proves that nondeterminism doesn't give you a superpower in space complexity (PS = NPS) by using the 'Recursive Doubling' trick, which uses \(O(p^2(n))\) space. Finally, QBF is our new 'boss monster'; it's PS-Complete because the alternation of quantifiers forces us to evaluate an entire tree of possibilities. Review your reductions, and always remember: reductions must be in polynomial TIME!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الدسمة. اليوم ننتقل من مجرد الحديث عن الوقت (P و NP) إلى الحديث عن 'المساحة' (الذاكرة). تخيل أنك تحل لغزاً معقداً؛ في مشاكل NP نحن نهتم بمدى سرعة حلك للغز، لكن في مشاكل PS نحن نهتم بمقدار 'الورق المسود' الذي تحتاجه، حتى لو استغرقت مليون سنة! تذكروا جيداً الفرق الجوهري بين 2-SAT (السهلة، في P) و 3-SAT (الصعبة، NP-Complete). ركزوا على 'نظرية سافيتش' للامتحان، فهي تثبت بشكل عبقري أن المساحة غير الحتمية لا تعطيك قوة خارقة مقارنة بالمساحة الحتمية (PS = NPS)، وذلك باستخدام حيلة 'المضاعفة العودية' التي تستهلك مساحة \(O(p^2(n))\). وأخيراً، مشكلة QBF هي 'الوحش' الجديد هنا، فهي PS-Complete لأن تناوب المحددات (لكل، ويوجد) يجعلها تتطلب فحص شجرة احتمالات كاملة. راجعوا الاختزالات جيداً، وتذكروا أن الاختزال يجب أن يكون دائماً في وقت متعدد الحدود!<p>لقد قمنا للتو بتعميق فهمنا من خلال تشريح الاختزال الدقيق من 3-SAT إلى غطاء العقد (Node Cover)، مما يوضح كيف تُترجم القيود المنطقية إلى هياكل رسومية. بالإضافة إلى ذلك، فإن استكشافنا لفئة Co-NP يكمل الصورة، ويوضح لنا أن إثبات 'عدم وجود حل' يمكن أن يكون بنفس تعقيد إيجاد الحل نفسه.</p></template>
+    <template class="content-en">Welcome friends to this dense module. Today we shift our focus from Time (P and NP) to Space (Memory). Imagine solving a puzzle; in NP we care how fast you solve it, but in PS we care how much 'scratch paper' you need, even if it takes a million years! Remember the stark contrast between 2-SAT (easy, in P) and 3-SAT (hard, NP-Complete). For the exam, focus heavily on Savitch's Theorem. It brilliantly proves that nondeterminism doesn't give you a superpower in space complexity (PS = NPS) by using the 'Recursive Doubling' trick, which uses \(O(p^2(n))\) space. Finally, QBF is our new 'boss monster'; it's PS-Complete because the alternation of quantifiers forces us to evaluate an entire tree of possibilities. Review your reductions, and always remember: reductions must be in polynomial TIME!<p>We've just deepened our understanding by dissecting the precise reduction from 3-SAT to Node Cover, illustrating how logical constraints translate into graph structures. Furthermore, our exploration of the Co-NP class completes the picture, showing us that proving 'no solution exists' can be just as structurally complex as finding one.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -994,6 +994,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">يمكننا تقييم صيغة QBF باستخدام مكدس (Stack) لتتبع التعبيرات الفرعية. أقصى عمق للمكدس هو n، وكل تعبير طوله n، مما يعني أننا نحتاج مساحة \(O(n^2)\) فقط، وهي متعددة الحدود.</template>
           <template class="content-en">We can evaluate a QBF formula using a stack to track subexpressions. The maximum stack depth is n, and each expression is length n, meaning we only need \(O(n^2)\) space, which is polynomial.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في اختزال 3-SAT إلى Node Cover، لماذا نضيف حواف أفقية بين المتغير ونفيه؟</template>
+          <template class="content-en">In the 3-SAT to Node Cover reduction, why do we add horizontal edges between a variable and its negation?</template>
+          <span class="content-target">في اختزال 3-SAT إلى Node Cover، لماذا نضيف حواف أفقية بين المتغير ونفيه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الحواف الأفقية تعمل كـ 'قيود تناقض'. غطاء العقد يجب أن يلمس كل حافة. إذا لم نضف هذه الحواف، فقد تختار الخوارزمية عقدة تمثل $x$ وعقدة تمثل $\neg x$ كلاهما كـ 'صحيح' لتغطية أعمدة مختلفة، وهو أمر مستحيل منطقياً. الحافة الأفقية تجبر غطاء العقد على عدم ترك كلتا العقدتين خارج الغطاء، مما يضمن اتساق تعيين القيم.</p></template>
+          <template class="content-en"><p>The horizontal edges act as 'contradiction constraints'. A node cover must touch every edge. If we didn't add them, the algorithm might leave both the $x$ node and the $\neg x$ node out of the cover (meaning both are assigned 'true' to satisfy different columns), which is logically impossible. The horizontal edge forces the cover to include at least one of them, ensuring a consistent truth assignment.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يهتم علماء الحاسب بالتقاطع بين NP و Co-NP؟</template>
+          <template class="content-en">Why do computer scientists care about the intersection of NP and Co-NP?</template>
+          <span class="content-target">لماذا يهتم علماء الحاسب بالتقاطع بين NP و Co-NP؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنه يمثل المشاكل التي تمتلك 'شهادات' (Certificates) قصيرة وسهلة التحقق لكل من الإجابة بـ 'نعم' والإجابة بـ 'لا'. الفئة P تقع بالكامل داخل هذا التقاطع. إذا وجدنا مشكلة في هذا التقاطع ولا تنتمي لـ P، فهذا سيثبت أن P لا تساوي NP، وهو أحد أهم الأسئلة المفتوحة في الرياضيات.</p></template>
+          <template class="content-en"><p>Because it represents problems that have short, easily verifiable 'certificates' for BOTH 'yes' and 'no' answers. Class P lies entirely within this intersection. If we find a problem in this intersection that is NOT in P, it would definitively prove that P != NP, resolving one of the biggest open questions in mathematics.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1346,6 +1381,23 @@
         "en": "QBF is an example of a PS-Complete problem."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في اختزال 3-SAT إلى Node Cover، ما هي قيمة الميزانية (Budget k)؟",
+      "en": "In the reduction from 3-SAT to Node Cover, what is the value of the budget (k)?"
+    },
+    "back": {
+      "definition": {
+        "ar": "الميزانية k تساوي ضعف عدد القيود (Clauses) في صيغة 3-SAT.",
+        "en": "The budget k is equal to twice the number of clauses in the 3-SAT formula."
+      },
+      "example": {
+        "ar": "إذا كان لدينا 4 قيود، فإن k = 8.",
+        "en": "If we have 4 clauses, then k = 8."
+      }
+    },
+    "id": 21
   }
 ]
 </script>
@@ -1355,7 +1407,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1371,7 +1423,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1696,6 +1748,38 @@
     },
     "difficulty": "medium",
     "conceptId": "polynomial-space-ps-nps"
+  },
+  {
+    "conceptId": "independent-set-node-cover",
+    "question": {
+      "ar": "عند اختزال صيغة 3-SAT تحتوي على 5 قيود إلى مشكلة غطاء العقد (Node Cover)، ما هو حجم غطاء العقد (الميزانية k) الذي نبحث عنه؟",
+      "en": "When reducing a 3-SAT formula with 5 clauses to the Node Cover problem, what is the size of the node cover (budget k) we are looking for?"
+    },
+    "options": {
+      "ar": [
+        "5",
+        "10",
+        "15",
+        "20"
+      ],
+      "en": [
+        "5",
+        "10",
+        "15",
+        "20"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في هذا الاختزال، يتم تعيين الميزانية k لتكون ضعف عدد القيود. بما أن لدينا 5 قيود، فإن k = 2 × 5 = 10.",
+      "en": "In this reduction, the budget k is set to twice the number of clauses. Since we have 5 clauses, k = 2 × 5 = 10."
+    },
+    "hint": {
+      "ar": "تذكر أن كل قيد يمثَّل بعمود من 3 عقد، ونحتاج لتغطية حوافه العمودية بعقدتين.",
+      "en": "Remember that each clause is represented by a column of 3 nodes, and we need 2 nodes to cover its vertical edges."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>
@@ -1740,6 +1824,14 @@
       <template class="content-ar">العلاقة بين Independent Set و Node Cover هي علاقة تكاملية. إذا وجدت أحدهما، فقد وجدت الآخر تلقائياً (V - IS = NC). كلاهما NP-Complete.</template>
       <template class="content-en">The relationship between Independent Set and Node Cover is complementary. If you find one, you automatically find the other (V - IS = NC). Both are NP-Complete.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الافتراض بأن التقاطع بين NP و Co-NP هو الفئة P فقط: على الرغم من أن P تنتمي إلى هذا التقاطع، إلا أنه لم يتم إثبات أن التقاطع يقتصر على P فقط. قد تكون هناك مشاكل في التقاطع لا تنتمي إلى P.</template>
+    <template class="content-en">Assuming the intersection of NP and Co-NP is exactly P: Although P is in this intersection, it has not been proven that the intersection is ONLY P. There might be problems in the intersection that are not in P.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

@@ -1,0 +1,2128 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark" data-subject="DS473" data-module="13" data-no-videos>
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>التصوير الحسابي · DS473 · الحديقة الرقمية</title>
+
+  <!-- Anti-flash: MUST be first script -->
+  <script>
+    (function(){
+      var t=localStorage.getItem('garden_theme')||'dark';
+      document.documentElement.setAttribute('data-theme',t);
+      var l=localStorage.getItem('garden_lang')||'ar';
+      document.documentElement.setAttribute('lang',l);
+      document.documentElement.setAttribute('dir',l==='ar'?'rtl':'ltr');
+    })();
+  </script>
+
+  <script src="../../shared/subject-tint.js"></script>
+  <!-- garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/vendor/fonts/garden/garden-core.css">
+  <!-- /garden-fontpath -->
+  <link rel="stylesheet" href="../../shared/garden.css">
+  <link rel="stylesheet" href="../../shared/garden-header.css">
+  <link rel="stylesheet" href="../../shared/skin.css">
+  <link rel="stylesheet" href="../../shared/vendor/fontawesome/css/garden-icons.css">
+
+  <!-- MathJax: ONLY include if json.concepts has ANY formula with latex !== null -->
+  <script>MathJax={tex:{inlineMath:[['$','$'],['\\(','\\)']]},chtml:{displayAlign:'left'}};</script>
+  <script id="MathJax-script" data-src="../../shared/vendor/mathjax/tex-mml-chtml.js"></script>
+
+
+
+  <!-- data-garden-icons -->
+  <link rel="icon" type="image/svg+xml" href="../../shared/icons/logo-mark.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../shared/icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../shared/icons/favicon-16.png">
+  <link rel="apple-touch-icon" href="../../shared/icons/apple-touch-icon.png">
+  <link rel="manifest" href="../../manifest.json">
+  <meta name="theme-color" content="#1f2937">
+  <!-- /data-garden-icons -->
+<!--garden-ga-->
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HGTK36LR0M"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HGTK36LR0M');
+  </script>
+<!--/garden-ga-->
+</head>
+<body data-page-title="DS473" data-page-title-en="DS473">
+
+<div class="reading-progress"></div>
+<div class="page-layout">
+
+<header data-gh data-gh-variant="module" data-gh-up="index.html" data-gh-prev="M12.html" data-gh-next="index.html" data-gh-card="../../hub/course.html?code=DS473"></header>
+
+<div class="content-wrapper">
+  <aside class="sidebar">
+    <div class="sidebar-title" data-i18n="toc.title">محتويات الوحدة</div>
+    <nav class="toc-list">
+      <a href="#hero" class="toc-link" data-bilingual>
+        <template class="content-ar">مقدمة الوحدة</template>
+        <template class="content-en">Module Intro</template>
+        <span class="content-target">مقدمة الوحدة</span>
+      </a>
+      <a href="#objectives" class="toc-link" data-bilingual>
+        <template class="content-ar">أهداف التعلم</template>
+        <template class="content-en">Learning Objectives</template>
+        <span class="content-target">أهداف التعلم</span>
+      </a>
+
+      <a href="#photometric-calibration" class="toc-link" data-bilingual>
+        <template class="content-ar">المعايرة الضوئية (Photometric Calibration)</template>
+        <template class="content-en">Photometric Calibration</template>
+        <span class="content-target">المعايرة الضوئية (Photometric Calibration)</span>
+      </a>
+      <a href="#noise-level-estimation" class="toc-link" data-bilingual>
+        <template class="content-ar">تقدير مستوى الضوضاء (Noise Level Estimation)</template>
+        <template class="content-en">Noise Level Estimation</template>
+        <span class="content-target">تقدير مستوى الضوضاء (Noise Level Estimation)</span>
+      </a>
+      <a href="#vignetting" class="toc-link" data-bilingual>
+        <template class="content-ar">التظليل المحيطي (Vignetting)</template>
+        <template class="content-en">Vignetting</template>
+        <span class="content-target">التظليل المحيطي (Vignetting)</span>
+      </a>
+      <a href="#optical-blur-psf" class="toc-link" data-bilingual>
+        <template class="content-ar">تقدير الضبابية البصرية (Optical Blur / PSF)</template>
+        <template class="content-en">Optical Blur (Spatial Response) Estimation</template>
+        <span class="content-target">تقدير الضبابية البصرية (Optical Blur / PSF)</span>
+      </a>
+      <a href="#image-matting-compositing" class="toc-link" data-bilingual>
+        <template class="content-ar">فصل الصورة وتركيبها (Image Matting and Compositing)</template>
+        <template class="content-en">Image Matting and Compositing</template>
+        <span class="content-target">فصل الصورة وتركيبها (Image Matting and Compositing)</span>
+      </a>
+      <a href="#blue-screen-matting" class="toc-link" data-bilingual>
+        <template class="content-ar">فصل الشاشة الزرقاء (Blue Screen Matting)</template>
+        <template class="content-en">Blue Screen Matting</template>
+        <span class="content-target">فصل الشاشة الزرقاء (Blue Screen Matting)</span>
+      </a>
+      <a href="#natural-image-matting" class="toc-link" data-bilingual>
+        <template class="content-ar">فصل الصورة الطبيعية (Natural Image Matting)</template>
+        <template class="content-en">Natural Image Matting</template>
+        <span class="content-target">فصل الصورة الطبيعية (Natural Image Matting)</span>
+      </a>
+      <a href="#smoke-shadow-matting" class="toc-link" data-bilingual>
+        <template class="content-ar">فصل الدخان والظل (Smoke and Shadow Matting)</template>
+        <template class="content-en">Smoke and Shadow Matting</template>
+        <span class="content-target">فصل الدخان والظل (Smoke and Shadow Matting)</span>
+      </a>
+      <a href="#texture-analysis-synthesis" class="toc-link" data-bilingual>
+        <template class="content-ar">تحليل وتوليد النسيج (Texture Analysis and Synthesis)</template>
+        <template class="content-en">Texture Analysis and Synthesis</template>
+        <span class="content-target">تحليل وتوليد النسيج (Texture Analysis and Synthesis)</span>
+      </a>
+      <a href="#inpainting-texture-transfer" class="toc-link" data-bilingual>
+        <template class="content-ar">التلوين الداخلي ونقل النسيج (Inpainting and Texture Transfer)</template>
+        <template class="content-en">Application: Hole filling, Inpainting, and Texture Transfer</template>
+        <span class="content-target">التلوين الداخلي ونقل النسيج (Inpainting and Texture Transfer)</span>
+      </a>
+
+      <div class="toc-divider"></div>
+
+      <a href="#professor" class="toc-link" data-bilingual>
+        <template class="content-ar">حديث البروفيسور</template>
+        <template class="content-en">Professor's Narrative</template>
+        <span class="content-target">حديث البروفيسور</span>
+      </a>
+      <a href="#ask-professor" class="toc-link" data-bilingual>
+        <template class="content-ar">اسأل البروفيسور</template>
+        <template class="content-en">Ask the Professor</template>
+        <span class="content-target">اسأل البروفيسور</span>
+      </a>
+      <a href="#flashcards" class="toc-link" data-bilingual>
+        <template class="content-ar">البطاقات التعليمية</template>
+        <template class="content-en">Flashcards</template>
+        <span class="content-target">البطاقات التعليمية</span>
+      </a>
+      <a href="#quiz" class="toc-link" data-bilingual>
+        <template class="content-ar">اختبر نفسك</template>
+        <template class="content-en">Self Quiz</template>
+        <span class="content-target">اختبر نفسك</span>
+      </a>
+      <a href="#vault" class="toc-link" data-bilingual>
+        <template class="content-ar">خزنة الامتحان</template>
+        <template class="content-en">Exam Vault</template>
+        <span class="content-target">خزنة الامتحان</span>
+      </a>
+    </nav>
+    <div class="sidebar-widget">
+      <div class="widget-number" id="fc-due-count">0</div>
+      <div class="widget-label" data-i18n="fc.due">بطاقة للمراجعة اليوم</div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+<section id="hero" class="hero fade-up">
+  <div class="hero-eyebrow font-display">
+    ⬡ <span data-bilingual>
+      <template class="content-ar">الوحدة 13</template>
+      <template class="content-en">Module 13</template>
+      <span class="content-target">الوحدة 13</span>
+    </span> · DS473
+  </div>
+  <div data-bilingual>
+    <template class="content-ar">
+      <h1 class="text-gradient">التصوير الحسابي</h1>
+      <p class="hero-description">تغطي هذه الوحدة مبادئ المعايرة الضوئية، وتقنيات فصل وتركيب الصور، بالإضافة إلى تحليل وتوليد النسيج وترميم الصور.</p>
+    </template>
+    <template class="content-en">
+      <h1 class="text-gradient">Computational Photography</h1>
+      <p class="hero-description">This module covers the principles of photometric calibration, image matting and compositing techniques, as well as texture analysis, synthesis, and image inpainting.</p>
+    </template>
+    <div class="content-target"></div>
+  </div>
+  <div class="tag-list" data-bilingual>
+    <template class="content-ar">
+      <span class="tag">المعايرة الضوئية</span>
+      <span class="tag">فصل الصور</span>
+      <span class="tag">التركيب</span>
+      <span class="tag">توليد النسيج</span>
+      <span class="tag">ترميم الصور</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+    </template>
+    <template class="content-en">
+      <span class="tag">Photometric Calibration</span>
+      <span class="tag">Image Matting</span>
+      <span class="tag">Compositing</span>
+      <span class="tag">Texture Synthesis</span>
+      <span class="tag">Inpainting</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+    </template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="objectives" class="objectives-card glass-card fade-up">
+  <h2><i class="fa-solid fa-bullseye sec-icon" aria-hidden="true"></i> <span data-i18n="obj.title">أهداف التعلم</span></h2>
+  <ul class="objectives-list" data-bilingual>
+    <template class="content-ar">
+      <li><span class="obj-icon">✦</span><span>شرح مبادئ المعايرة الضوئية وأهميتها في تحقيق تمثيل دقيق للألوان في الصور.</span></li>
+      <li><span class="obj-icon">✦</span><span>تعلم تقنيات مختلفة لفصل الصور (Matting) وتركيبها (Compositing).</span></li>
+      <li><span class="obj-icon">✦</span><span>تحليل الأنسجة في الصور باستخدام الطرق الإحصائية والهيكلية، وتنفيذ خوارزميات لتوليد أنسجة جديدة وواقعية من العينات.</span></li>
+    </template>
+    <template class="content-en">
+      <li><span class="obj-icon">✦</span><span>Explain the principles of photometric calibration and its importance in achieving accurate color representation in images.</span></li>
+      <li><span class="obj-icon">✦</span><span>Learn different techniques of image matting and compositing.</span></li>
+      <li><span class="obj-icon">✦</span><span>Analyze textures in images using statistical and structural methods, and Implement algorithms for texture synthesis to generate new, realistic textures from samples.</span></li>
+    </template>
+    <div class="content-target"></div>
+  </ul>
+</section>
+
+<section id="photometric-calibration" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">1</span> المعايرة الضوئية (Photometric Calibration)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">1</span> Photometric Calibration</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هي عملية تحويل المقادير الآلية (التي تلتقطها الكاميرا) إلى مقادير ظاهرية معايرة في نظام قياسي.</p></template>
+    <template class="content-en"><p>The process of converting instrumental (i.e., camera) magnitudes to calibrated apparent magnitudes in a standard system.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>قبل أن نتمكن من دمج عدة صور بنجاح (مثل دمج صور بفلاش وبدون فلاش)، نحتاج إلى توصيف الدوال التي تعين الإشعاع الوارد إلى قيم بكسل، وكذلك كمية الضوضاء الموجودة في كل صورة.</p><p>تتضمن المعايرة الضوئية فهم خط أنابيب استشعار الصورة (Image Sensing Pipeline) والذي يمر عبر البصريات، المستشعر، إزالة الفسيفساء (Demosaic)، توازن اللون الأبيض، والضغط.</p><p>المكونات الرئيسية التي يجب معايرتها تشمل:</p><ul><li><b><span class="smart-term" data-term-en="Radiometric response function" data-ar="دالة الاستجابة الإشعاعية" data-en-def="Maps photons arriving at the lens into digital values stored in the image file.">دالة الاستجابة الإشعاعية<span class="smart-term-tooltip"></span></span> (Radiometric response function):</b> تعين الفوتونات التي تصل إلى العدسة إلى قيم رقمية مخزنة في ملف الصورة.</li><li><b>التظليل المحيطي (Vignetting):</b> تعتيم قيم البكسل بالقرب من محيط الصور.</li><li><b>دالة انتشار النقطة (Point spread function - PSF):</b> تصف الضبابية الناتجة عن العدسة ومرشحات منع التعرج.</li></ul></template>
+    <template class="content-en"><p>Before we can successfully merge multiple photographs, we need to characterize the functions that map incoming irradiance into pixel values and also the amount of noise present in each image.</p><p>Photometric calibration involves understanding the image sensing pipeline, which passes through optics, sensor, demosaic, white balance, and compression.</p><p>Key components to calibrate include:</p><ul><li><b><span class="smart-term" data-term-en="Radiometric response function" data-ar="دالة الاستجابة الإشعاعية" data-en-def="Maps photons arriving at the lens into digital values stored in the image file.">Radiometric response function<span class="smart-term-tooltip"></span></span>:</b> maps photons arriving at the lens into digital values stored in the image file.</li><li><b>Vignetting:</b> darkens pixel values near the periphery of images.</li><li><b>Point spread function (PSF):</b> characterizes the blur induced by the lens and filters.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا تعتبر المعايرة الضوئية ضرورية؟ لأن الكاميرات الرقمية لا تسجل الضوء بشكل خطي تماماً. تقوم معالجات إشارة الصورة (ISP) بتطبيق منحنيات جاما، وتوازن اللون الأبيض، وضغط JPEG، مما يغير القيم الأصلية للإشعاع.</p><p>في تطبيقات التصوير الحسابي المتقدمة مثل التصوير بالمدى الديناميكي العالي (HDR) أو دمج الصور، يجب عكس هذه التعديلات للعمل في مساحة إشعاع خطية حقيقية.</p><p>تتطلب المعايرة الدقيقة أحياناً التقاط صور لنمط معايرة معروف أو استخدام خوارزميات استنتاجية لتقدير هذه الدوال من الصور الطبيعية مباشرة.</p></template>
+    <template class="content-en"><p>Why is photometric calibration necessary? Because digital cameras do not record light perfectly linearly. Image Signal Processors (ISPs) apply gamma curves, white balance, and JPEG compression, which alter the original irradiance values.</p><p>In advanced computational photography applications like High Dynamic Range (HDR) imaging or image merging, these adjustments must be inverted to work in a true linear irradiance space.</p><p>Accurate calibration sometimes requires capturing images of a known calibration pattern or using heuristic algorithms to estimate these functions directly from natural images.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[1]: Detailed SVG generation prompt: Create a block diagram showing the image sensing pipeline. Flow is left to right. Blocks: 'Scene Radiance' -> 'Optics' -> 'Aperture' -> 'Shutter' (grouped as Camera Body). Then -> 'Sensor (CCD/CMOS)' -> 'Gain (ISO)' -> 'ADC' (grouped as Sensor chip) -> outputs 'RAW' cylinder. Then -> 'Demosaic' -> 'Denoise and sharpen' -> 'White Balance' -> 'Gamma/curve' -> 'Compress' (grouped as Image Signal Processor ISP) -> outputs 'JPEG' cylinder. Style: educational, dark background #0d1117, accent color #3b82f6, viewBox 0 0 800 400, English labels. -->
+<div class="svg-diagram" data-diagram-id="1">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 500" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 8 5 L 0 9 z" fill="var(--brand-500)"/>
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)"/>
+
+    <!-- GROUPS -->
+    <!-- Camera Body Group -->
+    <rect x="135" y="50" width="330" height="110" fill="none" stroke="var(--border-color)" stroke-dasharray="6 4" stroke-width="2" rx="12"/>
+    <text x="300" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Camera Body</text>
+    <text x="300" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">جسم الكاميرا</text>
+
+    <!-- Sensor Chip Group -->
+    <rect x="485" y="50" width="330" height="110" fill="none" stroke="var(--border-color)" stroke-dasharray="6 4" stroke-width="2" rx="12"/>
+    <text x="650" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Sensor Chip</text>
+    <text x="650" y="75" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">شريحة المستشعر</text>
+
+    <!-- ISP Group -->
+    <rect x="160" y="340" width="600" height="120" fill="none" stroke="var(--border-color)" stroke-dasharray="6 4" stroke-width="2" rx="12"/>
+    <text x="460" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Image Signal Processor (ISP)</text>
+    <text x="460" y="365" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">معالج إشارة الصورة (ISP)</text>
+
+    <!-- CONNECTIONS (ARROWS) -->
+    <g stroke="var(--brand-500)" stroke-width="2" fill="none" marker-end="url(#arrow)">
+        <!-- Row 1 Connections -->
+        <path d="M 105 120 L 137 120"/>
+        <path d="M 235 120 L 247 120"/>
+        <path d="M 345 120 L 357 120"/>
+        <path d="M 455 120 L 487 120"/>
+        <path d="M 585 120 L 597 120"/>
+        <path d="M 695 120 L 707 120"/>
+        
+        <!-- ADC to RAW -->
+        <path d="M 760 150 L 760 222"/>
+
+        <!-- RAW to ISP (Routing Path) -->
+        <path d="M 760 270 L 760 280 Q 760 300 740 300 L 140 300 Q 120 300 120 320 L 120 390 Q 120 410 140 410 L 167 410"/>
+
+        <!-- Row 2 Connections -->
+        <path d="M 265 410 L 287 410"/>
+        <path d="M 385 410 L 407 410"/>
+        <path d="M 505 410 L 527 410"/>
+        <path d="M 625 410 L 647 410"/>
+        <path d="M 745 410 L 817 410"/>
+    </g>
+
+    <!-- EDUCATIONAL CALLOUTS (Dashed) -->
+    <g stroke="var(--brand-400)" stroke-width="1.5" stroke-dasharray="4 4" fill="none">
+        <path d="M 190 150 L 190 180"/>
+        <path d="M 650 150 L 650 180"/>
+    </g>
+    
+    <!-- Callout Text: PSF & Vignetting -->
+    <text x="190" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">
+        <tspan x="190" dy="-0.3em">PSF &amp;</tspan>
+        <tspan x="190" dy="1.2em">Vignetting</tspan>
+    </text>
+    <text x="190" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">
+        <tspan x="190" dy="-0.3em">دالة الانتشار النقطي</tspan>
+        <tspan x="190" dy="1.2em">والتظليل</tspan>
+    </text>
+
+    <!-- Callout Text: Radiometric Response -->
+    <text x="650" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-en">
+        <tspan x="650" dy="-0.3em">Radiometric</tspan>
+        <tspan x="650" dy="1.2em">Response</tspan>
+    </text>
+    <text x="650" y="200" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="500" fill="var(--text-secondary)" class="gsvg-ar">
+        <tspan x="650" dy="-0.3em">الاستجابة</tspan>
+        <tspan x="650" dy="1.2em">الإشعاعية</tspan>
+    </text>
+
+    <!-- SCENE RADIANCE (Input) -->
+    <g stroke="var(--brand-500)" stroke-width="2.5" stroke-linecap="round">
+        <circle cx="70" cy="105" r="14" fill="none"/>
+        <path d="M 70 80 L 70 85 M 70 125 L 70 130 M 45 105 L 50 105 M 90 105 L 95 105 M 52 87 L 56 91 M 88 123 L 84 119 M 88 87 L 84 91 M 52 123 L 56 119"/>
+    </g>
+    <text x="70" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">
+        <tspan x="70" dy="-0.3em">Scene</tspan>
+        <tspan x="70" dy="1.2em">Radiance</tspan>
+    </text>
+    <text x="70" y="150" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">
+        <tspan x="70" dy="-0.3em">إشعاع</tspan>
+        <tspan x="70" dy="1.2em">المشهد</tspan>
+    </text>
+
+    <!-- PIPELINE BLOCKS -->
+    <g fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" rx="8">
+        <!-- Camera Body -->
+        <rect x="145" y="90" width="90" height="60"/>
+        <rect x="255" y="90" width="90" height="60"/>
+        <rect x="365" y="90" width="90" height="60"/>
+        
+        <!-- Sensor Chip -->
+        <rect x="495" y="90" width="90" height="60"/>
+        <rect x="605" y="90" width="90" height="60"/>
+        <rect x="715" y="90" width="90" height="60"/>
+        
+        <!-- ISP -->
+        <rect x="175" y="380" width="90" height="60"/>
+        <rect x="295" y="380" width="90" height="60"/>
+        <rect x="415" y="380" width="90" height="60"/>
+        <rect x="535" y="380" width="90" height="60"/>
+        <rect x="655" y="380" width="90" height="60"/>
+    </g>
+
+    <!-- BLOCK LABELS -->
+    <g font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="500" fill="var(--text-primary)" text-anchor="middle">
+        
+        <!-- Optics -->
+        <text x="190" y="120" dy="0.3em" class="gsvg-en">Optics</text>
+        <text x="190" y="120" dy="0.3em" class="gsvg-ar">البصريات</text>
+
+        <!-- Aperture -->
+        <text x="300" y="120" dy="0.3em" class="gsvg-en">Aperture</text>
+        <text x="300" y="120" dy="0.3em" class="gsvg-ar">الفتحة</text>
+
+        <!-- Shutter -->
+        <text x="410" y="120" dy="0.3em" class="gsvg-en">Shutter</text>
+        <text x="410" y="120" dy="0.3em" class="gsvg-ar">الغالق</text>
+
+        <!-- Sensor -->
+        <text x="540" y="120" class="gsvg-en">
+            <tspan x="540" dy="-0.3em">Sensor</tspan>
+            <tspan x="540" dy="1.2em" font-size="11" fill="var(--text-muted)">(CCD/CMOS)</tspan>
+        </text>
+        <text x="540" y="120" class="gsvg-ar">
+            <tspan x="540" dy="-0.3em">المستشعر</tspan>
+            <tspan x="540" dy="1.2em" font-size="11" fill="var(--text-muted)">(CCD/CMOS)</tspan>
+        </text>
+
+        <!-- Gain -->
+        <text x="650" y="120" class="gsvg-en">
+            <tspan x="650" dy="-0.3em">Gain</tspan>
+            <tspan x="650" dy="1.2em" font-size="11" fill="var(--text-muted)">(ISO)</tspan>
+        </text>
+        <text x="650" y="120" class="gsvg-ar">
+            <tspan x="650" dy="-0.3em">الكسب</tspan>
+            <tspan x="650" dy="1.2em" font-size="11" fill="var(--text-muted)">(ISO)</tspan>
+        </text>
+
+        <!-- ADC -->
+        <text x="760" y="120" dy="0.3em" class="gsvg-en">ADC</text>
+        <text x="760" y="120" dy="0.3em" class="gsvg-ar">محول (ADC)</text>
+
+        <!-- Demosaic -->
+        <text x="220" y="410" dy="0.3em" class="gsvg-en">Demosaic</text>
+        <text x="220" y="410" dy="0.3em" class="gsvg-ar">إزالة الفسيفساء</text>
+
+        <!-- Denoise & Sharpen -->
+        <text x="340" y="410" class="gsvg-en">
+            <tspan x="340" dy="-0.3em">Denoise &amp;</tspan>
+            <tspan x="340" dy="1.2em">Sharpen</tspan>
+        </text>
+        <text x="340" y="410" class="gsvg-ar">
+            <tspan x="340" dy="-0.3em">إزالة الضوضاء</tspan>
+            <tspan x="340" dy="1.2em">والشحذ</tspan>
+        </text>
+
+        <!-- White Balance -->
+        <text x="460" y="410" class="gsvg-en">
+            <tspan x="460" dy="-0.3em">White</tspan>
+            <tspan x="460" dy="1.2em">Balance</tspan>
+        </text>
+        <text x="460" y="410" class="gsvg-ar">
+            <tspan x="460" dy="-0.3em">توازن</tspan>
+            <tspan x="460" dy="1.2em">الأبيض</tspan>
+        </text>
+
+        <!-- Gamma / Curve -->
+        <text x="580" y="410" class="gsvg-en">
+            <tspan x="580" dy="-0.3em">Gamma /</tspan>
+            <tspan x="580" dy="1.2em">Curve</tspan>
+        </text>
+        <text x="580" y="410" class="gsvg-ar">
+            <tspan x="580" dy="-0.3em">جاما /</tspan>
+            <tspan x="580" dy="1.2em">منحنى</tspan>
+        </text>
+
+        <!-- Compress -->
+        <text x="700" y="410" dy="0.3em" class="gsvg-en">Compress</text>
+        <text x="700" y="410" dy="0.3em" class="gsvg-ar">ضغط</text>
+    </g>
+
+    <!-- CYLINDERS (RAW & JPEG) -->
+    <!-- RAW Cylinder -->
+    <g stroke="var(--brand-500)" stroke-width="2">
+        <path d="M 725 230 L 725 270 A 35 12 0 0 0 795 270 L 795 230 Z" fill="var(--brand-500)"/>
+        <ellipse cx="760" cy="230" rx="35" ry="12" fill="var(--brand-400)"/>
+    </g>
+    <text x="760" y="255" dy="0.3em" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">RAW</text>
+    <text x="760" y="255" dy="0.3em" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">خام (RAW)</text>
+
+    <!-- JPEG Cylinder -->
+    <g stroke="var(--brand-500)" stroke-width="2">
+        <path d="M 825 390 L 825 430 A 35 12 0 0 0 895 430 L 895 390 Z" fill="var(--brand-500)"/>
+        <ellipse cx="860" cy="390" rx="35" ry="12" fill="var(--brand-400)"/>
+    </g>
+    <text x="860" y="415" dy="0.3em" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">JPEG</text>
+    <text x="860" y="415" dy="0.3em" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">صيغة JPEG</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">كيف يؤثر ضغط JPEG على عملية المعايرة الضوئية إذا لم يكن لدينا وصول إلى ملفات RAW؟</template>
+      <template class="content-en">How does JPEG compression affect the photometric calibration process if we do not have access to RAW files?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ضغط JPEG يطبق تحويلات غير خطية وفقدان للبيانات (Lossy)، مما يجعل من الصعب جداً استعادة قيم الإشعاع الأصلية بدقة. يجب تقدير دالة الاستجابة العكسية لفك تأثير منحنى جاما، ولكن فقدان البيانات يحد من دقة المعايرة.</p></template>
+      <template class="content-en"><p>JPEG compression applies non-linear transformations and lossy compression, making it very difficult to accurately recover the original irradiance values. The inverse response function must be estimated to undo the gamma curve, but data loss limits calibration accuracy.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="noise-level-estimation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> تقدير مستوى الضوضاء (Noise Level Estimation)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Noise Level Estimation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هو تحديد كمية الضوضاء المضافة للصورة تحت إعدادات كاميرا معينة (مثل مستوى ISO)، وغالباً ما تُمثل كدالة لقيمة البكسل.</p></template>
+    <template class="content-en"><p>Determining the amount of noise injected into an image under a particular camera setting (e.g., ISO level), often modeled as a function of pixel value.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>من المهم معرفة مقدار الضوضاء المحقونة في الصورة. أبسط توصيف للضوضاء هو انحراف معياري واحد، يُقاس عادةً بمستويات الرمادي، ويكون مستقلاً عن قيمة البكسل.</p><p>للحصول على نموذج أكثر دقة، نستخدم <b><span class="smart-term" data-term-en="Noise Level Function (NLF)" data-ar="دالة مستوى الضوضاء" data-en-def="A model that estimates the noise level in an image as a function of the pixel intensity value.">دالة مستوى الضوضاء<span class="smart-term-tooltip"></span></span> (Noise Level Function - NLF)</b>، والتي تقدر مستوى الضوضاء كدالة لقيمة البكسل.</p><p>يمكن تقدير الضوضاء بطريقتين:</p><ol><li><b>التباين الزمني (Temporal variance):</b> عند كل بكسل بشكل مستقل، عن طريق التقاط تعريضات متكررة وحساب التباين.</li><li><b>التباين المكاني (Spatial variance):</b> عبر مناطق معينة، بافتراض أن قيم البكسل يجب أن تكون متطابقة داخل منطقة ما (مثل مربع في لوحة فحص الألوان).</li></ol></template>
+    <template class="content-en"><p>It is important to know the amount of noise being injected under a particular camera setting. The simplest characterization is a single standard deviation, independent of pixel value.</p><p>For a more accurate model, we use a <b><span class="smart-term" data-term-en="Noise Level Function (NLF)" data-ar="دالة مستوى الضوضاء" data-en-def="A model that estimates the noise level in an image as a function of the pixel intensity value.">Noise Level Function (NLF)<span class="smart-term-tooltip"></span></span></b>, which estimates the noise level as a function of pixel value.</p><p>Noise can be estimated in two ways:</p><ol><li><b>Temporal variance:</b> at each pixel independently, by taking repeated exposures.</li><li><b>Spatial variance:</b> over regions, by assuming pixel values should be the same within a region (e.g., inside a color checker square).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في الصور الطبيعية التي لا تحتوي على لوحة معايرة، يمكن تعميم النهج للبحث عن مناطق ذات كثافة ثابتة أو متغيرة ببطء.</p><p>يتم ذلك عن طريق تقسيم الصورة إلى مناطق، وملاءمة دالة ثابتة أو خطية داخل كل منطقة، ثم قياس الانحراف المعياري المكاني للاختلافات بين البكسلات الصاخبة والدالة الملساء.</p><p>يتم رسم هذه الانحرافات كدالة لمستوى الإخراج لكل قناة لونية، ويتم ملاءمة غلاف سفلي (Lower envelope) لتجاهل القيم المتطرفة (Outliers) التي قد تمثل تفاصيل حقيقية في الصورة بدلاً من الضوضاء.</p></template>
+    <template class="content-en"><p>In natural photos without a calibration target, the approach can be generalized to look for regions of constant or slowly varying intensity.</p><p>This is done by segmenting the image into regions, fitting a constant or linear function inside each, and measuring the spatial standard deviation of the differences between the noisy pixels and the smooth function.</p><p>These are plotted as a function of output level for each color channel, and a lower envelope is fitted to this distribution to ignore outliers that might represent true image texture rather than noise.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم الغلاف السفلي (Lower envelope) عند تقدير دالة مستوى الضوضاء من صورة طبيعية؟</template>
+      <template class="content-en">Why do we fit a lower envelope when estimating the Noise Level Function from a natural image?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن التباين العالي في بعض المناطق قد يكون ناتجاً عن تفاصيل حقيقية في الصورة (حواف، نسيج) وليس فقط بسبب ضوضاء الكاميرا. الغلاف السفلي يضمن أننا نقيس الحد الأدنى من التباين الذي يمثل الضوضاء الأساسية للمستشعر.</p></template>
+      <template class="content-en"><p>Because high variance in some regions might be due to actual image details (edges, textures) rather than just camera noise. The lower envelope ensures we are measuring the baseline variance that represents the sensor's inherent noise.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="vignetting" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">3</span> التظليل المحيطي (Vignetting)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Vignetting</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>هو مشكلة شائعة تتمثل في تعتيم زوايا الصورة، وتحدث غالباً عند استخدام عدسات واسعة الزاوية أو فتحات عدسة كبيرة.</p></template>
+    <template class="content-en"><p>A common problem where the image tends to darken in the corners, especially when using wide-angle and wide-aperture lenses.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يأتي <span class="smart-term" data-term-en="Vignetting" data-ar="التظليل المحيطي" data-en-def="The reduction of an image&#x27;s brightness or saturation toward the periphery compared to the image center.">التظليل المحيطي<span class="smart-term-tooltip"></span></span> في عدة أشكال مختلفة، بما في ذلك التظليل الطبيعي، والبصري، والميكانيكي.</p><p>طرق معايرة التظليل المحيطي:</p><ol><li><b>الطريقة الأكثر دقة:</b> استخدام كرة دمج (Integrating sphere) أو التقاط صورة لجدار فارغ مضاء وملون بشكل موحد.</li><li><b>طريقة بديلة (الخياطة البانورامية):</b> خياطة مشهد بانورامي وافتراض أن الإشعاع الحقيقي عند كل بكسل يأتي من الجزء المركزي لكل صورة مدخلة (حيث يكون التظليل أقل ما يمكن).</li><li><b>صورة واحدة:</b> إذا توفرت صورة واحدة فقط، يمكن تقدير التظليل من خلال البحث عن اختلافات بطيئة ومتسقة في الكثافة في الاتجاه الشعاعي (Radial direction).</li></ol></template>
+    <template class="content-en"><p><span class="smart-term" data-term-en="Vignetting" data-ar="التظليل المحيطي" data-en-def="The reduction of an image&#x27;s brightness or saturation toward the periphery compared to the image center.">Vignetting<span class="smart-term-tooltip"></span></span> comes in several different forms, including natural, optical, and mechanical vignetting.</p><p>Methods to calibrate vignetting:</p><ol><li><b>Most accurate way:</b> use an integrating sphere or a picture of a uniformly colored and illuminated blank wall.</li><li><b>Alternative approach (Panoramic stitching):</b> stitch a panoramic scene and assume that the true radiance at each pixel comes from the central portion of each input image.</li><li><b>Single image:</b> If only a single image is available, vignetting can be estimated by looking for slow consistent intensity variations in the radial direction.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><ul><li><strong>التظليل الميكانيكي</strong> يحدث بسبب حجب الضوء بواسطة أجزاء مادية من العدسة أو غطاء العدسة.</li><li><strong>التظليل البصري</strong> يعتمد على تصميم العدسة المتعددة العناصر،</li><li>بينما <strong>التظليل الطبيعي</strong> يتبع قانون \((\cos^4)\) لزاوية السقوط.</li></ul><p>في التصوير الحسابي، إزالة التظليل ضرورية قبل دمج الصور (مثل البانوراما) لتجنب ظهور طبقات أو بقع داكنة عند حواف التداخل بين الصور.</p></template>
+    <template class="content-en"><p>Mechanical vignetting is caused by physical blockage of light by lens barrels or hoods. Optical vignetting depends on the multi-element lens design, while natural vignetting follows the \(\cos^4\) law of illumination falloff.</p><p>In computational photography, removing vignetting is crucial before image blending (like panoramas) to avoid visible seams or mottled dark patches at the overlapping boundaries.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُفترض في الخياطة البانورامية أن الإشعاع الحقيقي يأتي من الجزء المركزي للصورة؟</template>
+      <template class="content-en">Why is it assumed in panoramic stitching that the true radiance comes from the central portion of the image?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن تأثير التظليل المحيطي يكون في حده الأدنى (أو معدوماً) في مركز العدسة، ويزداد كلما اتجهنا نحو الحواف. لذا، المركز يمثل القياس الأكثر دقة للإشعاع الحقيقي للمشهد.</p></template>
+      <template class="content-en"><p>Because the vignetting effect is minimal (or zero) at the optical center of the lens and increases towards the edges. Therefore, the center provides the most accurate measurement of the scene's true radiance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="optical-blur-psf" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> تقدير الضبابية البصرية (Optical Blur / PSF)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Optical Blur (Spatial Response) Estimation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>دالة انتشار النقطة (PSF) هي شكل نواة الالتفاف (Convolution kernel) التي تصف كيف تتوزع نقطة ضوئية واحدة لتشكل ضبابية في الصورة الملتقطة.</p></template>
+    <template class="content-en"><p>The Point Spread Function (PSF) is the shape of the convolution kernel that encodes the optical blur applied to the incoming image.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>الضبابية البصرية تشفر التمويه الذي يتم التفافه (Convolved) مع الصورة الواردة لإنتاج الصورة المأخوذة كعينات.</p><p>تعتمد <span class="smart-term" data-term-en="Point Spread Function (PSF)" data-ar="دالة انتشار النقطة" data-en-def="Describes the response of an imaging system to a point source or point object, effectively the shape of the convolution kernel causing optical blur.">دالة انتشار النقطة<span class="smart-term-tooltip"></span></span> (PSF) على عدة عوامل:</p><ul><li>ضبابية العدسة والتشوه الشعاعي.</li><li>مرشحات منع التعرج (Anti-aliasing filters) أمام المستشعر.</li><li>شكل ومدى كل منطقة بكسل نشطة.</li></ul><p><b>طرق تقدير PSF:</b></p><ol><li>مراقبة مصدر ضوء نقطي صغير جداً في كل مكان في الصورة.</li><li>مراقبة صورة تتكون من خطوط أو أشرطة مستقيمة طويلة.</li><li>استخدام نمط معايرة (Calibration pattern) وتقليل الخطأ بين الصورة الملتقطة والصورة المتوقعة.</li><li>بدون نمط معايرة: عن طريق ملاءمة حواف متدرجة (Step edges) للحواف الممتدة في الصورة الطبيعية.</li></ol></template>
+    <template class="content-en"><p>Optical blur encodes the blur that gets convolved with the incoming image to produce the point-sampled image.</p><p>The <span class="smart-term" data-term-en="Point Spread Function (PSF)" data-ar="دالة انتشار النقطة" data-en-def="Describes the response of an imaging system to a point source or point object, effectively the shape of the convolution kernel causing optical blur.">Point Spread Function (PSF)<span class="smart-term-tooltip"></span></span> depends on several factors:</p><ul><li>Lens blur and radial distortion.</li><li>Anti-aliasing filters in front of the sensor.</li><li>The shape and extent of each active pixel area.</li></ul><p><b>Methods to estimate PSF:</b></p><ol><li>Observing an infinitely small point light source everywhere in the image.</li><li>Observing an image composed of long straight lines or bars.</li><li>Using a calibration pattern and minimizing the error between the sensed and predicted image.</li><li>Without a calibration pattern: by fitting step edges to elongated edges found in a natural image.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>عند استخدام نمط معايرة، يتم صياغة المشكلة كعملية تحسين (Optimization) لإيجاد النواة $K$ التي تقلل الفرق المربع بين الصورة الملتقطة $B$ والصورة الحادة المتوقعة $I$ بعد تطبيق الالتفاف والتقليل الاختياري للدقة $D$.</p><p>في حالة عدم وجود نمط معايرة (Blind Deconvolution جزئي)، تعتمد الخوارزميات على إيجاد حواف حادة في المشهد الطبيعي (مثل حواف المباني) واستخدام التدرج اللوني عبر هذه الحواف لتقدير شكل النواة التي تسببت في هذا التمويه.</p></template>
+    <template class="content-en"><p>When using a calibration pattern, the problem is formulated as an optimization to find the kernel $K$ that minimizes the squared difference between the sensed image $B$ and the predicted sharp image $I$ after convolution and optional downsampling $D$.</p><p>In the absence of a calibration pattern (partial Blind Deconvolution), algorithms rely on finding sharp step edges in the natural scene (like building edges) and using the intensity profile across these edges to estimate the shape of the blur kernel.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>حيث B هي الصورة الملتقطة (الضبابية)، I هي الصورة المتوقعة (الحادة)، D هو عامل تقليل الدقة، و K هي نواة PSF المراد تقديرها.</strong></template>
+      <template class="content-en"><strong>Where B is the sensed (blurred) image, I is the predicted (sharp) image, D is an optional downsampling operator, and K is the PSF kernel to be estimated.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$K = \arg\min_K ||B - D(I * K)||^2$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نحتاج إلى عامل تقليل الدقة (D) في معادلة تقدير PSF؟</template>
+      <template class="content-en">Why do we need the downsampling operator (D) in the PSF estimation equation?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الصورة الحادة المتوقعة (I) قد يتم توليدها أو نمذجتها بدقة أعلى (Sub-pixel resolution) لتمثيل الحواف بدقة، بينما الصورة الملتقطة (B) محدودة بدقة شبكة المستشعر. عامل D يطابق دقة الصورة المثالية مع الصورة الملتقطة.</p></template>
+      <template class="content-en"><p>Because the predicted sharp image (I) might be modeled at a higher (sub-pixel) resolution to accurately represent edges, while the sensed image (B) is limited by the sensor's pixel grid. The operator D matches the resolution of the ideal image to the sensed image.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="image-matting-compositing" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> فصل الصورة وتركيبها (Image Matting and Compositing)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Image Matting and Compositing</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>فصل الصورة (Matting) هو عملية قص كائن أمامي من صورة، و<span class="smart-term" data-term-en="Compositing" data-ar="التركيب" data-en-def="The process of combining visual elements from separate sources into single images.">التركيب<span class="smart-term-tooltip"></span></span> (Compositing) هو لصقه على خلفية جديدة.</p></template>
+    <template class="content-en"><p>Matting is the process of cutting a foreground object out of one image, and compositing is pasting it against a new background.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُستخدم هذه التقنيات بشكل شائع في إنتاج التلفزيون والأفلام لتركيب ممثل حي أمام صور مولدة بالحاسوب (CGI).</p><p><b>تقنيات الفصل (Matting techniques):</b></p><ul><li><b>فصل الشاشة الزرقاء (Blue screen matting):</b> يفترض أن الخلفية ذات لون ثابت ومعروف (أزرق أو أخضر).</li><li><b>فصل الصورة الطبيعية (Natural image matting):</b> كل من المقدمة والخلفية غير معروفين ومعقدين.</li><li><b>مشاكل فصل أخرى:</b> فصل الظل (Shadow matting)، فصل الدخان، فصل الفلاش، وفصل البيئة.</li></ul></template>
+    <template class="content-en"><p>It is commonly used in television and film production to composite a live actor in front of computer-generated imagery.</p><p><b>Matting techniques:</b></p><ul><li><b>Blue screen matting:</b> assumes that the background is a constant known color.</li><li><b>Natural image matting:</b> both foreground and background are unknown.</li><li><b>Other matting problems:</b> shadow matting, flash matting, and environment matting.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>المعادلة الأساسية للتركيب هي معادلة ألفا (Alpha blending): $C = \alpha F + (1 - \alpha) B$. الهدف من خوارزميات الفصل هو إيجاد قيمة $\alpha$ (الشفافية) ولون المقدمة $F$ لكل بكسل.</p><p>هذه المشكلة غير محددة بشكل كافٍ (Ill-posed) لأنه لكل بكسل لدينا 3 معادلات (RGB للصورة المركبة C) ولكن لدينا 7 مجاهيل (RGB للمقدمة، RGB للخلفية، وقيمة ألفا). لذلك نحتاج إلى قيود إضافية مثل معرفة لون الخلفية (الشاشة الزرقاء) أو استخدام خريطة ثلاثية (Trimap).</p></template>
+    <template class="content-en"><p>The fundamental <span class="smart-term" data-term-en="Compositing" data-ar="التركيب" data-en-def="The process of combining visual elements from separate sources into single images.">compositing<span class="smart-term-tooltip"></span></span> equation is the alpha blending equation: $C = \alpha F + (1 - \alpha) B$. The goal of matting algorithms is to find the opacity $\alpha$ and the foreground color $F$ for each pixel.</p><p>This problem is inherently ill-posed because for each pixel we have 3 equations (RGB of composite C) but 7 unknowns (RGB of F, RGB of B, and $\alpha$). Therefore, we need additional constraints like knowing the background color (blue screen) or using a user-provided Trimap.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة التركيب الأساسية: C هي الصورة النهائية، F لون المقدمة، B لون الخلفية، و ألفا هي نسبة العتامة (Opacity).</strong></template>
+      <template class="content-en"><strong>Basic compositing equation: C is the composite color, F is foreground, B is background, and alpha is the opacity.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$C = \alpha F + (1 - \alpha)B$$</div>
+  </div>
+
+  <!-- DIAGRAM[2]: Detailed SVG generation prompt: Show the matting and compositing process. Left: 'Input' image (woman on black background). Middle arrow labeled 'matting' points to 'Alpha-matting' image (woman with transparent/alpha channel shown). Right arrow labeled 'compositing' points to 'Output' image (woman placed on a new forest background). Style: educational, dark background #0d1117, accent color #3b82f6. -->
+<div class="svg-diagram" data-diagram-id="2">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 420" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrow Marker -->
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+        </marker>
+
+        <!-- Checkerboard Pattern for Alpha Transparency -->
+        <pattern id="checkerboard" width="20" height="20" patternUnits="userSpaceOnUse">
+            <rect width="20" height="20" fill="var(--bg-surface)" />
+            <rect width="10" height="10" fill="var(--bg-elevated)" />
+            <rect x="10" y="10" width="10" height="10" fill="var(--bg-elevated)" />
+        </pattern>
+
+        <!-- Reusable Woman Silhouette -->
+        <g id="woman-shape">
+            <!-- Head -->
+            <path d="M 80 25 C 60 25, 50 45, 50 65 C 50 85, 65 95, 80 95 C 95 95, 110 85, 110 65 C 110 45, 100 25, 80 25 Z" />
+            <!-- Torso -->
+            <path d="M 80 105 C 40 105, 20 150, 20 180 L 140 180 C 140 150, 120 105, 80 105 Z" />
+        </g>
+
+        <!-- Clip Path for Panel 3 (Output Image) -->
+        <clipPath id="panel3-clip">
+            <rect x="560" y="80" width="160" height="180" rx="12" />
+        </clipPath>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Main Title -->
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Image Matting and Compositing</text>
+    <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">فصل وتركيب الصور</text>
+
+    <!-- ========================================== -->
+    <!-- PANEL 1: INPUT IMAGE                       -->
+    <!-- ========================================== -->
+    <g id="panel1">
+        <!-- Solid Background (Blue Screen) -->
+        <rect x="80" y="80" width="160" height="180" rx="12" fill="var(--brand-600)" />
+        
+        <!-- Foreground Subject -->
+        <use href="#woman-shape" x="80" y="80" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="3" stroke-linejoin="round" />
+        
+        <!-- Context Tag -->
+        <rect x="115" y="90" width="90" height="24" rx="4" fill="var(--bg-surface)" opacity="0.85" />
+        <text x="160" y="107" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Blue Screen</text>
+        <text x="160" y="107" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">شاشة زرقاء</text>
+
+        <!-- Labels -->
+        <text x="160" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Input Image</text>
+        <text x="160" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الصورة الأصلية</text>
+        
+        <text x="160" y="305" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Foreground + Background)</text>
+        <text x="160" y="305" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(المقدمة + الخلفية)</text>
+    </g>
+
+    <!-- ARROW 1: MATTING -->
+    <line x1="255" y1="170" x2="305" y2="170" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <text x="280" y="155" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Matting</text>
+    <text x="280" y="155" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">عملية الفصل</text>
+
+    <!-- ========================================== -->
+    <!-- PANEL 2: ALPHA MATTE                       -->
+    <!-- ========================================== -->
+    <g id="panel2">
+        <!-- Checkerboard Background (Transparency) -->
+        <rect x="320" y="80" width="160" height="180" rx="12" fill="url(#checkerboard)" stroke="var(--border-color)" stroke-width="1" />
+        
+        <!-- Extracted Subject -->
+        <use href="#woman-shape" x="320" y="80" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="3" stroke-linejoin="round" />
+        
+        <!-- Alpha Matte Inset (Grayscale representation) -->
+        <g transform="translate(430, 90)">
+            <text x="20" y="-8" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-secondary)">Alpha (α)</text>
+            <rect width="40" height="50" rx="4" fill="var(--bg-surface)" stroke="var(--border-color)" stroke-width="2" />
+            <g transform="scale(0.25) translate(-10, -10)">
+                <use href="#woman-shape" fill="var(--text-primary)" />
+            </g>
+        </g>
+
+        <!-- Labels -->
+        <text x="400" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Alpha Matte</text>
+        <text x="400" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">قناع الألفا (Alpha Matte)</text>
+        
+        <text x="400" y="305" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Extracted Foreground)</text>
+        <text x="400" y="305" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(المقدمة المفصولة)</text>
+    </g>
+
+    <!-- ARROW 2: COMPOSITING -->
+    <line x1="495" y1="170" x2="545" y2="170" stroke="var(--brand-500)" stroke-width="3" marker-end="url(#arrow)" />
+    <text x="520" y="155" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Compositing</text>
+    <text x="520" y="155" text-anchor="middle" font-size="14" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">عملية التركيب</text>
+
+    <!-- ========================================== -->
+    <!-- PANEL 3: OUTPUT IMAGE                      -->
+    <!-- ========================================== -->
+    <g id="panel3">
+        <!-- Forest Background (Clipped to rounded rect) -->
+        <g clip-path="url(#panel3-clip)">
+            <!-- Sky -->
+            <rect x="560" y="80" width="160" height="180" fill="var(--bg-elevated)" />
+            <!-- Sun -->
+            <circle cx="680" cy="120" r="20" fill="var(--brand-400)" />
+            <!-- Mountains -->
+            <polygon points="540,260 620,150 700,260" fill="var(--brand-600)" opacity="0.8"/>
+            <polygon points="630,260 690,170 760,260" fill="var(--brand-700)" opacity="0.9"/>
+            <!-- Ground -->
+            <rect x="560" y="240" width="160" height="20" fill="var(--brand-800)" />
+            
+            <!-- Composited Subject -->
+            <use href="#woman-shape" x="560" y="80" fill="var(--text-primary)" stroke="var(--bg-surface)" stroke-width="3" stroke-linejoin="round" />
+        </g>
+        
+        <!-- Panel Border -->
+        <rect x="560" y="80" width="160" height="180" rx="12" fill="none" stroke="var(--border-color)" stroke-width="1" />
+
+        <!-- Context Tag -->
+        <rect x="580" y="90" width="120" height="24" rx="4" fill="var(--bg-surface)" opacity="0.85" />
+        <text x="640" y="107" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">New Background</text>
+        <text x="640" y="107" text-anchor="middle" font-size="13" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">خلفية جديدة</text>
+
+        <!-- Labels -->
+        <text x="640" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Output Image</text>
+        <text x="640" y="285" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">الصورة النهائية</text>
+        
+        <text x="640" y="305" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">(Foreground + New BG)</text>
+        <text x="640" y="305" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">(المقدمة + خلفية جديدة)</text>
+    </g>
+
+    <!-- ========================================== -->
+    <!-- COMPOSITING EQUATION                       -->
+    <!-- ========================================== -->
+    <g id="equation">
+        <rect x="100" y="340" width="600" height="50" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+        
+        <text x="400" y="372" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">
+            Output = α × Foreground + (1 - α) × Background
+        </text>
+        <text x="400" y="372" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">
+            النتيجة = α × المقدمة + (1 - α) × الخلفية
+        </text>
+    </g>
+
+</svg>
+</div>
+
+  <table class="comparison-table">
+    <thead><tr><th></th><th>Blue Screen Matting</th><th>Natural Image Matting</th></tr></thead>
+    <tbody>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">معرفة الخلفية</template>
+          <template class="content-en">Background Knowledge</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">معروفة وثابتة (أزرق/أخضر)</template>
+          <template class="content-en">Known and constant (Blue/Green)</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">غير معروفة ومعقدة</template>
+          <template class="content-en">Unknown and complex</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">المدخلات المطلوبة</template>
+          <template class="content-en">Required Inputs</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">الصورة فقط</template>
+          <template class="content-en">Image only</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">الصورة + خريطة ثلاثية (Trimap)</template>
+          <template class="content-en">Image + Trimap</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+      <tr>
+        <td data-bilingual>
+          <template class="content-ar">التعقيد الحسابي</template>
+          <template class="content-en">Computational Complexity</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-good" data-bilingual>
+          <template class="content-ar">منخفض نسبياً</template>
+          <template class="content-en">Relatively low</template>
+          <span class="content-target"></span>
+        </td>
+        <td class="td-bad" data-bilingual>
+          <template class="content-ar">عالي (يتطلب نماذج إحصائية)</template>
+          <template class="content-en">High (requires statistical modeling)</template>
+          <span class="content-target"></span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر مشكلة استخراج ألفا (Alpha matting) مشكلة غير محددة (Ill-posed) رياضياً؟</template>
+      <template class="content-en">Why is the alpha matting problem considered mathematically ill-posed?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن عدد المجاهيل (7: RGB للمقدمة، RGB للخلفية، وألفا) أكبر من عدد المعادلات المتاحة من البكسل الملاحظ (3: RGB للصورة).</p></template>
+      <template class="content-en"><p>Because the number of unknowns (7: RGB of foreground, RGB of background, and alpha) is greater than the number of available equations from the observed pixel (3: RGB of the composite image).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="blue-screen-matting" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">6</span> فصل الشاشة الزرقاء (Blue Screen Matting)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Blue Screen Matting</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تصوير كائن أمام خلفية ذات لون ثابت (أزرق أو أخضر) لتسهيل استخراج الكائن وعزله.</p></template>
+    <template class="content-en"><p>Filming an actor/object in front of a constant colored background (blue or green) to easily extract the foreground.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في الأصل كان اللون الأزرق الساطع هو المفضل، ولكن الأخضر الساطع يستخدم الآن بشكل أكثر شيوعاً.</p><p><b>خوارزمية ميشيما (Mishima’s algorithm):</b></p><ul><li>تقوم بملاءمة سطحين متعددي السطوح (متمركزين عند متوسط لون الخلفية)، لفصل توزيعات ألوان المقدمة والخلفية.</li><li>تقيس المسافة النسبية للون جديد إلى هذه الأسطح لتقدير قيمة $\alpha$.</li><li><b><span class="smart-term" data-term-en="Blue spill problem" data-ar="مشكلة الانسكاب الأزرق" data-en-def="When translucent pixels around the edges of an object acquire some of the background color.">مشكلة الانسكاب الأزرق<span class="smart-term-tooltip"></span></span> (Blue spill problem):</b> تكتسب البكسلات الشفافة حول حواف الكائن بعضاً من تلوين الخلفية الزرقاء.</li></ul><p><b>فصل الشاشتين (Two-screen matting):</b></p><ul><li>يستخدم أكثر من لون خلفية معروف لزيادة تقييد المعادلات (Over-constrain) المطلوبة لتقدير $\alpha$ ولون المقدمة $F$.</li><li>مثال: تعيين لون الخلفية إلى الأسود ($B=0$) ينتج $C = \alpha F$. استبدال الخلفية بلون آخر $B$ ينتج $C - \alpha F = (1 - \alpha)B$.</li></ul></template>
+    <template class="content-en"><p>Originally bright blue was the preferred color, but bright green is now more commonly used.</p><p><b>Mishima’s algorithm:</b></p><ul><li>Fits two polyhedral surfaces (centered at the mean background color), separating the foreground and background color distributions.</li><li>Measures the relative distance of a novel color to these surfaces to estimate $\alpha$.</li><li><b><span class="smart-term" data-term-en="Blue spill problem" data-ar="مشكلة الانسكاب الأزرق" data-en-def="When translucent pixels around the edges of an object acquire some of the background color.">Blue spill problem<span class="smart-term-tooltip"></span></span>:</b> translucent pixels around the edges of an object acquire some of the background blue coloration.</li></ul><p><b>Two-screen matting:</b></p><ul><li>Uses more than one known background color to over-constrain the equations required to estimate opacity $\alpha$ and foreground color $F$.</li><li>Example: setting background to black ($B=0$) gives $C = \alpha F$. Replacing with another known background $B$ gives $C - \alpha F = (1 - \alpha)B$.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>مشكلة الانسكاب الأزرق (Blue spill) تتطلب معالجة إضافية (Despilling) لإزالة اللون الأزرق الدخيل من حواف الكائن (مثل الشعر أو الزجاج) دون تدمير الألوان الأصلية للكائن.</p><p>طريقة الشاشتين (Two-screen matting) تحل مشكلة نقص المعادلات رياضياً، ولكنها غير عملية في تصوير الفيديو الحي لأنها تتطلب التقاط نفس المشهد الديناميكي مرتين بخلفيتين مختلفتين في نفس اللحظة.</p></template>
+    <template class="content-en"><p>The blue spill problem requires additional processing (despilling) to remove the intrusive blue color from the object's edges (like hair or glass) without destroying the object's original colors.</p><p>Two-screen matting mathematically solves the ill-posed nature of the problem, but it is highly impractical for live-action video because it requires capturing the exact same dynamic scene twice with two different backgrounds simultaneously.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>معادلة فصل الشاشتين حيث يتم استخدام خلفية ثانية B لإنشاء نظام معادلات مقيد بشكل زائد.</strong></template>
+      <template class="content-en"><strong>Two-screen matting equation where a second background B is used to create an over-constrained set of equations.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$C - \alpha F = (1 - \alpha)B$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا أصبح اللون الأخضر أكثر شيوعاً من الأزرق في تصوير الشاشة الملونة (Chroma key)؟</template>
+      <template class="content-en">Why has green become more common than blue in chroma key compositing?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>مستشعرات الكاميرات الرقمية (بسبب نمط باير) تحتوي على ضعف عدد بكسلات اللون الأخضر مقارنة بالأزرق أو الأحمر، مما يجعل القناة الخضراء أقل ضوضاء وأكثر دقة في التفاصيل. كما أن الأخضر أبعد عن درجات لون بشرة الإنسان.</p></template>
+      <template class="content-en"><p>Digital camera sensors (due to the Bayer pattern) have twice as many green pixels as blue or red, making the green channel less noisy and higher in detail. Also, bright green is further away from human skin tones.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="natural-image-matting" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> فصل الصورة الطبيعية (Natural Image Matting)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Natural Image Matting</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استخراج كائن من خلفية معقدة وغير معروفة باستخدام خريطة مبدئية (Trimap) تحدد مناطق المقدمة والخلفية والمناطق المجهولة.</p></template>
+    <template class="content-en"><p>Extracting an object from a complex, unknown background using a Trimap that defines known foreground, known background, and unknown regions.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عندما لا يُعرف شيء عن الخلفية، نستخدم <b><span class="smart-term" data-term-en="Trimap" data-ar="الخريطة الثلاثية" data-en-def="A rough segmentation of an image into three regions: definitely foreground, definitely background, and unknown.">الخريطة الثلاثية<span class="smart-term-tooltip"></span></span> (Trimap)</b> وهي تقسيم تقريبي للمشهد إلى مناطق: مقدمة، خلفية، ومناطق غير معروفة.</p><p><b>خوارزميات فصل الصورة الطبيعية:</b></p><ol><li><b>خوارزمية الضربة القاضية (Knockout algorithm):</b> تحدد أقرب بكسلات معروفة للمقدمة والخلفية، وتدمجها لإنتاج تقدير للون المقدمة $F$ والخلفية $B$ لكل بكسل. يتم تقدير $\alpha$ بناءً على اختلافات الألوان. مشكلتها: تفشل عندما تتكون الخلفية من أكثر من لون محلي سائد.</li><li><b>خوارزمية روزون وتوماسي (Ruzon and Tomasi):</b> تعامل ألوان المقدمة والخلفية كتوزيعات إحصائية (Distributions) مأخوذة من منطقة معينة، وتجد أفضل زوج من المكونات يصف اللون الملاحظ $C$.</li><li><b>الخوارزمية البايزية (Bayesian algorithm):</b> تحسب التقدير الأكثر احتمالاً (MAP) لـ $(F, B, \alpha)$ بالتناوب بين حساب $(F, B)$ وحساب $\alpha$. يتدهور أداؤها مع الخلفيات المعقدة أو الخرائط الثلاثية غير الدقيقة.</li></ol></template>
+    <template class="content-en"><p>When nothing is known about the background, we use a <b><span class="smart-term" data-term-en="Trimap" data-ar="الخريطة الثلاثية" data-en-def="A rough segmentation of an image into three regions: definitely foreground, definitely background, and unknown.">Trimap<span class="smart-term-tooltip"></span></span></b>, which is a rough segmentation of the scene into foreground, background, and unknown regions.</p><p><b>Natural image matting algorithms:</b></p><ol><li><b>Knockout algorithm:</b> nearest known foreground and background pixels are determined and blended to produce a per-pixel estimate of F and B. $\alpha$ is estimated based on color differences. Problem: fails when the background consists of more than one dominant local color.</li><li><b>Ruzon and Tomasi algorithm:</b> treats foreground and background colors as distributions sampled over some region, finding the best pairing of mixture components to describe C.</li><li><b>Bayesian algorithm:</b> computes the most likely (MAP) estimates for $(F, B, \alpha)$ by alternating between computing $(F, B)$ and $\alpha$. Performance degrades with complex backgrounds or inaccurate trimaps.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الخوارزمية البايزية (Bayesian Matting) تعتبر تحسيناً كبيراً لأنها تصيغ المشكلة إحصائياً. تستخدم نماذج خليط غاوسي (GMMs) لنمذجة توزيعات ألوان المقدمة والخلفية محلياً بناءً على الخريطة الثلاثية.</p><p>ثم تقوم بتعظيم الاحتمال البعدي (Maximum A Posteriori - MAP) لإيجاد أفضل قيم لـ F و B و $\alpha$ التي تشرح لون البكسل الملاحظ C. ومع ذلك، إذا كانت الخريطة الثلاثية واسعة جداً (منطقة مجهولة كبيرة) أو الخلفية شديدة التباين، فإن النماذج الإحصائية تفشل في تمثيل الألوان المحلية بدقة.</p></template>
+    <template class="content-en"><p>Bayesian Matting is a significant improvement as it formulates the problem statistically. It uses Gaussian Mixture Models (GMMs) to model the local foreground and background color distributions based on the trimap.</p><p>It then maximizes the posterior probability (MAP) to find the best F, B, and $\alpha$ that explain the observed pixel C. However, if the trimap is too broad (large unknown region) or the background is highly textured/variable, the statistical models fail to accurately represent the local colors.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[3]: Detailed SVG generation prompt: Show a Trimap concept. A silhouette of an object (like a dog). The inner core is solid white (Foreground). The outer area is solid black (Background). The boundary edge (fur/hair) is gray (Unknown region). Labels: 'Foreground (White)', 'Background (Black)', 'Unknown (Gray)'. Style: educational, dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    
+    <!-- Drop Shadow for Trimap Container -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+
+    <!-- Clip Path for Trimap Content -->
+    <clipPath id="trimap-clip">
+      <rect x="220" y="70" width="360" height="330" rx="8" />
+    </clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Natural Image Matting: Trimap</text>
+  <text x="400" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">فصل الصورة الطبيعية: الخريطة الثلاثية (Trimap)</text>
+
+  <!-- Trimap Container (Background Region) -->
+  <rect x="220" y="70" width="360" height="330" rx="8" fill="var(--brand-900)" stroke="var(--border-color)" stroke-width="2" filter="url(#shadow)" />
+
+  <!-- Trimap Inner Paths -->
+  <g clip-path="url(#trimap-clip)">
+    <!-- Unknown Region (Gray / Fur Boundary) -->
+    <path d="M 265 400 L 270 350 L 255 310 L 275 270 L 260 230 L 285 190 L 280 150 L 315 130 L 325 100 L 365 110 L 385 80 L 425 90 L 455 70 L 475 100 L 515 110 L 505 150 L 535 170 L 515 210 L 545 250 L 525 290 L 540 330 L 525 370 L 535 400 Z" fill="var(--brand-500)" />
+    
+    <!-- Foreground Region (White / Solid Core) -->
+    <path d="M 295 400 C 295 320, 285 250, 325 210 C 355 170, 415 170, 445 210 C 485 250, 475 320, 475 400 Z" fill="var(--brand-100)" />
+  </g>
+
+  <!-- ================= POINTERS & LABELS ================= -->
+
+  <!-- 1. Background Label (Left) -->
+  <line x1="170" y1="120" x2="250" y2="120" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <circle cx="170" cy="120" r="4" fill="var(--brand-500)" />
+  
+  <rect x="112" y="75" width="16" height="16" rx="3" fill="var(--brand-900)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="120" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Background (B)</text>
+  <text x="120" y="115" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">الخلفية (B)</text>
+  
+  <text x="120" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Solid Black (0)</text>
+  <text x="120" y="135" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">أسود داكن (0)</text>
+
+  <!-- 2. Unknown Label (Right) -->
+  <line x1="630" y1="200" x2="510" y2="200" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <circle cx="630" cy="200" r="4" fill="var(--brand-500)" />
+  
+  <rect x="672" y="155" width="16" height="16" rx="3" fill="var(--brand-500)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="680" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Unknown (α)</text>
+  <text x="680" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">منطقة غير معروفة (α)</text>
+  
+  <text x="680" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Gray / Blended</text>
+  <text x="680" y="215" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">رمادي / ممزوج</text>
+
+  <!-- 3. Foreground Label (Right) -->
+  <line x1="630" y1="320" x2="450" y2="320" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+  <circle cx="630" cy="320" r="4" fill="var(--brand-500)" />
+  
+  <rect x="672" y="275" width="16" height="16" rx="3" fill="var(--brand-100)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="680" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">Foreground (F)</text>
+  <text x="680" y="315" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">المقدمة (F)</text>
+  
+  <text x="680" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Solid White (1)</text>
+  <text x="680" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">أبيض ناصع (1)</text>
+
+  <!-- ================= BOTTOM CONCEPT BOX ================= -->
+  <rect x="100" y="430" width="600" height="70" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="1" />
+  
+  <text x="400" y="455" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">A Trimap provides a rough segmentation to solve the matting equation:</text>
+  <text x="400" y="455" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">توفر الخريطة الثلاثية تقسيماً أولياً لحل معادلة فصل الصورة:</text>
+
+  <text x="400" y="482" text-anchor="middle" font-family="monospace, 'Courier New', Courier" font-size="18" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-en">C = αF + (1 - α)B</text>
+  <text x="400" y="482" text-anchor="middle" font-family="monospace, 'Courier New', Courier" font-size="18" font-weight="bold" fill="var(--brand-ink-strong)" class="gsvg-ar">C = αF + (1 - α)B</text>
+
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تفشل خوارزمية Knockout عندما تحتوي الخلفية على ألوان متعددة ومتباينة؟</template>
+      <template class="content-en">Why does the Knockout algorithm fail when the background contains multiple, highly contrasting colors?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تعتمد على استيفاء (Interpolation) لون خلفية واحد بناءً على أقرب البكسلات. إذا كانت الخلفية تحتوي على حواف حادة أو ألوان متعددة، فإن اللون المستوفى لن يمثل اللون الحقيقي الموجود خلف البكسل الشفاف، مما يؤدي إلى حساب خاطئ لقيمة ألفا.</p></template>
+      <template class="content-en"><p>Because it relies on interpolating a single background color based on the nearest pixels. If the background has sharp edges or multiple colors, the interpolated color will not accurately represent the true color behind the translucent pixel, leading to an incorrect alpha calculation.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="smoke-shadow-matting" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> فصل الدخان والظل (Smoke and Shadow Matting)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Smoke and Shadow Matting</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تقنيات متخصصة لاستخراج العناصر شبه الشفافة مثل الدخان والظلال من تسلسلات الفيديو لإعادة استخدامها في مشاهد أخرى.</p></template>
+    <template class="content-en"><p>Specialized techniques to extract semi-transparent elements like smoke and shadows from video sequences for reuse in other scenes.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>فصل الدخان (Smoke matting):</b></p><ul><li>بدءاً من تسلسل فيديو، يُنمذج كل بكسل كمزيج خطي من لون خلفيته (غير المعروف) ولون مقدمة ثابت (الدخان) مشترك لجميع البكسلات.</li><li>يُستخدم التصويت في مساحة الألوان (Voting in color space) لتقدير لون المقدمة هذا.</li><li>تُستخدم المسافة على طول كل خط لوني لتقدير قيمة ألفا المتغيرة زمنياً لكل بكسل.</li></ul><p><b>فصل الظل (Shadow matting):</b></p><ul><li>استخراج الظلال وإعادة إدراجها.</li><li>يُفترض أن كل بكسل يتغير بين ألوانه المضاءة بالكامل والمظللة بالكامل.</li><li>يمكن تقدير ذلك بأخذ القيم الدنيا والقصوى (القوية) بمرور الوقت أثناء مرور الظل فوق المشهد.</li><li>يمكن استخدام <span class="smart-term" data-term-en="Fractional shadow matte" data-ar="قناع الظل الجزئي" data-en-def="An alpha channel representation of a shadow that captures the varying degrees of light attenuation, allowing realistic compositing onto new backgrounds.">قناع الظل الجزئي<span class="smart-term-tooltip"></span></span> الناتج (Fractional shadow matte) لإعادة عرض الظل في مشهد جديد.</li></ul></template>
+    <template class="content-en"><p><b>Smoke matting:</b></p><ul><li>Starting with a video sequence, each pixel is modeled as a linear combination of its (unknown) background color and a constant foreground (smoke) color common to all pixels.</li><li>Voting in color space is used to estimate this foreground color.</li><li>Distance along each color line is used to estimate the per-pixel temporally varying alpha.</li></ul><p><b>Shadow matting:</b></p><ul><li>Extracting and re-inserting shadows.</li><li>Each pixel is assumed to vary between its fully lit and fully shadowed colors.</li><li>Estimated by taking (robust) minimum and maximum values over time as a shadow passes over the scene.</li><li>The resulting <span class="smart-term" data-term-en="Fractional shadow matte" data-ar="قناع الظل الجزئي" data-en-def="An alpha channel representation of a shadow that captures the varying degrees of light attenuation, allowing realistic compositing onto new backgrounds.">fractional shadow matte<span class="smart-term-tooltip"></span></span> can be used to re-project the shadow into a new scene.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتمد هذه التقنيات بشكل كبير على المعلومات الزمنية (Temporal information) في الفيديو. في حالة الظل، لا نقوم فقط بتعتيم المشهد الجديد، بل نستخدم قناع الظل المستخرج لـ "ثني" الظل بشكل صحيح فوق الهندسة ثلاثية الأبعاد للمشهد الجديد، مما يحافظ على واقعية الإضاءة.</p></template>
+    <template class="content-en"><p>These techniques rely heavily on temporal information in video. For shadows, we don't just darken the new scene; we use the extracted fractional shadow matte to correctly "drape" the shadow over the 3D geometry of the new scene, preserving lighting realism.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يعتبر فصل الدخان أسهل نسبياً من فصل كائن صلب ذو ألوان متعددة؟</template>
+      <template class="content-en">Why is smoke matting relatively easier than matting a solid object with multiple colors?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الدخان غالباً ما يُفترض أن له لوناً واحداً ثابتاً (مثل الأبيض أو الرمادي) عبر المشهد بأكمله، مما يقلل من عدد المجاهيل في معادلة التركيب ويسمح باستخدام تقنيات التصويت اللوني لتقدير هذا اللون الموحد.</p></template>
+      <template class="content-en"><p>Because smoke is often assumed to have a single, constant color (e.g., white or gray) across the entire scene. This reduces the number of unknowns in the compositing equation and allows the use of color voting techniques to estimate this uniform color.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="texture-analysis-synthesis" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> تحليل وتوليد النسيج (Texture Analysis and Synthesis)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Texture Analysis and Synthesis</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>أخذ عينة صغيرة من نسيج (مثل العشب أو الطوب) وتوليد صورة أكبر تبدو مشابهة بصرياً دون أن تكون مجرد تكرار بسيط.</p></template>
+    <template class="content-en"><p>Taking a small sample of a texture (like grass or bricks) and generating a larger image that looks visually similar without being a simple tiling.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>الاستخدامات:</b> إصلاح العيوب (مثل الثقوب الصغيرة) في الصور، أو إنشاء تصييرات غير واقعية (Painterly renderings) من صور عادية.</p><p><b>خوارزميات توليد النسيج القائمة على الأمثلة (Exemplar-based):</b></p><ul><li>تقوم بتوليد بكسلات النسيج بالتسلسل عن طريق البحث عن أحياء (Neighborhoods) في نسيج المصدر تشبه الصورة التي يتم توليدها حالياً.</li></ul><p><b>تقنية التسريع وتحسين الجودة البصرية (Image Quilting):</b></p><ul><li>بدلاً من توليد بكسل واحد في كل مرة، يتم اختيار كتل مربعة متداخلة (Overlapping square blocks) باستخدام التشابه مع المناطق المولدة مسبقاً.</li><li>بمجرد اختيار الكتل المناسبة، يتم تحديد خط التماس (Seam) بين الكتل المتداخلة حديثاً باستخدام <b><span class="smart-term" data-term-en="Dynamic programming" data-ar="البرمجة الديناميكية" data-en-def="An algorithmic technique used here to find the optimal seam (minimum error path) between overlapping texture blocks.">البرمجة الديناميكية<span class="smart-term-tooltip"></span></span> (Dynamic programming)</b> لتقليل الخطأ البصري عند الحدود.</li></ul></template>
+    <template class="content-en"><p><b>Uses:</b> Repair defects, such as small holes, in images or to create non-photorealistic painterly renderings from regular photographs.</p><p><b>Exemplar-based texture synthesis algorithms:</b></p><ul><li>Sequentially generate texture pixels by looking for neighborhoods in the source texture that are similar to the currently synthesized image.</li></ul><p><b>Acceleration and visual quality improvement technique (Image Quilting):</b></p><ul><li>Instead of synthesizing a single pixel at a time, overlapping square blocks are selected using similarity with previously synthesized regions.</li><li>Once the appropriate blocks have been selected, the seam between newly overlapping blocks is determined using <b><span class="smart-term" data-term-en="Dynamic programming" data-ar="البرمجة الديناميكية" data-en-def="An algorithmic technique used here to find the optimal seam (minimum error path) between overlapping texture blocks.">dynamic programming<span class="smart-term-tooltip"></span></span></b> to minimize the visual error at the boundary.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>توليد بكسل ببكسل (Pixel-by-pixel) بطيء جداً ويمكن أن يؤدي إلى تراكم الأخطاء (Garbage accumulation) حيث يبتعد النسيج المولد عن النمط الأصلي.</p><p>طريقة الكتل (Block-based / Image Quilting) تحل هذه المشكلة عن طريق نسخ هياكل كاملة من المصدر. البرمجة الديناميكية تجد مساراً عبر منطقة التداخل حيث تكون الفروق بين بكسلات الكتلتين في حدها الأدنى، مما يجعل خط التماس غير مرئي تقريباً.</p></template>
+    <template class="content-en"><p>Pixel-by-pixel synthesis is very slow and can lead to garbage accumulation where the synthesized texture drifts away from the original pattern.</p><p>Block-based methods (Image Quilting) solve this by copying entire coherent structures from the source. Dynamic programming finds a path through the overlapping region where the pixel differences between the two blocks are minimal, making the seam almost invisible.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <!-- DIAGRAM[4]: Detailed SVG generation prompt: Illustrate Image Quilting. Show two overlapping square blocks of brick texture (Block B1 and Block B2). Highlight the overlapping vertical region. Inside the overlap, draw a jagged red line representing the 'Minimal error boundary cut' found via dynamic programming. Style: educational, dark background #0d1117. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <!-- Arrowhead Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)" />
+    </marker>
+
+    <!-- Brick Pattern for Block B1 -->
+    <pattern id="brick1" width="40" height="20" patternUnits="userSpaceOnUse">
+      <rect width="40" height="20" fill="var(--bg-elevated)" />
+      <line x1="0" y1="10" x2="40" y2="10" stroke="var(--border-color)" stroke-width="1.5" />
+      <line x1="20" y1="0" x2="20" y2="10" stroke="var(--border-color)" stroke-width="1.5" />
+      <line x1="0" y1="10" x2="0" y2="20" stroke="var(--border-color)" stroke-width="1.5" />
+    </pattern>
+
+    <!-- Brick Pattern for Block B2 (Offset to show mismatch in overlap) -->
+    <pattern id="brick2" width="40" height="20" patternUnits="userSpaceOnUse" patternTransform="translate(15, 8)">
+      <rect width="40" height="20" fill="var(--bg-elevated)" />
+      <line x1="0" y1="10" x2="40" y2="10" stroke="var(--border-color)" stroke-width="1.5" />
+      <line x1="20" y1="0" x2="20" y2="10" stroke="var(--border-color)" stroke-width="1.5" />
+      <line x1="0" y1="10" x2="0" y2="20" stroke="var(--border-color)" stroke-width="1.5" />
+    </pattern>
+
+    <!-- Drop Shadow for Blocks -->
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="2" dy="4" stdDeviation="4" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <g font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <!-- Title -->
+    <text class="gsvg-en" x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)">Image Quilting: Minimal Error Boundary Cut</text>
+    <text class="gsvg-ar" x="400" y="40" text-anchor="middle" font-size="22" font-weight="bold" fill="var(--text-primary)">ترقيع الصور: قطع الحدود بأقل خطأ</text>
+
+    <!-- Block B1 (Left) -->
+    <rect x="120" y="120" width="260" height="240" fill="url(#brick1)" stroke="var(--text-muted)" stroke-width="2" filter="url(#shadow)" />
+    
+    <!-- Block B2 (Right) - Semi-transparent to show overlap clash -->
+    <rect x="300" y="120" width="260" height="240" fill="url(#brick2)" fill-opacity="0.85" stroke="var(--text-muted)" stroke-width="2" filter="url(#shadow)" />
+
+    <!-- Overlap Region Highlight -->
+    <rect x="300" y="120" width="80" height="240" fill="var(--brand-500)" fill-opacity="0.1" stroke="var(--brand-500)" stroke-width="2" stroke-dasharray="6,4" />
+
+    <!-- Jagged Line (Minimal Error Boundary Cut) -->
+    <!-- White/Background glow for contrast -->
+    <path d="M 340 120 L 325 145 L 355 170 L 335 195 L 365 220 L 320 250 L 350 280 L 330 310 L 360 335 L 340 360" stroke="var(--bg-surface)" stroke-width="6" fill="none" stroke-linejoin="round" />
+    <!-- Actual Brand Colored Line -->
+    <path d="M 340 120 L 325 145 L 355 170 L 335 195 L 365 220 L 320 250 L 350 280 L 330 310 L 360 335 L 340 360" stroke="var(--brand-500)" stroke-width="3" fill="none" stroke-linejoin="round" />
+    
+    <!-- Start and End Nodes for the Cut -->
+    <circle cx="340" cy="120" r="4" fill="var(--brand-500)" />
+    <circle cx="340" cy="360" r="4" fill="var(--brand-500)" />
+
+    <!-- Labels for Blocks -->
+    <!-- Block B1 Label -->
+    <rect x="130" y="80" width="180" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text class="gsvg-en" x="220" y="100" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)">Block B1 (Synthesized)</text>
+    <text class="gsvg-ar" x="220" y="100" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)">الكتلة B1 (تم تركيبها)</text>
+
+    <!-- Block B2 Label -->
+    <rect x="450" y="80" width="140" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text class="gsvg-en" x="520" y="100" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)">Block B2 (New)</text>
+    <text class="gsvg-ar" x="520" y="100" text-anchor="middle" font-size="14" font-weight="600" fill="var(--text-primary)">الكتلة B2 (الجديدة)</text>
+
+    <!-- Overlap Region Annotation -->
+    <text class="gsvg-en" x="340" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)">Overlapping Region</text>
+    <text class="gsvg-ar" x="340" y="405" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)">منطقة التداخل</text>
+    <line x1="340" y1="385" x2="340" y2="370" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" />
+
+    <!-- Boundary Cut Annotation -->
+    <text class="gsvg-en" x="620" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)">Minimal Error Boundary Cut</text>
+    <text class="gsvg-ar" x="620" y="235" text-anchor="middle" font-size="16" font-weight="bold" fill="var(--brand-ink)">مسار قطع الحدود بأقل خطأ</text>
+    
+    <text class="gsvg-en" x="620" y="255" text-anchor="middle" font-size="14" fill="var(--text-secondary)">(Dynamic Programming)</text>
+    <text class="gsvg-ar" x="620" y="255" text-anchor="middle" font-size="14" fill="var(--text-secondary)">(البرمجة الديناميكية)</text>
+    
+    <path d="M 500 240 L 385 240" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow)" fill="none" />
+  </g>
+</svg>
+</div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نستخدم البرمجة الديناميكية لدمج الكتل بدلاً من مجرد مزجها (Blending) بشفافية متدرجة؟</template>
+      <template class="content-en">Why use dynamic programming to merge blocks instead of just blending them with a gradient alpha?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>المزج البسيط (Blending) سيؤدي إلى ضبابية (Blurring) أو ظهور أشباح (Ghosting) في منطقة التداخل إذا لم تكن الهياكل (مثل خطوط الطوب) متطابقة تماماً. البرمجة الديناميكية تقطع حول الهياكل، مما يحافظ على حدة الصورة وواقعيتها.</p></template>
+      <template class="content-en"><p>Simple blending would cause blurring or ghosting in the overlap region if the structures (like brick lines) are not perfectly aligned. Dynamic programming cuts around the structures, preserving the sharpness and realism of the texture.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="inpainting-texture-transfer" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> التلوين الداخلي ونقل النسيج (Inpainting and Texture Transfer)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Application: Hole filling, Inpainting, and Texture Transfer</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التلوين الداخلي (Inpainting) هو ملء الثقوب في الصور، بينما نقل النسيج (Texture Transfer) هو تطبيق خصائص نسيج صورة على صورة أخرى.</p></template>
+    <template class="content-en"><p>Inpainting is filling holes left by removed objects, while Texture Transfer applies the texture characteristics of one image onto a target image.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>التلوين الداخلي (Inpainting / Hole filling):</b></p><ul><li>التطبيق الأكثر شيوعاً لتوليد النسيج هو ملء الثقوب المتبقية عند إزالة كائنات أو عيوب من الصور.</li><li>تستعير معظم الخوارزميات قطعاً صغيرة من الصورة الأصلية لملء الثقوب.</li><li>عند توفر قاعدة بيانات كبيرة، يمكن نسخ منطقة صورة متجاورة واحدة لملء الثقب.</li><li><b>التقنيات الحديثة تستخدم الشبكات العصبية العميقة (Deep Neural Networks):</b> مثل الالتفافات الجزئية (Partial convolutions)، نشر هياكل الحواف، الانتباه متعدد الدقة (Multi-resolution attention)، والتغذية الراجعة التكرارية للثقة.</li></ul><p><b>التصيير غير الواقعي (Non-photorealistic rendering):</b></p><ul><li><b>نقل النسيج (Texture transfer):</b> يأخذ صورة مرجعية (أو هدف)، ويحاول مطابقة خصائص معينة للصورة الهدف مع الصورة المولدة حديثاً (مثل رسم وجه بشري باستخدام نسيج الأرز).</li></ul></template>
+    <template class="content-en"><p><b><span class="smart-term" data-term-en="Inpainting" data-ar="التلوين الداخلي / ترميم الصور" data-en-def="The process of reconstructing lost or deteriorated parts of images and videos.">Inpainting<span class="smart-term-tooltip"></span></span> (Hole filling):</b></p><ul><li>Most common application of texture synthesis is filling holes left behind when objects or defects are excised from photographs.</li><li>Most algorithms borrow small pieces of the original image to fill in the holes.</li><li>When a large database is available, it's possible to copy a single contiguous image region to fill the hole.</li><li><b>Latest techniques use Deep Neural Networks:</b> such as Partial convolutions, propagation of edge structures, Multi-resolution attention, and Iterative confidence feedback.</li></ul><p><b>Non-photorealistic rendering:</b></p><ul><li><b>Texture transfer:</b> takes a reference (or target) image, and tries to match certain characteristics of the target image with the newly synthesized image (e.g., rendering a face using a rice texture).</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في التلوين الداخلي القائم على الأمثلة (Exemplar-based inpainting)، ترتيب ملء البكسلات أمر بالغ الأهمية. الخوارزميات الجيدة تعطي الأولوية لملء الحواف والهياكل الخطية أولاً (Propagation along isophote directions) قبل ملء المناطق المسطحة، للحفاظ على الهيكل العام للمشهد.</p><p>في نقل النسيج، يتم تعديل دالة التكلفة (Cost function) في خوارزمية توليد النسيج لتشمل مصطلحين:</p><ul><li><strong>الأول</strong> يضمن أن النسيج المولد يشبه نسيج المصدر،</li><li><strong>والثاني</strong> يضمن أن كثافة (أو لون) النسيج المولد تتطابق مع الصورة الهدف.</li></ul></template>
+    <template class="content-en"><p>In exemplar-based inpainting, the filling order is critical. Good algorithms prioritize filling edges and linear structures first (propagation along isophote directions) before filling flat regions, to preserve the global structure of the scene.</p><p>In texture transfer, the cost function of the texture synthesis algorithm is modified to include two terms:</p><ul><li><strong>one</strong> ensures the synthesized patch matches the source texture,</li><li>and <strong>the other</strong> ensures the intensity/color of the patch matches the target image.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تتفوق الشبكات العصبية العميقة على الطرق التقليدية (القائمة على الأمثلة) في ملء الثقوب الكبيرة جداً؟</template>
+      <template class="content-en">Why do deep neural networks outperform traditional (exemplar-based) methods in filling very large holes?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>الطرق التقليدية تعتمد فقط على نسخ ما هو موجود في الصورة، وتفشل إذا كان الثقب يتطلب توليد هيكل جديد غير موجود في مكان آخر (مثل وجه شخص). الشبكات العصبية تتعلم دلالات الأشياء (Semantics) من ملايين الصور، مما يسمح لها بـ 'تخيل' وتوليد محتوى جديد منطقي لملء الفراغ.</p></template>
+      <template class="content-en"><p>Traditional methods rely solely on copying existing patches from the image and fail if the hole requires generating a novel structure not present elsewhere (like a missing face). Neural networks learn semantics from millions of images, allowing them to 'hallucinate' and generate logically consistent novel content.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="professor" class="professor-card glass-card fade-up">
+  <div class="professor-header">
+    <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
+    <h2 data-i18n="prof.title">حديث البروفيسور</h2>
+  </div>
+  <div class="professor-text" data-bilingual>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الممتعة حول التصوير الحسابي. تخيلوا أن الكاميرا ليست مجرد عين تلتقط الضوء، بل هي حاسوب يعيد بناء الواقع. لكي ندمج الصور أو نعدلها باحترافية، يجب أولاً أن 'نعاير' هذه الكاميرا (Photometric Calibration) لنفهم كيف تحول الضوء إلى أرقام، وكيف تضيف الضوضاء، وكيف تعتم الزوايا (Vignetting). بمجرد أن نفهم ذلك، ننتقل إلى سحر السينما: فصل الصور (Matting). تذكروا دائماً أن معادلة التركيب الأساسية بها مجاهيل أكثر من المعادلات، لذا نلجأ لحيل مثل الشاشة الخضراء أو الخريطة الثلاثية (Trimap) لحلها. وأخيراً، تحدثنا عن توليد النسيج (Texture Synthesis) وترميم الصور (Inpainting). ركزوا جيداً في الامتحان على الفرق بين خوارزميات الفصل (متى نستخدم Knockout ومتى نستخدم Bayesian)، ولماذا نستخدم البرمجة الديناميكية في دمج الأنسجة. بالتوفيق!</template>
+    <template class="content-en">Welcome, my friends, to this fascinating module on Computational Photography. Imagine the camera not just as an eye capturing light, but as a computer reconstructing reality. To professionally merge or edit images, we must first 'calibrate' this camera (Photometric Calibration) to understand how it converts light to numbers, adds noise, and darkens corners (Vignetting). Once we grasp that, we move to movie magic: Image Matting. Always remember that the basic compositing equation has more unknowns than equations, so we use tricks like green screens or Trimaps to solve it. Finally, we discussed Texture Synthesis and Inpainting. For the exam, focus heavily on the differences between matting algorithms (when to use Knockout vs. Bayesian) and why we use dynamic programming in texture quilting. Good luck!</template>
+    <div class="content-target"></div>
+  </div>
+</section>
+
+<section id="ask-professor" class="fade-up section-gap">
+  <h2><i class="fa-solid fa-circle-question sec-icon" aria-hidden="true"></i> <span data-i18n="ask.title">اسأل البروفيسور</span></h2>
+  <div class="accordion">
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر المعايرة الضوئية خطوة حاسمة قبل دمج عدة صور (مثل صور البانوراما)؟</template>
+          <template class="content-en">Why is photometric calibration a crucial step before merging multiple images (like panoramas)?</template>
+          <span class="content-target">لماذا تعتبر المعايرة الضوئية خطوة حاسمة قبل دمج عدة صور (مثل صور البانوراما)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن الكاميرات تطبق تحويلات غير خطية (مثل منحنى جاما) وتظليل محيطي. إذا دمجنا الصور دون معايرة، ستظهر خطوط واضحة (Seams) واختلافات في الإضاءة عند مناطق التداخل.</template>
+          <template class="content-en">Because cameras apply non-linear transformations (like gamma curves) and vignetting. If we merge images without calibration, visible seams and lighting inconsistencies will appear at the overlapping regions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو الفرق بين التباين الزمني والتباين المكاني في تقدير الضوضاء؟</template>
+          <template class="content-en">What is the difference between temporal and spatial variance in noise estimation?</template>
+          <span class="content-target">ما هو الفرق بين التباين الزمني والتباين المكاني في تقدير الضوضاء؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التباين الزمني يقيس الضوضاء لبكسل واحد عبر التقاط صور متعددة لنفس المشهد الثابت. التباين المكاني يقيس الضوضاء عبر منطقة من البكسلات يُفترض أن يكون لها نفس اللون في صورة واحدة.</template>
+          <template class="content-en">Temporal variance measures noise for a single pixel across multiple captures of the same static scene. Spatial variance measures noise across a region of pixels assumed to have the same color in a single image.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تحل طريقة 'فصل الشاشتين' (Two-screen matting) المشكلة الرياضية للفصل؟</template>
+          <template class="content-en">How does 'Two-screen matting' solve the mathematical problem of matting?</template>
+          <span class="content-target">كيف تحل طريقة 'فصل الشاشتين' (Two-screen matting) المشكلة الرياضية للفصل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">من خلال التقاط نفس الكائن الأمامي مرتين بخلفيتين مختلفتين معروفتين، فإنها توفر معادلات إضافية (Over-constrain) تتجاوز عدد المجاهيل، مما يسمح بحساب دقيق لقيمة ألفا ولون المقدمة.</template>
+          <template class="content-en">By capturing the same foreground object twice against two different known backgrounds, it provides additional equations (over-constraining the system) that exceed the number of unknowns, allowing exact calculation of alpha and foreground color.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">متى تفشل خوارزمية Knockout في فصل الصورة الطبيعية؟</template>
+          <template class="content-en">When does the Knockout algorithm fail in natural image matting?</template>
+          <span class="content-target">متى تفشل خوارزمية Knockout في فصل الصورة الطبيعية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تفشل عندما تكون الخلفية معقدة وتحتوي على ألوان محلية سائدة متعددة، لأنها تعتمد على استيفاء لون خلفية واحد بسيط، مما يؤدي إلى حساب خاطئ للشفافية.</template>
+          <template class="content-en">It fails when the background is complex and contains multiple dominant local colors, because it relies on interpolating a simple single background color, leading to incorrect transparency calculations.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي الميزة الرئيسية للخوارزمية البايزية (Bayesian Matting) مقارنة بالطرق الأقدم؟</template>
+          <template class="content-en">What is the main advantage of Bayesian Matting compared to older methods?</template>
+          <span class="content-target">ما هي الميزة الرئيسية للخوارزمية البايزية (Bayesian Matting) مقارنة بالطرق الأقدم؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تستخدم النماذج الإحصائية (توزيعات غاوسية) لتمثيل تباين الألوان في المقدمة والخلفية، مما يسمح لها بالتعامل مع الخلفيات الأكثر تعقيداً بشكل أفضل من طرق الاستيفاء البسيطة.</template>
+          <template class="content-en">It uses statistical models (Gaussian distributions) to represent color variations in the foreground and background, allowing it to handle more complex backgrounds better than simple interpolation methods.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في فصل الظل (Shadow matting)، لماذا نأخذ القيم الدنيا والقصوى بمرور الوقت؟</template>
+          <template class="content-en">In shadow matting, why do we take minimum and maximum values over time?</template>
+          <span class="content-target">في فصل الظل (Shadow matting)، لماذا نأخذ القيم الدنيا والقصوى بمرور الوقت؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأننا نفترض أن البكسل يتغير بين حالته المضاءة بالكامل (القيمة القصوى) وحالته المظللة بالكامل (القيمة الدنيا) أثناء مرور الظل، مما يسمح لنا بحساب قناع الظل الجزئي.</template>
+          <template class="content-en">Because we assume a pixel varies between its fully lit state (maximum value) and fully shadowed state (minimum value) as the shadow passes, allowing us to compute the fractional shadow matte.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفضل توليد النسيج القائم على الكتل (Block-based) بدلاً من بكسل ببكسل؟</template>
+          <template class="content-en">Why do we prefer block-based texture synthesis over pixel-by-pixel?</template>
+          <span class="content-target">لماذا نفضل توليد النسيج القائم على الكتل (Block-based) بدلاً من بكسل ببكسل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">لأن التوليد بكسل ببكسل بطيء جداً وعرضة لتراكم الأخطاء (Garbage accumulation). طريقة الكتل تنسخ هياكل كاملة، مما يحافظ على النمط العام ويسرع العملية.</template>
+          <template class="content-en">Because pixel-by-pixel synthesis is very slow and prone to garbage accumulation. Block-based methods copy entire structures, preserving the global pattern and speeding up the process.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو دور البرمجة الديناميكية في خوارزمية Image Quilting؟</template>
+          <template class="content-en">What is the role of dynamic programming in the Image Quilting algorithm?</template>
+          <span class="content-target">ما هو دور البرمجة الديناميكية في خوارزمية Image Quilting؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">تُستخدم لإيجاد مسار القطع الأمثل (الذي يحتوي على أقل فرق في الألوان) داخل منطقة التداخل بين كتلتين، مما يجعل خط التماس غير مرئي.</template>
+          <template class="content-en">It is used to find the optimal cut path (with the minimum color difference) within the overlapping region between two blocks, making the seam invisible.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تختلف تقنيات التلوين الداخلي (Inpainting) الحديثة عن التقليدية؟</template>
+          <template class="content-en">How do modern Inpainting techniques differ from traditional ones?</template>
+          <span class="content-target">كيف تختلف تقنيات التلوين الداخلي (Inpainting) الحديثة عن التقليدية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">التقليدية تنسخ فقط أجزاء موجودة من الصورة لملء الثقب. الحديثة تستخدم الشبكات العصبية العميقة لفهم السياق وتوليد محتوى جديد تماماً ومنطقي لملء الفراغات الكبيرة.</template>
+          <template class="content-en">Traditional ones only copy existing patches from the image to fill the hole. Modern ones use deep neural networks to understand context and generate entirely new, logical content to fill large gaps.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هو 'نقل النسيج' (Texture Transfer)؟</template>
+          <template class="content-en">What is 'Texture Transfer'?</template>
+          <span class="content-target">ما هو 'نقل النسيج' (Texture Transfer)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar">هو تطبيق لتوليد النسيج حيث يتم أخذ نسيج من صورة مصدر وتطبيقه على صورة هدف، مع الحفاظ على الهيكل العام (مثل الإضاءة والملامح) للصورة الهدف.</template>
+          <template class="content-en">It is an application of texture synthesis where a texture from a source image is applied to a target image, while preserving the overall structure (like lighting and features) of the target image.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="flashcards" class="flashcard-section fade-up">
+  <h2><i class="fa-solid fa-clone sec-icon" aria-hidden="true"></i> <span data-i18n="fc.title">البطاقات التعليمية</span></h2>
+  <div id="fc-container"></div>
+</section>
+<script type="application/json" id="flashcard-data">
+[
+  {
+    "id": 1,
+    "front": {
+      "ar": "المعايرة الضوئية (Photometric Calibration)",
+      "en": "Photometric Calibration"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية تحويل المقادير الآلية للكاميرا إلى مقادير ظاهرية معايرة في نظام قياسي.",
+        "en": "The process of converting instrumental camera magnitudes to calibrated apparent magnitudes in a standard system."
+      },
+      "example": {
+        "ar": "عكس تأثير منحنى جاما للكاميرا للعمل في مساحة إضاءة خطية.",
+        "en": "Inverting the camera's gamma curve to work in a linear light space."
+      }
+    }
+  },
+  {
+    "id": 2,
+    "front": {
+      "ar": "دالة الاستجابة الإشعاعية (Radiometric Response Function)",
+      "en": "Radiometric Response Function"
+    },
+    "back": {
+      "definition": {
+        "ar": "الدالة التي تعين الفوتونات الواصلة للعدسة إلى قيم رقمية في ملف الصورة.",
+        "en": "The function that maps photons arriving at the lens into digital values stored in the image file."
+      },
+      "example": {
+        "ar": "التحويل غير الخطي الذي يطبقه معالج الصورة (ISP).",
+        "en": "The non-linear transformation applied by the ISP."
+      }
+    }
+  },
+  {
+    "id": 3,
+    "front": {
+      "ar": "التظليل المحيطي (Vignetting)",
+      "en": "Vignetting"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعتيم قيم البكسل بالقرب من محيط الصورة، خاصة مع العدسات الواسعة.",
+        "en": "Darkening of pixel values near the periphery of images, especially at large apertures."
+      },
+      "example": {
+        "ar": "الزوايا المظلمة في صورة ملتقطة بعدسة عين السمكة.",
+        "en": "Dark corners in a photo taken with a fisheye lens."
+      }
+    }
+  },
+  {
+    "id": 4,
+    "front": {
+      "ar": "دالة انتشار النقطة (PSF)",
+      "en": "Point Spread Function (PSF)"
+    },
+    "back": {
+      "definition": {
+        "ar": "توصيف للضبابية الناتجة عن العدسة والمرشحات، وهي شكل نواة الالتفاف.",
+        "en": "Characterizes the blur induced by the lens and filters; the shape of the convolution kernel."
+      },
+      "example": {
+        "ar": "كيف تظهر نقطة ضوء نجمة كقرص ضبابي صغير في الصورة.",
+        "en": "How a point of starlight appears as a small blurred disk in the image."
+      }
+    }
+  },
+  {
+    "id": 5,
+    "front": {
+      "ar": "دالة مستوى الضوضاء (NLF)",
+      "en": "Noise Level Function (NLF)"
+    },
+    "back": {
+      "definition": {
+        "ar": "نموذج يقدر مستوى الضوضاء في الصورة كدالة لقيمة البكسل.",
+        "en": "A model that estimates the noise level as a function of pixel value."
+      },
+      "example": {
+        "ar": "ملاحظة أن المناطق المظلمة في الصورة تحتوي على تباين ضوضاء مختلف عن المناطق الساطعة.",
+        "en": "Observing that dark regions have different noise variance than bright regions."
+      }
+    }
+  },
+  {
+    "id": 6,
+    "front": {
+      "ar": "فصل الصورة (Matting)",
+      "en": "Image Matting"
+    },
+    "back": {
+      "definition": {
+        "ar": "عملية قص كائن أمامي من صورة واستخراج قيمة الشفافية (ألفا) له.",
+        "en": "The process of cutting a foreground object out of one image and extracting its alpha matte."
+      },
+      "example": {
+        "ar": "عزل ممثل عن خلفية خضراء.",
+        "en": "Isolating an actor from a green screen."
+      }
+    }
+  },
+  {
+    "id": 7,
+    "front": {
+      "ar": "التركيب (Compositing)",
+      "en": "Compositing"
+    },
+    "back": {
+      "definition": {
+        "ar": "لصق كائن أمامي مستخرج على خلفية جديدة باستخدام معادلة ألفا.",
+        "en": "Pasting an extracted foreground object against a new background using the alpha blending equation."
+      },
+      "example": {
+        "ar": "وضع الممثل المعزول أمام انفجار مولد بالحاسوب.",
+        "en": "Placing the isolated actor in front of a CGI explosion."
+      }
+    }
+  },
+  {
+    "id": 8,
+    "front": {
+      "ar": "مشكلة الانسكاب الأزرق (Blue Spill)",
+      "en": "Blue Spill Problem"
+    },
+    "back": {
+      "definition": {
+        "ar": "اكتساب البكسلات الشفافة حول حواف الكائن للون الخلفية الزرقاء/الخضراء.",
+        "en": "Translucent pixels around the edges of an object acquire some of the background blue/green coloration."
+      },
+      "example": {
+        "ar": "ظهور هالة خضراء حول شعر الممثل بعد فصله من الشاشة الخضراء.",
+        "en": "A green halo appearing around an actor's hair after green screen extraction."
+      }
+    }
+  },
+  {
+    "id": 9,
+    "front": {
+      "ar": "الخريطة الثلاثية (Trimap)",
+      "en": "Trimap"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقسيم مبدئي للصورة إلى مناطق: مقدمة مؤكدة، خلفية مؤكدة، ومناطق مجهولة.",
+        "en": "A rough segmentation of the scene into foreground, background, and unknown regions."
+      },
+      "example": {
+        "ar": "رسم خطوط بيضاء وسوداء يدوياً لتوجيه خوارزمية الفصل.",
+        "en": "Manually drawing white and black strokes to guide the matting algorithm."
+      }
+    }
+  },
+  {
+    "id": 10,
+    "front": {
+      "ar": "خوارزمية الضربة القاضية (Knockout Algorithm)",
+      "en": "Knockout Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية فصل تعتمد على دمج أقرب بكسلات معروفة للمقدمة والخلفية لتقدير ألفا.",
+        "en": "A matting algorithm that blends nearest known foreground and background pixels to estimate alpha."
+      },
+      "example": {
+        "ar": "استخدامها لفصل كائن ذو حواف ضبابية، لكنها تفشل مع الخلفيات متعددة الألوان.",
+        "en": "Used for fuzzy edges, but fails with multi-colored backgrounds."
+      }
+    }
+  },
+  {
+    "id": 11,
+    "front": {
+      "ar": "الخوارزمية البايزية للفصل (Bayesian Matting)",
+      "en": "Bayesian Matting"
+    },
+    "back": {
+      "definition": {
+        "ar": "خوارزمية تستخدم النماذج الإحصائية (MAP) لتقدير أفضل قيم للمقدمة والخلفية وألفا.",
+        "en": "An algorithm that computes the most likely (MAP) estimates for F, B, and alpha using statistical distributions."
+      },
+      "example": {
+        "ar": "نمذجة ألوان الشعر والخلفية كتوزيعات غاوسية لفصل دقيق.",
+        "en": "Modeling hair and background colors as Gaussian distributions for accurate matting."
+      }
+    }
+  },
+  {
+    "id": 12,
+    "front": {
+      "ar": "فصل الشاشتين (Two-screen Matting)",
+      "en": "Two-screen Matting"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام خلفيتين بلونين مختلفين لزيادة المعادلات وحل مشكلة الفصل رياضياً.",
+        "en": "Using more than one known background color to over-constrain the equations required to estimate opacity."
+      },
+      "example": {
+        "ar": "تصوير كائن ثابت مرة بخلفية سوداء ومرة بخلفية بيضاء.",
+        "en": "Photographing a static object once with a black background and once with white."
+      }
+    }
+  },
+  {
+    "id": 13,
+    "front": {
+      "ar": "توليد النسيج (Texture Synthesis)",
+      "en": "Texture Synthesis"
+    },
+    "back": {
+      "definition": {
+        "ar": "توليد صورة كبيرة تبدو مشابهة لعينة نسيج صغيرة دون تكرار واضح.",
+        "en": "Generating a larger similar-looking image given a small sample of a texture."
+      },
+      "example": {
+        "ar": "تحويل رقعة صغيرة من العشب إلى حقل كامل.",
+        "en": "Turning a small patch of grass into a full field."
+      }
+    }
+  },
+  {
+    "id": 14,
+    "front": {
+      "ar": "التلوين الداخلي (Inpainting)",
+      "en": "Inpainting"
+    },
+    "back": {
+      "definition": {
+        "ar": "تطبيق لتوليد النسيج يهدف إلى ملء الثقوب أو إزالة الكائنات من الصور.",
+        "en": "An application of texture synthesis used to fill holes left behind when objects are excised from photographs."
+      },
+      "example": {
+        "ar": "إزالة شخص غير مرغوب فيه من صورة سياحية وملء الفراغ بالخلفية.",
+        "en": "Removing an unwanted person from a tourist photo and filling the gap with the background."
+      }
+    }
+  },
+  {
+    "id": 15,
+    "front": {
+      "ar": "نقل النسيج (Texture Transfer)",
+      "en": "Texture Transfer"
+    },
+    "back": {
+      "definition": {
+        "ar": "مطابقة خصائص نسيج معين مع صورة هدف لإنشاء تصيير غير واقعي.",
+        "en": "Taking a reference image and matching its texture characteristics with a target image."
+      },
+      "example": {
+        "ar": "إعادة رسم صورة فوتوغرافية لتبدو وكأنها مرسومة بضربات فرشاة زيتية.",
+        "en": "Redrawing a photograph to look like it was painted with oil brush strokes."
+      }
+    }
+  }
+]
+</script>
+
+<section id="quiz" class="quiz-section fade-up">
+  <h2><i class="fa-solid fa-list-check sec-icon" aria-hidden="true"></i> <span data-i18n="quiz.title">اختبر نفسك</span></h2>
+  <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
+  <div id="quiz-content" class="quiz-card glass-card">
+    <div class="quiz-header">
+      <span id="quiz-counter">1 / 10</span>
+      <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
+    </div>
+    <div class="quiz-question" id="quiz-question-text"></div>
+    <div class="quiz-options" id="quiz-options-container"></div>
+    <button class="quiz-hint-btn" id="quiz-hint-btn" onclick="Garden.showQuizHint()"><i class="fa-solid fa-lightbulb" aria-hidden="true"></i> <span data-i18n="quiz.hint">تلميح</span></button>
+    <div class="quiz-feedback hidden" id="quiz-feedback"></div>
+    <div class="quiz-nav">
+      <div></div>
+      <button class="nav-btn hidden" id="quiz-next-btn" onclick="Garden.nextQ()">
+        <span data-i18n="quiz.next">التالي</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
+    </div>
+  </div>
+  <div id="quiz-results" class="quiz-results glass-card hidden">
+    <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
+    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
+  </div>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  {
+    "id": 1,
+    "question": {
+      "ar": "أي مما يلي يمثل الغرض الأساسي من دالة الاستجابة الإشعاعية (Radiometric response function)؟",
+      "en": "Which of the following represents the primary purpose of the Radiometric response function?"
+    },
+    "options": {
+      "ar": [
+        "تعتيم زوايا الصورة",
+        "تعيين الفوتونات الواردة إلى قيم رقمية",
+        "تحديد شكل نواة الضبابية",
+        "فصل المقدمة عن الخلفية"
+      ],
+      "en": [
+        "Darkening the corners of the image",
+        "Mapping incoming photons into digital values",
+        "Determining the shape of the blur kernel",
+        "Separating the foreground from the background"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "دالة الاستجابة الإشعاعية تصف كيف تحول الكاميرا الإشعاع الضوئي (الفوتونات) إلى قيم بكسل رقمية.",
+      "en": "The radiometric response function describes how the camera converts light irradiance (photons) into digital pixel values."
+    },
+    "hint": {
+      "ar": "تذكر كلمة 'إشعاع' وعلاقتها بالضوء الوارد.",
+      "en": "Think about the word 'radiometric' and its relation to incoming light."
+    },
+    "difficulty": "easy",
+    "conceptId": "photometric-calibration"
+  },
+  {
+    "id": 2,
+    "question": {
+      "ar": "ما هي الطريقة الأكثر دقة لمعايرة التظليل المحيطي (Vignetting)؟",
+      "en": "What is the most accurate way to calibrate vignetting?"
+    },
+    "options": {
+      "ar": [
+        "استخدام خوارزمية الضربة القاضية",
+        "الخياطة البانورامية",
+        "استخدام كرة دمج (Integrating sphere) أو جدار فارغ مضاء بانتظام",
+        "ملاءمة حواف متدرجة"
+      ],
+      "en": [
+        "Using the Knockout algorithm",
+        "Panoramic stitching",
+        "Using an integrating sphere or a uniformly illuminated blank wall",
+        "Fitting step edges"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "التقاط صورة لسطح موحد الإضاءة واللون (مثل جدار فارغ أو كرة دمج) يعزل تأثير التظليل المحيطي عن تفاصيل المشهد.",
+      "en": "Capturing an image of a uniformly colored and illuminated surface isolates the vignetting effect from scene details."
+    },
+    "hint": {
+      "ar": "ابحث عن الطريقة التي توفر بيئة خاضعة للرقابة تماماً.",
+      "en": "Look for the method that provides a completely controlled environment."
+    },
+    "difficulty": "medium",
+    "conceptId": "vignetting"
+  },
+  {
+    "id": 3,
+    "question": {
+      "ar": "في معادلة التركيب الأساسية C = αF + (1 - α)B، ماذا يمثل المتغير α؟",
+      "en": "In the basic compositing equation C = αF + (1 - α)B, what does the variable α represent?"
+    },
+    "options": {
+      "ar": [
+        "لون الخلفية",
+        "الشفافية / العتامة (Opacity)",
+        "لون المقدمة",
+        "مستوى الضوضاء"
+      ],
+      "en": [
+        "Background color",
+        "Opacity / Transparency",
+        "Foreground color",
+        "Noise level"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "ألفا (α) تمثل نسبة العتامة للكائن الأمامي، حيث 1 تعني معتم تماماً و 0 تعني شفاف تماماً.",
+      "en": "Alpha (α) represents the opacity of the foreground object, where 1 is fully opaque and 0 is fully transparent."
+    },
+    "hint": {
+      "ar": "إنه العامل الذي يحدد مقدار مزج المقدمة مع الخلفية.",
+      "en": "It's the factor that determines how much the foreground blends with the background."
+    },
+    "difficulty": "easy",
+    "conceptId": "image-matting-compositing"
+  },
+  {
+    "id": 4,
+    "question": {
+      "ar": "ما هي المشكلة الرئيسية التي تواجه خوارزمية Knockout في فصل الصورة الطبيعية؟",
+      "en": "What is the main problem faced by the Knockout algorithm in natural image matting?"
+    },
+    "options": {
+      "ar": [
+        "تتطلب شاشتين بخلفيات مختلفة",
+        "تفشل عندما تتكون الخلفية من أكثر من لون محلي سائد",
+        "لا يمكنها التعامل مع الشفافية",
+        "تتطلب كرة دمج للمعايرة"
+      ],
+      "en": [
+        "It requires two screens with different backgrounds",
+        "It fails when the background consists of more than one dominant local color",
+        "It cannot handle transparency",
+        "It requires an integrating sphere for calibration"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تعتمد الخوارزمية على استيفاء لون خلفية واحد محلياً، وتفشل إذا كانت الخلفية معقدة وتحتوي على ألوان متعددة متباينة.",
+      "en": "The algorithm relies on interpolating a single local background color and fails if the background is complex with multiple contrasting colors."
+    },
+    "hint": {
+      "ar": "كيف تتعامل الخوارزمية مع الخلفيات المعقدة جداً؟",
+      "en": "How does the algorithm handle very complex backgrounds?"
+    },
+    "difficulty": "medium",
+    "conceptId": "natural-image-matting"
+  },
+  {
+    "id": 5,
+    "question": {
+      "ar": "ما هو الغرض من استخدام 'الخريطة الثلاثية' (Trimap) في فصل الصور؟",
+      "en": "What is the purpose of using a 'Trimap' in image matting?"
+    },
+    "options": {
+      "ar": [
+        "معايرة العدسة",
+        "تقسيم المشهد مبدئياً إلى مقدمة، خلفية، ومناطق مجهولة",
+        "إزالة الضوضاء من الصورة",
+        "توليد نسيج جديد"
+      ],
+      "en": [
+        "Calibrating the lens",
+        "Roughly segmenting the scene into foreground, background, and unknown regions",
+        "Removing noise from the image",
+        "Generating a new texture"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الخريطة الثلاثية توفر قيوداً مبدئية للخوارزمية من خلال تحديد المناطق المؤكدة، مما يقلل من مساحة البحث في المناطق المجهولة.",
+      "en": "A trimap provides initial constraints to the algorithm by defining definite regions, reducing the search space in the unknown areas."
+    },
+    "hint": {
+      "ar": "الاسم 'ثلاثية' يشير إلى ثلاثة أنواع من المناطق.",
+      "en": "The name 'tri' refers to three types of regions."
+    },
+    "difficulty": "easy",
+    "conceptId": "natural-image-matting"
+  },
+  {
+    "id": 6,
+    "question": {
+      "ar": "في خوارزميات توليد النسيج (مثل Image Quilting)، لماذا تُستخدم البرمجة الديناميكية؟",
+      "en": "In texture synthesis algorithms (like Image Quilting), why is dynamic programming used?"
+    },
+    "options": {
+      "ar": [
+        "لتقدير دالة مستوى الضوضاء",
+        "لتحديد خط التماس (Seam) الأمثل بين الكتل المتداخلة لتقليل الخطأ البصري",
+        "لحساب الخريطة الثلاثية تلقائياً",
+        "لإزالة التظليل المحيطي"
+      ],
+      "en": [
+        "To estimate the noise level function",
+        "To determine the optimal seam between overlapping blocks to minimize visual error",
+        "To automatically compute the trimap",
+        "To remove vignetting"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تجد البرمجة الديناميكية مساراً عبر منطقة التداخل حيث تكون الفروق بين بكسلات الكتلتين في حدها الأدنى، مما يخفي خطوط القطع.",
+      "en": "Dynamic programming finds a path through the overlap region where pixel differences are minimal, hiding the cut seams."
+    },
+    "hint": {
+      "ar": "تتعلق بدمج الكتل المربعة معاً بسلاسة.",
+      "en": "It relates to merging square blocks together smoothly."
+    },
+    "difficulty": "hard",
+    "conceptId": "texture-analysis-synthesis"
+  },
+  {
+    "id": 7,
+    "question": {
+      "ar": "أي مما يلي يُعد من أحدث التقنيات المستخدمة في التلوين الداخلي (Inpainting) لملء الثقوب الكبيرة؟",
+      "en": "Which of the following is among the latest techniques used in Inpainting for filling large holes?"
+    },
+    "options": {
+      "ar": [
+        "خوارزمية ميشيما",
+        "الشبكات العصبية العميقة (مثل الالتفافات الجزئية)",
+        "فصل الشاشتين",
+        "كرة الدمج"
+      ],
+      "en": [
+        "Mishima's algorithm",
+        "Deep neural networks (like Partial convolutions)",
+        "Two-screen matting",
+        "Integrating sphere"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "التقنيات الحديثة تعتمد بشكل كبير على التعلم العميق (الشبكات العصبية) لفهم سياق الصورة وتوليد محتوى جديد لملء الثقوب.",
+      "en": "Modern techniques rely heavily on deep learning (neural networks) to understand image context and generate novel content to fill holes."
+    },
+    "hint": {
+      "ar": "تقنية حديثة تعتمد على الذكاء الاصطناعي.",
+      "en": "A modern technique based on AI."
+    },
+    "difficulty": "medium",
+    "conceptId": "inpainting-texture-transfer"
+  },
+  {
+    "id": 8,
+    "question": {
+      "ar": "كيف يتم تقدير دالة انتشار النقطة (PSF) بدون استخدام نمط معايرة؟",
+      "en": "How can the Point Spread Function (PSF) be estimated without using a calibration pattern?"
+    },
+    "options": {
+      "ar": [
+        "عن طريق قياس التباين الزمني",
+        "عن طريق ملاءمة حواف متدرجة (Step edges) للحواف الممتدة في الصورة",
+        "باستخدام خوارزمية روزون وتوماسي",
+        "عن طريق خياطة صور بانورامية"
+      ],
+      "en": [
+        "By measuring temporal variance",
+        "By fitting step edges to elongated edges in the image",
+        "Using the Ruzon and Tomasi algorithm",
+        "By stitching panoramic images"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "في غياب نمط المعايرة، تبحث الخوارزميات عن حواف حادة طبيعية في المشهد وتستخدم التدرج اللوني عبرها لتقدير شكل نواة الضبابية.",
+      "en": "In the absence of a calibration pattern, algorithms look for natural sharp edges in the scene and use the intensity profile across them to estimate the blur kernel."
+    },
+    "hint": {
+      "ar": "ابحث عن ميزة في الصورة الطبيعية يمكن أن تكشف عن مقدار الضبابية.",
+      "en": "Look for a feature in a natural image that can reveal the amount of blur."
+    },
+    "difficulty": "hard",
+    "conceptId": "optical-blur-psf"
+  },
+  {
+    "id": 9,
+    "question": {
+      "ar": "ما هي 'مشكلة الانسكاب الأزرق' (Blue spill problem) في فصل الصور؟",
+      "en": "What is the 'Blue spill problem' in image matting?"
+    },
+    "options": {
+      "ar": [
+        "تسرب سائل أزرق على عدسة الكاميرا",
+        "اكتساب البكسلات الشفافة حول حواف الكائن للون الخلفية الزرقاء",
+        "فشل الخوارزمية في التعرف على اللون الأزرق",
+        "تعتيم زوايا الصورة بسبب اللون الأزرق"
+      ],
+      "en": [
+        "Blue liquid spilling on the camera lens",
+        "Translucent pixels around object edges acquiring the blue background color",
+        "The algorithm failing to recognize the color blue",
+        "Darkening of image corners due to blue color"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تحدث هذه المشكلة عندما ينعكس ضوء الشاشة الزرقاء/الخضراء على حواف الكائن (مثل الشعر)، مما يتطلب معالجة إضافية لإزالته.",
+      "en": "This occurs when light from the blue/green screen reflects onto the object's edges (like hair), requiring extra processing to remove."
+    },
+    "hint": {
+      "ar": "تتعلق بتأثير لون الخلفية على حواف الكائن الأمامي.",
+      "en": "It relates to the effect of the background color on the edges of the foreground object."
+    },
+    "difficulty": "easy",
+    "conceptId": "blue-screen-matting"
+  },
+  {
+    "id": 10,
+    "question": {
+      "ar": "في فصل الدخان (Smoke matting)، كيف يتم تقدير لون الدخان (المقدمة)؟",
+      "en": "In smoke matting, how is the color of the smoke (foreground) estimated?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام الخريطة الثلاثية",
+        "عن طريق التصويت في مساحة الألوان (Voting in color space)",
+        "بأخذ القيم الدنيا والقصوى بمرور الوقت",
+        "باستخدام البرمجة الديناميكية"
+      ],
+      "en": [
+        "Using a trimap",
+        "By voting in color space",
+        "By taking minimum and maximum values over time",
+        "Using dynamic programming"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يُفترض أن الدخان له لون ثابت، ويتم استخدام تقنية التصويت في مساحة الألوان عبر إطارات الفيديو لتقدير هذا اللون المشترك.",
+      "en": "Smoke is assumed to have a constant color, and voting in color space across video frames is used to estimate this common color."
+    },
+    "hint": {
+      "ar": "طريقة إحصائية تعتمد على إيجاد اللون الأكثر شيوعاً الذي يمثل الدخان.",
+      "en": "A statistical method based on finding the most common color representing the smoke."
+    },
+    "difficulty": "hard",
+    "conceptId": "smoke-shadow-matting"
+  }
+]
+</script>
+
+<section id="vault" class="vault-section glass-card fade-up">
+  <h2><i class="fa-solid fa-lock sec-icon" aria-hidden="true"></i> <span data-i18n="vault.title">خزنة الامتحان</span></h2>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين التظليل المحيطي (Vignetting) والضبابية (Blur). التظليل يؤثر على 'السطوع' (Brightness) في الزوايا، بينما الضبابية (PSF) تؤثر على 'الحدة' (Sharpness) في جميع أنحاء الصورة.</template>
+    <template class="content-en">Confusing Vignetting with Blur. Vignetting affects 'brightness' at the corners, while PSF (blur) affects 'sharpness' throughout the image.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مشكلة فصل الصورة (Matting) هي مشكلة غير محددة رياضياً (Ill-posed) لأن لدينا 3 معادلات (RGB) و 7 مجاهيل (RGB للمقدمة، RGB للخلفية، وألفا). كل خوارزميات الفصل هي محاولات لإضافة قيود (Constraints) لحل هذه المشكلة.</template>
+    <template class="content-en">The matting problem is mathematically ill-posed because we have 3 equations (RGB) and 7 unknowns (F_rgb, B_rgb, alpha). All matting algorithms are essentially ways to add constraints to solve this.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في خوارزمية Image Quilting لتوليد النسيج، البرمجة الديناميكية لا تمزج الألوان، بل تبحث عن 'مسار القطع' الأقل وضوحاً بين كتلتين متداخلتين، مما يحافظ على حدة النسيج.</template>
+    <template class="content-en">In Image Quilting for texture synthesis, dynamic programming doesn't blend colors; it finds the least visible 'cut path' between two overlapping blocks, preserving texture sharpness.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن الخريطة الثلاثية (Trimap) تحل مشكلة الفصل بالكامل. الخريطة الثلاثية تحدد فقط المناطق المؤكدة، والخوارزمية (مثل Bayesian) هي التي تقوم بالعمل الشاق لتقدير ألفا في 'المنطقة المجهولة'.</template>
+    <template class="content-en">Believing that a Trimap completely solves matting. A trimap only defines definite regions; the algorithm (like Bayesian) does the heavy lifting to estimate alpha in the 'unknown region'.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+</section>
+
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-links">
+        <a href="M12.html" class="footer-link" data-i18n="nav.prev">السابق</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.home">الرئيسية</a>
+        <a href="index.html" class="footer-link" data-i18n="nav.next">التالي</a>
+        <button class="footer-link" aria-label="العودة إلى الأعلى" data-ar-title="العودة إلى الأعلى" data-en-title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>
+      </div>
+      <span class="footer-brand"><i class="fa-solid fa-seedling" aria-hidden="true"></i> DS Level 7 · Digital Garden</span>
+    </div>
+  </footer>
+</div>
+
+<script src="../../shared/endpoints.js"></script>
+<script src="../../shared/garden.js"></script>
+<script src="../../shared/garden-header.js"></script>
+<script src="../../shared/firebase-sync.js"></script>
+</body>
+</html>

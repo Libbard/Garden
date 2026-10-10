@@ -7821,7 +7821,8 @@ ${baseRules}`) + regenSuffix;
   var LAB_LANGS = {
     java: 'java', python: 'python', py: 'python', c: 'c', cpp: 'cpp', 'c++': 'cpp',
     php: 'php', sql: 'sql', javascript: 'javascript', js: 'javascript',
-    html: 'web', css: 'web', marie: 'marie'
+    html: 'web', css: 'web', marie: 'marie',
+    lmc: 'lmc', assembly: 'asm', asm: 'asm', nasm: 'asm', gas: 'asm', x86: 'asm', 'x86-64': 'asm', arm: 'asm'
   };
   var LAB_PATH = 'labs/programming-languages.html';
 

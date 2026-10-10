@@ -104,6 +104,11 @@
         <template class="content-en">Connectionless vs Connection-Oriented Services</template>
         <span class="content-target">الخدمات الموجهة للاتصال وعديمة الاتصال</span>
       </a>
+      <a href="#encapsulation-and-decapsulation" class="toc-link" data-bilingual>
+        <template class="content-ar">التغليف وفك التغليف</template>
+        <template class="content-en">Encapsulation and Decapsulation</template>
+        <span class="content-target">التغليف وفك التغليف</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -442,14 +447,29 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في طبقة النقل، نحتاج إلى عنوان يسمى <strong>رقم المنفذ (Port Number)</strong> للاختيار بين العمليات المتعددة التي تعمل في الوجهة. أرقام المنافذ هي أعداد صحيحة بحجم 16 بت (من 0 إلى 65,535).</p><p>يتم دمج عنوان IP (الذي يحدد الجهاز) مع رقم المنفذ (الذي يحدد العملية) لتكوين <strong>عنوان المقبس (Socket Address)</strong>.</p><p>رقم منفذ الوجهة مطلوب للتسليم، ورقم منفذ المصدر مطلوب للرد.</p></template>
-    <template class="content-en"><p>At the transport layer, a <strong>port number</strong> is needed to choose among multiple processes running on the destination host. Port numbers are 16-bit integers (0 to 65,535).</p><p>The combination of an IP address (identifying the host) and a port number (identifying the process) is called a <strong>Socket Address</strong>.</p><p>The destination port is needed for delivery, and the source port is needed for the reply.</p></template>
+    <template class="content-ar"><p>في طبقة النقل، نحتاج إلى عنوان يسمى <strong>رقم المنفذ (Port Number)</strong> للاختيار بين العمليات المتعددة التي تعمل في الوجهة. أرقام المنافذ هي أعداد صحيحة بحجم 16 بت (من 0 إلى 65,535).</p><p>يتم دمج عنوان IP (الذي يحدد الجهاز) مع رقم المنفذ (الذي يحدد العملية) لتكوين <strong>عنوان المقبس (Socket Address)</strong>.</p><p>رقم منفذ الوجهة مطلوب للتسليم، ورقم منفذ المصدر مطلوب للرد.</p><p>في أنظمة التشغيل مثل UNIX، يتم تخزين أرقام المنافذ المعروفة (Well-known ports) في ملف نظام يسمى <code>/etc/services</code>. يمكن للمستخدمين أو مسؤولي النظام استخدام أداة <code>grep</code> للبحث داخل هذا الملف واستخراج السطر الذي يتوافق مع التطبيق المطلوب لمعرفة رقم المنفذ الخاص به، كما هو موضح في المثال البرمجي.</p></template>
+    <template class="content-en"><p>At the transport layer, a <strong>port number</strong> is needed to choose among multiple processes running on the destination host. Port numbers are 16-bit integers (0 to 65,535).</p><p>The combination of an IP address (identifying the host) and a port number (identifying the process) is called a <strong>Socket Address</strong>.</p><p>The destination port is needed for delivery, and the source port is needed for the reply.</p><p>In operating systems like UNIX, well-known ports are stored in a system file called <code>/etc/services</code>. Users or system administrators can use the <code>grep</code> utility to search this file and extract the line corresponding to the desired application to find its port number, as shown in the code example.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
     <template class="content-ar"><p>قامت منظمة <span class="smart-term" data-term-en="ICANN" data-ar="آيكان" data-en-def="Internet Corporation for Assigned Names and Numbers, responsible for port number allocation.">ICANN<span class="smart-term-tooltip"></span></span> بتقسيم المنافذ إلى ثلاثة نطاقات:</p><ul><li><strong>المنافذ المعروفة (0-1023)</strong> المخصصة للخدمات الأساسية،</li><li><strong>المنافذ المسجلة (1024-49151)</strong> للشركات والتطبيقات،</li><li><strong>والمنافذ الديناميكية/الخاصة (49152-65535)</strong> التي يستخدمها العملاء مؤقتاً عند الاتصال بالخوادم.</li></ul></template>
     <template class="content-en"><p>ICANN divides port numbers into three ranges:</p><ul><li><strong>Well-known (0-1023)</strong> for standard services,</li><li><strong>Registered (1024-49151)</strong> for specific applications,</li><li>and <strong>Dynamic/Private (49152-65535)</strong> used as ephemeral ports by clients when initiating connections.</li></ul></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Bash</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>$ grep tftp /etc/services
+tftp 69/tcp
+tftp 69/udp
+
+$ grep snmp /etc/services
+snmp 161/tcp # Simple Net Mgmt Proto
+snmp 161/udp # Simple Net Mgmt Proto
+snmptrap 162/udp # Traps for SNMP</code></pre>
   </div>
 
   <!-- DIAGRAM[4]: A visual representation of a Socket Address. Show a white box labeled 'IP address' with '200.23.56.8' and an orange box labeled 'Port number' with '69'. Arrows point down from both to combine into a single long box labeled 'Socket address' containing '200.23.56.8 : 69'. -->
@@ -1364,14 +1384,57 @@
   </details>
 </section>
 
+<section id="encapsulation-and-decapsulation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> التغليف وفك التغليف</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Encapsulation and Decapsulation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>التغليف هو إضافة ترويسة طبقة النقل إلى رسالة التطبيق لتكوين حزمة، بينما فك التغليف هو إزالة هذه الترويسة عند المستلم لتسليم الرسالة.</p></template>
+    <template class="content-en"><p>Encapsulation is adding a transport layer header to the application message to form a packet, while decapsulation is removing this header at the receiver to deliver the message.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لكي تنتقل البيانات عبر الشبكة، يجب أن تمر بعمليتين أساسيتين في طبقة النقل:</p><ol><li><strong><span class="smart-term" data-term-en="Encapsulation" data-ar="التغليف" data-en-def="The process of adding headers to data as it passes down the protocol stack.">التغليف<span class="smart-term-tooltip"></span></span> (Encapsulation):</strong> يحدث في جهة المرسل (العميل أو الخادم). تستقبل طبقة النقل الرسالة (Message) من طبقة التطبيقات، وتعتبرها حمولة (Payload)، ثم تضيف إليها ترويسة (Header) تحتوي على معلومات حيوية مثل أرقام المنافذ، لتكوين حزمة (Packet) جاهزة للإرسال.</li><li><strong><span class="smart-term" data-term-en="Decapsulation" data-ar="فك التغليف" data-en-def="The process of removing headers from data as it passes up the protocol stack.">فك التغليف<span class="smart-term-tooltip"></span></span> (Decapsulation):</strong> يحدث في جهة المستقبل. تستقبل طبقة النقل الحزمة، وتقرأ الترويسة لمعرفة التطبيق الوجهة، ثم تزيل الترويسة وتمرر <span class="smart-term" data-term-en="Payload" data-ar="الحمولة" data-en-def="The actual data or message being transported, excluding the headers.">الحمولة<span class="smart-term-tooltip"></span></span> (الرسالة الأصلية) إلى طبقة التطبيقات.</li></ol></template>
+    <template class="content-en"><p>For data to travel across the network, it must undergo two fundamental processes at the transport layer:</p><ol><li><strong><span class="smart-term" data-term-en="Encapsulation" data-ar="التغليف" data-en-def="The process of adding headers to data as it passes down the protocol stack.">Encapsulation<span class="smart-term-tooltip"></span></span>:</strong> Occurs at the sender side. The transport layer receives a message from the application layer, treats it as a <span class="smart-term" data-term-en="Payload" data-ar="الحمولة" data-en-def="The actual data or message being transported, excluding the headers.">payload<span class="smart-term-tooltip"></span></span>, and adds a header containing vital information like port numbers to form a packet ready for transmission.</li><li><strong><span class="smart-term" data-term-en="Decapsulation" data-ar="فك التغليف" data-en-def="The process of removing headers from data as it passes up the protocol stack.">Decapsulation<span class="smart-term-tooltip"></span></span>:</strong> Occurs at the receiver side. The transport layer receives the packet, reads the header to identify the destination application, strips the header, and passes the payload (original message) up to the application layer.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الترويسة (Header) التي تتم إضافتها أثناء التغليف هي ما يجعل وظائف طبقة النقل ممكنة. بدونها، لا يمكن إجراء تعدد الإرسال (Multiplexing) أو التحكم في الأخطاء.</p><p>هذه العملية تخلق قناة منطقية (Logical Channel) بين العميل والخادم، حيث يبدو للتطبيقات أنها تتواصل مباشرة مع بعضها البعض، متجاهلة التعقيد الموجود في الطبقات السفلية.</p></template>
+    <template class="content-en"><p>The header added during encapsulation is what makes transport layer functions possible. Without it, multiplexing and error control cannot be performed.</p><p>This process creates a logical channel between the client and the server, making it appear to the applications as if they are communicating directly, abstracting away the complexity of the lower layers.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا سيحدث إذا وصلت حزمة إلى المستقبل وكانت ترويسة طبقة النقل تالفة؟</template>
+      <template class="content-en">What would happen if a packet arrives at the receiver and the transport layer header is corrupted?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لن تتمكن طبقة النقل من إجراء فك التغليف بشكل صحيح، ولن تعرف رقم منفذ الوجهة، مما سيؤدي إلى التخلص من الحزمة (Discard) لعدم القدرة على توجيهها للتطبيق المناسب.</p></template>
+      <template class="content-en"><p>The transport layer would not be able to perform decapsulation correctly. It wouldn't know the destination port number, leading to the packet being discarded since it cannot be routed to the appropriate application.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبطال الشبكات في الفصل 23. تخيلوا معي أن طبقة الشبكة (IP) هي ساعي البريد الذي يوصل الرسالة إلى باب العمارة (الجهاز). لكن العمارة بها شقق كثيرة (تطبيقات)! هنا يأتي دور بطلنا اليوم: طبقة النقل. هذه الطبقة تأخذ الرسالة من باب العمارة وتوصلها للشقة الصحيحة باستخدام 'رقم المنفذ'. في الامتحان، ركزوا جداً على الفرق بين الاتصال من مضيف لمضيف (طبقة الشبكة) ومن عملية لعملية (طبقة النقل). تذكروا دائماً أن عنوان المقبس (Socket Address) هو ببساطة IP + Port. أيضاً، لا تخلطوا بين التحكم في التدفق (حماية المستقبل البطيء من المرسل السريع باستخدام الـ Buffers) والتحكم في الازدحام (حماية الشبكة نفسها من الانهيار). وأخيراً، المقارنة بين الخدمة الموجهة للاتصال (مثل مكالمة هاتفية، موثوقة ومرتبة) وعديمة الاتصال (مثل رسائل البريد، سريعة لكن غير مضمونة) هي سؤال كلاسيكي في الاختبارات. بالتوفيق!</template>
-    <template class="content-en">Welcome, network champions, to Chapter 23. Imagine the Network layer (IP) as a mail carrier who delivers a letter to the front door of an apartment building (the host). But the building has many apartments (applications)! Enter our hero: the Transport Layer. It takes the letter from the front door to the exact apartment using a 'Port Number'. For the exam, strictly differentiate between host-to-host (Network) and process-to-process (Transport) delivery. Always remember that a Socket Address is simply IP + Port. Also, do not confuse Flow Control (protecting a slow receiver using buffers) with Congestion Control (protecting the network itself from collapsing). Finally, the comparison between Connection-Oriented (like a reliable phone call) and Connectionless (like fast but unreliable postal letters) is a classic exam question. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أبطال الشبكات في الفصل 23. تخيلوا معي أن طبقة الشبكة (IP) هي ساعي البريد الذي يوصل الرسالة إلى باب العمارة (الجهاز). لكن العمارة بها شقق كثيرة (تطبيقات)! هنا يأتي دور بطلنا اليوم: طبقة النقل. هذه الطبقة تأخذ الرسالة من باب العمارة وتوصلها للشقة الصحيحة باستخدام 'رقم المنفذ'. في الامتحان، ركزوا جداً على الفرق بين الاتصال من مضيف لمضيف (طبقة الشبكة) ومن عملية لعملية (طبقة النقل). تذكروا دائماً أن عنوان المقبس (Socket Address) هو ببساطة IP + Port. أيضاً، لا تخلطوا بين التحكم في التدفق (حماية المستقبل البطيء من المرسل السريع باستخدام الـ Buffers) والتحكم في الازدحام (حماية الشبكة نفسها من الانهيار). وأخيراً، المقارنة بين الخدمة الموجهة للاتصال (مثل مكالمة هاتفية، موثوقة ومرتبة) وعديمة الاتصال (مثل رسائل البريد، سريعة لكن غير مضمونة) هي سؤال كلاسيكي في الاختبارات. بالتوفيق!<p>بينما نختتم المفاهيم الأساسية لطبقة النقل، تذكر أن هذه الآليات ليست مجرد نظريات. في أنظمة التشغيل الحقيقية مثل UNIX، يمكنك رؤية تعيينات المنافذ مباشرة في ملفات النظام. فهم كيفية تغليف البيانات (Encapsulation) وعنونتها بالمنافذ هو المفتاح لإدراك كيف تتحدث التطبيقات فعلياً عبر الإنترنت، وكيف يتم تنظيم هذه الفوضى الرقمية.</p></template>
+    <template class="content-en">Welcome, network champions, to Chapter 23. Imagine the Network layer (IP) as a mail carrier who delivers a letter to the front door of an apartment building (the host). But the building has many apartments (applications)! Enter our hero: the Transport Layer. It takes the letter from the front door to the exact apartment using a 'Port Number'. For the exam, strictly differentiate between host-to-host (Network) and process-to-process (Transport) delivery. Always remember that a Socket Address is simply IP + Port. Also, do not confuse Flow Control (protecting a slow receiver using buffers) with Congestion Control (protecting the network itself from collapsing). Finally, the comparison between Connection-Oriented (like a reliable phone call) and Connectionless (like fast but unreliable postal letters) is a classic exam question. Good luck!<p>As we wrap up the transport layer's fundamental concepts, remember that these mechanisms aren't just theoretical. In real-world operating systems like UNIX, you can directly inspect port mappings in system files. Understanding how data is packaged (encapsulated) and addressed (ports) is the key to mastering how applications actually communicate across the internet, organizing the digital chaos.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1545,6 +1608,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">هو دمج عنوان IP مع رقم المنفذ (مثال: 200.23.56.8:69)، وهو يحدد بدقة التطبيق المعين على جهاز معين.</template>
           <template class="content-en">It is the combination of an IP address and a port number (e.g., 200.23.56.8:69), uniquely identifying a specific application on a specific host.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكن لمسؤول النظام في بيئة UNIX التحقق من المنفذ الافتراضي لبروتوكول معين دون حفظه؟</template>
+          <template class="content-en">How can a system administrator in a UNIX environment verify the default port for a specific protocol without memorizing it?</template>
+          <span class="content-target">كيف يمكن لمسؤول النظام في بيئة UNIX التحقق من المنفذ الافتراضي لبروتوكول معين دون حفظه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يمكنه ببساطة قراءة ملف <code>/etc/services</code> الموجود في النظام. باستخدام أمر مثل <code>grep</code> متبوعاً باسم البروتوكول (مثل <code>grep tftp /etc/services</code>)، سيقوم النظام بطباعة السطر الذي يحتوي على رقم المنفذ ونوع البروتوكول (TCP أو UDP) المخصص لهذه الخدمة.</p></template>
+          <template class="content-en"><p>They can simply read the <code>/etc/services</code> file on the system. By using a command like <code>grep</code> followed by the protocol name (e.g., <code>grep tftp /etc/services</code>), the system will output the line containing the port number and protocol type (TCP or UDP) assigned to that service.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">اشرح العلاقة بين التغليف (Encapsulation) وفك تعدد الإرسال (Demultiplexing).</template>
+          <template class="content-en">Explain the relationship between Encapsulation and Demultiplexing.</template>
+          <span class="content-target">اشرح العلاقة بين التغليف (Encapsulation) وفك تعدد الإرسال (Demultiplexing).</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>التغليف هو العملية التي تضع الأساس لفك تعدد الإرسال. أثناء التغليف في جهة المرسل، تتم إضافة ترويسة تحتوي على رقم منفذ الوجهة. عندما تصل الحزمة إلى المستقبل، تعتمد عملية فك تعدد الإرسال كلياً على قراءة هذه الترويسة (قبل فك التغليف النهائي) لمعرفة التطبيق الذي يجب توجيه الحمولة إليه.</p></template>
+          <template class="content-en"><p>Encapsulation sets the foundation for demultiplexing. During encapsulation at the sender, a header containing the destination port number is added. When the packet reaches the receiver, the demultiplexing process relies entirely on reading this header (before final decapsulation) to determine which application the payload should be routed to.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1829,6 +1927,40 @@
         "en": "TCP for reliable connection, UDP for fast connection."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يمكنك معرفة رقم المنفذ لخدمة معينة في نظام UNIX؟",
+      "en": "How can you find the port number for a specific service in a UNIX system?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام أداة grep للبحث في ملف /etc/services.",
+        "en": "By using the grep utility to search the /etc/services file."
+      },
+      "example": {
+        "ar": "grep snmp /etc/services",
+        "en": "grep snmp /etc/services"
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "ما هي العملية التي يتم فيها تحويل رسالة التطبيق إلى حزمة (Packet) في طبقة النقل؟",
+      "en": "What is the process where an application message is converted into a packet at the transport layer?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التغليف (Encapsulation)، حيث تتم إضافة الترويسة (Header) إلى الحمولة (Payload).",
+        "en": "Encapsulation, where a header is added to the payload."
+      },
+      "example": {
+        "ar": "إضافة رقم منفذ المصدر والوجهة إلى الرسالة.",
+        "en": "Adding source and destination port numbers to the message."
+      }
+    },
+    "id": 18
   }
 ]
 </script>
@@ -1838,7 +1970,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1854,7 +1986,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2179,6 +2311,70 @@
     },
     "difficulty": "easy",
     "conceptId": "connectionless-vs-connection-oriented"
+  },
+  {
+    "conceptId": "port-numbers-and-socket-address",
+    "question": {
+      "ar": "في أنظمة UNIX، ما هو الملف الذي يحتوي على قائمة المنافذ المعروفة (Well-known ports)؟",
+      "en": "In UNIX systems, which file contains the list of well-known ports?"
+    },
+    "options": {
+      "ar": [
+        "/etc/ports",
+        "/var/services",
+        "/etc/services",
+        "/bin/ports"
+      ],
+      "en": [
+        "/etc/ports",
+        "/var/services",
+        "/etc/services",
+        "/bin/ports"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "ملف /etc/services هو الملف القياسي في أنظمة UNIX الذي يربط أسماء الخدمات بأرقام المنافذ الخاصة بها.",
+      "en": "The /etc/services file is the standard file in UNIX systems that maps service names to their respective port numbers."
+    },
+    "hint": {
+      "ar": "تذكر الكلمة 'services' (خدمات).",
+      "en": "Remember the word 'services'."
+    },
+    "difficulty": "easy",
+    "id": 11
+  },
+  {
+    "conceptId": "encapsulation-and-decapsulation",
+    "question": {
+      "ar": "ما هو المصطلح الذي يطلق على الرسالة الأصلية القادمة من طبقة التطبيقات بعد أن تستلمها طبقة النقل وقبل إضافة الترويسة؟",
+      "en": "What is the term for the original message coming from the application layer after it is received by the transport layer and before the header is added?"
+    },
+    "options": {
+      "ar": [
+        "الترويسة (Header)",
+        "الحمولة (Payload)",
+        "المقبس (Socket)",
+        "الإطار (Frame)"
+      ],
+      "en": [
+        "Header",
+        "Payload",
+        "Socket",
+        "Frame"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الرسالة القادمة من الطبقة العليا تعتبر 'حمولة' (Payload) بالنسبة لطبقة النقل، والتي تقوم بتغليفها بإضافة ترويستها الخاصة.",
+      "en": "The message coming from the upper layer is considered the 'Payload' for the transport layer, which encapsulates it by adding its own header."
+    },
+    "hint": {
+      "ar": "البيانات الفعلية التي يتم نقلها.",
+      "en": "The actual data being transported."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -2223,6 +2419,14 @@
       <template class="content-ar">الفرق الجوهري بين التحكم في التدفق والتحكم في الازدحام: التدفق يحمي 'المستقبل' من الغرق بالبيانات، بينما الازدحام يحمي 'الشبكة' من الانهيار.</template>
       <template class="content-en">The core difference between Flow and Congestion control: Flow control protects the 'Receiver' from drowning in data, while Congestion control protects the 'Network' from collapsing.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من افتراض أن الخدمة عديمة الاتصال (Connectionless) تتضمن آليات تأكيد. في الواقع، لا توجد رسائل تأكيد (ACK) ولا يتم ضمان وصول الحزمة، مما يجعلها عرضة لفقدان البيانات دون علم المرسل.</template>
+    <template class="content-en">Beware of assuming that a connectionless service includes confirmation mechanisms. In reality, there are no Acknowledgments (ACKs) and packet delivery is not guaranteed, making it prone to silent data loss.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

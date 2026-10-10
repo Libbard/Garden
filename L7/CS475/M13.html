@@ -109,6 +109,11 @@
         <template class="content-en">Environment Sensors</template>
         <span class="content-target">مستشعرات البيئة (Environment Sensors)</span>
       </a>
+      <a href="#android-sensor-types" class="toc-link" data-bilingual>
+        <template class="content-ar">أنواع المستشعرات في منصة أندرويد (Android Sensor Types)</template>
+        <template class="content-en">Android Sensor Types</template>
+        <span class="content-target">أنواع المستشعرات في منصة أندرويد (Android Sensor Types)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -232,6 +237,61 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React, { useState, useEffect } from "react";
+import { Text, View } from "react-native";
+import styles from "./styles";
+
+const URL = "https://maps.google.com/maps/api/geocode/json?latlng=";
+
+export default function WhereAmI() {
+  const [address, setAddress] = useState("loading...");
+  const [longitude, setLongitude] = useState();
+  const [latitude, setLatitude] = useState();
+
+  useEffect(() =&gt; {
+    // Callback function to update state and fetch address
+    function setPosition({ coords: { latitude, longitude } }) {
+      setLongitude(longitude);
+      setLatitude(latitude);
+      fetch(`${URL}${latitude},${longitude}`)
+        .then(resp =&gt; resp.json())
+        .then(({ results: [{ formatted_address }] }) =&gt; {
+          setAddress(formatted_address);
+        })
+        .catch(e =&gt; console.error(e));
+    }
+
+    // 1. Get initial position once
+    navigator.geolocation.getCurrentPosition(setPosition);
+
+    // 2. Watch for continuous position changes
+    let watcher = navigator.geolocation.watchPosition(
+      setPosition,
+      err =&gt; console.error(err),
+      { enableHighAccuracy: true }
+    );
+
+    // Cleanup watcher on unmount
+    return () =&gt; {
+      navigator.geolocation.clearWatch(watcher);
+    };
+  }, []);
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;Text style={styles.label}&gt;Address: {address}&lt;/Text&gt;
+      &lt;Text style={styles.label}&gt;Latitude: {latitude}&lt;/Text&gt;
+      &lt;Text style={styles.label}&gt;Longitude: {longitude}&lt;/Text&gt;
+    &lt;/View&gt;
+  );
+}</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">متى يجب استخدام <code>getCurrentPosition</code> بدلاً من <code>watchPosition</code>؟</template>
@@ -273,6 +333,28 @@
     <template class="content-ar"><p>من الجيد عموماً استخدام خاصية <code>followUserLocation</code> متى ما تم استخدام <code>showsUserLocation</code> لضمان بقاء المستخدم في مركز الرؤية.</p><p>التحدي في نقاط الاهتمام الافتراضية هو أن المطور غالباً ما يرغب في إظهار نقاط اهتمام مخصصة وذات صلة بتطبيقه الخاص، بدلاً من النقاط الافتراضية التي توفرها الخريطة، مما يستدعي إخفاء الافتراضية ورسم علامات مخصصة.</p></template>
     <template class="content-en"><p>It's generally a good idea to use the <code>followUserLocation</code> property whenever using <code>showsUserLocation</code> to ensure the user remains in the visible region.</p><p>The challenge with default points of interest is that you probably want to show points of interest that are relevant to your application, instead of the points of interest that are rendered by default.</p><p>This requires disabling the default ones and plotting custom annotations.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React from "react";
+import { View } from "react-native";
+import MapView from "react-native-maps";
+import styles from "./styles";
+
+export default () =&gt; (
+  &lt;View style={styles.container}&gt;
+    {/* Basic MapView configuration tracking user location */}
+    &lt;MapView 
+      style={styles.mapView} 
+      showsUserLocation={true} 
+      followUserLocation={true} 
+    /&gt;
+  &lt;/View&gt;
+);</code></pre>
   </div>
 
   <table class="comparison-table">
@@ -339,6 +421,62 @@
     <template class="content-ar"><p>تُعد التراكبات (Overlays) قوية جداً عند الحاجة لتحديد مناطق جغرافية معينة (Geofencing) أو إظهار مناطق التغطية لخدمة ما.</p><p>يمكن التحكم في مظهر التراكب باستخدام خصائص مثل <code>strokeColor</code> و <code>strokeWidth</code>.</p><p>يمكن إدارة حالة التطبيق (State) للتبديل بين التراكبات المختلفة ديناميكياً بناءً على تفاعل المستخدم (مثل النقر على أزرار لتغيير المنطقة المظللة).</p></template>
     <template class="content-en"><p>Overlays are extremely powerful for geofencing or showing service coverage areas.</p><p>The appearance can be customized using properties like <code>strokeColor</code> and <code>strokeWidth</code>.</p><p>Application state can be managed to dynamically switch between different overlays based on user interaction (e.g., pressing text links to change the highlighted region).</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>JavaScript</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import React, { useState } from "react";
+import { View } from "react-native";
+import MapView from "react-native-maps";
+import styles from "./styles";
+
+// Define a region (array of coordinates) for the polygon overlay
+const ipaRegion = {
+  coordinates: [
+    { latitude: 43.8486744, longitude: -79.0695283 },
+    { latitude: 43.8537168, longitude: -79.0700046 },
+    { latitude: 43.8518394, longitude: -79.0725697 },
+    { latitude: 43.8481651, longitude: -79.0716377 },
+    { latitude: 43.8486744, longitude: -79.0695283 }
+  ],
+  strokeColor: "coral",
+  strokeWidth: 4
+};
+
+export default function PlottingPointsAndOverlays() {
+  const [overlays, setOverlays] = useState([ipaRegion]);
+
+  return (
+    &lt;View style={styles.container}&gt;
+      &lt;MapView
+        style={styles.mapView}
+        showsPointsOfInterest={false} // Hide default POIs
+        showsUserLocation={true}
+        followUserLocation={true}
+      &gt;
+        {/* 1. Plotting Markers (Points) */}
+        &lt;MapView.Marker
+          title="Duff Brewery"
+          description="Duff beer for me, Duff beer for you"
+          coordinate={{ latitude: 43.8418728, longitude: -79.086082 }}
+        /&gt;
+        
+        {/* 2. Plotting Polygons (Overlays) */}
+        {overlays.map((v, i) =&gt; (
+          &lt;MapView.Polygon
+            key={i}
+            coordinates={v.coordinates}
+            strokeColor={v.strokeColor}
+            strokeWidth={v.strokeWidth}
+          /&gt;
+        ))}
+      &lt;/MapView&gt;
+    &lt;/View&gt;
+  );
+}</code></pre>
   </div>
 
   <details class="thinking-question">
@@ -709,14 +847,57 @@
   </details>
 </section>
 
+<section id="android-sensor-types" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> أنواع المستشعرات في منصة أندرويد (Android Sensor Types)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Android Sensor Types</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>الثوابت البرمجية (Constants) المحددة في إطار عمل أندرويد للوصول إلى أنواع المستشعرات المختلفة ووحدات قياسها.</p></template>
+    <template class="content-en"><p>The specific programmatic constants defined in the Android framework to access different sensor types and their measurement units.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يوفر أندرويد ثوابت محددة للوصول إلى بيانات المستشعرات، لكل منها وحدة قياس واستخدام شائع:</p><ol><li><strong><code>TYPE_ACCELEROMETER</code></strong>: يقيس التسارع (بما في ذلك الجاذبية) بوحدة m/s². يُستخدم لاكتشاف الحركة (الاهتزاز، الإمالة).</li><li><strong><code>TYPE_GYROSCOPE</code></strong>: يقيس معدل الدوران بوحدة rad/s. يُستخدم لاكتشاف الدوران والالتفاف.</li><li><strong><code>TYPE_MAGNETIC_FIELD</code></strong>: يقيس المجال المغناطيسي بوحدة ميكرو تسلا (μT). يُستخدم لإنشاء البوصلة.</li><li><strong><code>TYPE_PROXIMITY</code></strong>: يقيس المسافة بالسنتيمتر (cm). يُستخدم لمعرفة موضع الهاتف أثناء المكالمة.</li><li><strong><code>TYPE_LIGHT</code></strong>: يقيس مستوى الإضاءة المحيطة بوحدة اللوكس (lx). يُستخدم للتحكم في سطوع الشاشة.</li></ol></template>
+    <template class="content-en"><p>Android provides specific constants to access sensor data, each with a measurement unit and common use:</p><ol><li><strong><code>TYPE_ACCELEROMETER</code></strong>: Measures acceleration (including gravity) in m/s². Used for motion detection (shake, tilt).</li><li><strong><code>TYPE_GYROSCOPE</code></strong>: Measures rate of rotation in rad/s. Used for rotation detection.</li><li><strong><code>TYPE_MAGNETIC_FIELD</code></strong>: Measures geomagnetic field in micro-Tesla (μT). Used for creating a compass.</li><li><strong><code>TYPE_PROXIMITY</code></strong>: Measures distance in cm. Used for phone position during a call.</li><li><strong><code>TYPE_LIGHT</code></strong>: Measures ambient light level in lux (lx). Used for controlling screen brightness.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>من المهم للمطورين التفريق بين المستشعرات بناءً على هيكل البيانات المرتجعة. المستشعرات المكانية والحركية (مثل <code>TYPE_ACCELEROMETER</code> و <code>TYPE_MAGNETIC_FIELD</code>) تُرجع مصفوفة تحتوي على ثلاث قيم تمثل المحاور (X, Y, Z).</p><p>في المقابل، المستشعرات البيئية ومستشعر التقارب (مثل <code>TYPE_LIGHT</code> و <code>TYPE_PROXIMITY</code>) تُرجع قيمة واحدة فقط في الحدث (SensorEvent)، مما يجعل معالجتها برمجياً أبسط وأقل استهلاكاً للموارد.</p></template>
+    <template class="content-en"><p>It is crucial for developers to differentiate sensors based on their returned data structure. Spatial and motion sensors (like <code>TYPE_ACCELEROMETER</code> and <code>TYPE_MAGNETIC_FIELD</code>) return an array containing three values representing the X, Y, and Z axes.</p><p>Conversely, environment and proximity sensors (like <code>TYPE_LIGHT</code> and <code>TYPE_PROXIMITY</code>) return only a single value in the SensorEvent, making their programmatic handling simpler and less resource-intensive.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُرجع <code>TYPE_LIGHT</code> قيمة واحدة بينما يُرجع <code>TYPE_ACCELEROMETER</code> ثلاث قيم؟</template>
+      <template class="content-en">Why does <code>TYPE_LIGHT</code> return a single value while <code>TYPE_ACCELEROMETER</code> returns three values?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الإضاءة هي خاصية بيئية محيطة (Scalar) لا تعتمد على الاتجاه، بينما التسارع هو كمية متجهة (Vector) تؤثر على الجهاز في الفضاء ثلاثي الأبعاد (X, Y, Z).</p></template>
+      <template class="content-en"><p>Because light is an ambient environmental property (scalar) that does not depend on direction, whereas acceleration is a vector quantity acting on the device in 3D space (X, Y, Z).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الممتعة. اليوم نربط تطبيقاتنا بالعالم الحقيقي! بدأنا بواجهة تحديد الموقع الجغرافي (Geolocation API)، وتذكروا دائماً الفرق الجوهري للامتحان: <code>getCurrentPosition</code> لمرة واحدة، و <code>watchPosition</code> للتتبع المستمر. ثم انتقلنا إلى الخرائط (MapView)، وهنا ركزوا على كيفية إخفاء النقاط الافتراضية ورسم علاماتكم (Markers) ومضلعاتكم (Polygons) الخاصة. الجزء الثاني من الوحدة كان عن المستشعرات. السر هنا هو فهم التصنيفات: مستشعرات حركة (مثل التسارع)، مستشعرات موضع (مثل التقارب والمجال المغناطيسي)، ومستشعرات بيئة (حرارة، ضغط). الفخ الأكبر في الامتحان هو نظام الإحداثيات؛ تذكروا دائماً أنه ثابت مع الجهاز ولا يدور مع الشاشة! المحور Z يخرج من الشاشة باتجاهكم. ركزوا على التمييز بين المستشعرات المادية (Hardware) والبرمجية (Software). بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome, future engineers, to this exciting module where we connect our apps to the real world! We started with the Geolocation API. For the exam, always remember the core difference: <code>getCurrentPosition</code> is for a one-time fix, while <code>watchPosition</code> is for continuous tracking. We then explored Maps (MapView), focusing on hiding default POIs and plotting custom Markers and Polygons (Overlays). The second half was all about the Android Sensor Framework. The key to mastering this is categorization: Motion sensors (Accelerometer), Position sensors (Proximity, Geomagnetic), and Environment sensors (Temperature, Pressure). The biggest exam trap is the coordinate system—remember, it is fixed to the physical device and does NOT rotate with the screen! The Z-axis points straight out of the screen. Finally, ensure you can distinguish between hardware-based and software-based sensors. Good luck with your studies!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الممتعة. اليوم نربط تطبيقاتنا بالعالم الحقيقي! بدأنا بواجهة تحديد الموقع الجغرافي (Geolocation API)، وتذكروا دائماً الفرق الجوهري للامتحان: <code>getCurrentPosition</code> لمرة واحدة، و <code>watchPosition</code> للتتبع المستمر. ثم انتقلنا إلى الخرائط (MapView)، وهنا ركزوا على كيفية إخفاء النقاط الافتراضية ورسم علاماتكم (Markers) ومضلعاتكم (Polygons) الخاصة. الجزء الثاني من الوحدة كان عن المستشعرات. السر هنا هو فهم التصنيفات: مستشعرات حركة (مثل التسارع)، مستشعرات موضع (مثل التقارب والمجال المغناطيسي)، ومستشعرات بيئة (حرارة، ضغط). الفخ الأكبر في الامتحان هو نظام الإحداثيات؛ تذكروا دائماً أنه ثابت مع الجهاز ولا يدور مع الشاشة! المحور Z يخرج من الشاشة باتجاهكم. ركزوا على التمييز بين المستشعرات المادية (Hardware) والبرمجية (Software). بالتوفيق في دراستكم!<p>الآن بعد أن فهمنا المفاهيم النظرية، من الضروري إتقان التنفيذ البرمجي. دمج واجهة تحديد الموقع الجغرافي مع مكونات <code>MapView</code> في React Native، وفهم كيفية إدارة حالة التطبيق (State) لرسم العلامات والمضلعات ديناميكياً، هي مهارات أساسية ستُختبرون فيها لبناء تطبيقات تعتمد على الموقع الحقيقي.</p></template>
+    <template class="content-en">Welcome, future engineers, to this exciting module where we connect our apps to the real world! We started with the Geolocation API. For the exam, always remember the core difference: <code>getCurrentPosition</code> is for a one-time fix, while <code>watchPosition</code> is for continuous tracking. We then explored Maps (MapView), focusing on hiding default POIs and plotting custom Markers and Polygons (Overlays). The second half was all about the Android Sensor Framework. The key to mastering this is categorization: Motion sensors (Accelerometer), Position sensors (Proximity, Geomagnetic), and Environment sensors (Temperature, Pressure). The biggest exam trap is the coordinate system—remember, it is fixed to the physical device and does NOT rotate with the screen! The Z-axis points straight out of the screen. Finally, ensure you can distinguish between hardware-based and software-based sensors. Good luck with your studies!<p>Now that we understand the theoretical concepts, mastering the programmatic implementation is crucial. Integrating the Geolocation API with React Native's <code>MapView</code> components, and understanding how to manage application state to dynamically render markers and polygons, are core skills you will be tested on to build real-world location-aware apps.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -894,6 +1075,24 @@
         </div>
       </div>
     </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">عند برمجة تطبيق خرائط، كيف يمكنك رسم منطقة تغطية خدمة التوصيل برمجياً؟</template>
+          <template class="content-en">When programming a maps application, how can you programmatically draw a delivery service coverage area?</template>
+          <span class="content-target">عند برمجة تطبيق خرائط، كيف يمكنك رسم منطقة تغطية خدمة التوصيل برمجياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يمكنك استخدام مكون <code>&lt;MapView.Polygon&gt;</code> وتمرير مصفوفة من الإحداثيات (خطوط الطول والعرض) إلى خاصية <code>coordinates</code> الخاصة به. سيقوم هذا برسم مضلع يربط بين هذه النقاط، ويمكنك تخصيص مظهره باستخدام خصائص مثل <code>strokeColor</code> و <code>strokeWidth</code>.</p></template>
+          <template class="content-en"><p>You can use the <code>&lt;MapView.Polygon&gt;</code> component and pass an array of coordinates (latitude and longitude) to its <code>coordinates</code> prop. This will draw a polygon connecting these points, and you can customize its appearance using props like <code>strokeColor</code> and <code>strokeWidth</code>.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -923,8 +1122,8 @@
   {
     "id": 2,
     "front": {
-      "ar": "ما هي وظيفة <code>getCurrentPosition()</code>؟",
-      "en": "What is the function of <code>getCurrentPosition()</code>?"
+      "ar": "ما هي وظيفة <code>getCurrentPosition()<\/code>؟",
+      "en": "What is the function of <code>getCurrentPosition()<\/code>?"
     },
     "back": {
       "definition": {
@@ -940,8 +1139,8 @@
   {
     "id": 3,
     "front": {
-      "ar": "ما هي وظيفة <code>watchPosition()</code>؟",
-      "en": "What is the function of <code>watchPosition()</code>?"
+      "ar": "ما هي وظيفة <code>watchPosition()<\/code>؟",
+      "en": "What is the function of <code>watchPosition()<\/code>?"
     },
     "back": {
       "definition": {
@@ -957,13 +1156,13 @@
   {
     "id": 4,
     "front": {
-      "ar": "ما هو مكون <code>MapView</code>؟",
-      "en": "What is the <code>MapView</code> component?"
+      "ar": "ما هو مكون <code>MapView<\/code>؟",
+      "en": "What is the <code>MapView<\/code> component?"
     },
     "back": {
       "definition": {
-        "ar": "المكون الأساسي من مكتبة <code>react-native-maps</code> المستخدم لعرض الخرائط في تطبيقات React Native.",
-        "en": "The main tool from <code>react-native-maps</code> used to render maps in React Native applications."
+        "ar": "المكون الأساسي من مكتبة <code>react-native-maps<\/code> المستخدم لعرض الخرائط في تطبيقات React Native.",
+        "en": "The main tool from <code>react-native-maps<\/code> used to render maps in React Native applications."
       },
       "example": {
         "ar": "null",
@@ -974,8 +1173,8 @@
   {
     "id": 5,
     "front": {
-      "ar": "ماذا تفعل خاصية <code>showsUserLocation</code>؟",
-      "en": "What does the <code>showsUserLocation</code> property do?"
+      "ar": "ماذا تفعل خاصية <code>showsUserLocation<\/code>؟",
+      "en": "What does the <code>showsUserLocation<\/code> property do?"
     },
     "back": {
       "definition": {
@@ -991,8 +1190,8 @@
   {
     "id": 6,
     "front": {
-      "ar": "ماذا تفعل خاصية <code>followUserLocation</code>؟",
-      "en": "What does the <code>followUserLocation</code> property do?"
+      "ar": "ماذا تفعل خاصية <code>followUserLocation<\/code>؟",
+      "en": "What does the <code>followUserLocation<\/code> property do?"
     },
     "back": {
       "definition": {
@@ -1013,8 +1212,8 @@
     },
     "back": {
       "definition": {
-        "ar": "عن طريق تعيين خاصية <code>showsPointsOfInterest</code> إلى <code>false</code>.",
-        "en": "By setting the <code>showsPointsOfInterest</code> property to <code>false</code>."
+        "ar": "عن طريق تعيين خاصية <code>showsPointsOfInterest<\/code> إلى <code>false<\/code>.",
+        "en": "By setting the <code>showsPointsOfInterest<\/code> property to <code>false<\/code>."
       },
       "example": {
         "ar": "null",
@@ -1025,8 +1224,8 @@
   {
     "id": 8,
     "front": {
-      "ar": "ما هو مكون <code>&lt;MapView.Marker&gt;</code>؟",
-      "en": "What is the <code>&lt;MapView.Marker&gt;</code> component?"
+      "ar": "ما هو مكون <code>&lt;MapView.Marker&gt;<\/code>؟",
+      "en": "What is the <code>&lt;MapView.Marker&gt;<\/code> component?"
     },
     "back": {
       "definition": {
@@ -1051,8 +1250,8 @@
         "en": "An area enclosed by a line connecting several coordinates, useful to highlight a region instead of a point."
       },
       "example": {
-        "ar": "استخدام <code>&lt;MapView.Polygon&gt;</code> لرسم حدود منطقة معينة.",
-        "en": "Using <code>&lt;MapView.Polygon&gt;</code> to draw the boundaries of a specific region."
+        "ar": "استخدام <code>&lt;MapView.Polygon&gt;<\/code> لرسم حدود منطقة معينة.",
+        "en": "Using <code>&lt;MapView.Polygon&gt;<\/code> to draw the boundaries of a specific region."
       }
     }
   },
@@ -1093,8 +1292,8 @@
   {
     "id": 12,
     "front": {
-      "ar": "ما هي وظيفة <code>SensorManager</code>؟",
-      "en": "What is the role of <code>SensorManager</code>?"
+      "ar": "ما هي وظيفة <code>SensorManager<\/code>؟",
+      "en": "What is the role of <code>SensorManager<\/code>?"
     },
     "back": {
       "definition": {
@@ -1110,8 +1309,8 @@
   {
     "id": 13,
     "front": {
-      "ar": "ما هي المعلومات التي يوفرها <code>SensorEvent</code>؟",
-      "en": "What information does <code>SensorEvent</code> provide?"
+      "ar": "ما هي المعلومات التي يوفرها <code>SensorEvent<\/code>؟",
+      "en": "What information does <code>SensorEvent<\/code> provide?"
     },
     "back": {
       "definition": {
@@ -1208,6 +1407,40 @@
         "en": "Barometer and Thermometer."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يتم تمرير الإحداثيات لرسم مضلع (Polygon) في React Native Maps؟",
+      "en": "How are coordinates passed to draw a Polygon in React Native Maps?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتم تمريرها كمصفوفة من الكائنات (Objects)، حيث يحتوي كل كائن على <code>latitude<\/code> و <code>longitude<\/code>، إلى خاصية <code>coordinates<\/code> في مكون <code>&lt;MapView.Polygon&gt;<\/code>.",
+        "en": "They are passed as an array of objects, each containing <code>latitude<\/code> and <code>longitude<\/code>, to the <code>coordinates<\/code> prop of the <code>&lt;MapView.Polygon&gt;<\/code> component."
+      },
+      "example": {
+        "ar": "<code>coordinates={[{latitude: 10, longitude: 20}, ...]}<\/code>",
+        "en": "<code>coordinates={[{latitude: 10, longitude: 20}, ...]}<\/code>"
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "ما هي وحدة القياس التي يستخدمها <code>TYPE_GYROSCOPE<\/code>؟",
+      "en": "What unit of measurement does <code>TYPE_GYROSCOPE<\/code> use?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يقيس معدل الدوران بوحدة الراديان في الثانية (rad/s).",
+        "en": "It measures the rate of rotation in radians per second (rad/s)."
+      },
+      "example": {
+        "ar": null,
+        "en": null
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1217,7 +1450,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1233,7 +1466,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1558,6 +1791,70 @@
     },
     "difficulty": "hard",
     "conceptId": "android-sensor-framework"
+  },
+  {
+    "conceptId": "geolocation-api",
+    "question": {
+      "ar": "في كود React Native، أين يجب وضع استدعاء <code>navigator.geolocation.clearWatch</code>؟",
+      "en": "In React Native code, where should the call to <code>navigator.geolocation.clearWatch</code> be placed?"
+    },
+    "options": {
+      "ar": [
+        "مباشرة بعد استدعاء watchPosition",
+        "داخل دالة رد الاتصال (callback) الخاصة بـ watchPosition",
+        "في دالة التنظيف (cleanup function) المُرجعة من useEffect",
+        "خارج مكون React بالكامل"
+      ],
+      "en": [
+        "Immediately after calling watchPosition",
+        "Inside the callback function of watchPosition",
+        "In the cleanup function returned by useEffect",
+        "Outside the React component entirely"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "لضمان إيقاف تتبع الموقع عند إزالة المكون من الشاشة (Unmount)، يجب وضع <code>clearWatch</code> في دالة التنظيف الخاصة بـ <code>useEffect</code>.",
+      "en": "To ensure location tracking stops when the component unmounts, <code>clearWatch</code> must be placed in the cleanup function returned by <code>useEffect</code>."
+    },
+    "hint": {
+      "ar": "فكر في دورة حياة المكون (Component Lifecycle) وكيفية منع تسرب الذاكرة.",
+      "en": "Think about the component lifecycle and how to prevent memory leaks."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "android-sensor-types",
+    "question": {
+      "ar": "أي من ثوابت المستشعرات التالية يُرجع قيمة واحدة فقط (Single value) بدلاً من مصفوفة ثلاثية الأبعاد؟",
+      "en": "Which of the following sensor constants returns only a single value rather than a 3D array?"
+    },
+    "options": {
+      "ar": [
+        "TYPE_ACCELEROMETER",
+        "TYPE_MAGNETIC_FIELD",
+        "TYPE_GYROSCOPE",
+        "TYPE_LIGHT"
+      ],
+      "en": [
+        "TYPE_ACCELEROMETER",
+        "TYPE_MAGNETIC_FIELD",
+        "TYPE_GYROSCOPE",
+        "TYPE_LIGHT"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "مستشعرات البيئة مثل <code>TYPE_LIGHT</code> تُرجع قيمة واحدة (مستوى الإضاءة)، بينما مستشعرات الحركة والموضع تُرجع مصفوفة للمحاور X, Y, Z.",
+      "en": "Environment sensors like <code>TYPE_LIGHT</code> return a single value (illuminance level), whereas motion and position sensors return an array for the X, Y, and Z axes."
+    },
+    "hint": {
+      "ar": "ابحث عن المستشعر الذي لا يعتمد على الاتجاه المكاني.",
+      "en": "Look for the sensor that does not depend on spatial direction."
+    },
+    "difficulty": "easy",
+    "id": 12
   }
 ]
 </script>
@@ -1602,6 +1899,14 @@
       <template class="content-ar">الفرق بين <code>showsUserLocation</code> و <code>followUserLocation</code>: الأولى تكتفي برسم النقطة الزرقاء على الخريطة، بينما الثانية تجبر الكاميرا على التحرك لتوسيط النقطة الزرقاء باستمرار.</template>
       <template class="content-en">The difference between <code>showsUserLocation</code> and <code>followUserLocation</code>: the first merely draws the blue dot on the map, while the second forces the camera to continuously pan and center on that blue dot.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان تنظيف (Cleanup) مستمع الموقع. عند استخدام <code>watchPosition</code> في React <code>useEffect</code>، يجب دائماً إرجاع دالة تقوم باستدعاء <code>clearWatch</code> لمنع تسرب الذاكرة (Memory Leaks) واستنزاف البطارية عند إغلاق المكون.</template>
+    <template class="content-en">Forgetting to cleanup the location watcher. When using <code>watchPosition</code> in a React <code>useEffect</code>, you must always return a cleanup function that calls <code>clearWatch</code> to prevent memory leaks and battery drain when the component unmounts.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

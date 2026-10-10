@@ -114,6 +114,16 @@
         <template class="content-en">Storage Device Management</template>
         <span class="content-target">إدارة أجهزة التخزين</span>
       </a>
+      <a href="#object-storage" class="toc-link" data-bilingual>
+        <template class="content-ar">التخزين الكائني (Object Storage)</template>
+        <template class="content-en">Object Storage</template>
+        <span class="content-target">التخزين الكائني (Object Storage)</span>
+      </a>
+      <a href="#disk-scheduling-examples" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة عملية: حساب حركة رأس القرص</template>
+        <template class="content-en">Worked Examples: Disk Head Movement</template>
+        <span class="content-target">أمثلة عملية: حساب حركة رأس القرص</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -231,8 +241,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تتكون محركات الأقراص الصلبة من أقراص تدور بسرعات تتراوح بين 60 إلى 250 مرة في الثانية.</p><p>يتم قياس الأداء من خلال</p><ul><li><strong><b>وقت البحث (Seek Time)</b></strong> وهو الوقت اللازم لتحريك ذراع القرص إلى الأسطوانة المطلوبة،</li><li>و<strong><b>التأخير الدوراني (Rotational Latency)</b></strong> وهو الوقت اللازم ليدور القطاع المطلوب تحت رأس القراءة/الكتابة.</li></ul><p><b>زمن الوصول (Access Latency)</b> هو مجموع هذين الوقتين.</p></template>
-    <template class="content-en"><p>HDDs consist of platters rotating at 60 to 250 times per second.</p><p>Performance is measured by</p><ul><li><strong><b>Seek Time</b></strong> (time to move the disk arm to the desired cylinder) and</li><li><strong><b>Rotational Latency</b></strong> (time for the desired sector to rotate under the disk head).</li></ul><p><b>Access Latency</b> is the sum of both.</p></template>
+    <template class="content-ar"><p>تتكون محركات الأقراص الصلبة من أقراص تدور بسرعات تتراوح بين 60 إلى 250 مرة في الثانية.</p><p>يتم قياس الأداء من خلال</p><ul><li><strong><b>وقت البحث (Seek Time)</b></strong> وهو الوقت اللازم لتحريك ذراع القرص إلى الأسطوانة المطلوبة،</li><li>و<strong><b>التأخير الدوراني (Rotational Latency)</b></strong> وهو الوقت اللازم ليدور القطاع المطلوب تحت رأس القراءة/الكتابة.</li></ul><p><b>زمن الوصول (Access Latency)</b> هو مجموع هذين الوقتين.</p><p>مثال عملي لحساب <b>متوسط وقت الإدخال/الإخراج (Average I/O time)</b> لنقل كتلة بحجم 4KB على قرص بسرعة 7200 دورة في الدقيقة (RPM)، بمتوسط وقت بحث 5ms، ومعدل نقل 1Gb/sec، وعبء متحكم 0.1ms:</p><ol><li><b>حساب التأخير الدوراني:</b> القرص يدور 120 مرة في الثانية (7200 / 60). الدورة الكاملة تستغرق 8.33ms. متوسط التأخير هو النصف = 4.17ms.</li><li><b>حساب وقت النقل:</b> 4KB مقسومة على 1Gb/sec تساوي تقريباً 0.031ms.</li><li><b>جمع الأوقات:</b> وقت البحث (5ms) + متوسط التأخير (4.17ms) + عبء المتحكم (0.1ms) + وقت النقل (0.031ms).</li></ol><p>النتيجة النهائية لمتوسط وقت الإدخال/الإخراج = 9.301ms.</p></template>
+    <template class="content-en"><p>HDDs consist of platters rotating at 60 to 250 times per second.</p><p>Performance is measured by</p><ul><li><strong><b>Seek Time</b></strong> (time to move the disk arm to the desired cylinder) and</li><li><strong><b>Rotational Latency</b></strong> (time for the desired sector to rotate under the disk head).</li></ul><p><b>Access Latency</b> is the sum of both.</p><p>A worked example to calculate the <b>Average I/O time</b> to transfer a 4KB block on a 7200 RPM disk with a 5ms average seek time, 1Gb/sec transfer rate, and a 0.1ms controller overhead:</p><ol><li><b>Calculate Rotational Latency:</b> The disk rotates 120 times per second (7200 / 60). A full rotation takes 8.33ms. The average latency is half of that = 4.17ms.</li><li><b>Calculate Transfer Time:</b> 4KB divided by 1Gb/sec equals approximately 0.031ms.</li><li><b>Sum the times:</b> Seek time (5ms) + average latency (4.17ms) + controller overhead (0.1ms) + transfer time (0.031ms).</li></ol><p>The final Average I/O time = 9.301ms.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1251,8 +1261,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>إدارة التخزين تتضمن:</p><ul><li><strong><b>التهيئة منخفضة المستوى (Physical Formatting)</b></strong> لتقسيم القرص إلى قطاعات يمكن للمتحكم قراءتها (تحتوي على ترويسة، بيانات، ورمز تصحيح الأخطاء ECC).</li><li>ثم <strong><b>التقسيم (Partitioning)</b></strong> لإنشاء أقراص منطقية.</li><li>وأخيراً <strong><b>التهيئة المنطقية (Logical Formatting)</b></strong> لإنشاء نظام الملفات.</li></ul><p>للإقلاع، يُخزن برنامج <b>Bootstrap loader</b> في كتل الإقلاع (Boot blocks) في قسم الإقلاع.</p></template>
-    <template class="content-en"><p>Storage management involves:</p><ul><li><strong><b>Low-level formatting (Physical Formatting)</b></strong> to divide the disk into sectors the controller can read (containing header, data, and ECC).</li><li>Then <strong><b>Partitioning</b></strong> to create logical disks.</li><li>Finally, <strong><b>Logical formatting</b></strong> to make a file system.</li></ul><p>For booting, a <b>Bootstrap loader</b> program is stored in the boot blocks of the boot partition.</p></template>
+    <template class="content-ar"><p>إدارة التخزين تتضمن:</p><ul><li><strong><b>التهيئة منخفضة المستوى (Physical Formatting)</b></strong> لتقسيم القرص إلى قطاعات يمكن للمتحكم قراءتها (تحتوي على ترويسة، بيانات، ورمز تصحيح الأخطاء ECC).</li><li>ثم <strong><b>التقسيم (Partitioning)</b></strong> لإنشاء أقراص منطقية.</li><li>وأخيراً <strong><b>التهيئة المنطقية (Logical Formatting)</b></strong> لإنشاء نظام الملفات.</li></ul><p>للإقلاع، يُخزن برنامج <b>Bootstrap loader</b> في كتل الإقلاع (Boot blocks) في قسم الإقلاع.</p><p>للتغلب على قيود مصفوفات RAID التي لا تكتشف تلف البيانات الصامت، تضيف أنظمة الملفات المتقدمة مثل <b>ZFS</b> مجاميع اختبارية (Checksums) لجميع البيانات والبيانات الوصفية (Metadata). كما أن ZFS يلغي الحاجة للأقسام (Partitions) التقليدية، وبدلاً من ذلك يجمع الأقراص في <b>تجمعات تخزين (Storage Pools)</b> تتشارك فيها أنظمة الملفات المساحة ديناميكياً.</p></template>
+    <template class="content-en"><p>Storage management involves:</p><ul><li><strong><b>Low-level formatting (Physical Formatting)</b></strong> to divide the disk into sectors the controller can read (containing header, data, and ECC).</li><li>Then <strong><b>Partitioning</b></strong> to create logical disks.</li><li>Finally, <strong><b>Logical formatting</b></strong> to make a file system.</li></ul><p>For booting, a <b>Bootstrap loader</b> program is stored in the boot blocks of the boot partition.</p><p>To overcome the limitations of RAID, which does not detect silent data corruption, advanced file systems like <b>ZFS</b> add <span class="smart-term" data-term-en="Checksum" data-ar="المجموع الاختباري" data-en-def="A small-sized block of data derived from another block of digital data for the purpose of detecting errors.">checksum<span class="smart-term-tooltip"></span></span>s to all data and metadata. ZFS also removes the need for traditional partitions, instead grouping disks into <b><span class="smart-term" data-term-en="Storage Pool" data-ar="تجمع التخزين" data-en-def="A collection of storage volumes managed as a single entity, allowing file systems to share space dynamically.">Storage Pool<span class="smart-term-tooltip"></span></span>s</b> where file systems share space dynamically.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1275,14 +1285,100 @@
   </details>
 </section>
 
+<section id="object-storage" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> التخزين الكائني (Object Storage)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Object Storage</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>بنية تخزين تدير البيانات ككائنات (Objects) في تجمع مسطح (Pool) بدلاً من هيكل مجلدات هرمي، ويتم الوصول إليها عبر معرفات فريدة (IDs).</p></template>
+    <template class="content-en"><p>A storage architecture that manages data as objects in a flat pool rather than a hierarchical directory structure, accessed via unique IDs.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>أنظمة الملفات ذات الأغراض العامة ليست كافية للبيانات على نطاق واسع جداً. لذلك، ظهر <b>التخزين الكائني</b> الذي يبدأ بتجمع تخزين (Storage pool) توضع فيه الكائنات.</p><p>الكائن هو مجرد حاوية للبيانات (Container of data). لا توجد طريقة للتنقل في التجمع للعثور على الكائنات (لا توجد هياكل أدلة). التسلسل النموذجي للعمليات هو: إنشاء كائن داخل التجمع، استلام <b><span class="smart-term" data-term-en="Object ID" data-ar="معرف الكائن" data-en-def="A unique identifier returned when an object is created, used for all future access.">معرف الكائن<span class="smart-term-tooltip"></span></span> (Object ID)</b>، الوصول إلى الكائن عبر ذلك المعرف، أو حذفه باستخدامه.</p></template>
+    <template class="content-en"><p>General-purpose file systems are not sufficient for very large-scale data. Thus, <b>Object Storage</b> emerged, starting with a <span class="smart-term" data-term-en="Storage Pool" data-ar="تجمع التخزين" data-en-def="A flat, unstructured space where objects are stored without a directory hierarchy.">storage pool<span class="smart-term-tooltip"></span></span> where objects are placed.</p><p>An object is just a container of data. There is no way to navigate the pool to find objects (no directory structures). The typical sequence is: create an object within the pool, receive an <b><span class="smart-term" data-term-en="Object ID" data-ar="معرف الكائن" data-en-def="A unique identifier returned when an object is created, used for all future access.">Object ID<span class="smart-term-tooltip"></span></span></b>, access the object via that ID, and delete the object via that ID.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>برامج إدارة التخزين الكائني، مثل نظام ملفات Hadoop (HDFS) و Ceph، تحدد مكان تخزين الكائنات وتدير حمايتها.</p><p>يتم ذلك عادةً عن طريق تخزين N من النسخ عبر N من الأنظمة داخل مجموعة التخزين (Cluster). هذا النهج يجعله قابلاً للتوسع أفقياً (Horizontally scalable) ومثالياً للبيانات غير المهيكلة (Unstructured data) التي تعتمد على المحتوى.</p></template>
+    <template class="content-en"><p>Object storage management software, like the Hadoop Distributed File System (HDFS) and Ceph, determines where to store objects and manages their protection.</p><p>This is typically done by storing N copies across N systems in the object storage cluster. This approach makes it horizontally scalable, content-addressable, and ideal for unstructured data.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يُعتبر التخزين الكائني موجهاً للحواسيب (Computer-oriented) وليس موجهاً للمستخدمين (User-oriented)؟</template>
+      <template class="content-en">Why is object storage considered computer-oriented rather than user-oriented?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنه يفتقر إلى المجلدات والمسارات التي يسهل على البشر قراءتها وتنظيمها. بدلاً من ذلك، يعتمد على معرفات فريدة (IDs) وواجهات برمجة تطبيقات (APIs) تتعامل معها التطبيقات البرمجية مباشرة.</p></template>
+      <template class="content-en"><p>Because it lacks human-readable folders and paths for organization. Instead, it relies on unique IDs and APIs that software applications interact with directly.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="disk-scheduling-examples" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> أمثلة عملية: حساب حركة رأس القرص</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Worked Examples: Disk Head Movement</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق رياضي لحساب إجمالي المسافة التي يقطعها ذراع القرص (Total head movement) باستخدام خوارزميات الجدولة المختلفة.</p></template>
+    <template class="content-en"><p>A mathematical application to calculate the total distance the disk arm travels (Total head movement) using different scheduling algorithms.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لنفترض أن لدينا طابور طلبات (Request queue) للأسطوانات التالية: 98، 183، 37، 122، 14، 124، 65، 67. ورأس القراءة يبدأ عند الأسطوانة 53.</p><ol><li><b>خوارزمية FCFS:</b> تخدم الطلبات بالترتيب. المسار: 53 &rarr; 98 &rarr; 183 &rarr; 37 &rarr; 122 &rarr; 14 &rarr; 124 &rarr; 65 &rarr; 67.<br>المسافات: |98-53|=45، |183-98|=85، |37-183|=146، |122-37|=85، |14-122|=108، |124-14|=110، |65-124|=59، |67-65|=2.<br><b><span class="smart-term" data-term-en="Total Head Movement" data-ar="إجمالي حركة الرأس" data-en-def="The sum of the absolute differences in cylinder numbers as the disk arm moves to service a queue of requests.">إجمالي حركة الرأس<span class="smart-term-tooltip"></span></span> = 640 أسطوانة.</b></li><li><b>خوارزمية SCAN (باتجاه الصفر):</b> يتحرك الرأس نحو الصفر، يخدم الطلبات، ثم يعكس اتجاهه. المسار: 53 &rarr; 37 &rarr; 14 &rarr; 0 &rarr; 65 &rarr; 67 &rarr; 98 &rarr; 122 &rarr; 124 &rarr; 183.<br>المسافة للصفر: 53. المسافة من 0 إلى 183: 183.<br><b>إجمالي حركة الرأس = 53 + 183 = 236 أسطوانة.</b></li><li><b>خوارزمية C-SCAN (باتجاه 199):</b> يتحرك للنهاية، يعود للصفر فوراً، ثم يكمل. المسار: 53 &rarr; 65 &rarr; 67 &rarr; 98 &rarr; 122 &rarr; 124 &rarr; 183 &rarr; 199 &rarr; 0 &rarr; 14 &rarr; 37.<br>المسافات: من 53 إلى 199 = 146. رحلة العودة من 199 إلى 0 = 199. من 0 إلى 37 = 37.<br><b>إجمالي حركة الرأس = 146 + 199 + 37 = 382 أسطوانة.</b></li></ol></template>
+    <template class="content-en"><p>Assume we have a request queue for the following cylinders: 98, 183, 37, 122, 14, 124, 65, 67. The read head starts at cylinder 53.</p><ol><li><b>FCFS Algorithm:</b> Services requests in order. Path: 53 &rarr; 98 &rarr; 183 &rarr; 37 &rarr; 122 &rarr; 14 &rarr; 124 &rarr; 65 &rarr; 67.<br>Distances: |98-53|=45, |183-98|=85, |37-183|=146, |122-37|=85, |14-122|=108, |124-14|=110, |65-124|=59, |67-65|=2.<br><b><span class="smart-term" data-term-en="Total Head Movement" data-ar="إجمالي حركة الرأس" data-en-def="The sum of the absolute differences in cylinder numbers as the disk arm moves to service a queue of requests.">Total head movement<span class="smart-term-tooltip"></span></span> = 640 cylinders.</b></li><li><b>SCAN Algorithm (towards 0):</b> Head moves towards 0, services requests, then reverses. Path: 53 &rarr; 37 &rarr; 14 &rarr; 0 &rarr; 65 &rarr; 67 &rarr; 98 &rarr; 122 &rarr; 124 &rarr; 183.<br>Distance to 0: 53. Distance from 0 to 183: 183.<br><b>Total head movement = 53 + 183 = 236 cylinders.</b></li><li><b>C-SCAN Algorithm (towards 199):</b> Moves to the end, returns to 0 immediately, then continues. Path: 53 &rarr; 65 &rarr; 67 &rarr; 98 &rarr; 122 &rarr; 124 &rarr; 183 &rarr; 199 &rarr; 0 &rarr; 14 &rarr; 37.<br>Distances: 53 to 199 = 146. Return trip 199 to 0 = 199. 0 to 37 = 37.<br><b>Total head movement = 146 + 199 + 37 = 382 cylinders.</b></li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ملاحظة هامة حول خوارزمية SCAN: في بعض المراجع (كما في الشريحة 21)، يُذكر أن إجمالي الحركة هو 208. هذا الرقم ينتج إذا عكس الرأس اتجاهه عند <b>آخر طلب</b> (الأسطوانة 14) بدلاً من الوصول للصفر. هذه النسخة المُحسنة تُعرف تقنياً باسم <b>LOOK</b>.</p><p>حساب LOOK: من 53 إلى 14 (المسافة 39). ثم من 14 إلى 183 (المسافة 169). الإجمالي = 39 + 169 = 208 أسطوانة.</p></template>
+    <template class="content-en"><p>Important note on SCAN: In some references (like slide 21), the total movement is stated as 208. This number is produced if the head reverses at the <b>last request</b> (cylinder 14) instead of going all the way to 0. This optimized version is technically known as <b>LOOK</b>.</p><p>LOOK calculation: 53 to 14 (distance 39). Then 14 to 183 (distance 169). Total = 39 + 169 = 208 cylinders.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في حساب C-SCAN، لماذا نجمع المسافة من 199 إلى 0 (وهي 199) رغم أن الرأس لا يقرأ أي بيانات خلال رحلة العودة؟</template>
+      <template class="content-en">In the C-SCAN calculation, why do we add the distance from 199 to 0 (which is 199) even though the head reads no data during the return trip?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن الذراع الميكانيكي لا يزال يضطر إلى قطع هذه المسافة فيزيائياً للعودة إلى البداية، وهذا يستغرق وقتاً (Seek Time) يجب أخذه في الاعتبار عند تقييم أداء الخوارزمية.</p></template>
+      <template class="content-en"><p>Because the mechanical arm still has to physically travel that distance to return to the beginning, and this takes time (Seek Time) which must be accounted for when evaluating the algorithm's performance.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة حول أنظمة التخزين الشامل. تخيلوا أن المعالج هو دماغ الحاسوب، والذاكرة العشوائية هي ذاكرته قصيرة المدى، أما التخزين الشامل فهو المكتبة الضخمة التي نحتفظ فيها بكل شيء للأبد. ليلة الامتحان، ركزوا جيداً على الفرق الجوهري بين الأقراص الميكانيكية (HDD) التي تعاني من 'وقت البحث' و'التأخير الدوراني'، وبين أقراص الحالة الصلبة (SSD/NVM) السريعة جداً ولكنها تتطلب إدارة معقدة مثل 'تسوية التآكل' و'جمع القمامة' لأنها لا تستطيع الكتابة فوق البيانات مباشرة. لا تنسوا خوارزميات جدولة الأقراص؛ فهم كيف يتحرك ذراع القرص (مثل خوارزمية المصعد SCAN و C-SCAN) هو سؤال كلاسيكي في الامتحانات. أخيراً، تقنية RAID هي درعنا الواقي ضد فقدان البيانات؛ تأكدوا من التمييز بين RAID 0 (للسرعة فقط) و RAID 1 (للنسخ المتطابق) و RAID 5 (للتكافؤ). بالتوفيق في دراستكم، ركزوا على هذه المفاهيم وستكونون في أمان!</template>
-    <template class="content-en">Welcome, my friends, to this crucial module on Mass-Storage Systems. Imagine the CPU as the brain, RAM as short-term memory, and mass storage as the massive library where we keep everything forever. For the exam, focus heavily on the fundamental difference between mechanical HDDs (which suffer from 'seek time' and 'rotational latency') and lightning-fast SSDs/NVMs (which require complex management like 'wear leveling' and 'garbage collection' because they can't overwrite data in place). Don't overlook disk scheduling algorithms; understanding how the disk arm moves (like the elevator algorithms SCAN and C-SCAN) is a classic exam topic. Finally, RAID is our shield against data loss; make sure you can distinguish between RAID 0 (speed only), RAID 1 (mirroring), and RAID 5 (parity). Good luck studying, master these concepts, and you'll ace the exam!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذه الوحدة الحاسمة حول أنظمة التخزين الشامل. تخيلوا أن المعالج هو دماغ الحاسوب، والذاكرة العشوائية هي ذاكرته قصيرة المدى، أما التخزين الشامل فهو المكتبة الضخمة التي نحتفظ فيها بكل شيء للأبد. ليلة الامتحان، ركزوا جيداً على الفرق الجوهري بين الأقراص الميكانيكية (HDD) التي تعاني من 'وقت البحث' و'التأخير الدوراني'، وبين أقراص الحالة الصلبة (SSD/NVM) السريعة جداً ولكنها تتطلب إدارة معقدة مثل 'تسوية التآكل' و'جمع القمامة' لأنها لا تستطيع الكتابة فوق البيانات مباشرة. لا تنسوا خوارزميات جدولة الأقراص؛ فهم كيف يتحرك ذراع القرص (مثل خوارزمية المصعد SCAN و C-SCAN) هو سؤال كلاسيكي في الامتحانات. أخيراً، تقنية RAID هي درعنا الواقي ضد فقدان البيانات؛ تأكدوا من التمييز بين RAID 0 (للسرعة فقط) و RAID 1 (للنسخ المتطابق) و RAID 5 (للتكافؤ). بالتوفيق في دراستكم، ركزوا على هذه المفاهيم وستكونون في أمان!<p>لقد قمنا بتوسيع المحتوى ليشمل الخطوات الرياضية الدقيقة لحساب متوسط وقت الإدخال/الإخراج، وهو موضوع شائع في الاختبارات. بالإضافة إلى ذلك، فصّلنا كيفية تعيين الكتل المنطقية على هندسة القرص الفيزيائية، وقدمنا التخزين الكائني (Object Storage) كحل حديث لإدارة تجمعات البيانات الضخمة وغير المهيكلة.</p><p>الآن بعد أن فهمنا البنية الفيزيائية للأقراص، من الضروري أن نرى كيف تترجم هذه الميكانيكا إلى أرقام. حساب مسافات الجدولة (مثل FCFS و SCAN) ليس مجرد تمرين رياضي، بل هو الطريقة التي يقرر بها نظام التشغيل الخوارزمية الأنسب. ومع تطور التخزين، نرى كيف تتجاوز أنظمة مثل ZFS ومحركات RAM القيود الميكانيكية القديمة لتقديم أداء وموثوقية لا مثيل لهما.</p></template>
+    <template class="content-en">Welcome, my friends, to this crucial module on Mass-Storage Systems. Imagine the CPU as the brain, RAM as short-term memory, and mass storage as the massive library where we keep everything forever. For the exam, focus heavily on the fundamental difference between mechanical HDDs (which suffer from 'seek time' and 'rotational latency') and lightning-fast SSDs/NVMs (which require complex management like 'wear leveling' and 'garbage collection' because they can't overwrite data in place). Don't overlook disk scheduling algorithms; understanding how the disk arm moves (like the elevator algorithms SCAN and C-SCAN) is a classic exam topic. Finally, RAID is our shield against data loss; make sure you can distinguish between RAID 0 (speed only), RAID 1 (mirroring), and RAID 5 (parity). Good luck studying, master these concepts, and you'll ace the exam!<p>We've expanded our coverage to include the exact mathematical steps for calculating Average I/O time, a common exam topic. Additionally, we've detailed how logical blocks map to physical disk geometry and introduced Object Storage as the modern solution for massive, unstructured data pools.</p><p>Now that we understand the physical structure of disks, it's crucial to see how these mechanics translate into numbers. Calculating scheduling distances (like FCFS and SCAN) isn't just a math exercise; it's how the OS decides the most optimal algorithm. As storage evolves, we see how systems like ZFS and RAM drives bypass old mechanical limitations to offer unparalleled performance and reliability.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1456,6 +1552,76 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لا يستخدم التخزين الكائني هيكل مجلدات هرمي. بدلاً من ذلك، يتم تخزين البيانات ككائنات في تجمع (Pool) كبير، ويتم الوصول إليها باستخدام معرف فريد (Object ID) عبر واجهات برمجة التطبيقات (APIs).</template>
           <template class="content-en">Object storage doesn't use a hierarchical folder structure. Instead, data is stored as objects in a flat pool and accessed using a unique Object ID via APIs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يبدأ تعيين العناوين الفيزيائية للقرص من الأسطوانة الخارجية (Outermost cylinder) ويتجه للداخل؟</template>
+          <template class="content-en">Why does physical disk address mapping start from the outermost cylinder and move inward?</template>
+          <span class="content-target">لماذا يبدأ تعيين العناوين الفيزيائية للقرص من الأسطوانة الخارجية (Outermost cylinder) ويتجه للداخل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الأسطوانات الخارجية لها محيط أكبر، مما يسمح لها باحتواء عدد أكبر من القطاعات مقارنة بالأسطوانات الداخلية. البدء من الخارج يضمن أداءً أعلى في البداية لأن كمية البيانات التي تمر تحت الرأس في الدورة الواحدة تكون أكبر.</p></template>
+          <template class="content-en"><p>Outermost cylinders have a larger circumference, allowing them to hold more sectors than inner cylinders. Starting from the outside ensures higher initial performance because more data passes under the head per rotation.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يحل التخزين الكائني (Object Storage) مشكلة التوسع التي تواجه أنظمة الملفات التقليدية؟</template>
+          <template class="content-en">How does Object Storage solve the scalability problem faced by traditional file systems?</template>
+          <span class="content-target">كيف يحل التخزين الكائني (Object Storage) مشكلة التوسع التي تواجه أنظمة الملفات التقليدية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>أنظمة الملفات التقليدية تعاني من بطء شديد عند البحث في ملايين المجلدات الهرمية. التخزين الكائني يلغي هذه الهيكلية تماماً ويستخدم تجمعاً مسطحاً (Flat pool) مع معرفات فريدة (IDs)، مما يسمح بتوزيع البيانات بسهولة عبر آلاف الخوادم (التوسع الأفقي) دون عنق زجاجة في إدارة الأدلة.</p></template>
+          <template class="content-en"><p>Traditional file systems suffer severe slowdowns when searching through millions of hierarchical folders. Object storage completely eliminates this structure, using a flat pool with unique IDs, allowing data to be easily distributed across thousands of servers (horizontal scaling) without a directory management bottleneck.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في خوارزمية C-SCAN، لماذا نعتبر رحلة العودة من نهاية القرص إلى بدايته جزءاً من إجمالي حركة الرأس، رغم عدم قراءة أي بيانات؟</template>
+          <template class="content-en">In the C-SCAN algorithm, why do we consider the return trip from the end of the disk to the beginning as part of the total head movement, even though no data is read?</template>
+          <span class="content-target">في خوارزمية C-SCAN، لماذا نعتبر رحلة العودة من نهاية القرص إلى بدايته جزءاً من إجمالي حركة الرأس، رغم عدم قراءة أي بيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن الهدف من حساب 'حركة الرأس' هو تقدير الوقت الضائع في العمليات الميكانيكية (Seek Time). حتى لو لم يقرأ الذراع بيانات، فإنه يستهلك وقتاً فيزيائياً للتحرك من الأسطوانة 199 عائداً إلى الأسطوانة 0، وهذا الوقت يؤثر على الأداء الكلي ويجب حسابه.</p></template>
+          <template class="content-en"><p>Because the goal of calculating 'head movement' is to estimate the time wasted on mechanical operations (Seek Time). Even if the arm isn't reading data, it consumes physical time to travel from cylinder 199 back to cylinder 0. This time impacts overall performance and must be accounted for.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا لا يُعتبر RAID بديلاً عن النسخ الاحتياطي (Backup)، ولماذا نحتاج إلى أنظمة مثل ZFS؟</template>
+          <template class="content-en">Why is RAID not considered a replacement for backups, and why do we need systems like ZFS?</template>
+          <span class="content-target">لماذا لا يُعتبر RAID بديلاً عن النسخ الاحتياطي (Backup)، ولماذا نحتاج إلى أنظمة مثل ZFS؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>RAID يحمي فقط من فشل الأجهزة (تلف قرص صلب). إذا قمت بحذف ملف بالخطأ، أو أصابك فيروس فدية، فإن RAID سينسخ هذا الخطأ فوراً لجميع الأقراص. علاوة على ذلك، RAID لا يكتشف 'تلف البيانات الصامت' (Bit rot). أنظمة مثل ZFS تحل مشكلة التلف الصامت باستخدام المجاميع الاختبارية (Checksums)، وتوفر ميزات مثل 'اللقطات' (Snapshots) التي تعمل كنسخ احتياطي حقيقي ضد أخطاء المستخدمين.</p></template>
+          <template class="content-en"><p>RAID only protects against hardware failure (a dead drive). If you accidentally delete a file, or get hit by ransomware, RAID instantly mirrors that mistake to all drives. Furthermore, RAID doesn't detect 'silent data corruption' (bit rot). Systems like ZFS solve silent corruption using checksums, and provide features like 'Snapshots' which act as true backups against user errors.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1723,6 +1889,57 @@
         "en": "Used in very large scale systems like Hadoop (HDFS) and Ceph."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هو التسلسل النموذجي للتعامل مع البيانات في التخزين الكائني؟",
+      "en": "What is the typical sequence for handling data in Object Storage?"
+    },
+    "back": {
+      "definition": {
+        "ar": "إنشاء كائن -> استلام معرف (ID) -> الوصول عبر المعرف -> الحذف عبر المعرف.",
+        "en": "Create object -> receive ID -> access via ID -> delete via ID."
+      },
+      "example": {
+        "ar": "لا يوجد مسار مجلد للبحث فيه، فقط المعرف الفريد.",
+        "en": "There is no folder path to search, only the unique ID."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "كيف تحسب إجمالي حركة الرأس لخوارزمية FCFS؟",
+      "en": "How do you calculate total head movement for the FCFS algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تجمع الفروق المطلقة (Absolute differences) بين كل طلب والطلب الذي يليه مباشرة في الطابور.",
+        "en": "Sum the absolute differences between each request and the immediately following request in the queue."
+      },
+      "example": {
+        "ar": "طابور: 50، 100. الرأس عند 40. الإجمالي = |50-40| + |100-50| = 10 + 50 = 60.",
+        "en": "Queue: 50, 100. Head at 40. Total = |50-40| + |100-50| = 10 + 50 = 60."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "ما هي الميزة الرئيسية لنظام ملفات ZFS مقارنة بـ RAID التقليدي؟",
+      "en": "What is the main advantage of the ZFS file system compared to traditional RAID?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يضيف ZFS مجاميع اختبارية (Checksums) لاكتشاف وتصحيح تلف البيانات الصامت، ويستخدم تجمعات التخزين (Pools) بدلاً من الأقسام.",
+        "en": "ZFS adds checksums to detect and correct silent data corruption, and uses storage pools instead of partitions."
+      },
+      "example": {
+        "ar": "إذا تغيرت بتة (Bit) واحدة بسبب خطأ مغناطيسي، سيكتشف ZFS ذلك عبر المجموع الاختباري، بينما RAID قد يمرر البيانات التالفة.",
+        "en": "If a single bit flips due to a magnetic error, ZFS detects it via the checksum, whereas RAID might pass the corrupted data."
+      }
+    },
+    "id": 18
   }
 ]
 </script>
@@ -1732,7 +1949,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 13</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1748,7 +1965,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 13</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2073,6 +2290,102 @@
     },
     "difficulty": "medium",
     "conceptId": "raid-structure"
+  },
+  {
+    "conceptId": "hdd-performance",
+    "question": {
+      "ar": "عند حساب متوسط وقت الإدخال/الإخراج (Average I/O time)، أي من المكونات التالية لا يدخل في المعادلة؟",
+      "en": "When calculating the Average I/O time, which of the following components is NOT part of the equation?"
+    },
+    "options": {
+      "ar": [
+        "متوسط وقت البحث (Average seek time)",
+        "وقت النقل (Transfer time)",
+        "وقت معالجة نظام الملفات (File system processing time)",
+        "العبء الإضافي للمتحكم (Controller overhead)"
+      ],
+      "en": [
+        "Average seek time",
+        "Transfer time",
+        "File system processing time",
+        "Controller overhead"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "متوسط وقت الإدخال/الإخراج للقرص يعتمد على وقت البحث، التأخير الدوراني، وقت النقل، وعبء المتحكم. وقت معالجة نظام الملفات هو عبء برمجي على مستوى نظام التشغيل وليس جزءاً من أداء القرص المادي.",
+      "en": "Average I/O time for a disk depends on seek time, rotational latency, transfer time, and controller overhead. File system processing time is a software overhead at the OS level, not part of the physical disk performance."
+    },
+    "hint": {
+      "ar": "المعادلة تركز على الأداء المادي للقرص والمتحكم الخاص به.",
+      "en": "The equation focuses on the physical performance of the disk and its controller."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "disk-scheduling-examples",
+    "question": {
+      "ar": "لدينا طابور الطلبات التالي: 80، 20، 10. ورأس القراءة يبدأ عند الأسطوانة 50. ما هو إجمالي حركة الرأس باستخدام خوارزمية FCFS؟",
+      "en": "Given the request queue: 80, 20, 10. The read head starts at cylinder 50. What is the total head movement using the FCFS algorithm?"
+    },
+    "options": {
+      "ar": [
+        "100",
+        "110",
+        "70",
+        "140"
+      ],
+      "en": [
+        "100",
+        "110",
+        "70",
+        "140"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "المسار هو: 50 -> 80 (المسافة 30). ثم 80 -> 20 (المسافة 60). ثم 20 -> 10 (المسافة 10). الإجمالي = 30 + 60 + 10 = 100.",
+      "en": "The path is: 50 -> 80 (distance 30). Then 80 -> 20 (distance 60). Then 20 -> 10 (distance 10). Total = 30 + 60 + 10 = 100."
+    },
+    "hint": {
+      "ar": "احسب الفرق المطلق بين كل رقمين متتاليين واجمعهم.",
+      "en": "Calculate the absolute difference between each consecutive pair and sum them up."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "storage-management",
+    "question": {
+      "ar": "أي من الميزات التالية يوفرها نظام ملفات ZFS ولا يوفرها إعداد RAID القياسي بمفرده؟",
+      "en": "Which of the following features is provided by the ZFS file system but NOT by a standard RAID setup alone?"
+    },
+    "options": {
+      "ar": [
+        "النسخ المتطابق للبيانات (Mirroring)",
+        "التقسيم الشريطي للأقراص (Striping)",
+        "اكتشاف تلف البيانات الصامت عبر المجاميع الاختبارية (Checksums)",
+        "استخدام الأقراص الاحتياطية الساخنة (Hot spares)"
+      ],
+      "en": [
+        "Data mirroring",
+        "Disk striping",
+        "Detecting silent data corruption via checksums",
+        "Using hot spare disks"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "RAID يحمي من فشل الأقراص الكامل، لكنه لا يكتشف الأخطاء الصامتة داخل القطاعات. ZFS يحل هذه المشكلة بإضافة مجاميع اختبارية لكل كتلة بيانات.",
+      "en": "RAID protects against whole-disk failure but doesn't detect silent bit rot within sectors. ZFS solves this by adding checksums to every data block."
+    },
+    "hint": {
+      "ar": "ابحث عن الميزة التي تتحقق من سلامة محتوى البيانات نفسها.",
+      "en": "Look for the feature that verifies the integrity of the data content itself."
+    },
+    "difficulty": "medium",
+    "id": 13
   }
 ]
 </script>
@@ -2122,6 +2435,22 @@
       <template class="content-ar">خوارزمية C-SCAN تعالج مشكلة عدم العدالة في SCAN من خلال معاملة الأسطوانات كقائمة دائرية، مما يوفر وقت انتظار موحد لجميع الطلبات.</template>
       <template class="content-en">The C-SCAN algorithm addresses the unfairness of SCAN by treating cylinders as a circular list, providing a uniform wait time for all requests.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند تعيين العناوين المنطقية إلى فيزيائية، يتم ملء الأسطوانة بالكامل (جميع المسارات فيها) قبل الانتقال إلى الأسطوانة التالية، وذلك لتقليل وقت البحث الميكانيكي البطيء.</template>
+    <template class="content-en">When mapping logical to physical addresses, an entire cylinder (all its tracks) is filled before moving to the next cylinder, in order to minimize slow mechanical seek time.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين SCAN و LOOK: خوارزمية SCAN الصارمة تذهب دائماً إلى نهاية القرص (الأسطوانة 0 أو الحد الأقصى) قبل أن تعكس اتجاهها. إذا عكست اتجاهها عند *آخر أسطوانة مطلوبة* دون الوصول للحافة، فهذه هي خوارزمية LOOK. انتبه لذلك عند حساب إجمالي حركة الرأس في الاختبارات!</template>
+    <template class="content-en">Confusing SCAN and LOOK: The strict SCAN algorithm always goes to the very end of the disk (cylinder 0 or max) before reversing. If it reverses at the *last requested cylinder* without reaching the edge, that is the LOOK algorithm. Pay attention to this when calculating total head movement in exams!</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

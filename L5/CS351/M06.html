@@ -117,6 +117,21 @@
         <template class="content-en">Recovery from Deadlock</template>
         <span class="content-target">التعافي من الجمود (Recovery from Deadlock)</span>
       </a>
+      <a href="#worked-example-bankers-algorithm" class="toc-link" data-bilingual>
+        <template class="content-ar">مثال عملي: خوارزمية المصرفي</template>
+        <template class="content-en">Worked Example: Banker's Algorithm</template>
+        <span class="content-target">مثال عملي: خوارزمية المصرفي</span>
+      </a>
+      <a href="#worked-example-detection-algorithm" class="toc-link" data-bilingual>
+        <template class="content-ar">مثال عملي: خوارزمية اكتشاف الجمود</template>
+        <template class="content-en">Worked Example: Deadlock Detection Algorithm</template>
+        <span class="content-target">مثال عملي: خوارزمية اكتشاف الجمود</span>
+      </a>
+      <a href="#system-resource-model" class="toc-link" data-bilingual>
+        <template class="content-ar">نموذج النظام واستخدام الموارد (System Model)</template>
+        <template class="content-en">System Model and Resource Utilization</template>
+        <span class="content-target">نموذج النظام واستخدام الموارد (System Model)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -243,6 +258,31 @@
     <div class="content-target"></div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>c</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>/* Shared Data:
+Semaphore S1 = 1;
+Semaphore S2 = 1;
+*/
+
+/* Process P1 */
+wait(S1);
+wait(S2);
+/* ... use resources ... */
+signal(S2);
+signal(S1);
+
+/* Process P2 */
+wait(S2);
+wait(S1);
+/* ... use resources ... */
+signal(S1);
+signal(S2);</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">لماذا لا يمكننا ببساطة إلغاء شرط 'الاستبعاد المتبادل' لمنع الجمود تماماً؟</template>
@@ -277,8 +317,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يتكون المخطط من مجموعة من العقد (Vertices) مقسمة إلى نوعين: العمليات (P) والموارد (R). يحتوي المورد على نقاط تمثل عدد النسخ (Instances) المتاحة منه.</p><p>هناك نوعان من الحواف (Edges):</p><ul><li><strong>حافة الطلب (Request Edge)</strong> — تتجه من العملية إلى المورد (Pi -> Rj)، وتعني أن العملية تطلب المورد.</li><li><strong>حافة التخصيص (Assignment Edge)</strong> — تتجه من المورد إلى العملية (Rj -> Pi)، وتعني أن المورد مخصص حالياً للعملية.</li></ul></template>
-    <template class="content-en"><p>The graph consists of a set of vertices V partitioned into two types: Processes P = {P1, P2, ..., Pn} and Resources R = {R1, R2, ..., Rm}. Resource nodes contain dots representing the number of instances.</p><p>There are two types of directed edges:</p><ul><li><strong>Request edge</strong> — directed from process Pi to resource Rj (Pi -> Rj).</li><li><strong>Assignment edge</strong> — directed from resource Rj to process Pi (Rj -> Pi).</li></ul></template>
+    <template class="content-ar"><p>يتكون المخطط من مجموعة من العقد (Vertices) مقسمة إلى نوعين: العمليات (P) والموارد (R). يحتوي المورد على نقاط تمثل عدد النسخ (Instances) المتاحة منه.</p><p>هناك نوعان من الحواف (Edges):</p><ul><li><strong>حافة الطلب (Request Edge)</strong> — تتجه من العملية إلى المورد (Pi -> Rj)، وتعني أن العملية تطلب المورد.</li><li><strong>حافة التخصيص (Assignment Edge)</strong> — تتجه من المورد إلى العملية (Rj -> Pi)، وتعني أن المورد مخصص حالياً للعملية.</li></ul><p>أمثلة على تحليل المخطط:</p><ol><li><b>مخطط يحتوي على جمود:</b> افترض أن العملية T1 تحتفظ بنسخة من R2 وتنتظر R1. العملية T2 تحتفظ بنسخة من R1 و R2 وتنتظر R3. العملية T3 تحتفظ بـ R3 وتنتظر R2. إذا كان R2 يمتلك نسختين فقط (وكلاهما محجوز لـ T1 و T2)، فإن T3 ستنتظر للأبد. تتشكل دورة (T1 -> R1 -> T2 -> R3 -> T3 -> R2 -> T1) ولا توجد عملية خارج الدورة يمكنها تحرير R2، مما يعني وجود جمود مؤكد.</li><li><b>مخطط يحتوي على دورة ولكن بدون جمود:</b> افترض أن T1 تنتظر R1 (المحجوز لـ T2 و T3). و T3 تنتظر R2 (المحجوز لـ T1 و T4). توجد دورة هنا (T1 -> R1 -> T3 -> R2 -> T1). ومع ذلك، العمليتان T2 و T4 ليستا جزءاً من الدورة ويمكنهما إنهاء عملهما وتحرير R1 و R2، مما يكسر الدورة ويمنع الجمود.</li></ol></template>
+    <template class="content-en"><p>The graph consists of a set of vertices V partitioned into two types: Processes P = {P1, P2, ..., Pn} and Resources R = {R1, R2, ..., Rm}. Resource nodes contain dots representing the number of instances.</p><p>There are two types of directed edges:</p><ul><li><strong>Request edge</strong> — directed from process Pi to resource Rj (Pi -> Rj).</li><li><strong>Assignment edge</strong> — directed from resource Rj to process Pi (Rj -> Pi).</li></ul><p>Examples of Graph Analysis:</p><ol><li><b>Graph with a deadlock:</b> Suppose T1 holds an instance of R2 and waits for R1. T2 holds R1 and R2, and waits for R3. T3 holds R3 and waits for R2. If R2 has only 2 instances (both held by T1 and T2), T3 waits forever. A cycle exists (T1 -> R1 -> T2 -> R3 -> T3 -> R2 -> T1) and no process outside the cycle can release R2, meaning a definite deadlock.</li><li><b>Graph with a cycle but NO deadlock:</b> Suppose T1 waits for R1 (held by T2 and T3). T3 waits for R2 (held by T1 and T4). A cycle exists (T1 -> R1 -> T3 -> R2 -> T1). However, T2 and T4 are not part of the cycle. They can finish their execution and release R1 and R2, breaking the cycle and preventing deadlock.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -665,14 +705,34 @@ void *do_work_two(void *param) {
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تعتمد طريقة الاكتشاف على عدد نسخ الموارد:</p><ul><li><strong>نسخة واحدة لكل مورد</strong> — يتم الحفاظ على <strong>مخطط الانتظار (Wait-for graph)</strong>، وهو نسخة مبسطة من مخطط تخصيص الموارد يحتوي على العمليات فقط (Pi -> Pj يعني Pi تنتظر Pj). يتم استدعاء خوارزمية للبحث عن دورة (Cycle) بشكل دوري (تتطلب عمليات \(O(n^2)\)).</li><li><strong>نسخ متعددة</strong> — تستخدم خوارزمية مشابهة لخوارزمية المصرفي، تعتمد على مصفوفات Available و Allocation و Request (الطلب الحالي وليس الأقصى). إذا كانت Finish[i] == false لبعض العمليات، فهذه العمليات في حالة جمود.</li></ul></template>
-    <template class="content-en"><p>Detection methods depend on resource instances:</p><ul><li><strong>Single instance</strong> — Maintain a <strong>Wait-for graph</strong> (nodes are processes, Pi -> Pj means Pi is waiting for Pj). Periodically invoke an algorithm to search for a cycle (requires \(O(n^2)\) operations).</li><li><strong>Multiple instances</strong> — Uses an algorithm similar to Banker's, utilizing Available, Allocation, and Request (current request, not max) matrices. If Finish[i] == false for some i, the system is in a deadlock state, and Pi is deadlocked.</li></ul></template>
+    <template class="content-ar"><p>تعتمد طريقة الاكتشاف على عدد نسخ الموارد:</p><ul><li><strong>نسخة واحدة لكل مورد</strong> — يتم الحفاظ على <strong>مخطط الانتظار (Wait-for graph)</strong>، وهو نسخة مبسطة من مخطط تخصيص الموارد يحتوي على العمليات فقط (Pi -> Pj يعني Pi تنتظر Pj). يتم استدعاء خوارزمية للبحث عن دورة (Cycle) بشكل دوري (تتطلب عمليات \(O(n^2)\)).</li><li><strong>نسخ متعددة</strong> — تستخدم خوارزمية مشابهة لخوارزمية المصرفي، تعتمد على مصفوفات Available و Allocation و Request (الطلب الحالي وليس الأقصى). إذا كانت Finish[i] == false لبعض العمليات، فهذه العمليات في حالة جمود.</li></ul><p>خطوة التهيئة (Initialization) في خوارزمية الاكتشاف تختلف عن خوارزمية المصرفي. في الاكتشاف، نقوم بتعيين <code>Finish[i] = true</code> لأي عملية لا تحتفظ بأي موارد حالياً (<code>Allocation == 0</code>). السبب هو أن العملية التي لا تملك موارد لا يمكن أن تساهم في دورة الجمود، لذا نعتبرها منتهية افتراضياً لأغراض الاكتشاف.</p></template>
+    <template class="content-en"><p>Detection methods depend on resource instances:</p><ul><li><strong>Single instance</strong> — Maintain a <strong>Wait-for graph</strong> (nodes are processes, Pi -> Pj means Pi is waiting for Pj). Periodically invoke an algorithm to search for a cycle (requires \(O(n^2)\) operations).</li><li><strong>Multiple instances</strong> — Uses an algorithm similar to Banker's, utilizing Available, Allocation, and Request (current request, not max) matrices. If Finish[i] == false for some i, the system is in a deadlock state, and Pi is deadlocked.</li></ul><p>The initialization step in the detection algorithm differs from Banker's algorithm. In detection, we set <code>Finish[i] = true</code> for any process that currently holds no resources (<code>Allocation == 0</code>). The reasoning is that a process holding no resources cannot contribute to a deadlock cycle, so we assume it can complete for the purpose of deadlock detection.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
     <template class="content-ar"><p>متى يتم استدعاء خوارزمية الاكتشاف؟ يعتمد ذلك على مدى تكرار حدوث الجمود وعدد العمليات التي ستتأثر.</p><p>إذا تم استدعاؤها بشكل عشوائي أو متباعد جداً، قد تتراكم دورات عديدة في المخطط، مما يجعل من المستحيل تحديد العملية التي 'تسببت' في الجمود الأصلي.</p><p>الاكتشاف المستمر يستهلك موارد المعالج (CPU overhead).</p></template>
     <template class="content-en"><p>When and how often to invoke the detection algorithm depends on how often a deadlock is likely to occur and how many processes will need to be rolled back.</p><p>If invoked arbitrarily or too infrequently, there may be many cycles in the resource graph, making it impossible to tell which of the deadlocked processes 'caused' the deadlock.</p><p>Frequent detection causes significant CPU overhead.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>pseudocode</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>1. Let Work and Finish be vectors of length m and n.
+2. Work = Available
+3. For i = 1, 2, ..., n:
+     if Allocation[i] != 0 then Finish[i] = false
+     else Finish[i] = true
+4. Find an index i such that both:
+     a) Finish[i] == false
+     b) Request[i] &lt;= Work
+   If no such i exists, go to step 6.
+5. Work = Work + Allocation[i]
+   Finish[i] = true
+   Go to step 4.
+6. If Finish[i] == false for some i, then the system is in a deadlock state.</code></pre>
   </div>
 
   <!-- DIAGRAM[1]: Show a side-by-side comparison of a Resource-Allocation Graph (left) and its corresponding Wait-for Graph (right). Left: T1 -> R1 -> T2 -> R3 -> T3 -> R2 -> T1 (cycle with resources). Right: T1 -> T2 -> T3 -> T1 (same cycle, but resources are removed, showing only processes waiting for processes). Dark background, processes in blue circles, resources in grey squares. -->
@@ -984,14 +1044,143 @@ void *do_work_two(void *param) {
   </details>
 </section>
 
+<section id="worked-example-bankers-algorithm" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> مثال عملي: خوارزمية المصرفي</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Worked Example: Banker's Algorithm</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق رقمي خطوة بخطوة لخوارزمية المصرفي لتحديد ما إذا كان النظام في حالة آمنة، وما إذا كان يجب قبول أو رفض طلبات الموارد الجديدة.</p></template>
+    <template class="content-en"><p>A step-by-step numerical application of Banker's Algorithm to determine if a system is in a safe state, and whether to grant or deny new resource requests.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>المشكلة:</b> 5 عمليات (P0-P4)، 3 أنواع موارد A(10), B(5), C(7). المتاح (Available) = (3,3,2). التخصيص (Allocation): P0(0,1,0), P1(2,0,0), P2(3,0,2), P3(2,1,1), P4(0,0,2). الحد الأقصى (Max): P0(7,5,3), P1(3,2,2), P2(9,0,2), P3(2,2,2), P4(4,3,3).</p><ol><li><b>حساب مصفوفة الاحتياج (Need = Max - Allocation):</b><br>P0: (7,4,3)<br>P1: (1,2,2)<br>P2: (6,0,0)<br>P3: (0,1,1)<br>P4: (4,3,1)</li><li><b>إيجاد تسلسل آمن:</b> نبدأ بـ Work = (3,3,2).<br>- P1 احتياجها (1,2,2) <= Work. تنهي عملها، Work = (3,3,2) + (2,0,0) = (5,3,2).<br>- P3 احتياجها (0,1,1) <= Work. تنهي عملها، Work = (5,3,2) + (2,1,1) = (7,4,3).<br>- P4 احتياجها (4,3,1) <= Work. تنهي عملها، Work = (7,4,3) + (0,0,2) = (7,4,5).<br>- P2 احتياجها (6,0,0) <= Work. تنهي عملها، Work = (7,4,5) + (3,0,2) = (10,4,7).<br>- P0 احتياجها (7,4,3) <= Work. تنهي عملها، Work = (10,5,7).<br><b>النتيجة:</b> النظام آمن. التسلسل: &lt;P1, P3, P4, P2, P0&gt;.</li><li><b>طلب جديد:</b> P1 تطلب (1,0,2).<br>- هل Request <= Available؟ نعم (1,0,2) <= (3,3,2).<br>- نتظاهر بالتخصيص: Available يصبح (2,3,0)، Allocation لـ P1 يصبح (3,0,2)، Need لـ P1 يصبح (0,2,0).<br>- بتشغيل خوارزمية الأمان مجدداً، نجد تسلسلاً آمناً &lt;P1, P3, P4, P0, P2&gt;. <b>النتيجة:</b> يُقبل الطلب.</li></ol></template>
+    <template class="content-en"><p><b>Problem:</b> 5 processes (P0-P4), 3 resource types A(10), B(5), C(7). Available = (3,3,2). Allocation: P0(0,1,0), P1(2,0,0), P2(3,0,2), P3(2,1,1), P4(0,0,2). Max: P0(7,5,3), P1(3,2,2), P2(9,0,2), P3(2,2,2), P4(4,3,3).</p><ol><li><b>Calculate Need matrix (Max - Allocation):</b><br>P0: (7,4,3)<br>P1: (1,2,2)<br>P2: (6,0,0)<br>P3: (0,1,1)<br>P4: (4,3,1)</li><li><b>Find a <span class="smart-term" data-term-en="Safe Sequence" data-ar="التسلسل الآمن" data-en-def="An execution order of all processes where each can finish using currently available resources plus resources released by previously finished processes.">safe sequence<span class="smart-term-tooltip"></span></span>:</b> Start with Work = (3,3,2).<br>- P1 Need(1,2,2) <= Work. P1 finishes, Work = (3,3,2) + (2,0,0) = (5,3,2).<br>- P3 Need(0,1,1) <= Work. P3 finishes, Work = (5,3,2) + (2,1,1) = (7,4,3).<br>- P4 Need(4,3,1) <= Work. P4 finishes, Work = (7,4,3) + (0,0,2) = (7,4,5).<br>- P2 Need(6,0,0) <= Work. P2 finishes, Work = (7,4,5) + (3,0,2) = (10,4,7).<br>- P0 Need(7,4,3) <= Work. P0 finishes, Work = (10,5,7).<br><b>Result:</b> System is safe. Sequence: &lt;P1, P3, P4, P2, P0&gt;.</li><li><b>New Request:</b> P1 requests (1,0,2).<br>- Is Request <= Available? Yes (1,0,2) <= (3,3,2).<br>- <span class="smart-term" data-term-en="Pretend Allocation" data-ar="التخصيص الوهمي (التظاهر)" data-en-def="Temporarily updating the state matrices to simulate granting a request, in order to test if the resulting state is safe.">Pretend allocation<span class="smart-term-tooltip"></span></span>: Available becomes (2,3,0), P1 Allocation becomes (3,0,2), P1 Need becomes (0,2,0).<br>- Running safety algorithm again yields a safe sequence &lt;P1, P3, P4, P0, P2&gt;. <b>Result:</b> Request granted.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ماذا لو طلبت P4 الموارد (3,3,0)؟ نتحقق أولاً: هل Request <= Available؟ (3,3,0) ليس أصغر من أو يساوي (2,3,0) (المتاح بعد طلب P1). لذلك، يجب أن تنتظر P4 لعدم توفر الموارد.</p><p>ماذا لو طلبت P0 الموارد (0,2,0)؟ نتحقق: (0,2,0) <= (2,3,0) (صحيح). نتظاهر بالتخصيص: Available يصبح (2,1,0). الآن، لا توجد أي عملية احتياجها (Need) أقل من أو يساوي (2,1,0). النظام سيدخل في حالة غير آمنة! لذلك، يُرفض طلب P0 وتُجبر على الانتظار.</p></template>
+    <template class="content-en"><p>What if P4 requests (3,3,0)? First check: Is Request <= Available? (3,3,0) is NOT <= (2,3,0) (Available after P1's request). Therefore, P4 must wait because resources are not available.</p><p>What if P0 requests (0,2,0)? Check: (0,2,0) <= (2,3,0) (True). Pretend allocation: Available becomes (2,1,0). Now, NO process has a Need <= (2,1,0). The system would enter an unsafe state! Therefore, P0's request is denied and it must wait.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في المثال، لماذا رُفض طلب P0 لـ (0,2,0) رغم أن الموارد كانت متاحة فعلياً في النظام؟</template>
+      <template class="content-en">In the example, why was P0's request for (0,2,0) denied even though the resources were physically available in the system?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن منحها لـ P0 سيترك النظام بـ (2,1,0) كموارد متاحة، وهذا لا يكفي لتلبية الحد الأقصى لاحتياج أي عملية أخرى. النظام سيفقد الضمان بأنه لن يدخل في جمود.</p></template>
+      <template class="content-en"><p>Because granting it would leave the system with (2,1,0) available, which is not enough to satisfy the maximum remaining need of ANY other process. The system would lose the guarantee that it can avoid a deadlock.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="worked-example-detection-algorithm" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> مثال عملي: خوارزمية اكتشاف الجمود</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Worked Example: Deadlock Detection Algorithm</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق رقمي خطوة بخطوة لخوارزمية اكتشاف الجمود لتحديد ما إذا كان النظام متوقفاً حالياً وأي العمليات متورطة في الجمود.</p></template>
+    <template class="content-en"><p>A step-by-step numerical application of the Deadlock Detection algorithm to determine if the system is currently deadlocked and which processes are involved.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>المشكلة:</b> 5 عمليات (P0-P4)، 3 أنواع موارد A(7), B(2), C(6). المتاح (Available) = (0,0,0). التخصيص (Allocation): P0(0,1,0), P1(2,0,0), P2(3,0,3), P3(2,1,1), P4(0,0,2). الطلب الحالي (Request): P0(0,0,0), P1(2,0,2), P2(0,0,0), P3(1,0,0), P4(0,0,2).</p><ol><li><b>التهيئة:</b> Work = (0,0,0). مصفوفة Finish = [false, false, false, false, false] (لأن جميع العمليات لها Allocation != 0).</li><li><b>البحث عن عملية:</b> P0 طلبها (0,0,0) <= Work(0,0,0). P0 تنهي عملها، Work = (0,0,0) + (0,1,0) = (0,1,0). Finish[0] = true.</li><li><b>الاستمرار:</b> P2 طلبها (0,0,0) <= Work(0,1,0). P2 تنهي عملها، Work = (0,1,0) + (3,0,3) = (3,1,3). Finish[2] = true.</li><li><b>الاستمرار:</b> P3 طلبها (1,0,0) <= Work(3,1,3). P3 تنهي عملها، Work = (3,1,3) + (2,1,1) = (5,2,4). Finish[3] = true.</li><li><b>الاستمرار:</b> P1 طلبها (2,0,2) <= Work(5,2,4). P1 تنهي عملها، Work = (5,2,4) + (2,0,0) = (7,2,4). Finish[1] = true.</li><li><b>الاستمرار:</b> P4 طلبها (0,0,2) <= Work(7,2,4). P4 تنهي عملها. جميع Finish[i] = true.<br><b>النتيجة:</b> لا يوجد جمود.</li></ol></template>
+    <template class="content-en"><p><b>Problem:</b> 5 processes (P0-P4), 3 resource types A(7), B(2), C(6). Available = (0,0,0). Allocation: P0(0,1,0), P1(2,0,0), P2(3,0,3), P3(2,1,1), P4(0,0,2). Current Request: P0(0,0,0), P1(2,0,2), P2(0,0,0), P3(1,0,0), P4(0,0,2).</p><ol><li><b>Initialization:</b> Work = (0,0,0). Finish array = [false, false, false, false, false] (since all have Allocation != 0).</li><li><b>Find process:</b> P0 Request(0,0,0) <= Work(0,0,0). P0 finishes, Work = (0,0,0) + (0,1,0) = (0,1,0). Finish[0] = true.</li><li><b>Continue:</b> P2 Request(0,0,0) <= Work(0,1,0). P2 finishes, Work = (0,1,0) + (3,0,3) = (3,1,3). Finish[2] = true.</li><li><b>Continue:</b> P3 Request(1,0,0) <= Work(3,1,3). P3 finishes, Work = (3,1,3) + (2,1,1) = (5,2,4). Finish[3] = true.</li><li><b>Continue:</b> P1 Request(2,0,2) <= Work(5,2,4). P1 finishes, Work = (5,2,4) + (2,0,0) = (7,2,4). Finish[1] = true.</li><li><b>Continue:</b> P4 Request(0,0,2) <= Work(7,2,4). P4 finishes. All Finish[i] = true.<br><b>Result:</b> No deadlock.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>ماذا لو طلبت P2 نسخة إضافية من المورد C؟ مصفوفة الطلب (Request) لـ P2 تصبح (0,0,1). نعيد تشغيل الخوارزمية:</p><p>P0 يمكنها الإنهاء لأن طلبها (0,0,0) <= Work(0,0,0). يصبح Work = (0,1,0).</p><p>الآن، نتحقق من باقي العمليات: P1(2,0,2)، P2(0,0,1)، P3(1,0,0)، P4(0,0,2). لا يوجد أي طلب من هذه الطلبات أصغر من أو يساوي Work(0,1,0). الخوارزمية تتوقف هنا.</p><p><b>النتيجة:</b> النظام في حالة جمود! العمليات المتورطة في الجمود هي تلك التي Finish[i] == false لها، وهي: P1, P2, P3, P4.</p></template>
+    <template class="content-en"><p>What if P2 requests an additional instance of type C? The Request matrix for P2 becomes (0,0,1). Let's rerun the algorithm:</p><p>P0 can still finish since Request(0,0,0) <= Work(0,0,0). Work becomes (0,1,0).</p><p>Now, check the remaining processes: P1(2,0,2), P2(0,0,1), P3(1,0,0), P4(0,0,2). NONE of these requests are <= Work(0,1,0). The algorithm halts.</p><p><b>Result:</b> The system is in a deadlock! The deadlocked processes are those where Finish[i] == false, which are: P1, P2, P3, and P4.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في سيناريو الجمود، لماذا لم يساعد إنهاء العملية P0 في فك الجمود عن العمليات الأخرى؟</template>
+      <template class="content-en">In the deadlock scenario, why didn't process P0 finishing help resolve the deadlock for the other processes?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن P0 حررت المورد B فقط (أضافت 1 للعمود الأوسط في Work)، بينما العمليات الأخرى (P1, P2, P3, P4) كانت تنتظر الموارد A و C، والتي كانت محجوزة بواسطة بعضها البعض في دورة مغلقة.</p></template>
+      <template class="content-en"><p>Because P0 only released resource B (adding 1 to the middle column of Work), while the other processes (P1, P2, P3, P4) were waiting for resources A and C, which were held by each other in a closed cycle.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="system-resource-model" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> نموذج النظام واستخدام الموارد (System Model)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> System Model and Resource Utilization</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يتكون النظام من أنواع مختلفة من الموارد (مثل دورات المعالج، مساحة الذاكرة، أجهزة الإدخال/الإخراج)، وكل مورد له عدد معين من النسخ (Instances).</p></template>
+    <template class="content-en"><p>The system consists of various resource types (e.g., CPU cycles, memory space, I/O devices), each with a specific number of instances.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>في هذا النموذج، يجب أن تستخدم كل عملية المورد في تسلسل صارم يتكون من ثلاث خطوات:</p><ol><li><strong>الطلب (Request):</strong> تطلب العملية المورد. إذا لم يكن المورد متاحاً فوراً (لأن عمليات أخرى تستخدمه)، يجب أن تنتظر العملية حتى يتم منحه لها.</li><li><strong>الاستخدام (Use):</strong> تقوم العملية بالعمل الفعلي وتعمل على المورد.</li><li><strong>التحرير (Release):</strong> تتخلى العملية عن المورد طواعية، مما يجعله متاحاً للعمليات الأخرى المنتظرة.</li></ol></template>
+    <template class="content-en"><p>In this model, each process must utilize a resource in a strict sequence of three steps:</p><ol><li><strong>Request:</strong> The process requests the resource. If the request cannot be granted immediately (e.g., the resource is being used by others), the process must wait.</li><li><strong>Use:</strong> The process operates on the resource.</li><li><strong>Release:</strong> The process voluntarily gives up the resource, making it available for other waiting processes.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذا التسلسل البسيط (<span class="smart-term" data-term-en="Request-Use-Release" data-ar="طلب-استخدام-تحرير" data-en-def="The mandatory lifecycle sequence for any process utilizing a system resource.">طلب-استخدام-تحرير<span class="smart-term-tooltip"></span></span>) هو الأساس الذي تعتمد عليه جميع خوارزميات التعامل مع الجمود. إذا لم تلتزم العمليات بهذا التسلسل (على سبيل المثال، استخدام مورد دون طلبه رسمياً، أو نسيان تحريره بعد الانتهاء)، فإن خوارزميات التجنب والاكتشاف ستفشل في تتبع حالة النظام بدقة.</p><p>الجمود يحدث تحديداً عندما تتعثر مجموعة من العمليات في مرحلة 'الطلب' (Request) إلى الأبد، دون القدرة على الوصول لمرحلة 'الاستخدام' أو 'التحرير'.</p></template>
+    <template class="content-en"><p>This simple <span class="smart-term" data-term-en="Request-Use-Release" data-ar="طلب-استخدام-تحرير" data-en-def="The mandatory lifecycle sequence for any process utilizing a system resource.">request-use-release<span class="smart-term-tooltip"></span></span> sequence is the foundation upon which all deadlock handling algorithms rely. If processes do not adhere to this sequence (e.g., using a resource without formally requesting it, or forgetting to release it), avoidance and detection algorithms will fail to track the system state accurately.</p><p>Deadlocks occur specifically when a set of processes gets stuck in the 'Request' phase forever, unable to ever reach the 'Use' or 'Release' phases.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث لنظام التشغيل إذا قامت عملية بطلب مورد، واستخدامه، ولكنها دخلت في حلقة مفرغة (Infinite Loop) قبل أن تصل إلى أمر 'التحرير' (Release)؟</template>
+      <template class="content-en">What happens to the OS if a process requests a resource, uses it, but enters an infinite loop before reaching the 'Release' command?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيحدث ما يسمى بـ 'تسرب الموارد' (Resource Leak). المورد سيظل محجوزاً للأبد، وأي عملية أخرى تطلبه ستنتظر إلى ما لا نهاية، مما قد يؤدي إلى توقف النظام جزئياً حتى لو لم يكن هناك جمود دائري حقيقي.</p></template>
+      <template class="content-en"><p>A 'Resource Leak' occurs. The resource remains locked forever, and any other process requesting it will wait indefinitely. This can partially halt the system even if a true circular deadlock hasn't formed.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أصدقائي في هذا الفصل الحاسم عن 'حالات الجمود' (Deadlocks). تخيلوا تقاطع طرق مزدحم حيث ترفض كل سيارة التراجع؛ هذا بالضبط ما يحدث في نظام التشغيل عندما تتوقف العمليات بانتظار بعضها البعض. للامتحان، ركزوا بشدة على الشروط الأربعة الضرورية؛ يجب أن تحفظوها كأسمائكم. تذكروا دائماً أن كسر شرط واحد يكفي للوقاية (Prevention). ثم ننتقل إلى التجنب (Avoidance)، وهنا تبرز 'خوارزمية المصرفي' كنجم ساطع؛ تأكدوا من فهم كيفية حساب مصفوفة Need وكيفية تتبع خوارزمية الأمان خطوة بخطوة. الفخ الأكبر في الامتحان هو الخلط بين الحالة غير الآمنة والجمود؛ الحالة غير الآمنة هي مجرد 'منطقة خطر' وليست حادثاً مؤكداً. أخيراً، افهموا الفرق بين مخطط تخصيص الموارد ومخطط الانتظار، وكيف نتعافى من الجمود دون التسبب في 'مجاعة' للعمليات. راجعوا الأمثلة الرقمية لخوارزمية المصرفي جيداً، فهي سؤال كلاسيكي في الاختبارات!</template>
-    <template class="content-en">Welcome, my friends, to this critical chapter on Deadlocks. Imagine a busy intersection where every car refuses to back up; that's exactly what happens in an OS when processes block each other. For the exam, focus heavily on the 4 necessary conditions; know them by heart. Remember that breaking just one is enough for Prevention. Then we move to Avoidance, where the 'Banker's Algorithm' is the star. Make sure you know how to calculate the Need matrix and trace the Safety algorithm step-by-step. The biggest exam trap is confusing an Unsafe State with a Deadlock; an unsafe state is just a 'danger zone', not a guaranteed crash. Finally, understand the difference between a Resource-Allocation Graph and a Wait-for Graph, and how we recover from deadlocks without causing 'Starvation'. Practice the numerical Banker's algorithm examples—they are classic exam questions!</template>
+    <template class="content-ar">أهلاً بكم يا أصدقائي في هذا الفصل الحاسم عن 'حالات الجمود' (Deadlocks). تخيلوا تقاطع طرق مزدحم حيث ترفض كل سيارة التراجع؛ هذا بالضبط ما يحدث في نظام التشغيل عندما تتوقف العمليات بانتظار بعضها البعض. للامتحان، ركزوا بشدة على الشروط الأربعة الضرورية؛ يجب أن تحفظوها كأسمائكم. تذكروا دائماً أن كسر شرط واحد يكفي للوقاية (Prevention). ثم ننتقل إلى التجنب (Avoidance)، وهنا تبرز 'خوارزمية المصرفي' كنجم ساطع؛ تأكدوا من فهم كيفية حساب مصفوفة Need وكيفية تتبع خوارزمية الأمان خطوة بخطوة. الفخ الأكبر في الامتحان هو الخلط بين الحالة غير الآمنة والجمود؛ الحالة غير الآمنة هي مجرد 'منطقة خطر' وليست حادثاً مؤكداً. أخيراً، افهموا الفرق بين مخطط تخصيص الموارد ومخطط الانتظار، وكيف نتعافى من الجمود دون التسبب في 'مجاعة' للعمليات. راجعوا الأمثلة الرقمية لخوارزمية المصرفي جيداً، فهي سؤال كلاسيكي في الاختبارات!<p>لقد أضفنا أمثلة رقمية مفصلة لخوارزميتي المصرفي والاكتشاف. في الامتحانات، غالباً ما يُطلب منك تتبع هذه المصفوفات يدوياً. تذكر دائماً: خوارزمية المصرفي تستخدم مصفوفة 'Max' للتنبؤ بالأسوأ وتجنبه، بينما خوارزمية الاكتشاف تستخدم مصفوفة 'Request' الحالية لتشخيص الواقع. تدرب على طرح المصفوفات وجمعها بدقة!</p><p>إن فهم كيف يمكن لعكس بسيط في ترتيب الحصول على الأقفال (كما رأينا في مثال الإشارات) أن يؤدي إلى جمود هو أمر بالغ الأهمية. هذا يربط الشروط النظرية الأربعة بأخطاء البرمجة العملية، ويذكرنا بأن نماذج النظام تعتمد على تسلسل صارم (طلب-استخدام-تحرير) للحفاظ على استقرار النظام.</p></template>
+    <template class="content-en">Welcome, my friends, to this critical chapter on Deadlocks. Imagine a busy intersection where every car refuses to back up; that's exactly what happens in an OS when processes block each other. For the exam, focus heavily on the 4 necessary conditions; know them by heart. Remember that breaking just one is enough for Prevention. Then we move to Avoidance, where the 'Banker's Algorithm' is the star. Make sure you know how to calculate the Need matrix and trace the Safety algorithm step-by-step. The biggest exam trap is confusing an Unsafe State with a Deadlock; an unsafe state is just a 'danger zone', not a guaranteed crash. Finally, understand the difference between a Resource-Allocation Graph and a Wait-for Graph, and how we recover from deadlocks without causing 'Starvation'. Practice the numerical Banker's algorithm examples—they are classic exam questions!<p>We've added detailed numerical walkthroughs for both Banker's and the Detection algorithms. In exams, you are frequently asked to trace these matrices by hand. Always remember: Banker's uses the 'Max' matrix to predict and avoid the worst-case, while Detection uses the current 'Request' matrix to diagnose reality. Practice your matrix addition and subtraction carefully!</p><p>Understanding how a simple reversal in lock acquisition order (as seen in the semaphore example) leads to a deadlock is crucial. It bridges the theoretical four conditions with practical programming errors, reminding us that system models rely on a strict request-use-release sequence to maintain stability.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1165,6 +1354,59 @@ void *do_work_two(void *param) {
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لأن الجمود نادر الحدوث في الاستخدام العادي، وتكلفة تشغيل خوارزميات الوقاية أو التجنب (مثل المصرفي) عالية جداً وتبطئ النظام بشكل كبير.</template>
           <template class="content-en">Because deadlocks are rare in normal use, and the performance cost of running prevention or avoidance algorithms (like Banker's) is too high and slows down the system significantly.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في خوارزمية المصرفي، لماذا قد نرفض طلباً لمورد رغم أن المورد متاح فعلياً في النظام في تلك اللحظة؟</template>
+          <template class="content-en">In Banker's Algorithm, why might we deny a resource request even if the resource is physically available in the system at that moment?</template>
+          <span class="content-target">في خوارزمية المصرفي، لماذا قد نرفض طلباً لمورد رغم أن المورد متاح فعلياً في النظام في تلك اللحظة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن تلبية الطلب قد تنقل النظام من 'حالة آمنة' إلى 'حالة غير آمنة'. إذا أعطينا المورد للعملية، قد لا يتبقى لدينا موارد كافية لضمان قدرة أي عملية أخرى على إكمال الحد الأقصى لعملها، مما يفتح الباب لاحتمالية الجمود.</p></template>
+          <template class="content-en"><p>Because granting the request might transition the system from a 'safe state' to an 'unsafe state'. If we give the resource away, we might not have enough left to guarantee that ANY other process can finish its maximum work, opening the door to a potential deadlock.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تقوم خوارزمية اكتشاف الجمود بتعيين Finish[i] = true فوراً للعمليات التي لا تمتلك أي موارد (Allocation = 0)؟</template>
+          <template class="content-en">Why does the Deadlock Detection algorithm immediately set Finish[i] = true for processes that hold no resources (Allocation = 0)?</template>
+          <span class="content-target">لماذا تقوم خوارزمية اكتشاف الجمود بتعيين Finish[i] = true فوراً للعمليات التي لا تمتلك أي موارد (Allocation = 0)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الجمود يتطلب شرط 'الاحتفاظ والانتظار' (Hold and Wait). العملية التي لا تحتفظ بأي مورد لا يمكن أن تمنع العمليات الأخرى من التقدم، وبالتالي لا يمكن أن تكون جزءاً من دورة الجمود. نعتبرها 'منتهية' لتسهيل الحسابات.</p></template>
+          <template class="content-en"><p>Deadlock requires the 'Hold and Wait' condition. A process holding no resources cannot block other processes from progressing, and thus cannot be part of a deadlock cycle. We consider it 'finished' to simplify the calculations.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في مثال الجمود باستخدام الإشارات (Semaphores)، كيف يتجلى شرط 'الانتظار الدائري' (Circular Wait) بالضبط؟</template>
+          <template class="content-en">In the semaphore deadlock example, how exactly does the 'Circular Wait' condition manifest?</template>
+          <span class="content-target">في مثال الجمود باستخدام الإشارات (Semaphores)، كيف يتجلى شرط 'الانتظار الدائري' (Circular Wait) بالضبط؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>تحتفظ العملية P1 بالإشارة S1 وتنتظر S2، بينما تحتفظ العملية P2 بالإشارة S2 وتنتظر S1. الدورة المغلقة هي: P1 تنتظر S2 (التي تملكها P2)، و P2 تنتظر S1 (التي تملكها P1). لا يمكن لأي منهما التقدم لتحرير الإشارة التي يمتلكها.</p></template>
+          <template class="content-en"><p>Process P1 holds semaphore S1 and waits for S2, while Process P2 holds semaphore S2 and waits for S1. The closed cycle is: P1 waits for S2 (held by P2), and P2 waits for S1 (held by P1). Neither can proceed to release the semaphore they currently hold.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1466,6 +1708,57 @@ void *do_work_two(void *param) {
         "en": "A low-priority process constantly has its resources preempted."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "التخصيص الوهمي (Pretend Allocation) في خوارزمية المصرفي",
+      "en": "Pretend Allocation in Banker's Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "تعديل مصفوفات Available و Allocation و Need مؤقتاً لاختبار ما إذا كان قبول الطلب سيترك النظام آمناً.",
+        "en": "Temporarily modifying Available, Allocation, and Need matrices to test if granting a request leaves the system safe."
+      },
+      "example": {
+        "ar": "Available = Available - Request; Allocation = Allocation + Request; Need = Need - Request.",
+        "en": "Available = Available - Request; Allocation = Allocation + Request; Need = Need - Request."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "تهيئة مصفوفة Finish في خوارزمية الاكتشاف",
+      "en": "Finish Array Initialization in Detection Algorithm"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُعين كـ false فقط للعمليات التي تمتلك موارد (Allocation != 0). العمليات التي لا تملك موارد تُعتبر true فوراً.",
+        "en": "Set to false ONLY for processes holding resources (Allocation != 0). Processes with no resources are immediately true."
+      },
+      "example": {
+        "ar": "إذا كانت P1 لا تملك أي مورد، فإن Finish[1] = true منذ البداية لأنها لا يمكن أن تسبب جموداً.",
+        "en": "If P1 holds no resources, Finish[1] = true initially because it cannot cause a deadlock."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "دورة حياة استخدام المورد (Resource Utilization Lifecycle)",
+      "en": "Resource Utilization Lifecycle"
+    },
+    "back": {
+      "definition": {
+        "ar": "التسلسل الصارم الذي يجب أن تتبعه أي عملية لاستخدام مورد: الطلب (Request)، ثم الاستخدام (Use)، ثم التحرير (Release).",
+        "en": "The strict sequence a process must follow to use a resource: Request, then Use, then Release."
+      },
+      "example": {
+        "ar": "طلب فتح ملف، قراءة البيانات منه، ثم إغلاق الملف.",
+        "en": "Requesting to open a file, reading data from it, then closing the file."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1475,7 +1768,7 @@ void *do_work_two(void *param) {
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 13</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1491,7 +1784,7 @@ void *do_work_two(void *param) {
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 13</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1816,6 +2109,102 @@ void *do_work_two(void *param) {
     },
     "difficulty": "hard",
     "conceptId": "deadlock-detection"
+  },
+  {
+    "conceptId": "worked-example-bankers-algorithm",
+    "question": {
+      "ar": "في خوارزمية المصرفي، إذا كان المتاح (Available) = (2,3,0) واحتياج العملية (Need) = (0,2,0)، هل يمكن لهذه العملية أن تنهي عملها في هذه الخطوة؟",
+      "en": "In Banker's Algorithm, if Available = (2,3,0) and a process's Need = (0,2,0), can this process finish in this step?"
+    },
+    "options": {
+      "ar": [
+        "نعم، لأن (0,2,0) أصغر من أو يساوي (2,3,0)",
+        "لا، لأن المورد الثالث غير متاح (0)",
+        "لا، يجب أن يكون الاحتياج مساوياً تماماً للمتاح",
+        "نعم، ولكن فقط إذا تخلت عن مواردها الحالية"
+      ],
+      "en": [
+        "Yes, because (0,2,0) <= (2,3,0)",
+        "No, because the third resource is not available (0)",
+        "No, Need must be exactly equal to Available",
+        "Yes, but only if it releases its current resources"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "العملية تحتاج فقط إلى نسختين من المورد الثاني، وهناك 3 نسخ متاحة. المورد الأول والثالث لا تحتاجهما (0)، لذا توفرهما لا يهم.",
+      "en": "The process only needs 2 instances of the second resource, and 3 are available. It needs 0 of the first and third, so their availability doesn't block it."
+    },
+    "hint": {
+      "ar": "قارن كل عنصر في المتجهين وجهاً لوجه.",
+      "en": "Compare each element in the vectors one-to-one."
+    },
+    "difficulty": "easy",
+    "id": 11
+  },
+  {
+    "conceptId": "worked-example-detection-algorithm",
+    "question": {
+      "ar": "أثناء تنفيذ خوارزمية اكتشاف الجمود، توقفت الخوارزمية ولم تجد أي عملية إضافية تحقق الشرط (Request <= Work). ماذا يعني هذا؟",
+      "en": "During the execution of the Deadlock Detection algorithm, the algorithm halts and finds no more processes satisfying (Request <= Work). What does this mean?"
+    },
+    "options": {
+      "ar": [
+        "النظام في حالة آمنة تماماً",
+        "يجب إعادة تشغيل النظام",
+        "العمليات التي قيمة Finish لها تساوي false هي في حالة جمود",
+        "العمليات التي قيمة Finish لها تساوي true هي في حالة جمود"
+      ],
+      "en": [
+        "The system is completely safe",
+        "The system must be rebooted",
+        "The processes with Finish == false are deadlocked",
+        "The processes with Finish == true are deadlocked"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "العمليات التي لم تتمكن الخوارزمية من إنهائها (Finish == false) هي العمليات العالقة في دورة الجمود.",
+      "en": "The processes that the algorithm could not simulate finishing (Finish == false) are the ones stuck in the deadlock cycle."
+    },
+    "hint": {
+      "ar": "العمليات التي 'لم تنتهِ' هي التي تواجه المشكلة.",
+      "en": "The processes that 'did not finish' are the ones in trouble."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "system-resource-model",
+    "question": {
+      "ar": "وفقاً لنموذج النظام القياسي، ما هو التسلسل الصحيح للإجراءات التي يجب أن تتبعها العملية لاستخدام مورد؟",
+      "en": "According to the standard system model, what is the correct sequence of actions a process must follow to utilize a resource?"
+    },
+    "options": {
+      "ar": [
+        "الاستخدام -> الطلب -> التحرير",
+        "الطلب -> الاستخدام -> التحرير",
+        "الطلب -> التحرير -> الاستخدام",
+        "التخصيص -> الاستخدام -> الإنهاء"
+      ],
+      "en": [
+        "Use -> Request -> Release",
+        "Request -> Use -> Release",
+        "Request -> Release -> Use",
+        "Allocate -> Use -> Terminate"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يجب على العملية أولاً طلب المورد، ثم استخدامه إذا تم منحه، وأخيراً تحريره ليتمكن الآخرون من استخدامه.",
+      "en": "A process must first request the resource, then use it if granted, and finally release it so others can use it."
+    },
+    "hint": {
+      "ar": "لا يمكنك استخدام شيء قبل أن تطلبه، ولا يمكنك تحريره قبل أن تنتهي من استخدامه.",
+      "en": "You cannot use something before asking for it, and you cannot release it before you finish using it."
+    },
+    "difficulty": "easy",
+    "id": 13
   }
 ]
 </script>

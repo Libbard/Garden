@@ -103,6 +103,16 @@
         <template class="content-en">Generating Permutations and Combinations</template>
         <span class="content-target">توليد التباديل والتوافيق (Generating Permutations & Combinations)</span>
       </a>
+      <a href="#recursive-modular-exponentiation" class="toc-link" data-bilingual>
+        <template class="content-ar">الأسس النمطية العودية (Recursive Modular Exponentiation)</template>
+        <template class="content-en">Recursive Modular Exponentiation</template>
+        <span class="content-target">الأسس النمطية العودية (Recursive Modular Exponentiation)</span>
+      </a>
+      <a href="#recursive-binary-search" class="toc-link" data-bilingual>
+        <template class="content-ar">البحث الثنائي العودي (Recursive Binary Search)</template>
+        <template class="content-en">Recursive Binary Search</template>
+        <span class="content-target">البحث الثنائي العودي (Recursive Binary Search)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -269,8 +279,8 @@ else return n * factorial(n - 1)</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لإثبات صحة خوارزمية عودية، نستخدم الاستقراء الرياضي على حجم المدخلات.</p><ul><li><strong>في خطوة الأساس (Basis Step)</strong>، نثبت أن الخوارزمية تعمل بشكل صحيح للمدخلات الأولية (الحالة الأساسية).</li><li><strong>في خطوة الاستقراء (Inductive Step)</strong>، نفترض أن الخوارزمية تعمل بشكل صحيح لمدخل بحجم $k$، ونثبت بناءً على ذلك أنها ستعمل بشكل صحيح لمدخل بحجم $k+1$.</li></ul></template>
-    <template class="content-en"><p>To prove a recursive algorithm is correct, we use mathematical induction on the size of the input.</p><ul><li><strong>In the Basis Step</strong>, we show the algorithm works correctly for the initial input (base case).</li><li><strong>In the Inductive Step</strong>, we assume the algorithm works correctly for an input of size $k$, and use this to prove it works for an input of size $k+1$.</li></ul></template>
+    <template class="content-ar"><p>لإثبات صحة خوارزمية عودية، نستخدم الاستقراء الرياضي على حجم المدخلات.</p><ul><li><strong>في خطوة الأساس (Basis Step)</strong>، نثبت أن الخوارزمية تعمل بشكل صحيح للمدخلات الأولية (الحالة الأساسية).</li><li><strong>في خطوة الاستقراء (Inductive Step)</strong>، نفترض أن الخوارزمية تعمل بشكل صحيح لمدخل بحجم $k$، ونثبت بناءً على ذلك أنها ستعمل بشكل صحيح لمدخل بحجم $k+1$.</li></ul><p><b>مثال:</b> أثبت صحة الخوارزمية العودية لحساب القوة $a^n$ (حيث $a \neq 0$ و $n$ عدد صحيح غير سالب).</p><p>الخوارزمية هي:</p><ul><li><code>if n = 0 then return 1</code></li><li><code>else return a * power(a, n - 1)</code></li></ul><p><b>الحل:</b> نستخدم الاستقراء الرياضي على الأس $n$.</p><ol><li><b>خطوة الأساس:</b> عندما $n = 0$، فإن $a^0 = 1$. الخوارزمية تُرجع 1 عندما $n = 0$، وهو ما يطابق $a^0$. إذن، خطوة الأساس صحيحة.</li><li><b>الخطوة الاستقرائية:</b> نفترض صحة <span class="smart-term" data-term-en="Inductive Hypothesis" data-ar="الفرضية الاستقرائية" data-en-def="The assumption that a statement holds for an arbitrary case k, used as a stepping stone to prove it for k+1.">الفرضية الاستقرائية<span class="smart-term-tooltip"></span></span> بأن <code>power(a, k) = a^k</code> تعمل بشكل صحيح لعدد صحيح غير سالب $k$. يجب أن نثبت أنها تحسب بشكل صحيح لـ $k + 1$.</li><li>عندما يكون المدخل $k + 1$، تُرجع الخوارزمية <code>a * power(a, k)</code>. بناءً على الفرضية الاستقرائية، هذا يساوي $a \cdot a^k = a^{k+1}$.</li></ol><p>هذا يكمل الإثبات، مما يوضح أن الخوارزمية تنتج المخرجات الصحيحة لجميع الأعداد الصحيحة غير السالبة $n$.</p></template>
+    <template class="content-en"><p>To prove a recursive algorithm is correct, we use mathematical induction on the size of the input.</p><ul><li><strong>In the Basis Step</strong>, we show the algorithm works correctly for the initial input (base case).</li><li><strong>In the Inductive Step</strong>, we assume the algorithm works correctly for an input of size $k$, and use this to prove it works for an input of size $k+1$.</li></ul><p><b>Example:</b> Prove that the recursive algorithm for computing $a^n$ (where $a \neq 0$ and $n$ is a nonnegative integer) is correct.</p><p>The algorithm is:</p><ul><li><code>if n = 0 then return 1</code></li><li><code>else return a * power(a, n - 1)</code></li></ul><p><b>Solution:</b> We use mathematical induction on the exponent $n$.</p><ol><li><b>Basis Step:</b> For $n = 0$, $a^0 = 1$. The algorithm returns 1 when $n = 0$, which matches $a^0$. Thus, the basis step is true.</li><li><b>Inductive Step:</b> Assume the <span class="smart-term" data-term-en="Inductive Hypothesis" data-ar="الفرضية الاستقرائية" data-en-def="The assumption that a statement holds for an arbitrary case k, used as a stepping stone to prove it for k+1.">inductive hypothesis<span class="smart-term-tooltip"></span></span> that <code>power(a, k) = a^k</code> is correct for an arbitrary nonnegative integer $k$. We must show it computes correctly for $k + 1$.</li><li>When the input is $k + 1$, the algorithm returns <code>a * power(a, k)</code>. By the inductive hypothesis, this equals $a \cdot a^k = a^{k+1}$.</li></ol><p>This completes the proof, showing the algorithm produces the correct output for all nonnegative integers $n$.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -312,8 +322,8 @@ else return n * factorial(n - 1)</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يعمل الترتيب بالدمج عن طريق تقسيم القائمة بشكل متكرر إلى قائمتين فرعيتين متساويتي الطول حتى تحتوي كل قائمة فرعية على عنصر واحد فقط (والذي يعتبر مرتباً بطبيعته).</p><p>بعد ذلك، يتم دمج أزواج القوائم الفرعية بشكل متتابع في قوائم مرتبة أكبر، حتى يتم دمج جميع القوائم الفرعية في قائمة واحدة نهائية مرتبة.</p><p>يمكن تمثيل هذه العملية باستخدام شجرة ثنائية متزنة.</p></template>
-    <template class="content-en"><p>Merge Sort works by iteratively splitting a list into two sublists of equal length until each sublist has one element (which is inherently sorted).</p><p>At each step, a pair of sublists is successively merged into a list with elements in increasing order. The process ends when all sublists have been merged.</p><p>This succession of splits and merges can be represented by a balanced binary tree.</p></template>
+    <template class="content-ar"><p>يعمل الترتيب بالدمج عن طريق تقسيم القائمة بشكل متكرر إلى قائمتين فرعيتين متساويتي الطول حتى تحتوي كل قائمة فرعية على عنصر واحد فقط (والذي يعتبر مرتباً بطبيعته).</p><p>بعد ذلك، يتم دمج أزواج القوائم الفرعية بشكل متتابع في قوائم مرتبة أكبر، حتى يتم دمج جميع القوائم الفرعية في قائمة واحدة نهائية مرتبة.</p><p>يمكن تمثيل هذه العملية باستخدام شجرة ثنائية متزنة.</p><p>خوارزمية دالة الدمج (<code>merge</code>) التي تدمج قائمتين مرتبتين $L_1$ و $L_2$ تعمل بالخطوات التالية:</p><ol><li>قم بإنشاء قائمة فارغة $L$.</li><li>طالما أن كلا القائمتين $L_1$ و $L_2$ ليستا فارغتين، قارن العنصر الأول من كل قائمة.</li><li>قم بإزالة العنصر الأصغر من قائمته وأضفه إلى النهاية اليمنى للقائمة $L$.</li><li>إذا أدت عملية الإزالة هذه إلى تفريغ إحدى القائمتين، فقم بإزالة جميع العناصر المتبقية من القائمة الأخرى وأضفها إلى نهاية $L$.</li></ol><p>في النهاية، نرجع القائمة المدمجة $L$ التي تحتوي الآن على جميع العناصر بترتيب تصاعدي.</p></template>
+    <template class="content-en"><p>Merge Sort works by iteratively splitting a list into two sublists of equal length until each sublist has one element (which is inherently sorted).</p><p>At each step, a pair of sublists is successively merged into a list with elements in increasing order. The process ends when all sublists have been merged.</p><p>This succession of splits and merges can be represented by a balanced binary tree.</p><p>The algorithm for the <code>merge</code> <span class="smart-term" data-term-en="Subroutine" data-ar="روتين فرعي" data-en-def="A sequence of program instructions that performs a specific task, packaged as a unit.">subroutine<span class="smart-term-tooltip"></span></span>, which merges two sorted lists $L_1$ and $L_2$, works through the following steps:</p><ol><li>Create an empty list $L$.</li><li>While both lists $L_1$ and $L_2$ are nonempty, compare the first element of each list.</li><li>Remove the smaller element from its respective list and append it to the right end of $L$.</li><li>If this removal makes one of the lists empty, remove all remaining elements from the other list and append them to $L$.</li></ol><p>Finally, return the merged list $L$, which now contains all elements in increasing order.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1077,6 +1087,35 @@ for (j = i + 1; j <= r; j++)
   a[j] = a[i] + j - i</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>void NextPermutation(int a[], int n) {
+    int j = n - 1;
+    // Find the rightmost element that is smaller than the element next to it
+    while (a[j] &gt; a[j+1]) {
+        j--;
+    }
+    int k = n;
+    // Find the smallest element to the right of a[j] that is greater than a[j]
+    while (a[j] &gt; a[k]) {
+        k--;
+    }
+    // Swap them
+    Swap(a[j], a[k]);
+    int r = n;
+    int s = j + 1;
+    // Reverse the elements after position j
+    while (r &gt; s) {
+        Swap(a[r], a[s]);
+        r--;
+        s++;
+    }
+}</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">ما هو التبديل الذي يلي التبديل 1243 في الترتيب المعجمي للمجموعة {1,2,3,4}؟</template>
@@ -1091,14 +1130,142 @@ for (j = i + 1; j <= r; j++)
   </details>
 </section>
 
+<section id="recursive-modular-exponentiation" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> الأسس النمطية العودية (Recursive Modular Exponentiation)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Recursive Modular Exponentiation</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية عودية فعالة لحساب $b^n \bmod m$ عن طريق تنصيف الأس في كل خطوة استدعاء.</p></template>
+    <template class="content-en"><p>An efficient recursive algorithm for computing $b^n \bmod m$ by halving the exponent at each recursive step.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لحساب $b^n \bmod m$ بكفاءة، نستخدم خوارزمية عودية تعتمد على تقسيم الأس $n$ إلى النصف في كل استدعاء، مما يقلل من عدد العمليات بشكل كبير.</p><ol><li>إذا كان $n = 0$، فإن النتيجة هي 1.</li><li>إذا كان $n$ زوجياً، نستدعي الخوارزمية لحساب النتيجة للأس $n/2$، ونربعها، ثم نأخذ الباقي بقسمة $m$.</li><li>إذا كان $n$ فردياً، نستدعي الخوارزمية لحساب النتيجة للأس $\lfloor n/2 \rfloor$، ونربعها، ونضربها في $b \bmod m$، ثم نأخذ الباقي بقسمة $m$.</li></ol></template>
+    <template class="content-en"><p>To compute $b^n \bmod m$ efficiently, we use a recursive algorithm that halves the exponent $n$ in each call, drastically reducing the number of operations.</p><ol><li>If $n = 0$, the result is 1.</li><li>If $n$ is even, we recursively compute the result for $n/2$, square it, and take the modulo $m$.</li><li>If $n$ is odd, we recursively compute the result for $\lfloor n/2 \rfloor$, square it, multiply by $b \bmod m$, and take the modulo $m$.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>هذه الخوارزمية تقلل بشكل كبير من عدد عمليات الضرب المطلوبة مقارنة بالضرب المتكرر المباشر.</p><p>تعقيدها الزمني هو $O(\log n)$، مما يجعلها أداة حيوية في تطبيقات التشفير (مثل خوارزمية RSA) حيث تكون الأرقام والأسس كبيرة جداً ولا يمكن حسابها بالطرق التقليدية دون تجاوز سعة الذاكرة.</p></template>
+    <template class="content-en"><p>This algorithm significantly reduces the number of multiplications required compared to direct repeated multiplication.</p><p>Its time complexity is $O(\log n)$, making it a vital tool in cryptography applications (like the RSA algorithm) where numbers and exponents are extremely large and cannot be computed conventionally without memory overflow.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>عملية الأسس النمطية.</strong></template>
+      <template class="content-en"><strong>Modular exponentiation operation.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$b^n \bmod m$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>pseudocode</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>procedure mpower(b, m, n: integers with b &gt; 0 and m &gt;= 2, n &gt;= 0)
+if n = 0 then return 1
+else if n is even then return mpower(b, n/2, m)^2 mod m
+else return (mpower(b, floor(n/2), m)^2 mod m * b mod m) mod m</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا نفضل استخدام هذه الخوارزمية العودية بدلاً من حساب $b^n$ أولاً ثم أخذ الباقي؟</template>
+      <template class="content-en">Why do we prefer this recursive algorithm over calculating $b^n$ first and then taking the modulo?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن حساب $b^n$ مباشرة للأرقام الكبيرة سيؤدي إلى تجاوز سعة الذاكرة (Overflow)، بينما أخذ الباقي في كل خطوة يبقي الأرقام صغيرة وقابلة للإدارة.</p></template>
+      <template class="content-en"><p>Because calculating $b^n$ directly for large numbers will cause memory overflow, whereas taking the modulo at each step keeps the numbers small and manageable.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="recursive-binary-search" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> البحث الثنائي العودي (Recursive Binary Search)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Recursive Binary Search</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية عودية تبحث عن عنصر في قائمة مرتبة عن طريق تقسيم فترة البحث إلى النصف في كل خطوة.</p></template>
+    <template class="content-en"><p>A recursive algorithm that searches for an element in a sorted list by halving the search interval at each step.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تعمل خوارزمية البحث الثنائي العودي على قائمة مرتبة $a_1, a_2, \dots, a_n$. للبحث عن عنصر $x$ في الفترة من المؤشر $i$ إلى $j$:</p><ol><li>نحسب المؤشر الأوسط $m = \lfloor (i+j)/2 \rfloor$.</li><li>إذا كان $x = a_m$، نرجع $m$ (تم العثور على العنصر).</li><li>إذا كان $x < a_m$ و $i < m$، نستدعي الخوارزمية عودياً للبحث في النصف الأيسر (من $i$ إلى $m-1$).</li><li>إذا كان $x > a_m$ و $j > m$، نستدعي الخوارزمية عودياً للبحث في النصف الأيمن (من $m+1$ إلى $j$).</li></ol><p>إذا لم يتحقق أي شرط (أي أن <span class="smart-term" data-term-en="Search Interval" data-ar="فترة البحث" data-en-def="The subset of the list currently being examined by the search algorithm.">فترة البحث<span class="smart-term-tooltip"></span></span> أصبحت فارغة)، نرجع 0 للإشارة إلى أن العنصر غير موجود.</p></template>
+    <template class="content-en"><p>The recursive binary search algorithm operates on a sorted list $a_1, a_2, \dots, a_n$. To search for an element $x$ in the interval from index $i$ to $j$:</p><ol><li>Calculate the middle index $m = \lfloor (i+j)/2 \rfloor$.</li><li>If $x = a_m$, return $m$ (element found).</li><li>If $x < a_m$ and $i < m$, recursively call the algorithm to search the left half (from $i$ to $m-1$).</li><li>If $x > a_m$ and $j > m$, recursively call the algorithm to search the right half (from $m+1$ to $j$).</li></ol><p>If no condition is met (meaning the <span class="smart-term" data-term-en="Search Interval" data-ar="فترة البحث" data-en-def="The subset of the list currently being examined by the search algorithm.">search interval<span class="smart-term-tooltip"></span></span> is empty), return 0 to indicate the element is not found.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تعتمد هذه الخوارزمية على مبدأ 'فرق تسد' (Divide and Conquer).</p><p>تعقيدها الزمني هو $O(\log n)$، مما يجعلها أسرع بكثير من البحث الخطي $O(n)$ للقوائم الكبيرة، ولكنها تشترط بشكل صارم أن تكون القائمة مرتبة مسبقاً لكي تعمل بشكل صحيح.</p></template>
+    <template class="content-en"><p>This algorithm relies on the 'Divide and Conquer' paradigm.</p><p>Its time complexity is $O(\log n)$, making it much faster than linear search $O(n)$ for large lists, but it strictly requires the list to be sorted beforehand to function correctly.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>التعقيد الزمني للبحث الثنائي.</strong></template>
+      <template class="content-en"><strong>Time complexity of binary search.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$O(\log n)$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>pseudocode</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>procedure binary_search(i, j, x: integers, 1 &lt;= i &lt;= j &lt;= n)
+m := floor((i + j) / 2)
+if x = a_m then return m
+else if (x &lt; a_m and i &lt; m) then return binary_search(i, m - 1, x)
+else if (x &gt; a_m and j &gt; m) then return binary_search(m + 1, j, x)
+else return 0</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا استخدمنا البحث الثنائي على قائمة غير مرتبة؟</template>
+      <template class="content-en">What happens if we use binary search on an unsorted list?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستفشل الخوارزمية في العثور على العنصر بشكل موثوق، لأنها تفترض أن جميع العناصر على يسار المنتصف أصغر منه وعلى يمينه أكبر منه، وهو افتراض خاطئ في القائمة غير المرتبة.</p></template>
+      <template class="content-en"><p>The algorithm will fail to find the element reliably, because it assumes all elements to the left of the middle are smaller and to the right are larger, which is a false assumption in an unsorted list.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبطال علوم الحاسب في الأسبوع الخامس! هذه الوحدة هي الجسر الذي يربط بين الرياضيات البحتة والبرمجة الفعلية. بدأنا بالخوارزميات العودية، وهي طريقة تفكير قبل أن تكون طريقة برمجة؛ كيف تحل مشكلة كبيرة بتقسيمها لمشاكل أصغر؟ تذكروا دائماً: لا تنسوا 'الحالة الأساسية' وإلا ستغرقون في حلقة لا نهائية! ثم انتقلنا لإثبات صحة هذه الخوارزميات باستخدام صديقنا القديم: الاستقراء الرياضي. بعد ذلك، درسنا 'الترتيب بالدمج' (Merge Sort)، وهو تطبيق عملي رائع للعودية يرينا كيف يمكن تحسين الأداء من $O(n^2)$ إلى $O(n \log n)$. في الجزء الثاني، رفعنا مستوى التحدي في العد: ماذا لو سمحنا بالتكرار؟ التباديل مع التكرار بسيطة ($n^r$)، لكن التوافيق مع التكرار تتطلب حيلة ذكية جداً وهي 'النجوم والأعمدة' $C(n+r-1, r)$. هذه الصيغة تأتي دائماً في الاختبارات، خاصة في أسئلة حلول المعادلات الخطية. ركزوا على فهم متى نستخدم كل صيغة، وتدربوا على توليد التباديل بالترتيب المعجمي. بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome, CS champions, to Module 4! This module is the bridge between pure math and actual programming. We started with recursive algorithms, which is a mindset before it's a coding technique: how do you solve a big problem by breaking it into smaller ones? Always remember: never forget the 'Base Case' or you'll drown in an infinite loop! We then proved these algorithms correct using our old friend: Mathematical Induction. Next, we looked at Merge Sort, a brilliant practical application of recursion showing how to optimize performance from $O(n^2)$ to $O(n \log n)$. In the second half, we leveled up our counting skills: what if repetition is allowed? Permutations with repetition are straightforward ($n^r$), but combinations with repetition require the clever 'Stars and Bars' trick $C(n+r-1, r)$. This formula is an exam favorite, especially for linear equation solutions. Focus on knowing when to apply which formula, and practice generating permutations in lexicographic order. Happy studying!</template>
+    <template class="content-ar">أهلاً بكم يا أبطال علوم الحاسب في الأسبوع الخامس! هذه الوحدة هي الجسر الذي يربط بين الرياضيات البحتة والبرمجة الفعلية. بدأنا بالخوارزميات العودية، وهي طريقة تفكير قبل أن تكون طريقة برمجة؛ كيف تحل مشكلة كبيرة بتقسيمها لمشاكل أصغر؟ تذكروا دائماً: لا تنسوا 'الحالة الأساسية' وإلا ستغرقون في حلقة لا نهائية! ثم انتقلنا لإثبات صحة هذه الخوارزميات باستخدام صديقنا القديم: الاستقراء الرياضي. بعد ذلك، درسنا 'الترتيب بالدمج' (Merge Sort)، وهو تطبيق عملي رائع للعودية يرينا كيف يمكن تحسين الأداء من $O(n^2)$ إلى $O(n \log n)$. في الجزء الثاني، رفعنا مستوى التحدي في العد: ماذا لو سمحنا بالتكرار؟ التباديل مع التكرار بسيطة ($n^r$)، لكن التوافيق مع التكرار تتطلب حيلة ذكية جداً وهي 'النجوم والأعمدة' $C(n+r-1, r)$. هذه الصيغة تأتي دائماً في الاختبارات، خاصة في أسئلة حلول المعادلات الخطية. ركزوا على فهم متى نستخدم كل صيغة، وتدربوا على توليد التباديل بالترتيب المعجمي. بالتوفيق في دراستكم!<p>بينما تتقن العودية، تذكر أن إثبات عمل خوارزميتك لا يقل أهمية عن كتابتها. الاستقراء الرياضي هو أفضل أداة لك هنا. علاوة على ذلك، يعد التوليد المنهجي للتباديل مثالاً كلاسيكياً على كيفية تحويل التفكير الخوارزمي لمفهوم رياضي إلى كود برمجي. انتبه جيداً للآليات التفصيلية لهذه الخوارزميات.</p><p>لقد أضفنا تفاصيل خوارزميات أساسية مثل البحث الثنائي والأسس النمطية، بالإضافة إلى دالة الدمج الحيوية. فهم هذه الخوارزميات العودية خطوة بخطوة هو مفتاحك لإتقان تحليل التعقيد الزمني وتصميم برامج فعالة في الاختبار.</p></template>
+    <template class="content-en">Welcome, CS champions, to Module 4! This module is the bridge between pure math and actual programming. We started with recursive algorithms, which is a mindset before it's a coding technique: how do you solve a big problem by breaking it into smaller ones? Always remember: never forget the 'Base Case' or you'll drown in an infinite loop! We then proved these algorithms correct using our old friend: Mathematical Induction. Next, we looked at Merge Sort, a brilliant practical application of recursion showing how to optimize performance from $O(n^2)$ to $O(n \log n)$. In the second half, we leveled up our counting skills: what if repetition is allowed? Permutations with repetition are straightforward ($n^r$), but combinations with repetition require the clever 'Stars and Bars' trick $C(n+r-1, r)$. This formula is an exam favorite, especially for linear equation solutions. Focus on knowing when to apply which formula, and practice generating permutations in lexicographic order. Happy studying!<p>As you master recursion, remember that proving your algorithm works is just as important as writing it. Mathematical induction is your best friend here. Furthermore, generating permutations systematically is a classic example of how algorithmic thinking transforms a mathematical concept into executable code. Pay close attention to the step-by-step mechanics of these algorithms.</p><p>We have added details of essential algorithms like binary search and modular exponentiation, alongside the crucial merge subroutine. Understanding these recursive algorithms step-by-step is your key to mastering time complexity analysis and designing efficient programs for the exam.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1272,6 +1439,59 @@ for (j = i + 1; j <= r; j++)
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">في التباديل، الترتيب مهم (AB يختلف عن BA). في التوافيق، الترتيب غير مهم (المجموعة {A,B} هي نفسها {B,A}).</template>
           <template class="content-en">In permutations, order matters (AB is different from BA). In combinations, order does not matter (the set {A,B} is the same as {B,A}).</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم الاستقراء الرياضي العادي بدلاً من الاستقراء القوي (Strong Induction) لإثبات صحة خوارزمية &lt;code&gt;power(a, n)&lt;/code&gt;؟</template>
+          <template class="content-en">Why do we use standard mathematical induction instead of strong induction to prove the &lt;code&gt;power(a, n)&lt;/code&gt; algorithm?</template>
+          <span class="content-target">لماذا نستخدم الاستقراء الرياضي العادي بدلاً من الاستقراء القوي (Strong Induction) لإثبات صحة خوارزمية &lt;code&gt;power(a, n)&lt;/code&gt;؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن الاستدعاء العودي في خوارزمية القوة يقلل حجم المشكلة بمقدار 1 بالضبط (من $n$ إلى $n-1$). الاستقراء القوي يكون ضرورياً فقط عندما يتم تقسيم حجم المشكلة أو تقليله بمقادير متغيرة أو أكبر من 1، كما هو الحال في خوارزمية الترتيب بالدمج (Merge Sort) أو البحث الثنائي.</p></template>
+          <template class="content-en"><p>Because the recursive call in the power algorithm reduces the problem size by exactly 1 (from $n$ to $n-1$). Strong induction is only necessary when the problem size is divided or reduced by varying amounts, such as in Merge Sort or Binary Search.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تحقق دالة الدمج (Merge Subroutine) تعقيداً زمنياً خطياً $O(m+n)$ رغم أنها تدمج قائمتين؟</template>
+          <template class="content-en">How does the Merge Subroutine achieve a linear time complexity $O(m+n)$ even though it merges two lists?</template>
+          <span class="content-target">كيف تحقق دالة الدمج (Merge Subroutine) تعقيداً زمنياً خطياً $O(m+n)$ رغم أنها تدمج قائمتين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>تحقق ذلك لأنها تستفيد من حقيقة أن القائمتين مرتبتان مسبقاً. بدلاً من مقارنة كل عنصر في القائمة الأولى بكل عنصر في القائمة الثانية، تقوم الخوارزمية بمقارنة العناصر الأمامية فقط وتتحرك للأمام في اتجاه واحد، مما يتطلب $m+n-1$ مقارنة كحد أقصى.</p></template>
+          <template class="content-en"><p>It achieves this by leveraging the fact that both lists are already sorted. Instead of comparing every element in the first list with every element in the second, the algorithm only compares the front elements and moves forward in a single pass, requiring at most $m+n-1$ comparisons.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تعتبر خوارزمية الأسس النمطية العودية ضرورية في علوم الحاسب الحديثة؟</template>
+          <template class="content-en">Why is the recursive modular exponentiation algorithm essential in modern computer science?</template>
+          <span class="content-target">لماذا تعتبر خوارزمية الأسس النمطية العودية ضرورية في علوم الحاسب الحديثة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها حجر الزاوية في أنظمة التشفير بالمفتاح العام مثل RSA. هذه الأنظمة تتطلب حساب $b^n \bmod m$ لأرقام ضخمة جداً (مئات الخانات). الطرق التقليدية ستستغرق وقتاً فلكياً وتتجاوز سعة الذاكرة، بينما هذه الخوارزمية تنجزها في وقت لوغاريتمي $O(\log n)$ مع الحفاظ على الأرقام صغيرة.</p></template>
+          <template class="content-en"><p>Because it is the cornerstone of public-key cryptography systems like RSA. These systems require computing $b^n \bmod m$ for massive numbers (hundreds of digits). Traditional methods would take astronomical time and overflow memory, whereas this algorithm does it in logarithmic time $O(\log n)$ while keeping numbers small.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1539,6 +1759,91 @@ for (j = i + 1; j <= r; j++)
         "en": "Choosing a team of 3 students out of 10."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "ما هي الفرضية الاستقرائية (Inductive Hypothesis) عند إثبات صحة خوارزمية القوة <code>power(a, n)<\/code>؟",
+      "en": "What is the inductive hypothesis when proving the recursive <code>power(a, n)<\/code> algorithm correct?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نفترض أن الخوارزمية تحسب <code>power(a, k) = a^k<\/code> بشكل صحيح لعدد صحيح غير سالب $k$.",
+        "en": "We assume that the algorithm correctly computes <code>power(a, k) = a^k<\/code> for an arbitrary nonnegative integer $k$."
+      },
+      "example": {
+        "ar": "نستخدم هذا الافتراض لإثبات أن <code>power(a, k+1) = a^{k+1}<\/code>.",
+        "en": "We use this assumption to prove that <code>power(a, k+1) = a^{k+1}<\/code>."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "في خوارزمية توليد التبديل التالي، كيف نحدد العنصر الأول الذي يجب تبديله؟",
+      "en": "In the algorithm for generating the next permutation, how do we find the first element to swap?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نبحث من اليمين إلى اليسار عن أول عنصر <code>a[j]<\/code> يكون أصغر من العنصر الذي يليه مباشرة <code>a[j+1]<\/code>.",
+        "en": "We scan from right to left to find the first element <code>a[j]<\/code> that is smaller than the element immediately to its right <code>a[j+1]<\/code>."
+      },
+      "example": {
+        "ar": "في التبديل 1342، العنصر هو 3 (لأنه أصغر من 4).",
+        "en": "In the permutation 1342, the element is 3 (since it is smaller than 4)."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "ما هو التعقيد الزمني لخوارزمية الأسس النمطية العودية (Recursive Modular Exponentiation)؟",
+      "en": "What is the time complexity of the Recursive Modular Exponentiation algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "$O(\\log n)$",
+        "en": "$O(\\log n)$"
+      },
+      "example": {
+        "ar": "لأننا نقسم الأس $n$ على 2 في كل استدعاء عودي.",
+        "en": "Because we divide the exponent $n$ by 2 in each recursive call."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "ما هو الشرط الأساسي الذي يجب توافره في القائمة قبل تطبيق خوارزمية البحث الثنائي؟",
+      "en": "What is the essential condition that a list must meet before applying the binary search algorithm?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يجب أن تكون القائمة مرتبة (Sorted).",
+        "en": "The list must be sorted."
+      },
+      "example": {
+        "ar": "إذا كانت القائمة غير مرتبة، فإن استبعاد نصف العناصر بناءً على مقارنة واحدة سيكون غير صحيح.",
+        "en": "If the list is unsorted, eliminating half the elements based on a single comparison would be incorrect."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "في دالة الدمج (Merge Subroutine)، ماذا نفعل عندما تفرغ إحدى القائمتين؟",
+      "en": "In the Merge Subroutine, what do we do when one of the lists becomes empty?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نقوم بإزالة جميع العناصر المتبقية من القائمة الأخرى ونضيفها مباشرة إلى نهاية القائمة المدمجة.",
+        "en": "We remove all remaining elements from the other list and append them directly to the end of the merged list."
+      },
+      "example": {
+        "ar": "لأن العناصر المتبقية مرتبة بالفعل وأكبر من جميع العناصر التي تم دمجها.",
+        "en": "Because the remaining elements are already sorted and are larger than all merged elements."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1548,7 +1853,7 @@ for (j = i + 1; j <= r; j++)
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 13</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1564,7 +1869,7 @@ for (j = i + 1; j <= r; j++)
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 13</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1889,6 +2194,102 @@ for (j = i + 1; j <= r; j++)
     },
     "difficulty": "easy",
     "conceptId": "recursive-algorithms"
+  },
+  {
+    "conceptId": "program-correctness-induction",
+    "question": {
+      "ar": "عند إثبات صحة خوارزمية <code>power(a, n)<\/code> العودية باستخدام الاستقراء الرياضي، ماذا تثبت الخطوة الاستقرائية (Inductive Step)؟",
+      "en": "When proving the correctness of the recursive <code>power(a, n)<\/code> algorithm using mathematical induction, what does the inductive step demonstrate?"
+    },
+    "options": {
+      "ar": [
+        "أن الخوارزمية تُرجع 1 عندما يكون $n = 0$.",
+        "أنه إذا كانت الخوارزمية تحسب $a^k$ بشكل صحيح، فإنها ستحسب أيضاً $a^{k+1}$ بشكل صحيح.",
+        "أن الخوارزمية تتوقف دائماً لجميع الأعداد الصحيحة السالبة.",
+        "أن $a^n$ هو دائماً رقم موجب."
+      ],
+      "en": [
+        "That the algorithm returns 1 when $n = 0$.",
+        "That if the algorithm correctly computes $a^k$, it will also correctly compute $a^{k+1}$.",
+        "That the algorithm always terminates for all negative integers.",
+        "That $a^n$ is always a positive number."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الخطوة الاستقرائية تبني على الفرضية (أنها تعمل لـ $k$) لإثبات أنها تعمل للحالة التالية ($k+1$)، مما يضمن صحتها لجميع القيم.",
+      "en": "The inductive step builds on the hypothesis (that it works for $k$) to prove it works for the next case ($k+1$), ensuring correctness for all values."
+    },
+    "hint": {
+      "ar": "تذكر كيف ننتقل من خطوة إلى التي تليها في الاستقراء.",
+      "en": "Remember how we move from one step to the next in induction."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "recursive-modular-exponentiation",
+    "question": {
+      "ar": "كيف تتعامل خوارزمية الأسس النمطية العودية مع الأس الفردي $n$؟",
+      "en": "How does the recursive modular exponentiation algorithm handle an odd exponent $n$?"
+    },
+    "options": {
+      "ar": [
+        "تطرح 1 من الأس وتستدعي نفسها.",
+        "تحسب النتيجة للأس $\\lfloor n/2 \\rfloor$، تربعها، وتضربها في الأساس $b$.",
+        "تتوقف وترجع خطأ.",
+        "تتجاهل الباقي وتستمر في القسمة."
+      ],
+      "en": [
+        "It subtracts 1 from the exponent and calls itself.",
+        "It computes the result for $\\lfloor n/2 \\rfloor$, squares it, and multiplies by the base $b$.",
+        "It stops and returns an error.",
+        "It ignores the remainder and continues dividing."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "عندما يكون الأس فردياً، فإن تنصيفه يترك باقياً مقداره 1، لذا يجب ضرب النتيجة المربعة في الأساس $b$ مرة إضافية (مع أخذ الباقي النمطي).",
+      "en": "When the exponent is odd, halving it leaves a remainder of 1, so the squared result must be multiplied by the base $b$ one extra time (while taking the modulo)."
+    },
+    "hint": {
+      "ar": "تذكر قوانين الأسس: $b^{2k+1} = (b^k)^2 \\cdot b$.",
+      "en": "Remember exponent rules: $b^{2k+1} = (b^k)^2 \\cdot b$."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "recursive-binary-search",
+    "question": {
+      "ar": "في خوارزمية البحث الثنائي العودي، متى ترجع الدالة القيمة 0؟",
+      "en": "In the recursive binary search algorithm, when does the function return 0?"
+    },
+    "options": {
+      "ar": [
+        "عندما تجد العنصر في المؤشر 0.",
+        "عندما يكون العنصر المطلوب سالباً.",
+        "عندما لا يتحقق أي شرط من شروط البحث (مما يعني أن العنصر غير موجود).",
+        "عندما تكون القائمة فارغة منذ البداية فقط."
+      ],
+      "en": [
+        "When it finds the element at index 0.",
+        "When the target element is negative.",
+        "When no search conditions are met (meaning the element is not found).",
+        "Only when the list is initially empty."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "إرجاع 0 هو الحالة الأساسية التي تشير إلى الفشل في العثور على العنصر بعد استنفاد جميع فترات البحث الممكنة.",
+      "en": "Returning 0 is the base case indicating failure to find the element after exhausting all possible search intervals."
+    },
+    "hint": {
+      "ar": "ماذا تمثل القيمة 0 في سياق مؤشرات القائمة (التي تبدأ من 1)؟",
+      "en": "What does the value 0 represent in the context of list indices (which start at 1)?"
+    },
+    "difficulty": "easy",
+    "id": 13
   }
 ]
 </script>
@@ -1933,6 +2334,14 @@ for (j = i + 1; j <= r; j++)
       <template class="content-ar">الاستقراء الرياضي هو المرآة الرياضية للعودية البرمجية. خطوة الأساس تقابل الحالة الأساسية، وخطوة الاستقراء تقابل الاستدعاء العودي.</template>
       <template class="content-en">Mathematical induction is the mathematical mirror of programmatic recursion. The basis step corresponds to the base case, and the inductive step corresponds to the recursive call.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في خوارزمية الأسس النمطية العودية، أخذ الباقي (mod m) في كل خطوة هو السر الذي يمنع الأرقام من التضخم وتجاوز سعة الذاكرة.</template>
+    <template class="content-en">In the recursive modular exponentiation algorithm, taking the modulo (mod m) at each step is the secret that prevents numbers from inflating and causing memory overflow.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

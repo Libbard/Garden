@@ -10,6 +10,10 @@
     { id: 'sql', name: 'SQL', nameAr: 'إس كيو إل', ver: 'SQLite 3.45', tier: 'browser', use: 'curriculum', ext: 'sql', color: '#e38c00' },
     { id: 'web', name: 'HTML & CSS', nameAr: 'إتش تي إم إل', ver: '', tier: 'browser', use: 'curriculum', ext: 'html', color: '#e34c26' },
     { id: 'marie', name: 'MARIE', nameAr: 'ماري', ver: '', tier: 'browser', use: 'curriculum', ext: 'mas', color: '#8892bf' },
+    /*@4.LAPLJ.207*/
+    { id: 'lmc', name: 'LMC', nameAr: 'حاسوبُ الرجل الصغير', ver: '', tier: 'browser', use: 'curriculum', ext: 'lmc', color: '#c084fc' },
+    { id: 'x86', name: 'x86-64', nameAr: 'تجميع x86-64', ver: '', tier: 'browser', use: 'curriculum', ext: 's', color: '#94a3b8' },
+    { id: 'arm', name: 'ARM', nameAr: 'تجميع ARM', ver: '', tier: 'browser', use: 'curriculum', ext: 'arm', color: '#22d3ee' },
 
     { id: 'java', name: 'Java', nameAr: 'جافا', ver: '15', tier: 'server', use: 'curriculum', ext: 'java', color: '#e76f00', ms: 2100 },
     { id: 'c', name: 'C', nameAr: 'سي', ver: 'GCC 8.3', tier: 'server', use: 'curriculum', ext: 'c', color: '#659ad2', ms: 700 },
@@ -53,7 +57,12 @@
     run:        ['شغّل', 'Run'],
     compiling:  ['يترجم…', 'Compiling…'],
     running:    ['يشغّل…', 'Running…'],
-    curriculum: ['لغاتٌ درستها في علوم الحاسب', 'Languages from your CS courses'],
+    stop:       ['إيقاف', 'Stop'],
+    stopped:    ['أوقفتَ التشغيل.', 'You stopped the run.'],
+    stopCut:    ['(قُصّ الناتجُ عند ٥٠٠٠ سطر)', '(output cut at 5000 lines)'],
+    stopServer: ['الخادمُ يُنهي نسختَه خلال ثوانٍ — وقد ينتظرها التشغيلُ التالي.',
+                 'The server finishes its copy within seconds — the next run may wait for it.'],
+    curriculum: ['لغاتٌ تدرسها في مقرّراتك', 'Languages from your courses'],
     experiment: ['للتجربة', 'To explore'],
     onServer:   ['على الخادم', 'On the server'],
     noOutput:   ['(لا ناتج — لم يُطبع شيء)', '(no output — nothing was printed)'],
@@ -185,7 +194,7 @@
   var lab = document.querySelector('[data-lab-root]');
   if (!lab) return;
 
-  var current = LANGS[5];
+  var current = LANGS.filter(function (lang) { return lang.id === 'java'; })[0];
   var buffers = {};
 
   /*@4.LAPLJ.9*/
@@ -261,6 +270,19 @@
         found = found.filter(function (item) { return item.severity !== 'warn'; });
         found.push({ start: at.start, end: at.end, line: real.line, severity: 'err',
           ar: 'خطأٌ نحويّ: ' + real.message, en: 'Syntax error: ' + real.message });
+      }
+    }
+    /*@4.LAPLJ.208*/
+    if (ASM_ISA[current.id] && source.trim()) {
+      if (!window.GardenASM) { ensureAsm().then(scheduleDiagnose, function () { }); }
+      else {
+        var asmBuilt = window.GardenASM.assemble(ASM_ISA[current.id], source);
+        if (!asmBuilt.ok) {
+          found = asmBuilt.errors.map(function (issue) {
+            var span = lineRange(source, issue.line);
+            return { start: span.start, end: span.end, line: issue.line, severity: 'err', ar: issue.ar, en: issue.en };
+          });
+        }
       }
     }
     if (current.id === 'marie' && window.GardenMARIE && source.trim()) {
@@ -441,6 +463,9 @@
     c: '#include <stdio.h>\n\nint main(void) {\n    int grades[] = {88, 92, 75, 60, 95};\n    int sum = 0;\n    for (int i = 0; i < 5; i++) sum += grades[i];\n    printf("Average = %d\\n", sum / 5);\n    return 0;\n}',
     web: "<!doctype html>\n<meta charset=\"utf-8\">\n<style>\n  body { font-family: system-ui; padding: 1.2rem; }\n  .card { border: 1px solid #ddd; border-radius: 10px; padding: 1rem; }\n  h1 { color: #7c3aed; margin: 0 0 .4rem; }\n</style>\n\n<div class=\"card\">\n  <h1>مرحباً بالحديقة</h1>\n  <p>عدّل هذا الكود واضغط شغّل — المعاينة تتغيّر فوراً.</p>\n  <button onclick=\"this.textContent = 'ضُغِط!'\">اضغطني</button>\n</div>",
     marie: '/ اجمع عددين من لوح المدخلات\nINPUT\nSTORE X\nINPUT\nADD X\nOUTPUT\nHALT\nX, DEC 0',
+    lmc: '; اجمع عددين من لوح المدخلات — صناديقُ LMC المئة\n        INP\n        STA first\n        INP\n        ADD first\n        OUT\n        HLT\nfirst   DAT 0',
+    x86: '# مجموعُ 1..10 — صيغةُ AT&T كما في CS477\n        .data\nfmt:    .string "sum = %ld\\n"\n        .text\n        .globl main\nmain:\n        movq $0, %rax          # المجموع\n        movq $1, %rcx          # العدّاد\nloop:\n        addq %rcx, %rax\n        incq %rcx\n        cmpq $10, %rcx\n        jle  loop\n        movq %rax, %rsi        # الوسيطُ الثاني لـ printf\n        leaq fmt(%rip), %rdi   # الأوّل: نصُّ التنسيق\n        movl $0, %eax\n        call printf\n        movl $0, %eax\n        ret',
+    arm: '@ مجموعُ 1..10 — ARM (A32)\n        .data\nfmt:    .asciz "sum = %d\\n"\n        .text\n        .global main\nmain:\n        PUSH {r4, lr}\n        MOV  r0, #0          @ المجموع\n        MOV  r1, #1          @ العدّاد\nloop:\n        ADD  r0, r0, r1\n        ADD  r1, r1, #1\n        CMP  r1, #10\n        BLE  loop\n        MOV  r1, r0\n        LDR  r0, =fmt\n        BL   printf\n        MOV  r0, #0\n        POP  {r4, pc}',
 
     /*@4.LAPLJ.23*/
     cpp: '#include <iostream>\n#include <vector>\nusing namespace std;\n\nint main() {\n    vector<int> grades = {88, 92, 75, 60, 95};\n    int sum = 0;\n    for (int g : grades) sum += g;\n    cout << "Average = " << sum / grades.size() << endl;\n    return 0;\n}',
@@ -492,6 +517,9 @@
     perl: /<STDIN>/,
     groovy: /System\.in|readLine\s*\(/,
     marie: /^\s*INPUT\b/mi,
+    lmc: /^\s*(\d{1,2}\s+)?([A-Za-z_]\w*:?\s+)?(INP|IN|INPUT)\b/mi,
+    x86: /\b(scanf|getchar)\b/,
+    arm: /\b(scanf|getchar)\b/,
     /*@4.LAPLJ.26*/
     bash: /\bread\s+(-[rp]\s+)*[A-Za-z_]/,
     erlang: /io:get_line|io:fread/,
@@ -584,7 +612,7 @@
   }
 
   /*@4.LAPLJ.31*/
-  var SAMPLE_STDIN = { marie: '12 30' };
+  var SAMPLE_STDIN = { marie: '12 30', lmc: '12 30' };
 
   function sampleFor(lang) {
     return SAMPLES[lang.id] || '// ' + lang.name + (lang.ver ? ' ' + lang.ver : '') + '\n';
@@ -661,7 +689,7 @@
     /*@4.LAPLJ.40*/
     if (libraryOpened) {
       loadIndex().then(function (index) {
-        return index.languages[lang.id] ? loadLang(lang.id) : [];
+        return index.languages[lang.id] ? loadLang(lang.id) : (LIB.byLang[lang.id] = []);
       }).then(function () {
         if (current.id === lang.id) renderExamplesPanel();
       }, function () { });
@@ -689,10 +717,46 @@
   /*@4.LAPLJ.42*/
   var runButton = $('plRun');
   function runLabel(state) {
+    var busy = !!state && !!activeRun;
+    runButton.classList.toggle('is-running', busy);
+    runButton.setAttribute('data-tip-ar', busy ? 'أوقف التشغيل' : 'شغّل الكود — أو Ctrl+Enter');
+    runButton.setAttribute('data-tip-en', busy ? 'Stop the run' : 'Run the code — or Ctrl+Enter');
+    if (busy) {
+      runButton.innerHTML = '<i class="fa-solid fa-stop"></i> <span>' + t('stop') + '</span>' +
+        '<em class="pl-run-state"><i class="fa-solid fa-circle-notch fa-spin"></i> ' + state + '</em>';
+      return;
+    }
     var icon = state ? '<i class="fa-solid fa-circle-notch fa-spin"></i> ' : '<i class="fa-solid fa-play"></i> ';
     var text = state || t('run');
     runButton.innerHTML = icon + '<span>' + text + '</span>' +
       (state ? '' : ' <kbd class="ltr">Ctrl↵</kbd>');
+  }
+  /*@4.LAPLJ.215*/
+  var activeRun = null;
+  function beginRun(place) {
+    activeRun = { at: performance.now(), where: place, stop: null };
+    return activeRun;
+  }
+  function stopRun() {
+    var mine = activeRun;
+    if (!mine || performance.now() - mine.at < 350) return;
+    activeRun = null;
+    var lines = [];
+    try { lines = (mine.stop && mine.stop()) || []; } catch (error) { lines = []; }
+    finish();
+    lines.push({ text: t('stopped'), kind: 'note', prose: true });
+    if (mine.where === 'server') lines.push({ text: t('stopServer'), kind: 'note', prose: true });
+    showResult({ verdict: 'stop', ms: Math.round(performance.now() - mine.at), where: mine.where }, lines);
+  }
+  function chunkLines(chunks, cut) {
+    var lines = [];
+    (chunks || []).forEach(function (chunk) {
+      String(chunk.text).replace(/\n$/, '').split('\n').forEach(function (line) {
+        lines.push({ text: line, kind: chunk.kind });
+      });
+    });
+    if (cut) lines.push({ text: t('stopCut'), kind: 'note' });
+    return lines;
   }
   /*@4.LAPLJ.43*/
 
@@ -833,12 +897,12 @@
       bar.textContent = '';
       var verdict = document.createElement('span');
       var kind = status.verdict || 'ok';
-      verdict.className = 'pl-verdict ' + kind;
+      verdict.className = 'pl-verdict ' + (kind === 'stop' ? 'warn' : kind);
       verdict.innerHTML = '<i class="fa-solid ' +
-        (kind === 'ok' ? 'fa-circle-check' : kind === 'warn' ? 'fa-clock' : 'fa-circle-xmark') +
+        (kind === 'ok' ? 'fa-circle-check' : kind === 'warn' ? 'fa-clock' : kind === 'stop' ? 'fa-stop' : 'fa-circle-xmark') +
         '"></i> ' + L(
-          kind === 'ok' ? 'انتهى بنجاح' : kind === 'warn' ? 'انتهت المهلة' : 'انتهى بخطأ',
-          kind === 'ok' ? 'Finished' : kind === 'warn' ? 'Timed out' : 'Finished with an error');
+          kind === 'ok' ? 'انتهى بنجاح' : kind === 'warn' ? 'انتهت المهلة' : kind === 'stop' ? 'أُوقف' : 'انتهى بخطأ',
+          kind === 'ok' ? 'Finished' : kind === 'warn' ? 'Timed out' : kind === 'stop' ? 'Stopped' : 'Finished with an error');
       bar.appendChild(verdict);
       var stat = function (icon, text, tipAr, tipEn, tint) {
         var node = document.createElement('span');
@@ -878,6 +942,8 @@
     out.textContent = '';
     var previous = document.querySelector('[data-out-panel="stdout"] .pl-hint');
     if (previous) previous.remove();
+    document.querySelectorAll('[data-out-panel="stdout"] .pl-asm').forEach(function (node) { node.remove(); });
+    out.classList.remove('is-asm');
 
     lastOutput = lines.map(function (line) { return stripAnsi(line.text); });
     /*@4.LAPLJ.53*/
@@ -1085,8 +1151,7 @@
 
   var wantsInput = false;
   function run() {
-    if (runButton.disabled) return;
-    runButton.disabled = true;
+    if (runButton.disabled || activeRun) return;
     /*@4.LAPLJ.69*/
     wantsInput = readsInput(current.id, editor.value) && !$('plStdin').value.trim();
     focusOutput();
@@ -1101,18 +1166,19 @@
       return;
     }
     var started = performance.now();
-    runLabel(place === 'browser' ? t('running') : t('compiling'));
 
     /*@4.LAPLJ.71*/
     if (needsOwnRunner() && aiBase() && FEATURES.interactive) {
-      runButton.disabled = false;
       startSession('run', projectFiles().length ? t('manyFiles') : t('ownName'));
       return;
     }
+    beginRun(place);
+    runLabel(place === 'browser' ? t('running') : t('compiling'));
     /*@4.LAPLJ.72*/
     if (place === 'browser') {
       if (current.id === 'javascript') return runJavaScriptForReal(started);
       if (current.id === 'marie') return runMarieForReal(started);
+      if (ASM_ISA[current.id]) return runAsmForReal(started);
       if (current.id === 'web') return runWebForReal(started);
       if (current.id === 'sql') return runSqlForReal(started);
       if (current.id === 'python') return runPythonForReal(started);
@@ -1125,40 +1191,56 @@
       showResult(null, t('simNote').split('\n').map(function (line) { return { text: line, kind: 'note' }; }));
     }, 120);
   }
-  function finish() { runButton.disabled = false; runLabel(null); }
+  function finish() { activeRun = null; runButton.disabled = false; runLabel(null); }
 
   /*@4.LAPLJ.74*/
   function runJavaScriptForReal(started) {
     var worker;
     /*@4.LAPLJ.75*/
     var inspectSource = (window.GardenPLInspect && window.GardenPLInspect.source) || 'String';
-    var code = 'var inspect=' + inspectSource + ';self.onmessage=function(e){var out=[];' +
-      'var log=function(){out.push(Array.prototype.map.call(arguments,function(v){' +
-      'try{return inspect(v,0)}catch(x){return String(v)}}).join(" "))};' +
+    var code = 'var inspect=' + inspectSource + ';self.onmessage=function(e){var sent=0;' +
+      'var log=function(){if(sent>5000)return;sent++;self.postMessage({line:sent>5000?null:Array.prototype.map.call(arguments,function(v){' +
+      'try{return inspect(v,0)}catch(x){return String(v)}}).join(" ")})};' +
       'var console={log:log,info:log,warn:log,error:log};' +
       /*@4.LAPLJ.76*/
-      'try{ (new Function("console",e.data))(console); self.postMessage({ok:true,out:out}); }' +
+      'try{ (new Function("console",e.data))(console); self.postMessage({done:true,ok:true}); }' +
       'catch(err){ var at=0; try{ var m=String(err&&err.stack||"").match(/<anonymous>:(\\d+):(\\d+)/);' +
       'if(m) at=Math.max(1,parseInt(m[1],10)-2); }catch(x){}' +
-      'self.postMessage({ok:false,out:out,err:String(err),at:at}); }};';
+      'self.postMessage({done:true,ok:false,err:String(err),at:at}); }};';
     try {
       worker = new Worker(URL.createObjectURL(new Blob([code], { type: 'text/javascript' })));
     } catch (error) {
       finish(); showText(t('noSandbox'), 'err'); return;
     }
+    var mine = activeRun;
+    var out = [];
+    var cut = false;
+    var printed = function () {
+      var lines = out.length ? out.join('\n').split('\n').map(function (line) { return { text: line }; }) : [];
+      if (cut) lines.push({ text: t('stopCut'), kind: 'note' });
+      return lines;
+    };
     var killer = setTimeout(function () {
-      worker.terminate(); finish();
-      showResult({ verdict: 'warn', ms: 5000, where: 'browser' }, [{ text: t('tooLong'), kind: 'err', prose: true }]);
+      worker.terminate();
+      if (activeRun !== mine) return;
+      finish();
+      showResult({ verdict: 'warn', ms: 5000, where: 'browser' },
+        printed().concat([{ text: t('tooLong'), kind: 'err', prose: true }]));
       appendHint(function () { return t('tooLongHint'); });
     }, 5000);
+    if (mine) mine.stop = function () { clearTimeout(killer); worker.terminate(); return printed(); };
 
     worker.onmessage = function (event) {
-      clearTimeout(killer); worker.terminate(); finish();
-      var elapsed = Math.round(performance.now() - started);
       var data = event.data;
-      var lines = data.out.length
-        ? data.out.join('\n').split('\n').map(function (line) { return { text: line }; })
-        : [];
+      if (!data.done) {
+        if (data.line === null) cut = true; else out.push(data.line);
+        return;
+      }
+      clearTimeout(killer); worker.terminate();
+      if (activeRun !== mine) return;
+      finish();
+      var elapsed = Math.round(performance.now() - started);
+      var lines = printed();
       if (!data.ok) lines.push({ text: data.err, kind: 'err', at: data.at || 0 });
       if (!lines.length) lines.push({ text: t('noOutput'), kind: 'note' });
       showResult({ verdict: data.ok ? 'ok' : 'bad', ms: elapsed, where: 'browser' }, lines);
@@ -1209,6 +1291,7 @@
       return;
     }
     var headers = { 'Content-Type': 'application/json', 'X-Garden-Identity': identity() };
+    var mine = activeRun;
     fetch(base + '/v1/jobs', {
       method: 'POST', headers: headers,
       body: JSON.stringify({
@@ -1219,7 +1302,8 @@
     }).then(function (response) {
       return response.json().then(function (data) { return { status: response.status, data: data }; });
     }).then(function (reply) {
-      if (reply.status === 202) return poll(base, headers, reply.data.job_id, started);
+      if (activeRun !== mine) return;
+      if (reply.status === 202) return poll(base, headers, reply.data.job_id, started, 0, mine);
       finish();
       /*@4.LAPLJ.85*/
       if (reply.data.suggestExternal) {
@@ -1250,6 +1334,7 @@
         kind: 'err', prose: true
       }]);
     }).catch(function () {
+      if (activeRun !== mine) return;
       finish();
       showResult({ verdict: 'bad', where: 'server' }, [{
         text: L('تعذّر الوصولُ إلى السيرفر — تحقّق من اتصالك ثم شغّل مرّةً أخرى.',
@@ -1288,8 +1373,9 @@
   };
 
   /*@4.LAPLJ.87*/
-  function poll(base, headers, jobId, started, attempt) {
+  function poll(base, headers, jobId, started, attempt, mine) {
     var round = attempt || 0;
+    if (activeRun !== mine) return;
     if (round === 0) runLabel(t('running'));
     if (round > 45) {
       finish();
@@ -1302,7 +1388,8 @@
       fetch(base + '/v1/jobs/' + jobId, { headers: headers })
         .then(function (response) { return response.json(); })
         .then(function (data) {
-          if (data.status !== 'done') return poll(base, headers, jobId, started, round + 1);
+          if (activeRun !== mine) return;
+          if (data.status !== 'done') return poll(base, headers, jobId, started, round + 1, mine);
           finish();
           var result = data.result || {};
           var accepted = result.status && result.status.id === 3;
@@ -1327,7 +1414,7 @@
             appendHint(function () { return L('حالةُ المُشغِّل: ', 'Runner status: ') + result.status.description; });
           }
         })
-        .catch(function () { poll(base, headers, jobId, started, round + 1); });
+        .catch(function () { poll(base, headers, jobId, started, round + 1, mine); });
     }, round === 0 ? 700 : (round < 12 ? 1000 : round < 30 ? 2000 : 3000));
   }
 
@@ -1335,34 +1422,40 @@
   function runPythonForReal(started) {
     var api = window.GardenPython;
     if (!api) { finish(); showText(L('لم يُحمَّل محرّكُ بايثون.', 'The Python engine did not load.'), 'err'); return; }
+    var mine = activeRun;
+    if (mine) mine.stop = function () { var partial = api.stop(); return partial ? chunkLines(partial.out, partial.cut) : []; };
     api.run(editor.value, $('plStdin').value, function (stage, packages) {
       /*@4.LAPLJ.89*/
-      runLabel(stage === 'script'
+      if (activeRun !== mine) return;
+      runLabel(stage === 'run'
+        ? t('running')
+        : stage === 'script'
         ? L('يُحمّل بايثون…', 'Loading Python…')
         : stage === 'packages'
           ? L('يُحمّل ' + (packages || []).join(' و') + '…', 'Loading ' + (packages || []).join(', ') + '…')
           : L('يُهيّئ بايثون…', 'Starting Python…'));
     }).then(function (outcome) {
+      if (activeRun !== mine) return;
       finish();
-      var lines = [];
-      outcome.out.forEach(function (chunk) {
-        String(chunk.text).replace(/\n$/, '').split('\n').forEach(function (line) {
-          lines.push({ text: line, kind: chunk.kind });
-        });
-      });
+      var lines = chunkLines(outcome.out, outcome.cut);
       /*@4.LAPLJ.90*/
-      if (!outcome.ok) {
+      if (outcome.crashed) {
+        lines.push({ text: L('توقّف بايثون فجأةً — غالباً نفدت الذاكرة.', 'Python stopped suddenly — most likely out of memory.'),
+          kind: 'err', prose: true });
+      } else if (!outcome.ok) {
         String(outcome.error).split('\n').forEach(function (line) {
           lines.push({ text: line, kind: 'err' });
         });
       }
       if (!lines.length) lines.push({ text: t('noOutput'), kind: 'note' });
       showResult({ verdict: outcome.ok ? 'ok' : 'bad', ms: outcome.ms, where: 'browser' }, lines);
+      if (outcome.images && outcome.images.length) renderPlots(outcome.images);
       if (!outcome.ok) {
         appendHint(function () { return L('أثرُ بايثون أعلاه — وآخرُ سطرٍ فيه هو نوعُ الخطأ ورسالتُه.',
           'The Python traceback above — its last line is the error type and message.'); });
       }
     }).catch(function (error) {
+      if (activeRun !== mine) return;
       finish();
       showResult({ verdict: 'bad', where: 'browser' }, [{
         text: String(error && error.message) === 'offline'
@@ -1374,13 +1467,44 @@
     });
   }
 
+  /*@4.LAPLJ.209*/
+  function renderPlots(images) {
+    var host = document.querySelector('[data-out-panel="stdout"]');
+    if (!host) return;
+    var box = document.createElement('section');
+    box.className = 'pl-asm pl-plots';
+    images.forEach(function (data, index) {
+      var figure = document.createElement('figure');
+      figure.className = 'pl-plot';
+      var img = document.createElement('img');
+      img.src = 'data:image/png;base64,' + data;
+      img.alt = L('الرسمُ ' + (index + 1) + ' من matplotlib', 'Plot ' + (index + 1) + ' from matplotlib');
+      img.loading = 'lazy';
+      figure.appendChild(img);
+      var save = document.createElement('a');
+      save.className = 'pl-plot-save';
+      save.href = img.src;
+      save.download = 'plot-' + (index + 1) + '.png';
+      save.innerHTML = '<i class="fa-solid fa-download"></i>';
+      save.setAttribute('aria-label', L('نزّلِ الرسم', 'Download the plot'));
+      figure.appendChild(save);
+      box.appendChild(figure);
+    });
+    host.appendChild(box);
+    var stdout = $('plStdout');
+    if (stdout) stdout.classList.add('is-asm');
+  }
+
   /*@4.LAPLJ.91*/
   function runSqlForReal(started) {
     var api = window.GardenSQL;
     if (!api) { finish(); showText(L('لم يُحمَّل محرّكُ SQL.', 'The SQL engine did not load.'), 'err'); return; }
     if (!api.isReady()) runLabel(L('يُحمّل SQLite…', 'Loading SQLite…'));
     var source = editor.value;
+    var mine = activeRun;
+    if (mine) mine.stop = function () { api.stop(); return []; };
     api.run(source).then(function (outcome) {
+      if (activeRun !== mine) return;
       finish();
       if (!outcome.ok) {
         showResult({ verdict: 'bad', ms: outcome.ms, where: 'browser' },
@@ -1401,6 +1525,7 @@
         'Statements ran; no query returned rows.'), kind: 'note' }]);
       if (tables.length) renderSqlTables(tables);
     }).catch(function (error) {
+      if (activeRun !== mine) return;
       finish();
       var why = String(error && error.message);
       showResult({ verdict: 'bad', where: 'browser' }, [{
@@ -1470,6 +1595,7 @@
     fresh.srcdoc = editor.value;
     $('plEmpty').hidden = true;
     $('plStdout').hidden = true;
+    document.querySelectorAll('[data-out-panel="stdout"] .pl-asm').forEach(function (node) { node.remove(); });
     var previous = document.querySelector('[data-out-panel="stdout"] .pl-hint');
     if (previous) previous.remove();
     var bar = $('plStatus');
@@ -1490,6 +1616,159 @@
   function showPreviewBar(on) {
     var bar = $('plPrevBar');
     if (bar) bar.hidden = !on;
+  }
+
+  /*@4.LAPLJ.210*/
+  var ASM_ISA = { lmc: 'lmc', x86: 'x86', arm: 'arm' };
+  var asmLoading = null;
+  function ensureAsm() {
+    if (window.GardenASM) return Promise.resolve(window.GardenASM);
+    if (asmLoading) return asmLoading;
+    asmLoading = new Promise(function (resolve, reject) {
+      var me = document.querySelector('script[src*="lab-programming-languages.js"]');
+      var tag = document.createElement('script');
+      tag.src = me ? me.src.replace('lab-programming-languages.js', 'lab-pl-asm.js') : '../shared/labs-v2/lab-pl-asm.js';
+      tag.onload = function () { if (window.GardenASM) resolve(window.GardenASM); else { asmLoading = null; reject(new Error('asm')); } };
+      tag.onerror = function () { asmLoading = null; reject(new Error('asm')); };
+      document.head.appendChild(tag);
+    });
+    return asmLoading;
+  }
+  function runAsmForReal(started) {
+    var isa = ASM_ISA[current.id];
+    var mine = activeRun;
+    ensureAsm().then(function (engine) {
+      if (activeRun !== mine) return;
+      var built = engine.assemble(isa, editor.value);
+      if (!built.ok) {
+        finish();
+        showResult({ verdict: 'bad', ms: Math.round(performance.now() - started), where: 'browser' },
+          built.errors.map(function (issue) {
+            return { text: L('السطر ', 'line ') + issue.line + ': ' + L(issue.ar, issue.en), kind: 'err', at: issue.line };
+          }));
+        appendHint(function () { return L('التجميعُ يقف قبل التشغيل — أصلح ما فوق ثم شغّل.',
+          'Assembly stops before running — fix the above, then run.'); });
+        return;
+      }
+      var res = engine.run(built, { input: $('plStdin').value });
+      var elapsed = Math.round(performance.now() - started);
+      finish();
+      var text = String(res.output || '').replace(/\n$/, '');
+      var lines = text ? text.split('\n').map(function (item) { return { text: item }; }) : [];
+      if (res.error) {
+        lines.push({ text: (res.error.line ? L('السطر ', 'line ') + res.error.line + ': ' : '') + L(res.error.ar, res.error.en),
+          kind: res.error.kind === 'steps' ? 'warn' : 'err', at: res.error.line || 0, prose: true });
+      }
+      if (res.warn) lines.push({ text: L(res.warn.ar, res.warn.en), kind: 'note' });
+      if (!lines.length) lines.push({ text: t('noOutput'), kind: 'note' });
+      showResult({
+        verdict: res.error ? (res.error.kind === 'steps' ? 'warn' : 'bad') : 'ok',
+        ms: elapsed, where: 'browser',
+        memory: plural(res.steps, ['تعليمةٌ واحدة', 'تعليمتان', 'تعليمات', 'تعليمة'], 'instruction', 'instructions')
+      }, lines);
+      renderAsmPanel(res, engine.TRACE_CAP);
+    }, function () {
+      if (activeRun !== mine) return;
+      finish();
+      showResult({ verdict: 'bad', where: 'browser' },
+        [{ text: L('لم يُحمَّل محرّكُ التجميع — تحقّقْ من الاتّصال وأعِد المحاولة.', 'The assembly engine did not load — check your connection and retry.'), kind: 'err', prose: true }]);
+    });
+  }
+  function asmValue(value) {
+    if (typeof value === 'bigint') {
+      var s = BigInt.asIntN(64, value);
+      return (s >= -4096n && s <= 0xffffn) ? s.toString() : '0x' + BigInt.asUintN(64, value).toString(16);
+    }
+    var n = Number(value);
+    return (n | 0) === n || (n >= -4096 && n <= 0xffff) ? String(n | 0) : '0x' + (n >>> 0).toString(16);
+  }
+  /*@4.LAPLJ.211*/
+  function renderAsmPanel(res, cap) {
+    var host = document.querySelector('[data-out-panel="stdout"]');
+    if (!host) return;
+    var box = document.createElement('section');
+    box.className = 'pl-asm';
+    var stdout = $('plStdout');
+    if (stdout) stdout.classList.add('is-asm');
+    var regs = document.createElement('div');
+    regs.className = 'pl-asm-regs';
+    (res.regs || []).forEach(function (reg) {
+      var chip = document.createElement('span');
+      chip.className = 'pl-asm-reg ltr';
+      chip.innerHTML = '<b></b><code></code>';
+      chip.querySelector('b').textContent = reg.k;
+      chip.querySelector('code').textContent = reg.v;
+      regs.appendChild(chip);
+    });
+    if (res.flags) {
+      var flags = document.createElement('span');
+      flags.className = 'pl-asm-reg is-flags ltr';
+      flags.textContent = Object.keys(res.flags).map(function (k) { return k + '=' + res.flags[k]; }).join(' ');
+      regs.appendChild(flags);
+    }
+    if (res.isa !== 'lmc') {
+      var code = document.createElement('span');
+      code.className = 'pl-asm-reg is-exit' + (res.exitCode ? ' is-bad' : '');
+      code.textContent = L('رمزُ الخروج ', 'exit code ') + res.exitCode;
+      regs.appendChild(code);
+    }
+    box.appendChild(regs);
+
+    var steps = res.trace || [];
+    if (steps.length) {
+      var details = document.createElement('details');
+      details.className = 'pl-asm-trace';
+      details.open = steps.length <= 80;
+      var summary = document.createElement('summary');
+      summary.textContent = L('تتبّعُ التنفيذ خطوةً خطوة — ', 'Step-by-step trace — ') +
+        plural(res.steps, ['تعليمةٌ واحدة', 'تعليمتان', 'تعليمات', 'تعليمة'], 'instruction', 'instructions') +
+        (res.steps > steps.length ? L(' (يُعرض أوّلُ ' + steps.length + ')', ' (first ' + steps.length + ' shown)') : '');
+      details.appendChild(summary);
+      var scroll = document.createElement('div');
+      scroll.className = 'pl-asm-scroll';
+      var table = document.createElement('table');
+      table.className = 'pl-asm-table';
+      var head = document.createElement('tr');
+      [L('#', '#'), L('السطر', 'Line'), L('التعليمة', 'Instruction'), L('ما تغيّر', 'What changed')].forEach(function (label) {
+        var th = document.createElement('th'); th.textContent = label; head.appendChild(th);
+      });
+      var thead = document.createElement('thead'); thead.appendChild(head); table.appendChild(thead);
+      var body = document.createElement('tbody');
+      steps.forEach(function (stepItem, index) {
+        var row = document.createElement('tr');
+        if (stepItem.skipped) row.className = 'is-skipped';
+        var cells = [String(index + 1), String(stepItem.line || ''), stepItem.text || ''];
+        cells.forEach(function (value, cellIndex) {
+          var td = document.createElement('td');
+          td.textContent = value;
+          if (cellIndex === 2) td.className = 'ltr pl-asm-ins';
+          row.appendChild(td);
+        });
+        var what = document.createElement('td');
+        what.className = 'ltr pl-asm-what';
+        var parts = (stepItem.changes || []).map(function (change) { return change.k + ' ← ' + asmValue(change.to); });
+        if (stepItem.flags) parts.push(stepItem.flags);
+        (Array.isArray(stepItem.mem) ? stepItem.mem : stepItem.mem ? [stepItem.mem] : []).forEach(function (write) {
+          parts.push('[' + write.at + '] ← ' + asmValue(write.value));
+        });
+        if (stepItem.jump) parts.push('↪ ' + (stepItem.jump === true ? L('قفز', 'jump') : stepItem.jump));
+        if (stepItem.out) parts.push(L('طُبع: ', 'printed: ') + JSON.stringify(stepItem.out).slice(1, -1));
+        if (stepItem.skipped) parts.push(L('لم تُنفَّذ (الشرطُ لم يتحقّق)', 'skipped (condition false)'));
+        what.textContent = parts.join('  ·  ');
+        row.appendChild(what);
+        if (stepItem.line) {
+          row.tabIndex = 0;
+          row.addEventListener('click', function () { jumpToLine(stepItem.line); });
+          row.addEventListener('keydown', function (event) { if (event.key === 'Enter') jumpToLine(stepItem.line); });
+        }
+        body.appendChild(row);
+      });
+      table.appendChild(body);
+      scroll.appendChild(table);
+      details.appendChild(scroll);
+      box.appendChild(details);
+    }
+    host.appendChild(box);
   }
 
   /*@4.LAPLJ.97*/
@@ -1551,7 +1830,7 @@
     node.appendChild(document.createTextNode(text));
     host.appendChild(node);
   }
-  runButton.addEventListener('click', run);
+  runButton.addEventListener('click', function () { if (activeRun) stopRun(); else run(); });
 
   /*@4.LAPLJ.101*/
   var session = { id: null, seq: 0, abort: null, alive: false, mode: 'run', ended: false,
@@ -1606,7 +1885,7 @@
       if (node) node.hidden = true;
     });
     /*@4.LAPLJ.104*/
-    host.querySelectorAll('.pl-hint').forEach(function (node) { node.remove(); });
+    host.querySelectorAll('.pl-hint, .pl-asm').forEach(function (node) { node.remove(); });
     var box = document.createElement('div');
     box.className = 'pl-console' + (session.mode === 'shell' ? ' is-shell' : '');
     box.id = 'plConsole';
@@ -1900,6 +2179,7 @@
     session.mode = mode === 'shell' ? 'shell' : 'run';
     session.ended = false;
     openConsole();
+    growOutput();
     sessionBusy(true);
     if (session.mode !== 'shell') runLabel(t('running'));
     if (note) appendSessionLine('sys', note);
@@ -2531,7 +2811,7 @@
     renderExamplesPanel();
     loadIndex()
       .then(function (index) {
-        return index.languages[current.id] ? loadLang(current.id) : [];
+        return index.languages[current.id] ? loadLang(current.id) : (LIB.byLang[current.id] = []);
       })
       .then(function () { renderExamplesPanel(); })
       .catch(function () {
@@ -2667,16 +2947,23 @@
     items.forEach(function (example) {
       (courses[example.course || '—'] = courses[example.course || '—'] || []).push(example);
     });
-    Object.keys(courses).sort().forEach(function (code) {
+    /*@4.LAPLJ.212*/
+    var major = studentMajor();
+    var mine = function (code) { return !!courseAlias(code, major) || code.indexOf(major) === 0; };
+    Object.keys(courses).sort(function (a, b) {
+      return (mine(b) ? 1 : 0) - (mine(a) ? 1 : 0) || a.localeCompare(b);
+    }).forEach(function (code) {
       var info = (LIB.index.courses || {})[code];
+      var alias = courseAlias(code, major);
       var wrap = document.createElement('div');
       wrap.className = 'pl-course';
       var head = document.createElement('button');
       head.className = 'pl-course-head';
       head.type = 'button';
       head.innerHTML = '<b class="ltr"></b><span></span><em></em><i class="fa-solid fa-chevron-down pl-car"></i>';
-      head.querySelector('b').textContent = code;
-      head.querySelector('span').textContent = info ? (isAr() ? info.ar : info.en) : '';
+      head.querySelector('b').textContent = alias ? alias.code : code;
+      head.querySelector('span').textContent = alias ? (isAr() ? alias.ar : alias.en) : info ? (isAr() ? info.ar : info.en) : '';
+      if (alias) head.setAttribute('title', L('أمثلتُها من ' + code + ' — المادّةُ نفسُها في علوم الحاسب', 'Examples from ' + code + ' — the same course in Computer Science'));
       head.querySelector('em').textContent = num(courses[code].length);
       wrap.appendChild(head);
       var inner = document.createElement('div');
@@ -2739,12 +3026,28 @@
     return row;
   }
 
+  /*@4.LAPLJ.213*/
+  var SLUG_MAJOR = { 'bachelor-of-computer-science': 'CS', 'bachelor-of-science-in-information-technology': 'IT', 'bachelor-of-data-science': 'DS' };
+  function studentMajor() {
+    var view = null, profile = null;
+    try { view = localStorage.getItem('garden_view_major'); profile = JSON.parse(localStorage.getItem('student_profile')); } catch (error) { }
+    if (view === 'CS' || view === 'IT' || view === 'DS') return view;
+    return (profile && SLUG_MAJOR[profile.program]) || 'CS';
+  }
+  function courseAlias(code, major) {
+    if (!code || major === 'CS') return null;
+    return ((LIB.index && LIB.index.aliases || {})[code] || []).filter(function (item) { return item.major === major; })[0] || null;
+  }
+  function aliasCodes(code) {
+    return ((LIB.index && LIB.index.aliases || {})[code] || []).map(function (item) { return item.code; }).join(' ');
+  }
+
   /*@4.LAPLJ.144*/
   function renderSearch(host, list) {
     var needle = normalizeArabic(LIB.query);
     var hits = list.filter(function (example) {
       return normalizeArabic([example.titleAr, example.titleEn, example.descAr, example.descEn,
-        example.course, example.category].join(' ')).indexOf(needle) !== -1;
+        example.course, aliasCodes(example.course), example.category].join(' ')).indexOf(needle) !== -1;
     });
     var label = document.createElement('div');
     label.className = 'pl-sep';
@@ -2891,7 +3194,7 @@
           if (example.course) {
             var tag = document.createElement('em');
             tag.className = 'ltr';
-            tag.textContent = example.course + (example.module ? ' · ' + example.module : '');
+            tag.textContent = (courseAlias(example.course, studentMajor()) || { code: example.course }).code + (example.module ? ' · ' + example.module : '');
             item.appendChild(tag);
           }
           item.addEventListener('click', function () { closeModal(); openExample(example, null); });
@@ -3407,6 +3710,7 @@
       });
     }
     if (openTab) selectOutTab('stdout');
+    growOutput();
   }
 
   function openSidePane(name, tab) {
@@ -3494,10 +3798,29 @@
   }
   function applyPanes() {
     lab.style.setProperty('--pl-side-w', panes.side + 'px');
-    lab.style.setProperty('--pl-out-w', panes.out + 'px');
     /*@4.LAPLJ.165*/
-    lab.style.setProperty('--pl-out-h', Math.min(panes.outH, maxOutPercent()) + '%');
+    lab.style.setProperty('--pl-out-h', Math.min(outGrown ? maxOutPercent() : panes.outH, maxOutPercent()) + '%');
+    lab.style.setProperty('--pl-out-w', panes.out + 'px');
   }
+  /*@4.LAPLJ.216*/
+  var outGrown = false;
+  function growOutput() {
+    if (!narrowRows() || outFull || outGrown) return;
+    if (panes.outH >= maxOutPercent()) return;
+    if (lab.classList.contains('is-out-collapsed')) {
+      lab.classList.remove('is-out-collapsed');
+      syncOutToggle();
+    }
+    outGrown = true;
+    applyPanes();
+  }
+  function shrinkOutput() {
+    if (!outGrown) return;
+    outGrown = false;
+    applyPanes();
+  }
+  editor.addEventListener('focus', shrinkOutput);
+  editor.addEventListener('pointerdown', shrinkOutput);
   function savePanes() {
     try { localStorage.setItem(GRIP_KEY, JSON.stringify(panes)); } catch (error) { }
   }
@@ -3551,6 +3874,7 @@
     grip.addEventListener('pointerdown', function (event) {
       if (event.button) return;
       var rows = gripIsRow(which);
+      if (rows && outGrown) { panes.outH = maxOutPercent(); outGrown = false; }
       var rtl = document.documentElement.getAttribute('dir') !== 'ltr';
       var startX = event.clientX, startY = event.clientY;
       var from = rows ? panes.outH : (which === 'side' ? panes.side : panes.out);
@@ -3588,6 +3912,7 @@
     /*@4.LAPLJ.173*/
     grip.addEventListener('dblclick', function () {
       var rows = gripIsRow(which);
+      outGrown = false;
       if (rows) panes.outH = PANE_DEFAULTS.outH;
       else if (which === 'side') panes.side = PANE_DEFAULTS.side;
       else panes.out = PANE_DEFAULTS.out;
@@ -3601,6 +3926,7 @@
       var step = event.shiftKey ? 40 : 12;
       var rows = gripIsRow(which);
       if (rows) {
+        if (outGrown) { panes.outH = maxOutPercent(); outGrown = false; }
         if (event.key === 'ArrowUp') panes.outH = clamp(panes.outH + 4, 14, maxOutPercent());
         else if (event.key === 'ArrowDown') panes.outH = clamp(panes.outH - 4, 14, maxOutPercent());
         else return;
@@ -3642,6 +3968,20 @@
 
   /*@4.LAPLJ.176*/
   var previewBar = $('plPrevBar');
+  var previewStop = $('plPrevStop');
+  if (previewStop) {
+    previewStop.addEventListener('click', function () {
+      var frame = $('plPreview');
+      if (!frame) return;
+      var blank = frame.cloneNode(false);
+      blank.removeAttribute('srcdoc');
+      blank.hidden = true;
+      frame.parentNode.replaceChild(blank, frame);
+      showPreviewBar(false);
+      showResult({ verdict: 'stop', where: 'browser' },
+        [{ text: L('أُوقفت المعاينة — شغّل لتعيدها.', 'Preview stopped — run to bring it back.'), kind: 'note', prose: true }]);
+    });
+  }
   if (previewBar) {
     previewBar.addEventListener('click', function (event) {
       var button = event.target.closest('button[data-w]');
@@ -3792,6 +4132,17 @@
     }
     activeFile = null;
     if (payload.stdin !== undefined) $('plStdin').value = payload.stdin;
+    /*@4.LAPLJ.214*/
+    if (payload.lang === 'asm') {
+      var code = (payload.buffers || {}).asm || '';
+      delete buffers.asm;
+      ensureAsm().then(function (engine) {
+        var id = engine.detect(code) || 'x86';
+        buffers[id] = code;
+        adopt({ lang: id });
+      }, function () { });
+      return;
+    }
     var lang = LANGS.filter(function (item) { return item.id === payload.lang; })[0];
     if (lang) selectLanguage(lang);
     else paint();
@@ -3873,7 +4224,7 @@
             results.push({ id: example.id, ok: false, why: 'timeout' }); done();
           }, 20000);
           var settle = function () {
-            if (runButton.disabled) { setTimeout(settle, 120); return; }
+            if (runButton.disabled || activeRun) { setTimeout(settle, 120); return; }
             clearTimeout(watchdog);
             /*@4.LAPLJ.192*/
             var tables = $('plStdout').querySelectorAll('table.pl-sql');

@@ -367,8 +367,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تبدأ الخوارزمية بشجرة تتكون من رأس واحد (أي رأس)، وتنمو الشجرة بإضافة رأس واحد في كل مرة لإنتاج MST.</p><p>في كل تكرار، يتم إضافة الرأس غير الموجود في الشجرة والذي يكون أقرب (بأقل وزن حافة) إلى الرؤوس الموجودة بالفعل في الشجرة (هذه هي الخطوة الجشعة!).</p><p>تتوقف الخوارزمية عند تضمين جميع الرؤوس. تتطلب طابور أولوية (priority queue / min-heap) لتحديد أقرب رأس بكفاءة.</p></template>
-    <template class="content-en"><p>Starts with a tree consisting of one (any) vertex and 'grows' the tree one vertex at a time to produce an MST.</p><p>On each iteration, it constructs \(T_{i+1}\) from \(T_i\) by adding a vertex not in \(T_i\) that is closest to those already in \(T_i\) (the greedy step).</p><p>Stops when all vertices are included. Needs a priority queue (min-heap) for locating the closest fringe vertex.</p></template>
+    <template class="content-ar"><p>تبدأ الخوارزمية بشجرة تتكون من رأس واحد (أي رأس)، وتنمو الشجرة بإضافة رأس واحد في كل مرة لإنتاج MST.</p><p>في كل تكرار، يتم إضافة الرأس غير الموجود في الشجرة والذي يكون أقرب (بأقل وزن حافة) إلى الرؤوس الموجودة بالفعل في الشجرة (هذه هي الخطوة الجشعة!).</p><p>تتوقف الخوارزمية عند تضمين جميع الرؤوس. تتطلب طابور أولوية (priority queue / min-heap) لتحديد أقرب رأس بكفاءة.</p><p><b>مثال عملي:</b> لنفترض رسماً بيانياً برؤوس {a, b, c, d, e, f} وحواف: (a,b,3), (a,f,5), (a,e,6), (b,c,1), (b,f,4), (c,f,4), (c,d,6), (f,d,5), (f,e,2), (e,d,8). لنتتبع خوارزمية Prim بدءاً من الرأس <b>a</b>:</p><ol><li><b>الخطوة 1:</b> الشجرة = {a}. الحواف المجاورة هي (a,b,3), (a,f,5), (a,e,6). الأقل وزناً هي (a,b,3). نضيف <b>b</b>. الشجرة = {a, b}.</li><li><b>الخطوة 2:</b> الحواف المجاورة من {a, b} للرؤوس المتبقية هي (a,f,5), (a,e,6), (b,c,1), (b,f,4). الأقل هي (b,c,1). نضيف <b>c</b>. الشجرة = {a, b, c}.</li><li><b>الخطوة 3:</b> الحواف المجاورة هي (a,f,5), (a,e,6), (b,f,4), (c,f,4), (c,d,6). الأقل هي (b,f,4) أو (c,f,4). لنختر (b,f,4). نضيف <b>f</b>. الشجرة = {a, b, c, f}.</li><li><b>الخطوة 4:</b> الحواف المجاورة هي (a,e,6), (c,d,6), (f,d,5), (f,e,2). الأقل هي (f,e,2). نضيف <b>e</b>. الشجرة = {a, b, c, f, e}.</li><li><b>الخطوة 5:</b> الحواف المجاورة للرأس المتبقي <b>d</b> هي (c,d,6), (f,d,5), (e,d,8). الأقل هي (f,d,5). نضيف <b>d</b>. الشجرة = {a, b, c, f, e, d}.</li></ol><p>اكتملت شجرة الامتداد الصغرى بالحواف {(a,b), (b,c), (b,f), (f,e), (f,d)} وبوزن إجمالي 3 + 1 + 4 + 2 + 5 = 15.</p></template>
+    <template class="content-en"><p>Starts with a tree consisting of one (any) vertex and 'grows' the tree one vertex at a time to produce an MST.</p><p>On each iteration, it constructs \(T_{i+1}\) from \(T_i\) by adding a vertex not in \(T_i\) that is closest to those already in \(T_i\) (the greedy step).</p><p>Stops when all vertices are included. Needs a priority queue (min-heap) for locating the closest fringe vertex.</p><p><b>Worked Example:</b> Consider a graph with vertices {a, b, c, d, e, f} and edges: (a,b,3), (a,f,5), (a,e,6), (b,c,1), (b,f,4), (c,f,4), (c,d,6), (f,d,5), (f,e,2), (e,d,8). Let's trace Prim's algorithm starting from vertex <b>a</b>:</p><ol><li><b>Step 1:</b> Tree = {a}. Adjacent edges are (a,b,3), (a,f,5), (a,e,6). The minimum is (a,b,3). Add <b>b</b>. Tree = {a, b}.</li><li><b>Step 2:</b> Adjacent edges from {a, b} to remaining vertices are (a,f,5), (a,e,6), (b,c,1), (b,f,4). The minimum is (b,c,1). Add <b>c</b>. Tree = {a, b, c}.</li><li><b>Step 3:</b> Adjacent edges are (a,f,5), (a,e,6), (b,f,4), (c,f,4), (c,d,6). The minimum is (b,f,4) or (c,f,4). Let's pick (b,f,4). Add <b>f</b>. Tree = {a, b, c, f}.</li><li><b>Step 4:</b> Adjacent edges are (a,e,6), (c,d,6), (f,d,5), (f,e,2). The minimum is (f,e,2). Add <b>e</b>. Tree = {a, b, c, f, e}.</li><li><b>Step 5:</b> Adjacent edges to the only remaining vertex <b>d</b> are (c,d,6), (f,d,5), (e,d,8). The minimum is (f,d,5). Add <b>d</b>. Tree = {a, b, c, f, e, d}.</li></ol><p>The Minimum Spanning Tree is complete with edges {(a,b), (b,c), (b,f), (f,e), (f,d)} and a total weight of 3 + 1 + 4 + 2 + 5 = 15.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -485,8 +485,8 @@ return ET</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تحل مشكلة أقصر مسار من مصدر واحد (Single Source Shortest Paths Problem).</p><p>مشابهة لخوارزمية Prim، ولكن بطريقة مختلفة لحساب التسميات الرقمية: من بين الرؤوس غير الموجودة في الشجرة، تجد الرأس u الذي يمتلك أصغر مجموع (\(d_v + w(v,u)\))، حيث \(d_v\) هو طول أقصر مسار تم إيجاده من المصدر إلى v، و w(v,u) هو وزن الحافة من v إلى u.</p><p>لا تعمل الخوارزمية مع الرسوم البيانية ذات الأوزان السالبة.</p></template>
-    <template class="content-en"><p>Solves the Single Source Shortest Paths Problem.</p><p>Similar to Prim’s MST algorithm, but computes numerical labels differently: Among vertices not already in the tree, it finds vertex u with the smallest sum \(d_v + w(v,u)\), where \(d_v\) is the length of the shortest path from the source to v, and w(v,u) is the weight of the edge from v to u.</p><p>It does not work for graphs with negative weights.</p></template>
+    <template class="content-ar"><p>تحل مشكلة أقصر مسار من مصدر واحد (Single Source Shortest Paths Problem).</p><p>مشابهة لخوارزمية Prim، ولكن بطريقة مختلفة لحساب التسميات الرقمية: من بين الرؤوس غير الموجودة في الشجرة، تجد الرأس u الذي يمتلك أصغر مجموع (\(d_v + w(v,u)\))، حيث \(d_v\) هو طول أقصر مسار تم إيجاده من المصدر إلى v، و w(v,u) هو وزن الحافة من v إلى u.</p><p>لا تعمل الخوارزمية مع الرسوم البيانية ذات الأوزان السالبة.</p><p><b>مثال عملي:</b> أوجد أقصر مسار من المصدر <b>a</b> في رسم بياني بحواف (a,b,3), (a,d,7), (b,c,4), (b,d,2), (c,d,5), (c,e,6), (d,e,4).</p><ol><li><b>التهيئة:</b> الشجرة = {a(0)}. المتبقي: b(a,3), c(-,∞), d(a,7), e(-,∞). الأقل هو <b>b</b>.</li><li><b>الخطوة 1:</b> نضيف <b>b</b>. الشجرة = {a, b(3)}. نحدث جيران b: تصبح c (b, 3+4=7)، وتصبح d القيمة الأقل بين (7 و 3+2=5) -> (b,5). المتبقي: c(b,7), d(b,5), e(-,∞). الأقل هو <b>d</b>.</li><li><b>الخطوة 2:</b> نضيف <b>d</b>. الشجرة = {a, b, d(5)}. نحدث جيران d: تبقى c (b,7) لأن 5+5=10 > 7. تصبح e (d, 5+4=9). المتبقي: c(b,7), e(d,9). الأقل هو <b>c</b>.</li><li><b>الخطوة 3:</b> نضيف <b>c</b>. الشجرة = {a, b, d, c(7)}. نحدث جيران c: تبقى e (d,9) لأن 7+6=13 > 9. المتبقي: e(d,9). الأقل هو <b>e</b>.</li><li><b>الخطوة 4:</b> نضيف <b>e</b>. الشجرة = {a, b, d, c, e(9)}. تمت معالجة جميع الرؤوس.</li></ol><p>أقصر المسافات من <b>a</b> هي: b=3, d=5, c=7, e=9.</p></template>
+    <template class="content-en"><p>Solves the Single Source Shortest Paths Problem.</p><p>Similar to Prim’s MST algorithm, but computes numerical labels differently: Among vertices not already in the tree, it finds vertex u with the smallest sum \(d_v + w(v,u)\), where \(d_v\) is the length of the shortest path from the source to v, and w(v,u) is the weight of the edge from v to u.</p><p>It does not work for graphs with negative weights.</p><p><b>Worked Example:</b> Find the shortest path from source <b>a</b> in a graph with edges (a,b,3), (a,d,7), (b,c,4), (b,d,2), (c,d,5), (c,e,6), (d,e,4).</p><ol><li><b>Init:</b> Tree = {a(0)}. Remaining: b(a,3), c(-,∞), d(a,7), e(-,∞). Minimum is <b>b</b>.</li><li><b>Step 1:</b> Add <b>b</b>. Tree = {a, b(3)}. Update neighbors of b: c becomes (b, 3+4=7), d becomes min(7, 3+2=5) -> (b,5). Remaining: c(b,7), d(b,5), e(-,∞). Minimum is <b>d</b>.</li><li><b>Step 2:</b> Add <b>d</b>. Tree = {a, b, d(5)}. Update neighbors of d: c remains (b,7) since 5+5=10 > 7. e becomes (d, 5+4=9). Remaining: c(b,7), e(d,9). Minimum is <b>c</b>.</li><li><b>Step 3:</b> Add <b>c</b>. Tree = {a, b, d, c(7)}. Update neighbors of c: e remains (d,9) since 7+6=13 > 9. Remaining: e(d,9). Minimum is <b>e</b>.</li><li><b>Step 4:</b> Add <b>e</b>. Tree = {a, b, d, c, e(9)}. All vertices processed.</li></ol><p>The shortest distances from <b>a</b> are: b=3, d=5, c=7, e=9.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -641,8 +641,8 @@ for i <- 0 to |V| - 1 do
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>الترميز (Coding) هو تعيين سلاسل بتات (bit strings) لحروف الأبجدية. كود Huffman هو مخطط ترميز متغير الطول (variable-length) وخالٍ من البادئة (prefix-free)، مما يعني أنه لا يوجد كود يمثل بادئة لكود آخر. يتم بناء شجرة Huffman جشعياً:</p><ol><li>تهيئة n أشجار ذات عقدة واحدة بأوزان تساوي تكرار الحروف.</li><li>دمج الشجرتين ذواتي الأوزان الأصغر في شجرة واحدة وزنها مجموع الوزنين، وتكرار ذلك n-1 مرة.</li></ol><p>يتم تمييز الحواف بـ 0 و 1.</p></template>
-    <template class="content-en"><p>Coding is the assignment of bit strings to alphabet characters. A Huffman code is an optimal prefix-free variable-length encoding scheme. Prefix-free means no codeword is a prefix of another. Huffman's algorithm steps:</p><ol><li>Initialize n one-node trees with alphabet characters and frequencies as weights.</li><li>Repeat n-1 times: join two binary trees with smallest weights into one, making its weight the sum of the two.</li></ol><p>Mark edges with 0s and 1s. This minimizes the expected length of a codeword.</p></template>
+    <template class="content-ar"><p>الترميز (Coding) هو تعيين سلاسل بتات (bit strings) لحروف الأبجدية. كود Huffman هو مخطط ترميز متغير الطول (variable-length) وخالٍ من البادئة (prefix-free)، مما يعني أنه لا يوجد كود يمثل بادئة لكود آخر. يتم بناء شجرة Huffman جشعياً:</p><ol><li>تهيئة n أشجار ذات عقدة واحدة بأوزان تساوي تكرار الحروف.</li><li>دمج الشجرتين ذواتي الأوزان الأصغر في شجرة واحدة وزنها مجموع الوزنين، وتكرار ذلك n-1 مرة.</li></ol><p>يتم تمييز الحواف بـ 0 و 1.</p><p><b>مثال عملي:</b> لنفترض الأبجدية {A, B, C, D, _} بتكرارات A(0.35), B(0.1), C(0.2), D(0.2), _(0.15).</p><ol><li><b>الخطوة 1:</b> العقد الأولية: B(0.1), _(0.15), C(0.2), D(0.2), A(0.35). ندمج الأصغرين: B(0.1) و _(0.15) في عقدة جديدة N1(0.25).</li><li><b>الخطوة 2:</b> المتبقي: C(0.2), D(0.2), N1(0.25), A(0.35). ندمج C(0.2) و D(0.2) في N2(0.4).</li><li><b>الخطوة 3:</b> المتبقي: N1(0.25), A(0.35), N2(0.4). ندمج N1(0.25) و A(0.35) في N3(0.6).</li><li><b>الخطوة 4:</b> المتبقي: N2(0.4), N3(0.6). ندمجهما في الجذر Root(1.0).</li></ol><p>بتعيين 0 للفروع اليسرى و 1 لليمنى، نحصل على الأكواد: C=00, D=01, B=100, _=101, A=11. متوسط البتات لكل حرف هو (0.35*2) + (0.1*3) + (0.2*2) + (0.2*2) + (0.15*3) = 2.25. الترميز ثابت الطول لـ 5 حروف يتطلب 3 بتات. <span class="smart-term" data-term-en="Compression ratio" data-ar="نسبة الضغط" data-en-def="A measure of the reduction in data representation size, calculated by comparing the average bits per character of the compressed code to a fixed-length baseline.">نسبة الضغط<span class="smart-term-tooltip"></span></span> هي (3 - 2.25) / 3 * 100% = 25%.</p></template>
+    <template class="content-en"><p>Coding is the assignment of bit strings to alphabet characters. A Huffman code is an optimal prefix-free variable-length encoding scheme. Prefix-free means no codeword is a prefix of another. Huffman's algorithm steps:</p><ol><li>Initialize n one-node trees with alphabet characters and frequencies as weights.</li><li>Repeat n-1 times: join two binary trees with smallest weights into one, making its weight the sum of the two.</li></ol><p>Mark edges with 0s and 1s. This minimizes the expected length of a codeword.</p><p><b>Worked Example:</b> Consider the alphabet {A, B, C, D, _} with frequencies A(0.35), B(0.1), C(0.2), D(0.2), _(0.15).</p><ol><li><b>Step 1:</b> Initial nodes: B(0.1), _(0.15), C(0.2), D(0.2), A(0.35). Merge the two smallest: B(0.1) and _(0.15) into a new node N1(0.25).</li><li><b>Step 2:</b> Remaining: C(0.2), D(0.2), N1(0.25), A(0.35). Merge C(0.2) and D(0.2) into N2(0.4).</li><li><b>Step 3:</b> Remaining: N1(0.25), A(0.35), N2(0.4). Merge N1(0.25) and A(0.35) into N3(0.6).</li><li><b>Step 4:</b> Remaining: N2(0.4), N3(0.6). Merge them into the Root(1.0).</li></ol><p>Assigning 0 to left branches and 1 to right branches yields the codes: C=00, D=01, B=100, _=101, A=11. The average bits per character is (0.35*2) + (0.1*3) + (0.2*2) + (0.2*2) + (0.15*3) = 2.25. A fixed-length encoding for 5 characters requires 3 bits. The <span class="smart-term" data-term-en="Compression ratio" data-ar="نسبة الضغط" data-en-def="A measure of the reduction in data representation size, calculated by comparing the average bits per character of the compressed code to a fixed-length baseline.">compression ratio<span class="smart-term-tooltip"></span></span> is (3 - 2.25) / 3 * 100% = 25%.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -675,8 +675,8 @@ for i <- 0 to |V| - 1 do
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبنائي في هذه المراجعة الشاملة للوحدة الحادية عشرة. اليوم نتحدث عن 'التقنية الجشعة' (Greedy Technique)، وهي استراتيجية تعتمد على اتخاذ الخيار الأفضل في اللحظة الحالية (أمثل محلياً) دون النظر للعواقب المستقبلية، وبمجرد اتخاذ القرار لا يمكن التراجع عنه. هذه الطريقة رائعة وسريعة، وتضمن لنا حلولاً مثالية في بعض المشاكل مثل إيجاد شجرة الامتداد الصغرى (MST) باستخدام خوارزميتي Prim و Kruskal، وإيجاد أقصر مسار باستخدام خوارزمية Dijkstra، وكذلك في ضغط البيانات باستخدام ترميز Huffman. لكن احذروا في الامتحان! الخوارزمية الجشعة لا تعطي دائماً الحل الأمثل لكل المشاكل، كما رأينا في مشكلة الصرافة (Change-Making) مع بعض فئات العملات غير التقليدية، أو في مشكلة البائع المتجول (TSP). تذكروا دائماً الفروق الجوهرية: Prim تبني الشجرة من عقدة واحدة وتتوسع، بينما Kruskal ترتب الحواف وتضيفها بشرط عدم تكوين حلقة باستخدام Union-Find. أما Dijkstra فهي تشبه Prim لكنها تراكم الأوزان من نقطة البداية، وتفشل تماماً إذا كانت هناك أوزان سالبة. ركزوا على هذه الفروق الدقيقة، وتدربوا على تتبع الخوارزميات خطوة بخطوة. بالتوفيق في اختباركم!</template>
-    <template class="content-en">Welcome to our comprehensive review of Module 11. Today we focus on the 'Greedy Technique', a strategy that makes the locally optimal choice at each step without looking ahead, and once a decision is made, it's irrevocable. This approach is incredibly fast and guarantees optimal solutions for specific problems like finding the Minimum Spanning Tree (MST) using Prim's and Kruskal's algorithms, finding shortest paths with Dijkstra's, and compressing data with Huffman coding. But beware on the exam! Greedy doesn't always yield the optimal solution, as seen in the Change-Making problem with non-standard denominations or the Traveling Salesman Problem (TSP). Always remember the core differences: Prim grows the tree from a single node, while Kruskal sorts edges and adds them globally using Union-Find to avoid cycles. Dijkstra is similar to Prim but accumulates weights from the source, and it completely fails with negative weights. Focus on these nuances and practice tracing the algorithms step-by-step. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أبنائي في هذه المراجعة الشاملة للوحدة الحادية عشرة. اليوم نتحدث عن 'التقنية الجشعة' (Greedy Technique)، وهي استراتيجية تعتمد على اتخاذ الخيار الأفضل في اللحظة الحالية (أمثل محلياً) دون النظر للعواقب المستقبلية، وبمجرد اتخاذ القرار لا يمكن التراجع عنه. هذه الطريقة رائعة وسريعة، وتضمن لنا حلولاً مثالية في بعض المشاكل مثل إيجاد شجرة الامتداد الصغرى (MST) باستخدام خوارزميتي Prim و Kruskal، وإيجاد أقصر مسار باستخدام خوارزمية Dijkstra، وكذلك في ضغط البيانات باستخدام ترميز Huffman. لكن احذروا في الامتحان! الخوارزمية الجشعة لا تعطي دائماً الحل الأمثل لكل المشاكل، كما رأينا في مشكلة الصرافة (Change-Making) مع بعض فئات العملات غير التقليدية، أو في مشكلة البائع المتجول (TSP). تذكروا دائماً الفروق الجوهرية: Prim تبني الشجرة من عقدة واحدة وتتوسع، بينما Kruskal ترتب الحواف وتضيفها بشرط عدم تكوين حلقة باستخدام Union-Find. أما Dijkstra فهي تشبه Prim لكنها تراكم الأوزان من نقطة البداية، وتفشل تماماً إذا كانت هناك أوزان سالبة. ركزوا على هذه الفروق الدقيقة، وتدربوا على تتبع الخوارزميات خطوة بخطوة. بالتوفيق في اختباركم!<p>لإتقان التقنية الجشعة حقاً، يجب عليك التدرب على تتبع هذه الخوارزميات خطوة بخطوة. انتبه جيداً للاختلاف في كيفية تحديث طابور الأولوية بين Prim و Dijkstra، وتدرب على بناء أشجار Huffman من الصفر لحساب نسب الضغط الدقيقة. هذه التتبعات هي مادة مؤكدة في الاختبار.</p></template>
+    <template class="content-en">Welcome to our comprehensive review of Module 11. Today we focus on the 'Greedy Technique', a strategy that makes the locally optimal choice at each step without looking ahead, and once a decision is made, it's irrevocable. This approach is incredibly fast and guarantees optimal solutions for specific problems like finding the Minimum Spanning Tree (MST) using Prim's and Kruskal's algorithms, finding shortest paths with Dijkstra's, and compressing data with Huffman coding. But beware on the exam! Greedy doesn't always yield the optimal solution, as seen in the Change-Making problem with non-standard denominations or the Traveling Salesman Problem (TSP). Always remember the core differences: Prim grows the tree from a single node, while Kruskal sorts edges and adds them globally using Union-Find to avoid cycles. Dijkstra is similar to Prim but accumulates weights from the source, and it completely fails with negative weights. Focus on these nuances and practice tracing the algorithms step-by-step. Good luck!<p>To truly master the greedy technique, you must practice tracing these algorithms step-by-step. Pay close attention to how Prim's and Dijkstra's update their priority queues differently, and practice building Huffman trees from scratch to calculate exact compression ratios. These traces are guaranteed exam material.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -850,6 +850,24 @@ for i <- 0 to |V| - 1 do
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">من خلال إعطاء أكواد قصيرة (عدد بتات أقل) للحروف الأكثر تكراراً، وأكواد طويلة للحروف النادرة، مما يقلل متوسط عدد البتات لكل حرف في النص الإجمالي.</template>
           <template class="content-en">By assigning shorter codes (fewer bits) to the most frequent characters and longer codes to rare characters, thereby reducing the average number of bits per character in the overall text.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف تحسب متوسط عدد البتات لكل حرف بعد بناء شجرة Huffman؟</template>
+          <template class="content-en">How do you calculate the average number of bits per character after building a Huffman tree?</template>
+          <span class="content-target">كيف تحسب متوسط عدد البتات لكل حرف بعد بناء شجرة Huffman؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>تقوم بضرب طول الكود (عدد البتات) لكل حرف في احتمالية تكراره (تردده)، ثم تجمع النواتج لجميع الحروف في الأبجدية.</p></template>
+          <template class="content-en"><p>You multiply the code length (number of bits) of each character by its probability of occurrence (frequency), and then sum these products for all characters in the alphabet.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1117,6 +1135,23 @@ for i <- 0 to |V| - 1 do
         "en": "Merging rare characters first so they end up at the bottom (longer codes)."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يتم حساب نسبة الضغط (Compression ratio) في ترميز Huffman؟",
+      "en": "How is the compression ratio calculated in Huffman coding?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بطرح متوسط البتات لكل حرف في Huffman من عدد البتات في الترميز ثابت الطول، ثم قسمة الناتج على عدد البتات في الترميز الثابت وضربها في 100.",
+        "en": "By subtracting the average bits per character in Huffman from the fixed-length bits, dividing by the fixed-length bits, and multiplying by 100."
+      },
+      "example": {
+        "ar": "إذا كان الثابت 3 بتات و Huffman 2.25 بت، فإن النسبة هي (3 - 2.25) / 3 = 25%.",
+        "en": "If fixed is 3 bits and Huffman is 2.25 bits, the ratio is (3 - 2.25) / 3 = 25%."
+      }
+    },
+    "id": 16
   }
 ]
 </script>
@@ -1126,7 +1161,7 @@ for i <- 0 to |V| - 1 do
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 11</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1142,7 +1177,7 @@ for i <- 0 to |V| - 1 do
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 11</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1467,6 +1502,38 @@ for i <- 0 to |V| - 1 do
     },
     "difficulty": "medium",
     "conceptId": "minimum-spanning-tree"
+  },
+  {
+    "conceptId": "dijkstras-algorithm",
+    "question": {
+      "ar": "في خوارزمية Dijkstra، إذا كانت المسافة الحالية للعقدة d هي 7، وتم اكتشاف مسار جديد عبر العقدة b (التي مسافتها 3) بحافة وزنها 2، فماذا سيحدث لمسافة d؟",
+      "en": "In Dijkstra's algorithm, if the current distance to node d is 7, and a new path is discovered via node b (distance 3) with an edge weight of 2, what happens to d's distance?"
+    },
+    "options": {
+      "ar": [
+        "تبقى 7 لأنها لا تتغير بمجرد تعيينها.",
+        "تصبح 5 لأن (3 + 2) أقل من 7.",
+        "تصبح 2 لأن وزن الحافة الجديدة هو 2.",
+        "تصبح 10 لأننا نجمع (7 + 3)."
+      ],
+      "en": [
+        "It remains 7 because it cannot change once set.",
+        "It becomes 5 because (3 + 2) is less than 7.",
+        "It becomes 2 because the new edge weight is 2.",
+        "It becomes 10 because we add (7 + 3)."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تقوم الخوارزمية بتحديث المسافة إذا كان المسار الجديد (مسافة العقدة السابقة + وزن الحافة) أقل من المسافة الحالية. هنا 3 + 2 = 5، وهو أقل من 7.",
+      "en": "The algorithm updates the distance if the new path (previous node's distance + edge weight) is less than the current distance. Here 3 + 2 = 5, which is less than 7."
+    },
+    "hint": {
+      "ar": "قارن بين المسافة القديمة (7) والمسافة عبر المسار الجديد (3 + 2).",
+      "en": "Compare the old distance (7) with the distance via the new path (3 + 2)."
+    },
+    "difficulty": "medium",
+    "id": 11
   }
 ]
 </script>

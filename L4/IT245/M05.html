@@ -343,8 +343,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>في التنفيذ البسيط للمصفوفة، تتقدم مؤشرات front و back باستمرار. بعد عدة عمليات، قد يصل مؤشر back إلى نهاية المصفوفة رغم وجود مساحة فارغة في بدايتها.</p><p>الحل هو <strong><span class="smart-term" data-term-en="Circular Array" data-ar="المصفوفة الدائرية" data-en-def="An array implementation where the end of the array wraps around to the start to reuse empty spaces.">المصفوفة الدائرية (Circular Array)</span></strong>: عندما يصل front أو back إلى نهاية المصفوفة، يتم لفه (wrapped around) ليعود إلى الفهرس 0.</p><p>نحتفظ بمتغير <code>currentSize</code> لتتبع عدد العناصر الفعلي.</p></template>
-    <template class="content-en"><p>In a simple array implementation, the front and back pointers continuously advance. After several operations, the back pointer might reach the end of the array even if there is empty space at the beginning.</p><p>The solution is a <strong><span class="smart-term" data-term-en="Circular Array" data-ar="المصفوفة الدائرية" data-en-def="An array implementation where the end of the array wraps around to the start to reuse empty spaces.">Circular Array</span></strong>: whenever front or back gets to the end of the array, it is wrapped around to the beginning.</p><p>We keep track of the number of elements using a <code>currentSize</code> variable.</p></template>
+    <template class="content-ar"><p>في التنفيذ البسيط للمصفوفة، تتقدم مؤشرات front و back باستمرار. بعد عدة عمليات، قد يصل مؤشر back إلى نهاية المصفوفة رغم وجود مساحة فارغة في بدايتها.</p><p>الحل هو <strong><span class="smart-term" data-term-en="Circular Array" data-ar="المصفوفة الدائرية" data-en-def="An array implementation where the end of the array wraps around to the start to reuse empty spaces.">المصفوفة الدائرية (Circular Array)</span></strong>: عندما يصل front أو back إلى نهاية المصفوفة، يتم لفه (wrapped around) ليعود إلى الفهرس 0.</p><p>نحتفظ بمتغير <code>currentSize</code> لتتبع عدد العناصر الفعلي.</p><p>دعونا نتتبع حالة طابور يعتمد على مصفوفة خلال سلسلة من العمليات:</p><ol><li><b>الحالة الابتدائية:</b> لنفترض طابوراً يشير فيه مؤشر <code>front</code> إلى العنصر '2' ومؤشر <code>back</code> إلى العنصر '4'.</li><li><b>بعد عملية enqueue(1):</b> يتقدم مؤشر <code>back</code> خطوة، ويتم إدراج '1' في موضع <code>back</code> الجديد.</li><li><b>بعد عملية enqueue(3):</b> يتقدم مؤشر <code>back</code> مرة أخرى، ويتم إدراج '3'.</li><li><b>بعد عملية dequeue():</b> يتم حذف وإرجاع العنصر الموجود عند <code>front</code> ('2'). يتقدم مؤشر <code>front</code> خطوة ليشير إلى '4'.</li><li><b>بعد عملية dequeue():</b> يتم حذف العنصر '4'. يتقدم مؤشر <code>front</code> ليشير إلى '1'.</li><li><b>بعد عملية dequeue():</b> يتم حذف العنصر '1'. يتقدم مؤشر <code>front</code> ليشير إلى '3'.</li><li><b>بعد عملية dequeue():</b> يتم حذف العنصر '3'. يصبح الطابور الآن فارغاً.</li></ol></template>
+    <template class="content-en"><p>In a simple array implementation, the front and back pointers continuously advance. After several operations, the back pointer might reach the end of the array even if there is empty space at the beginning.</p><p>The solution is a <strong><span class="smart-term" data-term-en="Circular Array" data-ar="المصفوفة الدائرية" data-en-def="An array implementation where the end of the array wraps around to the start to reuse empty spaces.">Circular Array</span></strong>: whenever front or back gets to the end of the array, it is wrapped around to the beginning.</p><p>We keep track of the number of elements using a <code>currentSize</code> variable.</p><p>Let's trace the state of an array-based queue through a sequence of operations:</p><ol><li><b>Initial State:</b> Assume a queue where <code>front</code> points to an element '2' and <code>back</code> points to an element '4'.</li><li><b>After enqueue(1):</b> The <code>back</code> pointer increments, and '1' is inserted at the new <code>back</code> position.</li><li><b>After enqueue(3):</b> The <code>back</code> pointer increments again, and '3' is inserted.</li><li><b>After dequeue():</b> The element at <code>front</code> ('2') is removed and returned. The <code>front</code> pointer increments to point to '4'.</li><li><b>After dequeue():</b> The element '4' is removed. The <code>front</code> pointer increments to point to '1'.</li><li><b>After dequeue():</b> The element '1' is removed. The <code>front</code> pointer increments to point to '3'.</li><li><b>After dequeue():</b> The element '3' is removed. The queue is now empty.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -384,6 +384,77 @@
         }
         queue[rear] = data;
         rear++;
+    }
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>pseudocode</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>ENQUEUE(Q, x)
+1  Q[Q.tail] = x
+2  if Q.tail == Q.length
+3      Q.tail = 1
+4  else Q.tail = Q.tail + 1
+
+DEQUEUE(Q)
+1  x = Q[Q.head]
+2  if Q.head == Q.length
+3      Q.head = 1
+4  else Q.head = Q.head + 1
+5  return x</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>class Queue {
+    private static int front, rear, capacity;
+    private static int queue[];
+
+    Queue(int c) {
+        front = rear = 0;
+        capacity = c;
+        queue = new int[capacity];
+    }
+
+    static void queueEnqueue(int data) {
+        if (capacity == rear) {
+            System.out.printf("\nQueue is full\n");
+            return;
+        } else {
+            queue[rear] = data;
+            rear++;
+        }
+    }
+
+    static void queueDequeue() {
+        if (front == rear) {
+            System.out.printf("\nQueue is empty\n");
+            return;
+        } else {
+            // shift all elements to the right by one (Note: O(N) time complexity)
+            for (int i = 0; i &lt; rear - 1; i++) {
+                queue[i] = queue[i + 1];
+            }
+            if (rear &lt; capacity)
+                queue[rear] = 0;
+            rear--;
+        }
+    }
+
+    static void queueDisplay() {
+        if (front == rear) {
+            System.out.printf("\nQueue is Empty\n");
+            return;
+        }
+        for (int i = front; i &lt; rear; i++) {
+            System.out.printf(" %d &lt;-- ", queue[i]);
+        }
     }
 }</code></pre>
   </div>
@@ -690,6 +761,72 @@ String head = myQueue.poll(); // Removes and returns head, or null if empty
 String top = myQueue.peek();  // Returns head without removing, or null if empty</code></pre>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>import java.util.Scanner;
+
+public class BinaryCounter {
+    private Queue&lt;String&gt; q;
+
+    public void countTo(int n) {
+        q = new QueueArray&lt;String&gt;();
+        q.enqueue("1");
+        for (int i = 0; i &lt; n; i++) {
+            String front = q.dequeue();
+            System.out.println(front);
+            q.enqueue(front + "0");
+            q.enqueue(front + "1");
+        }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("Count in binary to what decimal value?");
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        scanner.close();
+        BinaryCounter binaryCounter = new BinaryCounter();
+        binaryCounter.countTo(n);
+    }
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>Queue&lt;String&gt; myQueue = new LinkedList&lt;&gt;();
+myQueue.offer("Monday");
+myQueue.offer("Thursday");
+boolean flag = myQueue.offer("Wednesday");
+System.out.println("Wednesday inserted successfully? " + flag);
+
+try {
+    myQueue.add("Thursday");
+    myQueue.add("Friday");
+    myQueue.add("Weekend");
+} catch (IllegalStateException e) {
+    e.printStackTrace();
+}
+
+System.out.println("Pick the head of the queue: " + myQueue.peek());
+
+try {
+    String head = myQueue.remove();
+    System.out.print("1) Push out " + head + " from the queue ");
+    System.out.println("and the new head is now: " + myQueue.element());
+} catch (NoSuchElementException e) {
+    e.printStackTrace();
+}
+
+String head2 = myQueue.poll();
+System.out.print("2) Push out " + head2 + " from the queue ");
+System.out.println("and the new head is now: " + myQueue.peek());</code></pre>
+  </div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">متى تفضل استخدام <code>offer()</code> بدلاً من <code>add()</code> في جافا؟</template>
@@ -710,8 +847,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبنائي في وحدة الطابور (Queue). تخيلوا أنكم تقفون في طابور لشراء القهوة؛ من يصل أولاً يُخدم أولاً، وهذا بالضبط هو مبدأ FIFO الذي يعتمد عليه هذا الهيكل. في الامتحان، ركزوا جيداً على الفرق بين تنفيذ المصفوفة والقائمة المترابطة. تذكروا أن المصفوفة العادية تخدعنا وتدعي أنها ممتلئة بينما بدايتها فارغة، وهنا يأتي دور 'المصفوفة الدائرية' كحل عبقري باستخدام باقي القسمة (Modulo). أما في القائمة المترابطة، فالأمر أبسط، لكن احذروا من حالة الحافة (Edge Case) عندما يفرغ الطابور؛ يجب تصفير مؤشر النهاية (rear). أخيراً، لا تنسوا دوال الجافا الجاهزة والفرق بين الدوال التي ترمي استثناءات (مثل add) والدوال الآمنة (مثل offer). بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome to the Queue module! Imagine standing in line for coffee; the first to arrive is the first served. This is the exact FIFO principle of a Queue. For the exam, focus heavily on the difference between array and linked list implementations. Remember that a standard array can trick us into thinking it's full when the front is empty—this is where the brilliant 'Circular Array' comes in using modulo arithmetic. The linked list implementation is more straightforward, but beware of the edge case: when the queue becomes empty, you must set the rear pointer to null. Finally, memorize the Java Queue interface methods, specifically the difference between exception-throwing methods (like add) and safe methods (like offer). Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا أبنائي في وحدة الطابور (Queue). تخيلوا أنكم تقفون في طابور لشراء القهوة؛ من يصل أولاً يُخدم أولاً، وهذا بالضبط هو مبدأ FIFO الذي يعتمد عليه هذا الهيكل. في الامتحان، ركزوا جيداً على الفرق بين تنفيذ المصفوفة والقائمة المترابطة. تذكروا أن المصفوفة العادية تخدعنا وتدعي أنها ممتلئة بينما بدايتها فارغة، وهنا يأتي دور 'المصفوفة الدائرية' كحل عبقري باستخدام باقي القسمة (Modulo). أما في القائمة المترابطة، فالأمر أبسط، لكن احذروا من حالة الحافة (Edge Case) عندما يفرغ الطابور؛ يجب تصفير مؤشر النهاية (rear). أخيراً، لا تنسوا دوال الجافا الجاهزة والفرق بين الدوال التي ترمي استثناءات (مثل add) والدوال الآمنة (مثل offer). بالتوفيق في دراستكم!<p>كما رأينا، لا يقتصر دور الطابور على تنظيم البيانات فحسب، بل يمتد لحل مشكلات خوارزمية بذكاء، مثل توليد الأرقام الثنائية. تذكر دائماً أن سياسة 'الداخل أولاً يخرج أولاً' هي المفتاح لفهم متى وكيف تستخدم هذا الهيكل بكفاءة في برامجك.</p><p>أثناء مراجعتك لهذه التطبيقات، انتبه جيداً لكيفية تحرك المؤشرات. تتبع مؤشري <code>front</code> و <code>back</code> خطوة بخطوة في المصفوفة هو سؤال كلاسيكي في الاختبارات. تذكر أنه على الرغم من أن إزاحة العناصر تعمل برمجياً، إلا أن المصفوفة الدائرية هي الحل الأمثل O(1) الذي يبحث عنه الأساتذة.</p></template>
+    <template class="content-en">Welcome to the Queue module! Imagine standing in line for coffee; the first to arrive is the first served. This is the exact FIFO principle of a Queue. For the exam, focus heavily on the difference between array and linked list implementations. Remember that a standard array can trick us into thinking it's full when the front is empty—this is where the brilliant 'Circular Array' comes in using modulo arithmetic. The linked list implementation is more straightforward, but beware of the edge case: when the queue becomes empty, you must set the rear pointer to null. Finally, memorize the Java Queue interface methods, specifically the difference between exception-throwing methods (like add) and safe methods (like offer). Good luck!<p>As we have seen, a queue's role is not limited to organizing data; it extends to cleverly solving algorithmic problems, like generating binary numbers. Always remember that the 'First In, First Out' policy is the key to understanding when and how to use this structure efficiently in your programs.</p><p>As you review these implementations, pay close attention to how pointers move. Tracing the <code>front</code> and <code>back</code> pointers step-by-step in an array is a classic exam question. Remember that while shifting elements works programmatically, the circular array is the optimal O(1) solution professors look for.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -889,6 +1026,42 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
         </div>
       </div>
     </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يعتبر الطابور الهيكل المثالي لتوليد الأرقام الثنائية بالتسلسل؟</template>
+          <template class="content-en">Why is a Queue the ideal structure for generating binary numbers in sequence?</template>
+          <span class="content-target">لماذا يعتبر الطابور الهيكل المثالي لتوليد الأرقام الثنائية بالتسلسل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن الطابور يتبع سياسة FIFO، مما يضمن معالجة الأرقام الأقصر (الأقدم) قبل الأطول. عندما نسحب رقماً، نولد الرقمين التاليين له بإضافة 0 و 1، ونضعهما في نهاية الطابور ليتم معالجتهما بالترتيب الصحيح لاحقاً.</p></template>
+          <template class="content-en"><p>Because a Queue follows the FIFO policy, ensuring shorter (older) numbers are processed before longer ones. When we dequeue a number, we generate its next two sequence members by appending 0 and 1, placing them at the rear to be processed in the correct order later.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في التنفيذ المبسط للطابور باستخدام المصفوفة، يتم إزاحة جميع العناصر إلى اليسار عند كل عملية Dequeue. لماذا يعتبر هذا التصميم سيئاً، وما هو البديل الأمثل؟</template>
+          <template class="content-en">In the simple array implementation of a queue, all elements are shifted to the left during every Dequeue operation. Why is this design poor, and what is the optimal alternative?</template>
+          <span class="content-target">في التنفيذ المبسط للطابور باستخدام المصفوفة، يتم إزاحة جميع العناصر إلى اليسار عند كل عملية Dequeue. لماذا يعتبر هذا التصميم سيئاً، وما هو البديل الأمثل؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>إزاحة العناصر تستغرق وقتاً يتناسب مع عدد العناصر O(N)، مما يقلل من كفاءة الطابور بشكل كبير مع زيادة حجم البيانات. البديل الأمثل هو 'المصفوفة الدائرية' (Circular Array)، والتي تكتفي بتحريك مؤشر <code>front</code> باستخدام الحساب المعياري، مما يحقق تعقيداً زمنياً ثابتاً O(1) دون الحاجة لنقل أي بيانات.</p></template>
+          <template class="content-en"><p>Shifting elements takes O(N) time, which significantly degrades the queue's efficiency as data grows. The optimal alternative is a 'Circular Array', which simply advances the <code>front</code> pointer using modular arithmetic, achieving a constant O(1) time complexity without moving any data.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -986,8 +1159,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 6,
     "front": {
-      "ar": "في تنفيذ القائمة المترابطة، إلى ماذا يشير مؤشر <code>front</code>؟",
-      "en": "In a linked list implementation, what does the <code>front</code> pointer point to?"
+      "ar": "في تنفيذ القائمة المترابطة، إلى ماذا يشير مؤشر <code>front<\/code>؟",
+      "en": "In a linked list implementation, what does the <code>front<\/code> pointer point to?"
     },
     "back": {
       "definition": {
@@ -1003,8 +1176,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 7,
     "front": {
-      "ar": "في تنفيذ القائمة المترابطة، إلى ماذا يشير مؤشر <code>rear</code>؟",
-      "en": "In a linked list implementation, what does the <code>rear</code> pointer point to?"
+      "ar": "في تنفيذ القائمة المترابطة، إلى ماذا يشير مؤشر <code>rear<\/code>؟",
+      "en": "In a linked list implementation, what does the <code>rear<\/code> pointer point to?"
     },
     "back": {
       "definition": {
@@ -1020,8 +1193,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 8,
     "front": {
-      "ar": "ما هي دالة <code>offer()</code> في واجهة Queue في جافا؟",
-      "en": "What is the <code>offer()</code> method in Java's Queue interface?"
+      "ar": "ما هي دالة <code>offer()<\/code> في واجهة Queue في جافا؟",
+      "en": "What is the <code>offer()<\/code> method in Java's Queue interface?"
     },
     "back": {
       "definition": {
@@ -1037,8 +1210,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 9,
     "front": {
-      "ar": "ما هي دالة <code>add()</code> في واجهة Queue في جافا؟",
-      "en": "What is the <code>add()</code> method in Java's Queue interface?"
+      "ar": "ما هي دالة <code>add()<\/code> في واجهة Queue في جافا؟",
+      "en": "What is the <code>add()<\/code> method in Java's Queue interface?"
     },
     "back": {
       "definition": {
@@ -1054,8 +1227,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 10,
     "front": {
-      "ar": "ما هي دالة <code>poll()</code> في واجهة Queue في جافا؟",
-      "en": "What is the <code>poll()</code> method in Java's Queue interface?"
+      "ar": "ما هي دالة <code>poll()<\/code> في واجهة Queue في جافا؟",
+      "en": "What is the <code>poll()<\/code> method in Java's Queue interface?"
     },
     "back": {
       "definition": {
@@ -1071,8 +1244,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 11,
     "front": {
-      "ar": "ما هي دالة <code>remove()</code> في واجهة Queue في جافا؟",
-      "en": "What is the <code>remove()</code> method in Java's Queue interface?"
+      "ar": "ما هي دالة <code>remove()<\/code> في واجهة Queue في جافا؟",
+      "en": "What is the <code>remove()<\/code> method in Java's Queue interface?"
     },
     "back": {
       "definition": {
@@ -1088,8 +1261,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 12,
     "front": {
-      "ar": "ما هي دالة <code>peek()</code> في واجهة Queue في جافا؟",
-      "en": "What is the <code>peek()</code> method in Java's Queue interface?"
+      "ar": "ما هي دالة <code>peek()<\/code> في واجهة Queue في جافا؟",
+      "en": "What is the <code>peek()<\/code> method in Java's Queue interface?"
     },
     "back": {
       "definition": {
@@ -1105,8 +1278,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 13,
     "front": {
-      "ar": "ما هي دالة <code>element()</code> في واجهة Queue في جافا؟",
-      "en": "What is the <code>element()</code> method in Java's Queue interface?"
+      "ar": "ما هي دالة <code>element()<\/code> في واجهة Queue في جافا؟",
+      "en": "What is the <code>element()<\/code> method in Java's Queue interface?"
     },
     "back": {
       "definition": {
@@ -1156,8 +1329,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 16,
     "front": {
-      "ar": "ما هو المتغير <code>currentSize</code> في تنفيذ المصفوفة للطابور؟",
-      "en": "What is the <code>currentSize</code> variable in the array implementation of a queue?"
+      "ar": "ما هو المتغير <code>currentSize<\/code> في تنفيذ المصفوفة للطابور؟",
+      "en": "What is the <code>currentSize<\/code> variable in the array implementation of a queue?"
     },
     "back": {
       "definition": {
@@ -1173,8 +1346,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 17,
     "front": {
-      "ar": "في تنفيذ القائمة المترابطة، ماذا يحدث لمؤشر <code>rear</code> إذا أصبح الطابور فارغاً بعد عملية Dequeue؟",
-      "en": "In a linked list implementation, what happens to the <code>rear</code> pointer if the queue becomes empty after a Dequeue?"
+      "ar": "في تنفيذ القائمة المترابطة، ماذا يحدث لمؤشر <code>rear<\/code> إذا أصبح الطابور فارغاً بعد عملية Dequeue؟",
+      "en": "In a linked list implementation, what happens to the <code>rear<\/code> pointer if the queue becomes empty after a Dequeue?"
     },
     "back": {
       "definition": {
@@ -1237,6 +1410,57 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
         "en": "Hence the time complexity is O(1)."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في خوارزمية توليد الأرقام الثنائية باستخدام الطابور، ماذا نفعل بالعنصر بعد سحبه (Dequeue)؟",
+      "en": "In the binary number generation algorithm using a queue, what do we do with the element after dequeuing it?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نطبعه، ثم نضيف إليه '0' ونعيده للطابور، ثم نضيف إليه '1' ونعيده للطابور.",
+        "en": "We print it, append '0' and enqueue it, then append '1' and enqueue it."
+      },
+      "example": {
+        "ar": "إذا سحبنا '10'، نضيف '100' ثم '101'.",
+        "en": "If we dequeue '10', we enqueue '100' then '101'."
+      }
+    },
+    "id": 21
+  },
+  {
+    "front": {
+      "ar": "في طابور يعتمد على مصفوفة، إذا قمنا بعملية <code>enqueue<\/code>، أي مؤشر يتحرك؟",
+      "en": "In an array-based queue, if we perform an <code>enqueue<\/code> operation, which pointer moves?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مؤشر <code>back<\/code> (أو <code>rear<\/code>) يتقدم خطوة واحدة.",
+        "en": "The <code>back<\/code> (or <code>rear<\/code>) pointer increments by one step."
+      },
+      "example": {
+        "ar": "إذا كان back عند الفهرس 4، يصبح عند الفهرس 5.",
+        "en": "If back is at index 4, it moves to index 5."
+      }
+    },
+    "id": 22
+  },
+  {
+    "front": {
+      "ar": "في طابور يعتمد على مصفوفة، إذا قمنا بعملية <code>dequeue<\/code>، أي مؤشر يتحرك؟",
+      "en": "In an array-based queue, if we perform a <code>dequeue<\/code> operation, which pointer moves?"
+    },
+    "back": {
+      "definition": {
+        "ar": "مؤشر <code>front<\/code> (أو <code>head<\/code>) يتقدم خطوة واحدة.",
+        "en": "The <code>front<\/code> (or <code>head<\/code>) pointer increments by one step."
+      },
+      "example": {
+        "ar": "إذا كان front عند الفهرس 2، يصبح عند الفهرس 3.",
+        "en": "If front is at index 2, it moves to index 3."
+      }
+    },
+    "id": 23
   }
 ]
 </script>
@@ -1246,7 +1470,7 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1262,7 +1486,7 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1495,8 +1719,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 8,
     "question": {
-      "ar": "في تنفيذ القائمة المترابطة، ماذا يجب أن نفعل لمؤشر <code>rear</code> إذا أدت عملية Dequeue إلى جعل الطابور فارغاً؟",
-      "en": "In a linked list implementation, what must be done to the <code>rear</code> pointer if a Dequeue operation makes the queue empty?"
+      "ar": "في تنفيذ القائمة المترابطة، ماذا يجب أن نفعل لمؤشر <code>rear<\/code> إذا أدت عملية Dequeue إلى جعل الطابور فارغاً؟",
+      "en": "In a linked list implementation, what must be done to the <code>rear<\/code> pointer if a Dequeue operation makes the queue empty?"
     },
     "options": {
       "ar": [
@@ -1527,8 +1751,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 9,
     "question": {
-      "ar": "في واجهة Queue في جافا، ما الفرق بين <code>add()</code> و <code>offer()</code>؟",
-      "en": "In Java's Queue interface, what is the difference between <code>add()</code> and <code>offer()</code>?"
+      "ar": "في واجهة Queue في جافا، ما الفرق بين <code>add()<\/code> و <code>offer()<\/code>؟",
+      "en": "In Java's Queue interface, what is the difference between <code>add()<\/code> and <code>offer()<\/code>?"
     },
     "options": {
       "ar": [
@@ -1559,8 +1783,8 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
   {
     "id": 10,
     "question": {
-      "ar": "كيف يتم حساب الموضع الجديد لمؤشر <code>back</code> في المصفوفة الدائرية عند الإضافة؟",
-      "en": "How is the new position of the <code>back</code> pointer calculated in a circular array during enqueue?"
+      "ar": "كيف يتم حساب الموضع الجديد لمؤشر <code>back<\/code> في المصفوفة الدائرية عند الإضافة؟",
+      "en": "How is the new position of the <code>back<\/code> pointer calculated in a circular array during enqueue?"
     },
     "options": {
       "ar": [
@@ -1587,6 +1811,70 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
     },
     "difficulty": "medium",
     "conceptId": "array-implementation-circular"
+  },
+  {
+    "conceptId": "applications-of-queue",
+    "question": {
+      "ar": "عند استخدام طابور لتوليد الأرقام الثنائية، إذا سحبنا العنصر '10'، ما هما العنصران اللذان سيتم إضافتهما (Enqueue) للطابور مباشرة بعد ذلك؟",
+      "en": "When using a queue to generate binary numbers, if we dequeue the element '10', what two elements will be enqueued immediately after?"
+    },
+    "options": {
+      "ar": [
+        "100 و 101",
+        "010 و 110",
+        "11 و 100",
+        "101 و 110"
+      ],
+      "en": [
+        "100 and 101",
+        "010 and 110",
+        "11 and 100",
+        "101 and 110"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "نأخذ العنصر المسحوب '10' ونضيف إليه '0' ليصبح '100'، ثم نضيف إليه '1' ليصبح '101'.",
+      "en": "We take the dequeued element '10', append '0' to get '100', and append '1' to get '101'."
+    },
+    "hint": {
+      "ar": "أضف '0' أولاً، ثم أضف '1' لنفس السلسلة المسحوبة.",
+      "en": "Append '0' first, then append '1' to the same dequeued string."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "array-implementation-circular",
+    "question": {
+      "ar": "في طابور يعتمد على مصفوفة، إذا كان مؤشر <code>front<\/code> عند الفهرس 2 ومؤشر <code>back<\/code> عند الفهرس 4، ما هي المواضع الجديدة للمؤشرين بعد إجراء عملية <code>enqueue<\/code> واحدة تليها عمليتا <code>dequeue<\/code>؟ (بافتراض عدم حدوث التفاف دائري بعد).",
+      "en": "In an array-based queue, if <code>front<\/code> is at index 2 and <code>back<\/code> is at index 4, what are the new positions of the pointers after one <code>enqueue<\/code> followed by two <code>dequeue<\/code> operations? (Assume no wrap-around occurs yet)."
+    },
+    "options": {
+      "ar": [
+        "front = 4, back = 5",
+        "front = 3, back = 5",
+        "front = 4, back = 4",
+        "front = 2, back = 3"
+      ],
+      "en": [
+        "front = 4, back = 5",
+        "front = 3, back = 5",
+        "front = 4, back = 4",
+        "front = 2, back = 3"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "عملية الإضافة (enqueue) تزيد مؤشر <code>back<\/code> ليصبح 5. عملية الحذف (dequeue) الأولى تزيد مؤشر <code>front<\/code> ليصبح 3. عملية الحذف الثانية تزيد مؤشر <code>front<\/code> ليصبح 4. النتيجة: front = 4, back = 5.",
+      "en": "The enqueue operation increments <code>back<\/code> to 5. The first dequeue increments <code>front<\/code> to 3. The second dequeue increments <code>front<\/code> to 4. Result: front = 4, back = 5."
+    },
+    "hint": {
+      "ar": "تذكر أن enqueue يحرك back، و dequeue يحرك front.",
+      "en": "Remember that enqueue moves back, and dequeue moves front."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1631,6 +1919,14 @@ String top = myQueue.peek();  // Returns head without removing, or null if empty
       <template class="content-ar">في جافا، واجهة Queue توفر مجموعتين من الدوال: مجموعة ترمي استثناءات عند الفشل (<code>add</code>, <code>remove</code>, <code>element</code>) ومجموعة تعيد قيماً خاصة مثل false أو null (<code>offer</code>, <code>poll</code>, <code>peek</code>).</template>
       <template class="content-en">In Java, the Queue interface provides two sets of methods: one throws exceptions on failure (<code>add</code>, <code>remove</code>, <code>element</code>) and the other returns special values like false or null (<code>offer</code>, <code>poll</code>, <code>peek</code>).</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من التنفيذ المبسط للمصفوفة الذي يقوم بإزاحة (Shifting) جميع العناصر إلى اليسار عند كل عملية Dequeue. هذا يجعل التعقيد الزمني O(N) ويدمر ميزة الطابور السريعة. التنفيذ الصحيح هو المصفوفة الدائرية O(1).</template>
+    <template class="content-en">Beware of the simple array implementation that shifts all elements to the left on every Dequeue. This makes the time complexity O(N) and destroys the queue's fast performance. The correct optimal implementation is the Circular Array O(1).</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

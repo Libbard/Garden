@@ -103,6 +103,21 @@
         <template class="content-en">Field-Programmable Gate Arrays (FPGA)</template>
         <span class="content-target">مصفوفات البوابات المنطقية القابلة للبرمجة ميدانياً (FPGA)</span>
       </a>
+      <a href="#sram-latch-and-bit-slice" class="toc-link" data-bilingual>
+        <template class="content-ar">نموذج مزلاج SRAM وشرائح البت</template>
+        <template class="content-en">SRAM Latch Model and Bit Slices</template>
+        <span class="content-target">نموذج مزلاج SRAM وشرائح البت</span>
+      </a>
+      <a href="#rom-internal-structure" class="toc-link" data-bilingual>
+        <template class="content-ar">البنية الداخلية لذاكرة القراءة فقط (ROM)</template>
+        <template class="content-en">ROM Internal Structure</template>
+        <span class="content-target">البنية الداخلية لذاكرة القراءة فقط (ROM)</span>
+      </a>
+      <a href="#implementing-logic-with-decoders" class="toc-link" data-bilingual>
+        <template class="content-ar">تنفيذ المنطق باستخدام مفككات الشفرة</template>
+        <template class="content-en">Implementing Logic with Decoders</template>
+        <span class="content-target">تنفيذ المنطق باستخدام مفككات الشفرة</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -410,8 +425,8 @@
   </div>
   
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تتكون إشارات الذاكرة من ثلاث مجموعات:</p><ul><li><strong>ناقل العناوين (Address bus)</strong> لتحديد الموقع،</li><li><strong>ناقل البيانات (Data bus)</strong> لنقل المعلومات،</li><li><strong>وإشارات التحكم (Control Signals)</strong> لتحديد العملية.</li></ul><p>أهم إشارات التحكم هي:</p><ul><li><strong><span class="smart-term" data-term-en="Chip Select (CS)" data-ar="اختيار الشريحة" data-en-def="A control signal that must be active to enable the memory chip to be accessed.">CS (Chip Select)</span></strong> لتفعيل الشريحة،</li><li><strong>OE (Output Enable)</strong> للسماح بظهور البيانات على الناقل،</li><li><strong>WR (Write)</strong> للكتابة،</li><li><strong>و R (Read)</strong> للقراءة.</li></ul><p>دورة القراءة (Read cycle) عادة ما تكون أقصر من دورة الكتابة (Write cycle).</p></template>
-    <template class="content-en"><p>Memory signals fall into three groups:</p><ul><li><strong>Address bus</strong> (selects location),</li><li><strong>Data bus</strong> (transfers info),</li><li><strong>and Control Signals</strong> (specifies operation).</li></ul><p>Key control signals are:</p><ul><li><strong><span class="smart-term" data-term-en="Chip Select (CS)" data-ar="اختيار الشريحة" data-en-def="A control signal that must be active to enable the memory chip to be accessed.">CS (Chip Select)</span></strong> to activate the chip,</li><li><strong>OE (Output Enable)</strong> to allow data on the bus,</li><li><strong>WR (Write)</strong>,</li><li><strong>and R (Read)</strong>.</li></ul><p>The Read cycle is usually shorter than the Write cycle.</p></template>
+    <template class="content-ar"><p>تتكون إشارات الذاكرة من ثلاث مجموعات:</p><ul><li><strong>ناقل العناوين (Address bus)</strong> لتحديد الموقع،</li><li><strong>ناقل البيانات (Data bus)</strong> لنقل المعلومات،</li><li><strong>وإشارات التحكم (Control Signals)</strong> لتحديد العملية.</li></ul><p>أهم إشارات التحكم هي:</p><ul><li><strong><span class="smart-term" data-term-en="Chip Select (CS)" data-ar="اختيار الشريحة" data-en-def="A control signal that must be active to enable the memory chip to be accessed.">CS (Chip Select)</span></strong> لتفعيل الشريحة،</li><li><strong>OE (Output Enable)</strong> للسماح بظهور البيانات على الناقل،</li><li><strong>WR (Write)</strong> للكتابة،</li><li><strong>و R (Read)</strong> للقراءة.</li></ul><p>دورة القراءة (Read cycle) عادة ما تكون أقصر من دورة الكتابة (Write cycle).</p><p>تُحدد سعة الذاكرة بعدد خطوط العناوين وحجم الكلمة. الذاكرة التي تحتوي على $k$ من خطوط العناوين يمكنها الوصول إلى $2^k$ موقع فريد (كلمة).</p><p>على سبيل المثال، ذاكرة بحجم <b>1K x 16</b>:</p><ul><li><b>1K</b> تعني 1024 كلمة، وهي $2^{10}$. لذلك، تتطلب <b>10 خطوط عناوين</b>.</li><li><b>16</b> تعني أن عرض كل كلمة هو 16 بت، مما يتطلب <b>16 خط بيانات</b>.</li><li>السعة الإجمالية بالبايت هي $(1024 \times 16) / 8 = 2048$ بايت (2 كيلوبايت).</li></ul><p>لفهم توقيت الذاكرة، تخيل معالجاً يعمل بتردد 50 ميجاهرتز (دورة ساعة 20 نانوثانية). <b>دورة الكتابة (Write Cycle):</b> يتطلب التسلسل إعداد خطوط العناوين والبيانات، ثم تفعيل خط الكتابة. يوضح <span class="smart-term" data-term-en="Timing Waveform" data-ar="المخطط الزمني" data-en-def="A visual representation of electrical signals over time, showing when addresses and data must be valid relative to clock cycles.">المخطط الزمني<span class="smart-term-tooltip"></span></span> (Timing Waveform) أن هذا يستغرق حوالي 4 دورات ساعة (مثلاً 75 نانوثانية) لضمان استقرار البيانات وتخزينها بأمان. <b>دورة القراءة (Read Cycle):</b> يتضمن التسلسل إعداد العنوان وتفعيل خط القراءة، لتصبح البيانات متاحة بعد وقت محدد. عادة ما يستغرق المخطط الزمني لدورة القراءة وقتاً أقصر (مثلاً 65 نانوثانية) مقارنة بدورة الكتابة.</p></template>
+    <template class="content-en"><p>Memory signals fall into three groups:</p><ul><li><strong>Address bus</strong> (selects location),</li><li><strong>Data bus</strong> (transfers info),</li><li><strong>and Control Signals</strong> (specifies operation).</li></ul><p>Key control signals are:</p><ul><li><strong><span class="smart-term" data-term-en="Chip Select (CS)" data-ar="اختيار الشريحة" data-en-def="A control signal that must be active to enable the memory chip to be accessed.">CS (Chip Select)</span></strong> to activate the chip,</li><li><strong>OE (Output Enable)</strong> to allow data on the bus,</li><li><strong>WR (Write)</strong>,</li><li><strong>and R (Read)</strong>.</li></ul><p>The Read cycle is usually shorter than the Write cycle.</p><p>The capacity of a memory is defined by the number of address lines and the word size. A memory with $k$ address lines can access $2^k$ unique locations (words).</p><p>For example, a <b>1K x 16</b> memory:</p><ul><li><b>1K</b> means 1024 words, which is $2^{10}$. Therefore, it requires <b>10 address lines</b>.</li><li><b>16</b> means each word is 16 bits wide, requiring <b>16 data lines</b>.</li><li>The total capacity in bytes is $(1024 \times 16) / 8 = 2048$ bytes (2KB).</li></ul><p>To understand memory timing, consider a CPU operating at 50 MHz (a 20 ns <span class="smart-term" data-term-en="Clock Cycle" data-ar="دورة الساعة" data-en-def="The amount of time between two pulses of an oscillator, used to synchronize operations in a digital circuit.">clock cycle<span class="smart-term-tooltip"></span></span>). <b>Write Cycle:</b> The sequence requires setting up the address and data lines, then activating the write line. The <span class="smart-term" data-term-en="Timing Waveform" data-ar="المخطط الزمني" data-en-def="A visual representation of electrical signals over time, showing when addresses and data must be valid relative to clock cycles.">timing waveform<span class="smart-term-tooltip"></span></span> shows this takes about 4 clock cycles (e.g., 75 ns) to ensure data is stable and safely stored. <b>Read Cycle:</b> The sequence involves setting up the address and activating the read line, with data becoming available after a specified time. The read cycle timing waveform typically requires less time (e.g., 65 ns) than the write cycle.</p></template>
     <div class="content-target"></div>
   </div>
   
@@ -419,6 +434,15 @@
     <template class="content-ar"><p>إشارة <span class="smart-term" data-term-en="Chip Select (CS)" data-ar="اختيار الشريحة" data-en-def="A control signal that must be active to enable the memory chip to be accessed.">CS (Chip Select)</span> ضرورية جداً لأنها تسمح بتوصيل عدة شرائح ذاكرة على نفس ناقل البيانات باستخدام بوابات ثلاثية الحالة (Tri-state buffers).</p><p>في دورة الكتابة، يجب تثبيت العنوان والبيانات قبل تفعيل إشارة الكتابة لضمان استقرار الإشارات (Setup time). دورة الكتابة هي أقصى وقت من تطبيق العنوان حتى اكتمال التخزين الداخلي.</p></template>
     <template class="content-en"><p>The <span class="smart-term" data-term-en="Chip Select (CS)" data-ar="اختيار الشريحة" data-en-def="A control signal that must be active to enable the memory chip to be accessed.">CS (Chip Select)</span> signal is crucial because it allows multiple memory chips to share the same data bus using tri-state buffers.</p><p>In a write cycle, the address and data must be stable before the write signal is activated (Setup time). The <span class="smart-term" data-term-en="Write Cycle Time" data-ar="وقت دورة الكتابة" data-en-def="The maximum time from the application of the address to the completion of all internal memory operations required to store a word.">write cycle time</span> is the maximum time from address application to the completion of internal storage operations.</p></template>
     <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>سعة الذاكرة، حيث k هو عدد خطوط العناوين و n هو حجم كلمة البيانات بالبت.</strong></template>
+      <template class="content-en"><strong>Memory capacity, where k is the number of address lines and n is the data word size in bits.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$\text{Capacity} = 2^k \times n$$</div>
   </div>
 
   <!-- DIAGRAM[5]: Detailed SVG generation prompt: Timing waveform diagram showing a Memory Write cycle. Show Clock signal, Address signal (becoming valid), Memory Enable (going high), Read/Write signal (going low for write), and Data Input (becoming valid). Highlight the setup times and the total write cycle time (e.g., 75ns). Style: technical, dark background #0d1117, cyan and white lines. -->
@@ -812,8 +836,8 @@
   </div>
   
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>التفاعلات الفيزيائية قد تسبب أخطاء في الذاكرة. لتحسين الموثوقية، يُستخدم <span class="smart-term" data-term-en="Hamming Code" data-ar="كود هامينغ" data-en-def="An error-correcting code that can detect and correct single-bit errors in data.">كود هامينغ</span> (Hamming Code). يتم إضافة k بتات تماثل (Parity bits) إلى n بتات بيانات.</p><p>تُحجز المواقع التي تمثل مضاعفات الرقم 2 (1، 2، 4، 8...) لبتات التماثل، والباقي للبيانات. يتم حساب بتات التماثل باستخدام دالة XOR أثناء الكتابة، ويتم فحصها أثناء القراءة لإنشاء كود الفحص (Syndrome C).</p><ul><li><strong>إذا كان C = 0000</strong>، فلا يوجد خطأ.</li><li><strong>إذا كان C ≠ 0</strong>، فإن قيمة C تدل على موقع البت الخاطئ.</li></ul></template>
-    <template class="content-en"><p>Physical interactions can cause memory errors. To improve reliability, <span class="smart-term" data-term-en="Hamming Code" data-ar="كود هامينغ" data-en-def="An error-correcting code that can detect and correct single-bit errors in data.">Hamming Code</span> is used. k parity bits are added to an n-bit data word.</p><p>Positions that are powers of 2 (1, 2, 4, 8...) are reserved for parity bits, the rest for data. Parity bits are calculated using XOR during write, and checked during read to generate a <span class="smart-term" data-term-en="Syndrome (C)" data-ar="كود الفحص (المتلازمة)" data-en-def="The result of XORing the read bits; its decimal value points to the error position.">syndrome C</span>.</p><ul><li><strong>If C = 0000</strong>, there is no error.</li><li><strong>If C ≠ 0</strong>, the value of C indicates the position of the erroneous bit.</li></ul></template>
+    <template class="content-ar"><p>التفاعلات الفيزيائية قد تسبب أخطاء في الذاكرة. لتحسين الموثوقية، يُستخدم <span class="smart-term" data-term-en="Hamming Code" data-ar="كود هامينغ" data-en-def="An error-correcting code that can detect and correct single-bit errors in data.">كود هامينغ</span> (Hamming Code). يتم إضافة k بتات تماثل (Parity bits) إلى n بتات بيانات.</p><p>تُحجز المواقع التي تمثل مضاعفات الرقم 2 (1، 2، 4، 8...) لبتات التماثل، والباقي للبيانات. يتم حساب بتات التماثل باستخدام دالة XOR أثناء الكتابة، ويتم فحصها أثناء القراءة لإنشاء كود الفحص (Syndrome C).</p><ul><li><strong>إذا كان C = 0000</strong>، فلا يوجد خطأ.</li><li><strong>إذا كان C ≠ 0</strong>، فإن قيمة C تدل على موقع البت الخاطئ.</li></ul><p><b>مثال عملي: حساب بتات التماثل</b></p><p>لنقم بتوليد كود هامينغ لبيانات من 8 بت <code>11000100</code>. نحتاج إلى 4 بتات تماثل ($P_1, P_2, P_4, P_8$) توضع في المواقع 1، 2، 4، و 8. الطول الإجمالي هو 12 بت.</p><ol><li>نضع البيانات في المواقع غير المخصصة للتماثل (3، 5، 6، 7، 9، 10، 11، 12): تصبح المصفوفة <code>P1 P2 1 P4 1 0 0 P8 0 1 0 0</code>.</li><li>نحسب $P_1$ (بوابة XOR للمواقع 3، 5، 7، 9، 11): $1 \oplus 1 \oplus 0 \oplus 0 \oplus 0 = 0$.</li><li>نحسب $P_2$ (بوابة XOR للمواقع 3، 6، 7، 10، 11): $1 \oplus 0 \oplus 0 \oplus 1 \oplus 0 = 0$.</li><li>نحسب $P_4$ (بوابة XOR للمواقع 5، 6، 7، 12): $1 \oplus 0 \oplus 0 \oplus 0 = 1$.</li><li>نحسب $P_8$ (بوابة XOR للمواقع 9، 10، 11، 12): $0 \oplus 1 \oplus 0 \oplus 0 = 1$.</li></ol><p>الكود النهائي المخزن المكون من 12 بت هو <code>001110010100</code>.</p></template>
+    <template class="content-en"><p>Physical interactions can cause memory errors. To improve reliability, <span class="smart-term" data-term-en="Hamming Code" data-ar="كود هامينغ" data-en-def="An error-correcting code that can detect and correct single-bit errors in data.">Hamming Code</span> is used. k parity bits are added to an n-bit data word.</p><p>Positions that are powers of 2 (1, 2, 4, 8...) are reserved for parity bits, the rest for data. Parity bits are calculated using XOR during write, and checked during read to generate a <span class="smart-term" data-term-en="Syndrome (C)" data-ar="كود الفحص (المتلازمة)" data-en-def="The result of XORing the read bits; its decimal value points to the error position.">syndrome C</span>.</p><ul><li><strong>If C = 0000</strong>, there is no error.</li><li><strong>If C ≠ 0</strong>, the value of C indicates the position of the erroneous bit.</li></ul><p><b>Worked Example: Calculating Parity Bits</b></p><p>Let's generate the Hamming code for the 8-bit data <code>11000100</code>. We need 4 parity bits ($P_1, P_2, P_4, P_8$) placed at positions 1, 2, 4, and 8. The total length is 12 bits.</p><ol><li>Place data in non-parity positions (3, 5, 6, 7, 9, 10, 11, 12): The array becomes <code>P1 P2 1 P4 1 0 0 P8 0 1 0 0</code>.</li><li>Calculate $P_1$ (XOR positions 3, 5, 7, 9, 11): $1 \oplus 1 \oplus 0 \oplus 0 \oplus 0 = 0$.</li><li>Calculate $P_2$ (XOR positions 3, 6, 7, 10, 11): $1 \oplus 0 \oplus 0 \oplus 1 \oplus 0 = 0$.</li><li>Calculate $P_4$ (XOR positions 5, 6, 7, 12): $1 \oplus 0 \oplus 0 \oplus 0 = 1$.</li><li>Calculate $P_8$ (XOR positions 9, 10, 11, 12): $0 \oplus 1 \oplus 0 \oplus 0 = 1$.</li></ol><p>The final 12-bit stored code is <code>001110010100</code>.</p></template>
     <div class="content-target"></div>
   </div>
   
@@ -1317,8 +1341,8 @@
   </div>
   
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>الـ FPGAs هي دوائر يمكن برمجتها من قبل المستخدم النهائي. تتكون معمارية FPGA النموذجية من مصفوفة من <span class="smart-term" data-term-en="CLB" data-ar="الكتلة المنطقية القابلة للتهيئة" data-en-def="Configurable Logic Block; the fundamental building block of an FPGA containing LUTs and flip-flops.">الكتل المنطقية القابلة للتهيئة (CLBs)</span> محاطة بكتل إدخال وإخراج (I/O pads)، وترتبط ببعضها عبر قنوات توجيه قابلة للبرمجة (Routing Channels) وكتل تحويل (Switch Blocks).</p><p>تتكون الكتلة المنطقية الأساسية (BLE) من:</p><ul><li><strong><span class="smart-term" data-term-en="LUT" data-ar="جدول البحث" data-en-def="Look-Up Table; a small memory/multiplexer unit inside an FPGA used to implement any Boolean function.">جدول بحث (LUT)</span></strong> لتنفيذ المنطق التوافقي،</li><li><strong>ومسجل (Flip-flop)</strong> للمنطق التتابعي،</li><li><strong>ومجمع (Multiplexer)</strong>.</li></ul></template>
-    <template class="content-en"><p>FPGAs are circuits programmable by the end user. A typical FPGA architecture consists of an array of <span class="smart-term" data-term-en="CLB" data-ar="الكتلة المنطقية القابلة للتهيئة" data-en-def="Configurable Logic Block; the fundamental building block of an FPGA containing LUTs and flip-flops.">Configurable Logic Blocks (CLBs)</span> surrounded by I/O pads, connected via programmable Routing Channels and Switch Blocks.</p><p>A Basic Logic Element (BLE) inside a CLB consists of:</p><ul><li><strong>a <span class="smart-term" data-term-en="LUT" data-ar="جدول البحث" data-en-def="Look-Up Table; a small memory/multiplexer unit inside an FPGA used to implement any Boolean function.">Look-Up Table (LUT)</span></strong> for combinational logic,</li><li><strong>a Flip-flop</strong> for sequential logic,</li><li><strong>and a multiplexer</strong>.</li></ul></template>
+    <template class="content-ar"><p>الـ FPGAs هي دوائر يمكن برمجتها من قبل المستخدم النهائي. تتكون معمارية FPGA النموذجية من مصفوفة من <span class="smart-term" data-term-en="CLB" data-ar="الكتلة المنطقية القابلة للتهيئة" data-en-def="Configurable Logic Block; the fundamental building block of an FPGA containing LUTs and flip-flops.">الكتل المنطقية القابلة للتهيئة (CLBs)</span> محاطة بكتل إدخال وإخراج (I/O pads)، وترتبط ببعضها عبر قنوات توجيه قابلة للبرمجة (Routing Channels) وكتل تحويل (Switch Blocks).</p><p>تتكون الكتلة المنطقية الأساسية (BLE) من:</p><ul><li><strong><span class="smart-term" data-term-en="LUT" data-ar="جدول البحث" data-en-def="Look-Up Table; a small memory/multiplexer unit inside an FPGA used to implement any Boolean function.">جدول بحث (LUT)</span></strong> لتنفيذ المنطق التوافقي،</li><li><strong>ومسجل (Flip-flop)</strong> للمنطق التتابعي،</li><li><strong>ومجمع (Multiplexer)</strong>.</li></ul><p><b>مثال عملي: تنفيذ المنطق باستخدام المجمع (Multiplexer)</b></p><p>يمكن لمجمع بحجم $2^n:1$ تنفيذ أي دالة بوليانية بـ $n$ من المتغيرات باستخدام المتغيرات كمدخلات تحكم (Select lines) وربط مدخلات البيانات بـ 0 أو 1 (ليعمل كجدول بحث).</p><p>على سبيل المثال، لتنفيذ الدالة $F(A,B,C) = \Sigma m(0, 2, 6, 7)$ باستخدام مجمع 8:1:</p><ol><li>قم بتوصيل المتغيرات $A, B, C$ بخطوط الاختيار $S_2, S_1, S_0$.</li><li>قم بتوصيل مدخلات البيانات المطابقة للحدود الصغرى (Minterms) الموجودة في الدالة (المدخلات 0، 2، 6، 7) بالمنطق 1.</li><li>قم بتوصيل مدخلات البيانات المتبقية (1، 3، 4، 5) بالمنطق 0.</li></ol><p>هذه التقنية بالتحديد هي الأساس لكيفية تنفيذ FPGAs المعتمدة على SRAM للمنطق التوافقي داخل جداول البحث (LUTs) الخاصة بها.</p><p>بصرياً، يتم تخطيط الـ FPGA كشبكة. <b>الكتل المنطقية القابلة للتهيئة (CLBs)</b> عبارة عن جزر محاطة ببحر من <b>قنوات التوجيه (Routing Channels)</b> (أجزاء من الأسلاك). توجد <b>كتل التحويل (Switch Blocks)</b> عند تقاطعات هذه القنوات لتوجيه الإشارات، بينما تربط <b>كتل الاتصال (Connection Blocks)</b> الـ CLBs بقنوات التوجيه. داخل الـ CLB، يمتلك <b>العنصر المنطقي الأساسي (BLE)</b> مساراً محدداً: تدخل الإشارات إلى جدول بحث (LUT) بـ 3 مداخل (منطق توافقي). يذهب مخرج الـ LUT إلى كل من مسجل D (منطق تتابعي) ومجمع (Multiplexer). يختار المجمع بعد ذلك إما إخراج الإشارة التوافقية المباشرة أو الإشارة التتابعية المتزامنة مع الساعة.</p></template>
+    <template class="content-en"><p>FPGAs are circuits programmable by the end user. A typical FPGA architecture consists of an array of <span class="smart-term" data-term-en="CLB" data-ar="الكتلة المنطقية القابلة للتهيئة" data-en-def="Configurable Logic Block; the fundamental building block of an FPGA containing LUTs and flip-flops.">Configurable Logic Blocks (CLBs)</span> surrounded by I/O pads, connected via programmable Routing Channels and Switch Blocks.</p><p>A Basic Logic Element (BLE) inside a CLB consists of:</p><ul><li><strong>a <span class="smart-term" data-term-en="LUT" data-ar="جدول البحث" data-en-def="Look-Up Table; a small memory/multiplexer unit inside an FPGA used to implement any Boolean function.">Look-Up Table (LUT)</span></strong> for combinational logic,</li><li><strong>a Flip-flop</strong> for sequential logic,</li><li><strong>and a multiplexer</strong>.</li></ul><p><b>Worked Example: Implementing Logic with a Multiplexer</b></p><p>A $2^n:1$ multiplexer can implement any Boolean function of $n$ variables by using the variables as control inputs and tying the data inputs to 0 or 1 (acting as a lookup table).</p><p>For example, to implement $F(A,B,C) = \Sigma m(0, 2, 6, 7)$ using an 8:1 MUX:</p><ol><li>Connect the variables $A, B, C$ to the select lines $S_2, S_1, S_0$.</li><li>Connect the data inputs corresponding to the minterms in the function (inputs 0, 2, 6, 7) to logic 1.</li><li>Connect the remaining data inputs (1, 3, 4, 5) to logic 0.</li></ol><p>This exact technique is the foundation of how SRAM FPGAs implement combinational logic inside their LUTs.</p><p>Visually, a generic FPGA is laid out as a grid. The <b>Configurable Logic Blocks (CLBs)</b> are islands surrounded by a sea of <b>Routing Channels</b> (wire segments). <b><span class="smart-term" data-term-en="Switch Block" data-ar="كتلة التحويل" data-en-def="A programmable routing matrix located at the intersections of routing channels in an FPGA, allowing signals to change direction.">Switch Block<span class="smart-term-tooltip"></span></span>s</b> sit at the intersections of these channels to route signals, while <b><span class="smart-term" data-term-en="Connection Block" data-ar="كتلة الاتصال" data-en-def="A programmable block that connects the inputs and outputs of a CLB to the surrounding routing channels.">Connection Block<span class="smart-term-tooltip"></span></span>s</b> link the CLBs to the routing channels. Inside a CLB, the <b>Basic Logic Element (BLE)</b> has a specific flow: inputs enter a 3-input LUT (Combinational Logic). The LUT's output goes to both a D Flip-Flop (Sequential Logic) and a Multiplexer. The Multiplexer then selects whether to output the raw combinational signal or the clocked sequential signal.</p></template>
     <div class="content-target"></div>
   </div>
   
@@ -1653,14 +1677,143 @@
   </details>
 </section>
 
+<section id="sram-latch-and-bit-slice" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">7</span> نموذج مزلاج SRAM وشرائح البت</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> SRAM Latch Model and Bit Slices</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تُخزن ذاكرة SRAM كل بت باستخدام آلية مزلاج (Latch). من خلال توصيل هذه الخلايا معاً، نشكل "شريحة بت" تمثل عموداً واحداً من الذاكرة.</p></template>
+    <template class="content-en"><p>SRAM stores each bit using a latch mechanism. By connecting these cells together, we form a "bit slice" representing one column of memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن نمذجة تخزين ذاكرة الوصول العشوائي الساكنة (SRAM) بواسطة <span class="smart-term" data-term-en="SR Latch" data-ar="مزلاج SR" data-en-def="A basic sequential logic circuit used to model the storage mechanism of a single SRAM cell.">مزلاج SR<span class="smart-term-tooltip"></span></span>، حيث تتطلب كل بت خلية ذاكرة واحدة. يستخدم منطق التحكم خط اختيار (Select line):</p><ul><li>إذا كان Select = 0، يتم الاحتفاظ بالمحتوى المخزن.</li><li>إذا كان Select = 1، يتحدد المحتوى المخزن بواسطة قيم المدخلات (B و B').</li></ul><p><b><span class="smart-term" data-term-en="Bit Slice" data-ar="شريحة البت" data-en-def="A one-dimensional array of memory cells connected to form a single bit position across multiple memory words.">شريحة البت<span class="smart-term-tooltip"></span></span> (Bit Slice)</b> هي مصفوفة أحادية البعد من خلايا الذاكرة المتصلة لتشكيل موضع بت واحد (1-bit position) عبر كلمات متعددة. يختار خط "<span class="smart-term" data-term-en="Word Select" data-ar="اختيار الكلمة" data-en-def="A control line that activates a specific row of memory cells for reading or writing.">اختيار الكلمة<span class="smart-term-tooltip"></span></span>" (Word Select) المزلاج النشط لعمليات القراءة/الكتابة. عندما تكون إشارة القراءة/الكتابة = 0 (كتابة) ويكون اختيار البت نشطاً، تقوم بيانات الإدخال بضبط المزلاج أو إعادة ضبطه.</p></template>
+    <template class="content-en"><p>Static RAM storage can be modeled by an <span class="smart-term" data-term-en="SR Latch" data-ar="مزلاج SR" data-en-def="A basic sequential logic circuit used to model the storage mechanism of a single SRAM cell.">SR latch<span class="smart-term-tooltip"></span></span>, requiring one memory cell per bit. The control logic uses a Select line:</p><ul><li>If Select = 0, the stored content is held.</li><li>If Select = 1, the stored content is determined by the input values (B and B').</li></ul><p>A <b><span class="smart-term" data-term-en="Bit Slice" data-ar="شريحة البت" data-en-def="A one-dimensional array of memory cells connected to form a single bit position across multiple memory words.">Bit Slice<span class="smart-term-tooltip"></span></span></b> is a one-dimensional array of memory cells connected to form a 1-bit position across multiple words. A <span class="smart-term" data-term-en="Word Select" data-ar="اختيار الكلمة" data-en-def="A control line that activates a specific row of memory cells for reading or writing.">Word Select<span class="smart-term-tooltip"></span></span> line chooses which latch is active for read/write operations. When Read/Write = 0 (Write) and the Bit Select is active, the input data sets or resets the latch.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>للوصول إلى صف واحد في كل مرة داخل شريحة البت، تُستخدم مفككات الشفرة (Decoders). على سبيل المثال، تستخدم ذاكرة RAM بحجم 16x1 مفكك شفرة 4-إلى-16 خط لاختيار واحدة من الكلمات الـ 16 (كل منها بعرض 1 بت).</p><p>كلما زاد حجم الذاكرة، يصبح مفكك الشفرة أحادي البعد (1D) ضخماً جداً، مما يؤدي إلى ضرورة استخدام الاختيار المتزامن ثنائي الأبعاد (2D Coincident Selection) لتقسيم العناوين إلى صفوف وأعمدة.</p></template>
+    <template class="content-en"><p>To access one row at a time in a bit slice, decoders are used. For instance, a 16x1 RAM uses a 4-to-16 line decoder to select one of the 16 words (each 1 bit wide).</p><p>As memory gets larger, a single 1D decoder becomes massive, which leads to the necessity of 2D Coincident Selection to split addresses into rows and columns.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تستهلك ذاكرة SRAM مساحة فيزيائية أكبر على الشريحة مقارنة بذاكرة DRAM؟</template>
+      <template class="content-en">Why does SRAM take up more physical space on a chip than DRAM?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن كل خلية SRAM تتطلب دائرة مزلاج معقدة (عادة 6 ترانزستورات) للاحتفاظ ببت واحد، بينما تستخدم DRAM ترانزستوراً واحداً ومكثفاً فقط.</p></template>
+      <template class="content-en"><p>Because each SRAM cell requires a complex latch circuit (typically 6 transistors) to hold a single bit, whereas DRAM uses just one transistor and a capacitor.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="rom-internal-structure" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> البنية الداخلية لذاكرة القراءة فقط (ROM)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> ROM Internal Structure</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>ذاكرة ROM هي في الأساس دائرة توافقية تتكون من مفكك شفرة (Decoder) يولد جميع العناوين الممكنة، وبوابات OR مبرمجة لتخزين البيانات الدائمة.</p></template>
+    <template class="content-en"><p>A ROM is essentially a combinational circuit made of a decoder that generates all possible addresses, and OR gates programmed to store the permanent data.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُبنى ذاكرة ROM باستخدام مفكك شفرة يمثل مصفوفة AND ثابتة، وبوابات OR تمثل مصفوفة قابلة للبرمجة. إليك مثال عملي لكيفية تخزين البيانات في ذاكرة ROM بحجم 32x8:</p><ol><li>تحتوي الذاكرة على 5 مدخلات للعناوين ($I_0$ إلى $I_4$)، والتي تدخل إلى <b>مفكك شفرة 5-إلى-32</b>.</li><li>يُخرج مفكك الشفرة 32 خط كلمة (Word lines) متميزة (من 0 إلى 31). خط واحد فقط يكون نشطاً (HIGH) في أي وقت بناءً على العنوان المدخل.</li><li>يوجد 8 <b>بوابات OR</b> عند المخرج، لتوليد البيانات المكونة من 8 بت ($A_0$ إلى $A_7$).</li><li>لبرمجة الذاكرة، نقوم بتوصيل (أو ترك) خطوط مخرجات مفكك الشفرة بمدخلات بوابات OR فيزيائياً. إذا تم توصيل <span class="smart-term" data-term-en="Word Line" data-ar="خط الكلمة" data-en-def="A horizontal wire in a memory array that is activated by the decoder to select a specific memory location.">خط الكلمة<span class="smart-term-tooltip"></span></span> رقم 0 ببوابة OR الخاصة بـ $A_7$، فإن قراءة العنوان 0 ستُخرج القيمة '1' عند $A_7$.</li></ol><p>مصفوفة التوصيلات هذه هي التي تشكل المعلومات الثنائية الدائمة المخزنة في الذاكرة.</p></template>
+    <template class="content-en"><p>A ROM is built using a decoder representing a fixed AND array, and OR gates representing a programmable array. Here is a worked example of how data is stored in a 32x8 ROM:</p><ol><li>The memory has 5 address inputs ($I_0$ to $I_4$), which feed into a <b>5-to-32 decoder</b>.</li><li>The decoder outputs 32 distinct <span class="smart-term" data-term-en="Word Line" data-ar="خط الكلمة" data-en-def="A horizontal wire in a memory array that is activated by the decoder to select a specific memory location.">word line<span class="smart-term-tooltip"></span></span>s (0 to 31). Only one line is active (HIGH) at any time based on the input address.</li><li>There are 8 <b>OR gates</b> at the output, producing the 8-bit data ($A_0$ to $A_7$).</li><li>To program the ROM, we physically wire (or leave unconnected) the decoder's output lines to the inputs of the OR gates. If word line 0 is wired to the OR gate for $A_7$, reading address 0 will output a '1' at $A_7$.</li></ol><p>This wiring matrix forms the permanent binary information stored in the memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يُطلق على مصفوفة AND في الـ ROM اسم "ثابتة" (Fixed) لأن مفكك الشفرة يجب أن يولد بشكل شامل كل الاحتمالات (Minterms) الممكنة للمدخلات. لا يمكنك تغيير هذه الاحتمالات.</p><p>الجزء "القابل للبرمجة" هو مصفوفة OR. في ذواكر Mask ROM، تتم هذه البرمجة في المصنع أثناء تصنيع الشريحة. أما في ذواكر PROM، فيمكن للمستخدم حرق صمامات (Fuses) لبرمجة هذه التوصيلات مرة واحدة.</p></template>
+    <template class="content-en"><p>The AND array in a ROM is called "fixed" because the decoder must exhaustively generate every possible minterm for the inputs. You cannot change these combinations.</p><p>The "programmable" part is the OR array. In <span class="smart-term" data-term-en="Mask ROM" data-ar="ذاكرة القراءة فقط المقنعة" data-en-def="A type of ROM whose contents are programmed by the integrated circuit manufacturer during fabrication.">Mask ROM<span class="smart-term-tooltip"></span></span>s, this programming is done at the factory during chip fabrication. In PROMs, the user can blow fuses to program these connections once.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان لدينا ذاكرة ROM تحتوي على 10 خطوط عناوين و 16 خط بيانات، فكم عدد مخرجات مفكك الشفرة الداخلي وكم عدد بوابات OR الموجودة؟</template>
+      <template class="content-en">If we have a ROM with 10 address lines and 16 data lines, how many internal decoder outputs and how many OR gates does it have?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيكون لمفكك الشفرة 1024 مخرجاً (لأن $2^{10} = 1024$)، وسيكون هناك 16 بوابة OR (واحدة لكل خط بيانات).</p></template>
+      <template class="content-en"><p>The decoder will have 1024 outputs (since $2^{10} = 1024$), and there will be 16 OR gates (one for each data line).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="implementing-logic-with-decoders" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> تنفيذ المنطق باستخدام مفككات الشفرة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Implementing Logic with Decoders</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>نظراً لأن مفكك الشفرة يولد كل الاحتمالات (Minterms) الممكنة لمدخلاته، يمكننا استخدامه لتنفيذ أي دالة بوليانية ببساطة عن طريق جمع (OR) الاحتمالات المطلوبة.</p></template>
+    <template class="content-en"><p>Since a decoder generates every possible minterm for its inputs, we can use it to implement any Boolean function simply by ORing the desired minterms together.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن لمفكك الشفرة تنفيذ أي دالة بوليانية إذا اعتبرنا مدخلاته كمتغيرات للدالة. إليك مثال عملي لتنفيذ الدالة $S(A_2, A_1, A_0) = \Sigma m(1,2,4,7)$:</p><ol><li>بما أن هناك 3 متغيرات ($A_2, A_1, A_0$)، فإننا نستخدم <b>مفكك شفرة 3-إلى-8 خطوط</b>.</li><li>يولد مفكك الشفرة جميع الاحتمالات الثمانية (Minterms) من $D_0$ إلى $D_7$.</li><li>نستخدم <b>بوابة OR</b> واحدة لتشكيل <span class="smart-term" data-term-en="Logical Sum" data-ar="المجموع المنطقي" data-en-def="The result of passing multiple Boolean variables or terms through an OR gate.">المجموع المنطقي<span class="smart-term-tooltip"></span></span> للاحتمالات المطلوبة.</li><li>نقوم بتوصيل مخرجات مفكك الشفرة $D_1, D_2, D_4$، و $D_7$ بمدخلات بوابة OR هذه.</li></ol><p>مخرج بوابة OR هو الدالة $S$. هذه التقنية بالتحديد هي الأساس الذي بُنيت عليه الأجهزة المنطقية القابلة للبرمجة (SPLDs/CPLDs).</p></template>
+    <template class="content-en"><p>A decoder can implement any Boolean function if we treat its inputs as the function's variables. Here is a worked example for $S(A_2, A_1, A_0) = \Sigma m(1,2,4,7)$:</p><ol><li>Since there are 3 variables ($A_2, A_1, A_0$), we use a <b>3-to-8 line decoder</b>.</li><li>The decoder generates all 8 <span class="smart-term" data-term-en="Minterm" data-ar="الحد الأصغر (الاحتمال)" data-en-def="A Boolean expression resulting in 1 for the output of a single cell in a truth table; a product of all variables.">minterm<span class="smart-term-tooltip"></span></span>s ($D_0$ to $D_7$).</li><li>We use a single <b>OR gate</b> to form the <span class="smart-term" data-term-en="Logical Sum" data-ar="المجموع المنطقي" data-en-def="The result of passing multiple Boolean variables or terms through an OR gate.">logical sum<span class="smart-term-tooltip"></span></span> of the required minterms.</li><li>We connect the decoder outputs $D_1, D_2, D_4$, and $D_7$ to the inputs of this OR gate.</li></ol><p>The output of the OR gate is the function $S$. This exact technique is the foundation of Simple Programmable Logic Devices (SPLDs/CPLDs).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>على الرغم من أن هذه الطريقة تعمل دائماً، إلا أنها غير فعالة للغاية بالنسبة للدوال التي تحتوي على العديد من المتغيرات ولكن القليل من الاحتمالات (Minterms). يتضاعف حجم مفكك الشفرة مع كل متغير إضافي ($2^n$)، مما يهدر الكثير من البوابات على احتمالات لا تُستخدم أبداً.</p><p>هذا القصور هو ما أدى إلى تطوير PALs و PLAs، حيث أصبحت مصفوفة AND (جزء مفكك الشفرة) قابلة للبرمجة أيضاً، مما يسمح لنا بتوليد حدود الضرب (Product terms) التي نحتاجها فعلياً فقط.</p></template>
+    <template class="content-en"><p>While this method always works, it is highly inefficient for functions with many variables but few minterms. The decoder size doubles with each added variable ($2^n$), wasting many gates on minterms that are never used.</p><p>This inefficiency is exactly what led to the development of PALs and PLAs, where the AND array (the decoder part) is also made programmable, allowing us to generate only the product terms we actually need.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا أردنا تنفيذ دالة بـ 6 متغيرات باستخدام هذه الطريقة، فما هو حجم مفكك الشفرة المطلوب؟</template>
+      <template class="content-en">If we wanted to implement a 6-variable function using this method, what size decoder is required?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سنحتاج إلى مفكك شفرة 6-إلى-64، والذي سيولد 64 احتمالاً (Minterms).</p></template>
+      <template class="content-en"><p>We would need a 6-to-64 line decoder, which will generate 64 minterms.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في الوحدة الثالثة عشرة. نحن الآن نربط بين البوابات المنطقية التي درسناها والأنظمة الحاسوبية الكاملة من خلال دراسة الذاكرة والمنطق القابل للبرمجة. نبدأ بهرمية الذاكرة؛ لماذا لا نصنع كل شيء من SRAM السريعة؟ لأن التكلفة ستكون باهظة! لذا نستخدم DRAM للذاكرة الرئيسية. ركزوا جيداً على 'الاختيار المتزامن' (Coincident Selection)، فهو حيلة هندسية عبقرية لتقليل حجم العتاد باستخدام مصفوفة ثنائية الأبعاد. في الامتحان، توقعوا سؤالاً حسابياً حول كود هامينغ؛ تذكروا دائماً أن بتات التماثل توضع في المواقع 1، 2، 4، 8، وتأكدوا من إتقان حساب كود الفحص (Syndrome) لتحديد البت الخاطئ. أخيراً، ننتقل إلى PLDs و FPGAs. الـ FPGA هي مستقبل التصميم الرقمي، افهموا جيداً كيف يستخدم جدول البحث (LUT) لتنفيذ أي دالة منطقية بدون بوابات فعلية. بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome to Module 13. We are now bridging the gap between logic gates and full computer systems by studying Memory and Programmable Logic. We start with the memory hierarchy; why not build everything from fast SRAM? Because the cost would be astronomical! So we use DRAM for main memory. Pay close attention to 'Coincident Selection'; it's a brilliant engineering trick to reduce hardware size using a 2D matrix. For the exam, expect a calculation question on the Hamming Code; always remember that parity bits go in positions 1, 2, 4, 8, and make sure you master calculating the Syndrome to find the erroneous bit. Finally, we cover PLDs and FPGAs. FPGAs are the future of digital design—understand exactly how a Look-Up Table (LUT) implements any logic function without physical gates. Good luck with your studies!</template>
+    <template class="content-ar">أهلاً بكم في الوحدة الثالثة عشرة. نحن الآن نربط بين البوابات المنطقية التي درسناها والأنظمة الحاسوبية الكاملة من خلال دراسة الذاكرة والمنطق القابل للبرمجة. نبدأ بهرمية الذاكرة؛ لماذا لا نصنع كل شيء من SRAM السريعة؟ لأن التكلفة ستكون باهظة! لذا نستخدم DRAM للذاكرة الرئيسية. ركزوا جيداً على 'الاختيار المتزامن' (Coincident Selection)، فهو حيلة هندسية عبقرية لتقليل حجم العتاد باستخدام مصفوفة ثنائية الأبعاد. في الامتحان، توقعوا سؤالاً حسابياً حول كود هامينغ؛ تذكروا دائماً أن بتات التماثل توضع في المواقع 1، 2، 4، 8، وتأكدوا من إتقان حساب كود الفحص (Syndrome) لتحديد البت الخاطئ. أخيراً، ننتقل إلى PLDs و FPGAs. الـ FPGA هي مستقبل التصميم الرقمي، افهموا جيداً كيف يستخدم جدول البحث (LUT) لتنفيذ أي دالة منطقية بدون بوابات فعلية. بالتوفيق في دراستكم!<p>في ختام هذه الوحدة، تذكر أن الذاكرة ليست مجرد مساحة للتخزين؛ بل إن هياكلها الأساسية - مثل مفككات الشفرة والمجمعات - هي اللبنات الأساسية للمنطق القابل للبرمجة. إن فهم كيف يتوسع مزلاج SRAM البسيط ليصبح مصفوفة FPGA ضخمة سيسد الفجوة بين الدوائر الرقمية الأساسية ومعماريات الحاسوب المعقدة.</p><p>بينما تتقن مفاهيم الذاكرة والمنطق القابل للبرمجة، انتبه جيداً للحقائق الفيزيائية لهذه الأجهزة. تحدد المخططات الزمنية (Timing waveforms) مدى سرعة قراءة أو كتابة البيانات بشكل موثوق، بينما تحدد معمارية التوجيه المعقدة في FPGAs (مثل كتل التحويل و BLEs) مدى كفاءة تنفيذنا للخوارزميات المعقدة على شريحة سيليكون فارغة.</p><p>لاحظ كيف تتكرر فكرة 'المصفوفة الشبكية' (Grid) في هذا المنهج. بدأنا بتصور الذاكرة كمصفوفة برمجية بسيطة، ثم رأينا كيف تُبنى ROM فعلياً كشبكة من مفككات الشفرة وبوابات OR. هذا المفهوم الشبكي ذاته هو ما تطور لاحقاً ليصبح مصفوفات PLA و FPGAs، حيث أصبح بإمكاننا برمجة نقاط التقاطع في هذه الشبكة لتشكيل أي دائرة رقمية نتخيلها.</p></template>
+    <template class="content-en">Welcome to Module 13. We are now bridging the gap between logic gates and full computer systems by studying Memory and Programmable Logic. We start with the memory hierarchy; why not build everything from fast SRAM? Because the cost would be astronomical! So we use DRAM for main memory. Pay close attention to 'Coincident Selection'; it's a brilliant engineering trick to reduce hardware size using a 2D matrix. For the exam, expect a calculation question on the Hamming Code; always remember that parity bits go in positions 1, 2, 4, 8, and make sure you master calculating the Syndrome to find the erroneous bit. Finally, we cover PLDs and FPGAs. FPGAs are the future of digital design—understand exactly how a Look-Up Table (LUT) implements any logic function without physical gates. Good luck with your studies!<p>As we conclude this module, remember that memory isn't just for storage; its underlying structures—like decoders and multiplexers—are the very building blocks of programmable logic. Mastering how a simple SRAM latch scales up to a massive FPGA will bridge the gap between basic digital circuits and complex computer architectures.</p><p>As you master memory and programmable logic, pay close attention to the physical realities of these devices. Timing waveforms dictate how fast we can reliably read or write data, while the intricate routing architecture of FPGAs (Switch Blocks and BLEs) determines how effectively we can implement complex algorithms on a blank silicon canvas.</p><p>Notice how the concept of a 'Grid' repeats throughout this module. We started by conceptualizing memory as a simple software array, then saw how ROM is physically built as a grid of decoders and OR gates. This exact grid concept evolved into PLAs and FPGAs, where we can program the intersections of this grid to form any digital circuit imaginable.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1834,6 +1987,77 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">تُنفذ باستخدام مفكك شفرة (Decoder) لمدخلات العنوان، والذي يولد جميع الاحتمالات (Minterms)، ثم تُستخدم بوابات OR لربط هذه الاحتمالات وتوليد مخرجات البيانات المطلوبة.</template>
           <template class="content-en">It is implemented using a decoder for the address inputs, which generates all minterms, and then OR gates are used to combine these minterms to produce the desired data outputs.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكننا استخدام مجمع (Multiplexer) عادي لتنفيذ أي دالة منطقية، وكيف يرتبط ذلك بـ FPGAs؟</template>
+          <template class="content-en">How can we use a standard multiplexer to implement ANY logic function, and how does this relate to FPGAs?</template>
+          <span class="content-target">كيف يمكننا استخدام مجمع (Multiplexer) عادي لتنفيذ أي دالة منطقية، وكيف يرتبط ذلك بـ FPGAs؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يمكننا استخدام المجمع كجدول بحث (LUT) عن طريق توصيل متغيرات الدالة بخطوط الاختيار (Select lines) للمجمع. ثم نربط مدخلات البيانات إما بـ 1 أو 0 بناءً على مخرجات جدول الحقيقة المطلوبة. هذه التقنية هي بالضبط كيف تقوم FPGAs المعتمدة على SRAM بتنفيذ المنطق التوافقي، حيث تستبدل البوابات الفيزيائية بمجمعات تقرأ من خلايا ذاكرة صغيرة.</p></template>
+          <template class="content-en"><p>We can use a MUX as a Look-Up Table (LUT) by connecting the function's variables to the MUX's select lines. We then tie the data inputs to either 1 or 0 based on the desired truth table outputs. This exact technique is how SRAM-based FPGAs implement combinational logic, replacing physical gates with multiplexers reading from tiny memory cells.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يدعم العنصر المنطقي الأساسي (BLE) في الـ FPGA كلاً من المنطق التوافقي والتتابعي في نفس الوقت؟</template>
+          <template class="content-en">How does the Basic Logic Element (BLE) in an FPGA support both combinational and sequential logic simultaneously?</template>
+          <span class="content-target">كيف يدعم العنصر المنطقي الأساسي (BLE) في الـ FPGA كلاً من المنطق التوافقي والتتابعي في نفس الوقت؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يحتوي الـ BLE على جدول بحث (LUT) لتنفيذ المنطق التوافقي، ومسجل (Flip-Flop) لتنفيذ المنطق التتابعي. يوجد مجمع (Multiplexer) في النهاية يسمح للمصمم باختيار ما إذا كان مخرج الـ BLE سيكون النتيجة التوافقية المباشرة من الـ LUT، أو النتيجة التتابعية المتزامنة مع الساعة من المسجل.</p></template>
+          <template class="content-en"><p>The BLE contains a LUT for combinational logic and a Flip-Flop for sequential logic. A multiplexer at the output allows the designer to choose whether the BLE outputs the immediate combinational result from the LUT or the clocked sequential result from the Flip-Flop.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر مفكك الشفرة (Decoder) في ذاكرة ROM بمثابة مصفوفة AND ثابتة؟</template>
+          <template class="content-en">Why do we consider the decoder in a ROM to be a fixed AND array?</template>
+          <span class="content-target">لماذا نعتبر مفكك الشفرة (Decoder) في ذاكرة ROM بمثابة مصفوفة AND ثابتة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن كل مخرج من مخرجات مفكك الشفرة يمثل بوابة AND داخلياً تقوم بضرب (ANDing) حالة معينة من المدخلات (Minterm). وهي 'ثابتة' لأننا لا نستطيع تغيير هذه البوابات؛ فهي تولد دائماً جميع الاحتمالات الممكنة للعناوين بشكل شامل.</p></template>
+          <template class="content-en"><p>Because each output of the decoder internally represents an AND gate that multiplies a specific combination of inputs (a minterm). It is 'fixed' because we cannot alter these gates; they always exhaustively generate every possible address combination.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يساعدنا تشبيه الذاكرة بـ 'المصفوفة' (Array) في البرمجة على فهم عمل ناقل العناوين؟</template>
+          <template class="content-en">How does the analogy of memory as a programming 'Array' help us understand the address bus?</template>
+          <span class="content-target">كيف يساعدنا تشبيه الذاكرة بـ 'المصفوفة' (Array) في البرمجة على فهم عمل ناقل العناوين؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>في البرمجة، للوصول إلى عنصر محدد في مصفوفة، نمرر الفهرس (Index) الخاص به. ناقل العناوين يقوم بنفس الوظيفة تماماً في الأجهزة؛ فهو يحمل 'الفهرس' الثنائي الذي يخبر الذاكرة بالصف الدقيق (الكلمة) الذي نريد قراءته أو الكتابة عليه.</p></template>
+          <template class="content-en"><p>In programming, to access a specific element in an array, we pass its index. The address bus does exactly this in hardware; it carries the binary 'index' that tells the memory which exact row (word) we want to read from or write to.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -2135,6 +2359,108 @@
         "en": "Surrounded by I/O pads and routing channels."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "معادلة سعة الذاكرة",
+      "en": "Memory Capacity Formula"
+    },
+    "back": {
+      "definition": {
+        "ar": "السعة = $2^k \\times n$، حيث k هو عدد خطوط العناوين و n هو حجم الكلمة.",
+        "en": "Capacity = $2^k \\times n$, where k is the number of address lines and n is the word size."
+      },
+      "example": {
+        "ar": "10 خطوط عناوين وكلمة بحجم 16 بت تعطي سعة 1K x 16.",
+        "en": "10 address lines and a 16-bit word give a capacity of 1K x 16."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "شريحة البت (Bit Slice)",
+      "en": "Bit Slice"
+    },
+    "back": {
+      "definition": {
+        "ar": "مصفوفة أحادية البعد من خلايا الذاكرة المتصلة لتشكيل موضع بت واحد عبر كلمات متعددة.",
+        "en": "A one-dimensional array of memory cells connected to form a single bit position across multiple words."
+      },
+      "example": {
+        "ar": "تجميع 8 شرائح بت معاً يشكل ذاكرة بعرض 8 بت (بايت واحد).",
+        "en": "Combining 8 bit slices together forms an 8-bit wide memory."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "كتلة التحويل (Switch Block) مقابل كتلة الاتصال (Connection Block) في FPGA",
+      "en": "Switch Block vs. Connection Block in FPGA"
+    },
+    "back": {
+      "definition": {
+        "ar": "كتلة التحويل توجه الإشارات عند تقاطعات قنوات التوجيه، بينما كتلة الاتصال تربط الكتل المنطقية (CLBs) بقنوات التوجيه.",
+        "en": "A Switch Block routes signals at channel intersections, while a Connection Block links the logic blocks (CLBs) to the routing channels."
+      },
+      "example": {
+        "ar": "مثل تقاطع طرق (Switch Block) مقابل مخرج من منزل إلى الشارع (Connection Block).",
+        "en": "Like a road intersection (Switch Block) vs. a driveway connecting a house to the street (Connection Block)."
+      }
+    },
+    "id": 20
+  },
+  {
+    "front": {
+      "ar": "المخطط الزمني: دورة القراءة مقابل دورة الكتابة",
+      "en": "Timing Waveform: Read Cycle vs. Write Cycle"
+    },
+    "back": {
+      "definition": {
+        "ar": "دورة الكتابة تستغرق عادةً وقتاً أطول (مثلاً 75 نانوثانية) من دورة القراءة (مثلاً 65 نانوثانية).",
+        "en": "A write cycle typically takes longer (e.g., 75ns) than a read cycle (e.g., 65ns)."
+      },
+      "example": {
+        "ar": "لأن الكتابة تتطلب استقرار العنوان والبيانات معاً قبل إتمام التخزين الداخلي.",
+        "en": "Because writing requires both address and data to stabilize before internal storage completes."
+      }
+    },
+    "id": 21
+  },
+  {
+    "front": {
+      "ar": "البنية الداخلية لـ ROM",
+      "en": "Internal Structure of ROM"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتكون من مفكك شفرة (مصفوفة AND ثابتة) يولد العناوين، وبوابات OR (مصفوفة قابلة للبرمجة) لتخزين البيانات.",
+        "en": "Consists of a decoder (fixed AND array) generating addresses, and OR gates (programmable array) storing data."
+      },
+      "example": {
+        "ar": "ذاكرة 32x8 تستخدم مفكك شفرة 5-إلى-32 و 8 بوابات OR.",
+        "en": "A 32x8 ROM uses a 5-to-32 decoder and 8 OR gates."
+      }
+    },
+    "id": 22
+  },
+  {
+    "front": {
+      "ar": "تنفيذ المنطق باستخدام مفكك الشفرة",
+      "en": "Implementing Logic with a Decoder"
+    },
+    "back": {
+      "definition": {
+        "ar": "استخدام مفكك الشفرة لتوليد جميع الاحتمالات (Minterms)، ثم جمع الاحتمالات المطلوبة باستخدام بوابة OR.",
+        "en": "Using a decoder to generate all minterms, then summing the required minterms using an OR gate."
+      },
+      "example": {
+        "ar": "لتنفيذ SUM(m(1,2,4,7))، نربط مخرجات مفكك الشفرة 1، 2، 4، 7 ببوابة OR.",
+        "en": "To implement SUM(m(1,2,4,7)), connect decoder outputs 1, 2, 4, 7 to an OR gate."
+      }
+    },
+    "id": 23
   }
 ]
 </script>
@@ -2144,7 +2470,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 16</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -2160,7 +2486,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 16</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2485,6 +2811,198 @@
     },
     "difficulty": "easy",
     "conceptId": "memory-hierarchy-and-types"
+  },
+  {
+    "conceptId": "memory-signals-and-operations",
+    "question": {
+      "ar": "كم عدد خطوط العناوين المطلوبة للوصول إلى ذاكرة سعتها 4K كلمة؟",
+      "en": "How many address lines are required to access a memory with a capacity of 4K words?"
+    },
+    "options": {
+      "ar": [
+        "4 خطوط",
+        "10 خطوط",
+        "12 خط",
+        "16 خط"
+      ],
+      "en": [
+        "4 lines",
+        "10 lines",
+        "12 lines",
+        "16 lines"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "حجم 4K يعني $4 \\times 1024 = 4096$ كلمة. بما أن $4096 = 2^{12}$، فإننا نحتاج إلى 12 خط عنوان.",
+      "en": "4K means $4 \\times 1024 = 4096$ words. Since $4096 = 2^{12}$, we need 12 address lines."
+    },
+    "hint": {
+      "ar": "تذكر أن 1K يساوي $2^{10}$، و 4 تساوي $2^2$.",
+      "en": "Remember that 1K is $2^{10}$, and 4 is $2^2$."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "fpga-architecture",
+    "question": {
+      "ar": "عند تنفيذ دالة بوليانية بـ 4 متغيرات باستخدام مجمع (Multiplexer) كجدول بحث (LUT)، ما هو حجم المجمع المطلوب؟",
+      "en": "When implementing a 4-variable Boolean function using a multiplexer as a LUT, what size multiplexer is required?"
+    },
+    "options": {
+      "ar": [
+        "مجمع 4:1",
+        "مجمع 8:1",
+        "مجمع 16:1",
+        "مجمع 32:1"
+      ],
+      "en": [
+        "4:1 MUX",
+        "8:1 MUX",
+        "16:1 MUX",
+        "32:1 MUX"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "دالة بـ 4 متغيرات تحتوي على $2^4 = 16$ احتمالاً في جدول الحقيقة. لذلك، نحتاج إلى مجمع 16:1 حيث تعمل المتغيرات الـ 4 كخطوط اختيار.",
+      "en": "A 4-variable function has $2^4 = 16$ truth table possibilities. Therefore, a 16:1 MUX is needed where the 4 variables act as select lines."
+    },
+    "hint": {
+      "ar": "حجم المجمع يعتمد على عدد الاحتمالات الممكنة للمتغيرات.",
+      "en": "The MUX size depends on the number of possible combinations of the variables."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "fpga-architecture",
+    "question": {
+      "ar": "في معمارية FPGA، ما هو المكون المسؤول عن توجيه الإشارات عند تقاطعات قنوات التوجيه (Routing Channels)؟",
+      "en": "In an FPGA architecture, which component is responsible for routing signals at the intersections of Routing Channels?"
+    },
+    "options": {
+      "ar": [
+        "الكتل المنطقية القابلة للتهيئة (CLBs)",
+        "كتل الإدخال والإخراج (I/O Pads)",
+        "كتل التحويل (Switch Blocks)",
+        "جداول البحث (LUTs)"
+      ],
+      "en": [
+        "Configurable Logic Blocks (CLBs)",
+        "I/O Pads",
+        "Switch Blocks",
+        "Look-Up Tables (LUTs)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "كتل التحويل (Switch Blocks) تقع عند تقاطعات قنوات التوجيه وتسمح للإشارات بتغيير مسارها، بينما كتل الاتصال تربط الـ CLBs بهذه القنوات.",
+      "en": "Switch Blocks are located at the intersections of routing channels and allow signals to change direction, whereas connection blocks link CLBs to these channels."
+    },
+    "hint": {
+      "ar": "فكر في تقاطع طرق يسمح لك بتغيير اتجاهك.",
+      "en": "Think of a road intersection that allows you to change direction."
+    },
+    "difficulty": "medium",
+    "id": 13
+  },
+  {
+    "conceptId": "memory-signals-and-operations",
+    "question": {
+      "ar": "لماذا تستغرق دورة الكتابة في الذاكرة عدة دورات ساعة (Clock cycles) بدلاً من الحدوث فوراً؟",
+      "en": "Why does a memory write cycle take multiple clock cycles instead of happening instantly?"
+    },
+    "options": {
+      "ar": [
+        "لتبريد المعالج بين العمليات",
+        "لضمان استقرار خطوط العناوين والبيانات قبل إتمام التخزين",
+        "لأن ناقل البيانات دائماً ما يكون بعرض 8 بت فقط",
+        "لحساب كود هامينغ تلقائياً في كل مرة"
+      ],
+      "en": [
+        "To cool down the processor between operations",
+        "To ensure address and data lines are stable before storage completes",
+        "Because the data bus is always only 8 bits wide",
+        "To automatically calculate Hamming code every time"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تتطلب الذاكرة وقتاً للإعداد (Setup time) لضمان أن الإشارات الكهربائية للعناوين والبيانات قد استقرت قبل تفعيل إشارة الكتابة، مما يمنع تخزين بيانات خاطئة.",
+      "en": "Memory requires setup time to ensure the electrical signals for addresses and data have stabilized before the write signal is activated, preventing the storage of corrupted data."
+    },
+    "hint": {
+      "ar": "الإشارات الكهربائية تحتاج إلى وقت لتستقر.",
+      "en": "Electrical signals need time to settle."
+    },
+    "difficulty": "medium",
+    "id": 14
+  },
+  {
+    "conceptId": "rom-internal-structure",
+    "question": {
+      "ar": "في البنية الداخلية لذاكرة ROM، ما هو المكون الذي يمثل مصفوفة AND الثابتة (Fixed AND array)؟",
+      "en": "In the internal structure of a ROM, which component represents the fixed AND array?"
+    },
+    "options": {
+      "ar": [
+        "بوابات OR",
+        "مفكك الشفرة (Decoder)",
+        "المجمع (Multiplexer)",
+        "المسجلات (Flip-flops)"
+      ],
+      "en": [
+        "OR gates",
+        "Decoder",
+        "Multiplexer",
+        "Flip-flops"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مفكك الشفرة (Decoder) يعمل كمصفوفة AND ثابتة لأنه يولد بشكل شامل جميع الاحتمالات (Minterms) الممكنة لمدخلات العنوان دون إمكانية تغييرها.",
+      "en": "The decoder acts as a fixed AND array because it exhaustively generates all possible minterms for the address inputs without the ability to change them."
+    },
+    "hint": {
+      "ar": "هذا المكون يأخذ مدخلات العنوان ويولد خطوط الكلمات (Word lines).",
+      "en": "This component takes the address inputs and generates the word lines."
+    },
+    "difficulty": "medium",
+    "id": 15
+  },
+  {
+    "conceptId": "implementing-logic-with-decoders",
+    "question": {
+      "ar": "لماذا يُعتبر استخدام مفكك الشفرة (Decoder) لتنفيذ الدوال البوليانية غير فعال للدوائر الكبيرة؟",
+      "en": "Why is using a decoder to implement Boolean functions considered inefficient for large circuits?"
+    },
+    "options": {
+      "ar": [
+        "لأنه لا يمكنه تنفيذ دوال تحتوي على بوابات XOR",
+        "لأنه يولد جميع الاحتمالات (Minterms) الممكنة، مما يهدر البوابات على الاحتمالات غير المستخدمة",
+        "لأن بوابات OR المستخدمة في المخرجات تكون بطيئة جداً",
+        "لأنه يتطلب ذاكرة SRAM داخلية للعمل"
+      ],
+      "en": [
+        "Because it cannot implement functions containing XOR gates",
+        "Because it generates all possible minterms, wasting gates on unused combinations",
+        "Because the OR gates used at the output are too slow",
+        "Because it requires internal SRAM to function"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "مفكك الشفرة يولد $2^n$ احتمالاً. إذا كانت الدالة تحتاج إلى 3 احتمالات فقط من أصل 64، فإن 61 بوابة AND في مفكك الشفرة ستكون مهدرة.",
+      "en": "A decoder generates $2^n$ minterms. If a function only needs 3 minterms out of 64, then 61 AND gates in the decoder are wasted."
+    },
+    "hint": {
+      "ar": "فكر في حجم مفكك الشفرة عندما يزداد عدد المتغيرات.",
+      "en": "Think about the size of the decoder as the number of variables increases."
+    },
+    "difficulty": "medium",
+    "id": 16
   }
 ]
 </script>
@@ -2529,6 +3047,30 @@
       <template class="content-ar">الـ FPGAs الحديثة لا تستخدم بوابات AND و OR فيزيائية لتنفيذ المنطق. بدلاً من ذلك، تستخدم جداول البحث (LUTs) التي تعمل كمجمعات (Multiplexers) صغيرة تقرأ من خلايا ذاكرة.</template>
       <template class="content-en">Modern FPGAs don't use physical AND/OR gates to implement logic. Instead, they use Look-Up Tables (LUTs) which act as small multiplexers reading from memory cells.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن جداول البحث (LUTs) في الـ FPGA هي بوابات منطقية سحرية. في الواقع، هي مجرد مجمعات (Multiplexers) عادية تعمل كذاكرة ROM صغيرة، حيث تعمل مدخلاتك كخطوط اختيار (Select lines).</template>
+    <template class="content-en">Believing that LUTs in FPGAs are magical logic gates. In reality, they are just standard multiplexers acting as tiny ROMs, where your inputs serve as the select lines.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن الذاكرة تستجيب فوراً بمجرد تغيير العنوان. في الواقع، تتطلب عمليات القراءة والكتابة أوقات إعداد (Setup times) محددة وعدة دورات ساعة (مثل 65 أو 75 نانوثانية) لضمان استقرار البيانات على الناقل.</template>
+    <template class="content-en">Assuming memory responds instantly as soon as the address changes. In reality, read and write operations require specific setup times and multiple clock cycles (e.g., 65ns or 75ns) to ensure data is stable on the bus.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--secret"><i class="fa-solid fa-user-secret" aria-hidden="true"></i> <span data-i18n="vault.secret">سر الامتحان</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في مصفوفة PLA، غالباً ما تمر المخرجات عبر "عاكس قابل للبرمجة" (Programmable Inverter) وهو عبارة عن بوابة XOR. إذا تم ربط أحد مدخلات XOR بـ 0، تخرج الدالة كما هي. وإذا رُبط بـ 1، يتم عكس الدالة. هذا يسمح للمصمم بتنفيذ الدالة أو مكملها (Complement)، أيهما يتطلب بوابات AND أقل!</template>
+    <template class="content-en">In a PLA, outputs often pass through a "programmable inverter" which is an XOR gate. If one XOR input is tied to 0, the function passes unchanged. If tied to 1, the function is inverted. This allows the designer to implement either the function or its complement, whichever requires fewer AND gates!</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

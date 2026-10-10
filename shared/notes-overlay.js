@@ -39,6 +39,9 @@
     /*@3.NOOJ.14*/
     this.bound = o.bound !== false;
     this.hist = o.hist || null;
+    this.refBase = o.refW || A4W;
+    this.lineSel = o.lineSel || LINE_SEL;
+    this.heightOf = o.heightOf || null;
     this.on = false;
     this.pick = false;
     this.build();
@@ -82,6 +85,7 @@
     var h = this.bound
       ? Math.max(Math.round(this.sheet.scrollHeight), Math.round(sc.height / z))
       : Math.round(this.sheet.scrollHeight);
+    if (this.heightOf) h = Math.max(1, Math.round(this.heightOf()));
     var rtl = false;
     try { rtl = getComputedStyle(this.scroller).direction === 'rtl'; } catch (e) {}
     var top = (sh.top - st.top) / z;
@@ -95,7 +99,7 @@
       /*@3.NOOJ.5*/
       /*@3.NOOJ.11*/
       /*@3.NOOJ.20*/
-      if (this.bound) { this.refW = A4W; this.cv.setFit(1); this.syncWindow(); }
+      if (this.bound) { this.refW = this.refBase; this.cv.setFit(1); this.syncWindow(); }
       else this.fitBoard(w);
     }
   };
@@ -196,7 +200,7 @@
     var cTop = Math.min(a.y, b.y), cBot = Math.max(a.y, b.y);
     var cL = Math.min(a.x, b.x), cR = Math.max(a.x, b.x);
     var mid = (cTop + cBot) / 2, cMx = (cL + cR) / 2;
-    var hosts = this.sheet.querySelectorAll(LINE_SEL);
+    var hosts = this.sheet.querySelectorAll(this.lineSel);
     var lines = [], i;
     for (i = 0; i < hosts.length; i++) {
       var hr = hosts[i].getBoundingClientRect();
@@ -252,7 +256,7 @@
     this.host.style.pointerEvents = 'none';
     this.sheet.style.pointerEvents = 'auto';
     var ra = null, rb = null;
-    var inSheet = function (rg) { var n = rg && rg.startContainer; return !!(n && this.sheet.contains(n.nodeType === 3 ? n.parentNode : n) && (n.nodeType === 3 ? n.parentNode : n).closest && (n.nodeType === 3 ? n.parentNode : n).closest(LINE_SEL)); }.bind(this);
+    var inSheet = function (rg) { var n = rg && rg.startContainer; return !!(n && this.sheet.contains(n.nodeType === 3 ? n.parentNode : n) && (n.nodeType === 3 ? n.parentNode : n).closest && (n.nodeType === 3 ? n.parentNode : n).closest(this.lineSel)); }.bind(this);
     try {
       ra = caretAt(a.x, a.y); rb = caretAt(b.x, b.y);
       if (!inSheet(ra)) ra = this.caretNear(a.x, a.y);
@@ -290,7 +294,7 @@
     var cx = Math.min(Math.max(x, sr.left + 8), sr.right - 8);
     var els = document.elementsFromPoint ? document.elementsFromPoint(cx, y) : [], blk = null, i;
     for (i = 0; i < els.length; i++) { if (els[i].matches && els[i].matches('[data-bid]') && this.sheet.contains(els[i])) { blk = els[i]; break; } }
-    var cands = (blk || this.sheet).querySelectorAll(LINE_SEL), best = null, bd = Infinity;
+    var cands = (blk || this.sheet).querySelectorAll(this.lineSel), best = null, bd = Infinity;
     for (i = 0; i < cands.length; i++) {
       var r = cands[i].getBoundingClientRect();
       if (!(r.height > 0) || !(r.width > 0)) continue;
@@ -342,8 +346,9 @@
       /*@3.NOOJ.8*/
       bound: this.bound,
       onScroll: function (dx, dy) {
-        self.scroller.scrollTop -= dy;
-        self.scroller.scrollLeft -= dx;
+        var sc = self.scroller;
+        if (typeof sc.scrollBy === 'function') sc.scrollBy({ left: -dx, top: -dy, behavior: 'instant' });
+        else { sc.scrollTop -= dy; sc.scrollLeft -= dx; }
       },
       onPinch: function (phase, f, cx, cy) {
         if (self.onPinch) self.onPinch(phase, f, cx, cy);
@@ -353,7 +358,7 @@
         var out = {};
         for (var k in d) if (Object.prototype.hasOwnProperty.call(d, k)) out[k] = d[k];
         out.ch = d.ch || 0;
-        out.rw = A4W;
+        out.rw = self.refBase;
         self.onChange(out, quiet);
       },
       onState: function () { self.sync(); },
@@ -413,7 +418,7 @@
     }
     if (this.data && (this.data.ink || (this.data.shapes && this.data.shapes.length))) {
       var was = this.data.rw || this.data.w || 0;
-      this.refW = this.bound ? A4W : pageW(this.sheet, zoomOf(this.stage));
+      this.refW = this.bound ? this.refBase : pageW(this.sheet, zoomOf(this.stage));
       var self2 = this;
       var done = this.cv.load(this.data.ink, null, this.data.shapes, this.data.ts);
       if (done && done.then) done.then(function () { self2.migrateRef(was); if (self2.onLoad) self2.onLoad(); });
@@ -428,7 +433,7 @@
 
   Overlay.prototype.migrateRef = function (was) {
     if (!this.bound || !this.cv) return 0;
-    var now = A4W;
+    var now = this.refBase;
     var k = (was && was > 0) ? (now / was) : 1;
     if (Math.abs(k - 1) < 0.002) return 0;
     var els = this.cv.els, i;
@@ -443,7 +448,7 @@
     var want = !!on;
     this.pick = want;
     this.ensureCanvas();
-    if (!this.refW) this.refW = this.bound ? A4W : pageW(this.sheet, zoomOf(this.stage));
+    if (!this.refW) this.refW = this.bound ? this.refBase : pageW(this.sheet, zoomOf(this.stage));
     this.fit();
     if (this.cv) {
       this.cv.setPick(want);
@@ -464,7 +469,7 @@
   Overlay.prototype.show = function () {
     this.host.hidden = false;
     this.ensureCanvas();
-    if (!this.refW) this.refW = this.bound ? A4W : pageW(this.sheet, zoomOf(this.stage));
+    if (!this.refW) this.refW = this.bound ? this.refBase : pageW(this.sheet, zoomOf(this.stage));
     this.fit();
   };
 
@@ -477,7 +482,7 @@
     this.scroller.classList.toggle('nov-drawing', want);
     if (want) { try { var s0 = window.getSelection(); if (s0) s0.removeAllRanges(); } catch (eS) {} }
     this.ensureCanvas();
-    if (!this.refW) this.refW = this.bound ? A4W : pageW(this.sheet, zoomOf(this.stage));
+    if (!this.refW) this.refW = this.bound ? this.refBase : pageW(this.sheet, zoomOf(this.stage));
     this.fit();
     if (this.dial) this.dial.show(want, want);
     if (want) this.sync();
@@ -492,7 +497,7 @@
   Overlay.prototype.load = function (data) {
     this.data = data || null;
     var was = this.data ? (this.data.rw || this.data.w || 0) : 0;
-    this.refW = this.bound ? A4W : pageW(this.sheet, zoomOf(this.stage));
+    this.refW = this.bound ? this.refBase : pageW(this.sheet, zoomOf(this.stage));
     if (this.cv && this.data) {
       var self3 = this;
       var p = this.cv.load(this.data.ink, null, this.data.shapes, this.data.ts);

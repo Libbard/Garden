@@ -384,9 +384,10 @@
         fireAt: fireAt,
         eventAt: eventMs,
         /*@3.REMJ.91*/
-        url: (t.origin && t.origin.type === 'note' && t.origin.uid)
-          ? ('hub/notes.html?id=' + encodeURIComponent(t.origin.uid))
-          : 'index.html#tasks',
+        url: (GardenData.noteHref && GardenData.noteHref(t.origin)) ||
+          ((t.origin && t.origin.type === 'note' && t.origin.uid && t.origin.src !== 'quick')
+            ? ('hub/notes.html?id=' + encodeURIComponent(t.origin.uid))
+            : 'index.html#tasks'),
         course: t.course || null
       });
     });

@@ -222,8 +222,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>غالباً ما يؤدي استخدام عدد أقل من المعالجات إلى تحسين أداء الأنظمة المتوازية. يتم ذلك عبر:</p><ul><li>تعيين <span class="smart-term" data-term-en="Virtual processor" data-ar="المعالج الافتراضي" data-en-def="A conceptual processor in the original fine-grained algorithm that is mapped to a physical processor.">معالجات افتراضية (Virtual Processors)<span class="smart-term-tooltip"></span></span> بالتساوي على المعالجات المادية.</li><li>بما أن عدد المعالجات يقل بمعامل n/p، فإن الحساب لكل معالج يزداد بنفس المعامل.</li><li>تكلفة الاتصال لا تزداد بنفس المعامل لأن بعض المعالجات الافتراضية المعينة لنفس المعالج المادي قد تتواصل مع بعضها داخلياً دون الحاجة للشبكة.</li></ul><p>هذا هو السبب الأساسي لتحسن الأداء عند بناء دقة تقسيم (Granularity) أكبر.</p></template>
-    <template class="content-en"><p>Often, using fewer processors improves the performance of parallel systems. This is achieved by:</p><ul><li>Assigning <span class="smart-term" data-term-en="Virtual processor" data-ar="المعالج الافتراضي" data-en-def="A conceptual processor in the original fine-grained algorithm that is mapped to a physical processor.">virtual processors<span class="smart-term-tooltip"></span></span> equally to scaled-down physical processors.</li><li>Since the number of processing elements decreases by a factor of n/p, computation at each element increases by n/p.</li><li>Communication cost does not increase by this factor because virtual processors on the same physical processor communicate locally.</li></ul><p>This is the basic reason for the improvement from building granularity.</p></template>
+    <template class="content-ar"><p>غالباً ما يؤدي استخدام عدد أقل من المعالجات إلى تحسين أداء الأنظمة المتوازية. يتم ذلك عبر:</p><ul><li>تعيين <span class="smart-term" data-term-en="Virtual processor" data-ar="المعالج الافتراضي" data-en-def="A conceptual processor in the original fine-grained algorithm that is mapped to a physical processor.">معالجات افتراضية (Virtual Processors)<span class="smart-term-tooltip"></span></span> بالتساوي على المعالجات المادية.</li><li>بما أن عدد المعالجات يقل بمعامل n/p، فإن الحساب لكل معالج يزداد بنفس المعامل.</li><li>تكلفة الاتصال لا تزداد بنفس المعامل لأن بعض المعالجات الافتراضية المعينة لنفس المعالج المادي قد تتواصل مع بعضها داخلياً دون الحاجة للشبكة.</li></ul><p>هذا هو السبب الأساسي لتحسن الأداء عند بناء دقة تقسيم (Granularity) أكبر.</p><p>مثال عملي: بناء دقة التقسيم (Granularity) لجمع $n$ من الأرقام باستخدام $p$ معالج ($p < n$).</p><ol><li>بدلاً من تعيين رقم واحد لكل معالج، نقوم بتعيين $n/p$ من الأرقام لكل معالج مادي. يقوم كل معالج بجمع أرقامه محلياً في وقت مقداره $\Theta(n/p)$.</li><li>تنتج لدينا $p$ مجاميع جزئية (Partial sums). نقوم بجمع هذه المجاميع الجزئية باستخدام المعالجات الـ $p$ في وقت مقداره $\Theta(\log p)$ باستخدام خوارزمية الشجرة الثنائية.</li></ol><p>النتيجة: وقت التنفيذ المتوازي الإجمالي هو $T_P = \Theta(n/p + \log p)$. التكلفة الإجمالية هي $p \times T_P = \Theta(n + p \log p)$. يكون هذا النظام مثالياً من حيث التكلفة (Cost-optimal) طالما أن حجم المشكلة $n = \Omega(p \log p)$.</p></template>
+    <template class="content-en"><p>Often, using fewer processors improves the performance of parallel systems. This is achieved by:</p><ul><li>Assigning <span class="smart-term" data-term-en="Virtual processor" data-ar="المعالج الافتراضي" data-en-def="A conceptual processor in the original fine-grained algorithm that is mapped to a physical processor.">virtual processors<span class="smart-term-tooltip"></span></span> equally to scaled-down physical processors.</li><li>Since the number of processing elements decreases by a factor of n/p, computation at each element increases by n/p.</li><li>Communication cost does not increase by this factor because virtual processors on the same physical processor communicate locally.</li></ul><p>This is the basic reason for the improvement from building granularity.</p><p>Worked Example: Building granularity for adding $n$ numbers using $p$ processing elements ($p < n$).</p><ol><li>Instead of assigning one number per processor, we assign $n/p$ numbers to each physical processor. Each processor locally adds its numbers in $\Theta(n/p)$ time.</li><li>This results in $p$ partial sums. We add these partial sums using the $p$ processors in $\Theta(\log p)$ time using a binary tree algorithm.</li></ol><p>Result: The overall parallel runtime is $T_P = \Theta(n/p + \log p)$. The total cost is $p \times T_P = \Theta(n + p \log p)$. This system is cost-optimal as long as the problem size $n = \Omega(p \log p)$.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -636,8 +636,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>للحفاظ على كفاءة ثابتة $E$، يجب أن تظل النسبة بين العبء الإضافي $T_o$ وحجم المشكلة $W$ ثابتة.</p><ol><li>نعرف حجم المشكلة $W$ بأنه العدد المقارب للعمليات في أفضل خوارزمية تسلسلية.</li><li>من معادلة الكفاءة، نستنتج أن: $W = \frac{E}{1 - E} T_o(W, p)$</li><li>إذا اعتبرنا $K = \frac{E}{1 - E}$ كثابت، تصبح المعادلة: $W = K T_o(W, p)$</li><li>بحل هذه المعادلة جبرياً لإيجاد $W$ كدالة في $p$، نحصل على <b>دالة تساوي الكفاءة (Isoefficiency Function)</b>.</li></ol></template>
-    <template class="content-en"><p>To maintain a constant efficiency $E$, the ratio of overhead $T_o$ to problem size $W$ must be maintained at a constant value.</p><ol><li>We define problem size $W$ as the asymptotic number of operations of the best serial algorithm.</li><li>From the efficiency equation, we get: $W = \frac{E}{1 - E} T_o(W, p)$</li><li>Letting $K = \frac{E}{1 - E}$ be a constant, we have: $W = K T_o(W, p)$</li><li>Solving this equation algebraically for $W$ as a function of $p$ yields the <b>isoefficiency function</b>.</li></ol></template>
+    <template class="content-ar"><p>للحفاظ على كفاءة ثابتة $E$، يجب أن تظل النسبة بين العبء الإضافي $T_o$ وحجم المشكلة $W$ ثابتة.</p><ol><li>نعرف حجم المشكلة $W$ بأنه العدد المقارب للعمليات في أفضل خوارزمية تسلسلية.</li><li>من معادلة الكفاءة، نستنتج أن: $W = \frac{E}{1 - E} T_o(W, p)$</li><li>إذا اعتبرنا $K = \frac{E}{1 - E}$ كثابت، تصبح المعادلة: $W = K T_o(W, p)$</li><li>بحل هذه المعادلة جبرياً لإيجاد $W$ كدالة في $p$، نحصل على <b>دالة تساوي الكفاءة (Isoefficiency Function)</b>.</li></ol><p>مثال عملي: حساب دالة تساوي الكفاءة بحدود متعددة (Multiple Terms).</p><p>لنفترض أن دالة العبء الإضافي لنظام هي: $T_o = p^{3/2} + p^{3/4}W^{3/4}$. لإيجاد دالة تساوي الكفاءة، نساوي حجم المشكلة $W$ بكل حد على حدة باستخدام العلاقة $W = K T_o$:</p><ol><li><b>باستخدام الحد الأول:</b> $W = K p^{3/2}$.</li><li><b>باستخدام الحد الثاني:</b> $W = K p^{3/4}W^{3/4}$. بقسمة الطرفين على $W^{3/4}$ نحصل على $W^{1/4} = K p^{3/4}$. برفع الطرفين للأس 4، ينتج $W = K^4 p^3$.</li></ol><p>النتيجة: نختار الحد الذي يتطلب أعلى معدل نمو مقارب (Asymptotic growth rate) لحجم المشكلة. بما أن $\Theta(p^3)$ ينمو أسرع من $\Theta(p^{3/2})$، فإن دالة تساوي الكفاءة الكلية للنظام هي $\Theta(p^3)$.</p></template>
+    <template class="content-en"><p>To maintain a constant efficiency $E$, the ratio of overhead $T_o$ to problem size $W$ must be maintained at a constant value.</p><ol><li>We define problem size $W$ as the asymptotic number of operations of the best serial algorithm.</li><li>From the efficiency equation, we get: $W = \frac{E}{1 - E} T_o(W, p)$</li><li>Letting $K = \frac{E}{1 - E}$ be a constant, we have: $W = K T_o(W, p)$</li><li>Solving this equation algebraically for $W$ as a function of $p$ yields the <b>isoefficiency function</b>.</li></ol><p>Worked Example: Calculating isoefficiency with multiple terms.</p><p>Suppose the overhead function of a system is: $T_o = p^{3/2} + p^{3/4}W^{3/4}$. To find the isoefficiency function, we evaluate the problem size $W$ against each term separately using $W = K T_o$:</p><ol><li><b>Using the first term:</b> $W = K p^{3/2}$.</li><li><b>Using the second term:</b> $W = K p^{3/4}W^{3/4}$. Dividing both sides by $W^{3/4}$ gives $W^{1/4} = K p^{3/4}$. Raising both sides to the power of 4 yields $W = K^4 p^3$.</li></ol><p>Result: We select the term that requires the highest <span class="smart-term" data-term-en="Asymptotic growth rate" data-ar="معدل النمو المقارب" data-en-def="The rate at which a mathematical function grows as its input approaches infinity, used to compare the scalability of different terms.">asymptotic growth rate<span class="smart-term-tooltip"></span></span> for the problem size. Since $\Theta(p^3)$ grows faster than $\Theta(p^{3/2})$, the overall isoefficiency function for the system is $\Theta(p^3)$.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -927,8 +927,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تم اقتراح مقاييس أخرى لقابلية التوسع تمليها احتياجات التطبيقات:</p><ul><li><strong>التسريع المقاس (Scaled Speedup):</strong> التسريع الذي يتم الحصول عليه عند زيادة حجم المشكلة خطياً مع عدد المعالجات. إذا كان التسريع المقاس قريباً من الخطي، يعتبر النظام قابلاً للتوسع.</li><li><strong>مقيد بالذاكرة (Memory-constrained):</strong> إذا كانت الذاكرة الإجمالية تنمو خطياً مع $p$، فإننا نزيد حجم المشكلة لملء الذاكرة.</li><li><strong>مقيد بالوقت (Time-constrained):</strong> يتم زيادة حجم المشكلة بحيث لا يتجاوز وقت التنفيذ المتوازي حداً أقصى معيناً (مهم لتطبيقات الوقت الفعلي).</li></ul></template>
-    <template class="content-en"><p>Other scalability metrics have been proposed based on application needs:</p><ul><li><strong>Scaled Speedup:</strong> Speedup obtained when the problem size is increased linearly with the number of processing elements. If scaled speedup is close to linear, the system is scalable.</li><li><strong>Memory-constrained:</strong> If aggregate memory grows linearly in $p$, scaled speedup increases problem size to fill memory.</li><li><strong>Time-constrained:</strong> The size of the problem is increased subject to an upper-bound on parallel execution time (crucial for real-time applications).</li></ul></template>
+    <template class="content-ar"><p>تم اقتراح مقاييس أخرى لقابلية التوسع تمليها احتياجات التطبيقات:</p><ul><li><strong>التسريع المقاس (Scaled Speedup):</strong> التسريع الذي يتم الحصول عليه عند زيادة حجم المشكلة خطياً مع عدد المعالجات. إذا كان التسريع المقاس قريباً من الخطي، يعتبر النظام قابلاً للتوسع.</li><li><strong>مقيد بالذاكرة (Memory-constrained):</strong> إذا كانت الذاكرة الإجمالية تنمو خطياً مع $p$، فإننا نزيد حجم المشكلة لملء الذاكرة.</li><li><strong>مقيد بالوقت (Time-constrained):</strong> يتم زيادة حجم المشكلة بحيث لا يتجاوز وقت التنفيذ المتوازي حداً أقصى معيناً (مهم لتطبيقات الوقت الفعلي).</li></ul><p>مثال عملي: مقارنة التوسع المقيد بالذاكرة والمقيد بالوقت لضرب مصفوفتين $n \times n$.</p><p>وقت التنفيذ التسلسلي هو $W = t_c n^3$. وقت التنفيذ المتوازي هو $T_P = t_c \frac{n^3}{p} + t_s \log p + 2t_w \frac{n^2}{\sqrt{p}}$.</p><ol><li><b>التوسع المقيد بالذاكرة:</b> تعقيد الذاكرة هو $\Theta(n^2)$. لملء الذاكرة التي تنمو خطياً مع $p$، نجعل $n^2 = c \times p$. بتعويض هذا في معادلة التسريع، نجد أن التسريع المقاس $S' = O(p)$. هذا يعني أن النظام قابل للتوسع بشكل ممتاز تحت قيود الذاكرة.</li><li><b>التوسع المقيد بالوقت:</b> للحفاظ على وقت تنفيذ ثابت $T_P = O(1)$، يجب أن يكون الحد المهيمن للحساب $O(n^3/p)$ ثابتاً، أي $n^3 = c \times p$. في هذه الحالة، سيُهيمن حد الاتصال $O(n^2/\sqrt{p})$ على وقت التنفيذ المتوازي، والذي يصبح $O((p)^{2/3} / p^{1/2}) = O(p^{1/6})$. التسريع هو الوقت التسلسلي $O(n^3) = O(p)$ مقسوماً على الوقت المتوازي $O(p^{1/6})$، مما يعطي تسريعاً مقيداً بالوقت $S'' = O(p^{5/6})$.</li></ol><p>النتيجة: في هذه الخوارزمية، التوسع المقيد بالذاكرة يعطي أداءً أفضل ($O(p)$) مقارنة بالتوسع المقيد بالوقت ($O(p^{5/6})$).</p></template>
+    <template class="content-en"><p>Other scalability metrics have been proposed based on application needs:</p><ul><li><strong>Scaled Speedup:</strong> Speedup obtained when the problem size is increased linearly with the number of processing elements. If scaled speedup is close to linear, the system is scalable.</li><li><strong>Memory-constrained:</strong> If aggregate memory grows linearly in $p$, scaled speedup increases problem size to fill memory.</li><li><strong>Time-constrained:</strong> The size of the problem is increased subject to an upper-bound on parallel execution time (crucial for real-time applications).</li></ul><p>Worked Example: Memory-constrained vs. Time-constrained scaling for multiplying two $n \times n$ matrices.</p><p>The serial runtime is $W = t_c n^3$. The parallel runtime is $T_P = t_c \frac{n^3}{p} + t_s \log p + 2t_w \frac{n^2}{\sqrt{p}}$.</p><ol><li><b>Memory-constrained scaling:</b> Memory complexity is $\Theta(n^2)$. To fill the memory which grows linearly with $p$, we set $n^2 = c \times p$. Substituting this into the speedup equation yields a scaled speedup $S' = O(p)$. This means the system is highly scalable under memory constraints.</li><li><b>Time-constrained scaling:</b> To maintain a constant execution time $T_P = O(1)$, the dominant computation term $O(n^3/p)$ must be constant, so $n^3 = c \times p$. The parallel runtime is then dominated by the communication term $O(n^2/\sqrt{p}) = O((p)^{2/3} / p^{1/2}) = O(p^{1/6})$. The speedup is the serial time $O(n^3) = O(p)$ divided by the parallel time $O(p^{1/6})$, giving a time-constrained speedup $S'' = O(p^{5/6})$.</li></ol><p>Result: For this algorithm, memory-constrained scaling yields better performance ($O(p)$) than time-constrained scaling ($O(p^{5/6})$).</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1009,8 +1009,8 @@
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. إذا كنتم تتساءلون: 'لماذا لا نضيف ألف معالج لحل المشكلة في ثانية؟'، فهذه الوحدة تجيبكم. لقد تعلمنا أن الاتصالات والتزامن (العبء الإضافي) هي أعداء التوازي الخفية. ركزوا جيداً في الامتحان على 'دالة تساوي الكفاءة' (Isoefficiency)؛ فهي تخبرنا بالضبط كم يجب أن نزيد حجم المشكلة لنبرر إضافة معالجات جديدة. تذكروا دائماً الحد الأدنى $\Omega(p)$. أيضاً، لا تخلطوا بين 'أسرع وقت ممكن' (Minimum Execution Time) و'أفضل استخدام للموارد' (Cost-Optimal Time). أحياناً، تقليص عدد المعالجات (Scaling down) يعطينا أداءً أفضل وتكلفة أقل. راجعوا معادلة الجزء التسلسلي $f$، فهي أداة تشخيصية ممتازة لمعرفة ما إذا كان نظامكم يعاني من اختناقات. بالتوفيق في دراستكم!</template>
-    <template class="content-en">Welcome, future engineers, to this crucial module. If you've ever wondered, 'Why not just add a thousand processors to solve it in a second?', this module gives you the answer. We learned that communication and synchronization (overhead) are the hidden enemies of parallelism. For the exam, focus heavily on the 'Isoefficiency function'; it tells us exactly how much we must increase the problem size to justify adding new processors. Always remember the $\Omega(p)$ lower bound. Also, do not confuse 'fastest possible time' (Minimum Execution Time) with 'best use of resources' (Cost-Optimal Time). Sometimes, scaling down gives us better performance and lower cost. Review the serial fraction $f$ equation; it's an excellent diagnostic tool to see if your system is bottlenecking. Good luck with your studies!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. إذا كنتم تتساءلون: 'لماذا لا نضيف ألف معالج لحل المشكلة في ثانية؟'، فهذه الوحدة تجيبكم. لقد تعلمنا أن الاتصالات والتزامن (العبء الإضافي) هي أعداء التوازي الخفية. ركزوا جيداً في الامتحان على 'دالة تساوي الكفاءة' (Isoefficiency)؛ فهي تخبرنا بالضبط كم يجب أن نزيد حجم المشكلة لنبرر إضافة معالجات جديدة. تذكروا دائماً الحد الأدنى $\Omega(p)$. أيضاً، لا تخلطوا بين 'أسرع وقت ممكن' (Minimum Execution Time) و'أفضل استخدام للموارد' (Cost-Optimal Time). أحياناً، تقليص عدد المعالجات (Scaling down) يعطينا أداءً أفضل وتكلفة أقل. راجعوا معادلة الجزء التسلسلي $f$، فهي أداة تشخيصية ممتازة لمعرفة ما إذا كان نظامكم يعاني من اختناقات. بالتوفيق في دراستكم!<p>فهم قابلية التوسع لا يقتصر على حفظ التعريفات، بل يتطلب تطبيق الرياضيات. من خلال تتبع الخطوات الجبرية لدالة تساوي الكفاءة ذات الحدود المتعددة، ومقارنة التسريع المقيد بالذاكرة مقابل المقيد بالوقت في ضرب المصفوفات، ستكتسب الأدوات التحليلية اللازمة للتنبؤ بأداء الأنظمة المتوازية في العالم الحقيقي وتحسينها.</p></template>
+    <template class="content-en">Welcome, future engineers, to this crucial module. If you've ever wondered, 'Why not just add a thousand processors to solve it in a second?', this module gives you the answer. We learned that communication and synchronization (overhead) are the hidden enemies of parallelism. For the exam, focus heavily on the 'Isoefficiency function'; it tells us exactly how much we must increase the problem size to justify adding new processors. Always remember the $\Omega(p)$ lower bound. Also, do not confuse 'fastest possible time' (Minimum Execution Time) with 'best use of resources' (Cost-Optimal Time). Sometimes, scaling down gives us better performance and lower cost. Review the serial fraction $f$ equation; it's an excellent diagnostic tool to see if your system is bottlenecking. Good luck with your studies!<p>Understanding scalability isn't just about knowing the definitions; it's about applying the math. By working through the algebraic steps of the isoefficiency function with multiple terms, and contrasting memory-constrained versus time-constrained speedups in matrix multiplication, you gain the analytical tools needed to predict and optimize real-world parallel system performance.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1184,6 +1184,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">لا، يعتمد ذلك على المقياس المطلوب. قد تكون الخوارزمية الأسرع غير فعالة وذات تكلفة عالية جداً (غير مثالية التكلفة). يجب الموازنة بين السرعة، الكفاءة، والتكلفة بناءً على الموارد المتاحة.</template>
           <template class="content-en">No, it depends on the required metric. The fastest algorithm might be highly inefficient and costly (not cost-optimal). One must balance speed, efficiency, and cost based on available resources.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في حساب دالة تساوي الكفاءة بحدود متعددة، لماذا نختار دائماً الحد الذي يعطي أعلى معدل نمو مقارب لحجم المشكلة $W$؟</template>
+          <template class="content-en">When calculating the isoefficiency function with multiple terms, why do we always choose the term that yields the highest asymptotic growth rate for the problem size $W$?</template>
+          <span class="content-target">في حساب دالة تساوي الكفاءة بحدود متعددة، لماذا نختار دائماً الحد الذي يعطي أعلى معدل نمو مقارب لحجم المشكلة $W$؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن دالة تساوي الكفاءة تمثل 'أسوأ حالة' للنمو المطلوب للحفاظ على الكفاءة. الحد الذي ينمو بأسرع معدل هو الذي سيهيمن على العبء الإضافي الكلي عند زيادة عدد المعالجات. إذا لم نقم بزيادة حجم المشكلة بهذا المعدل الأسرع، فإن هذا الحد سيتسبب في انخفاض الكفاءة.</p></template>
+          <template class="content-en"><p>Because the isoefficiency function represents the 'worst-case' growth required to maintain efficiency. The term that grows fastest will dominate the total overhead as processors increase. If we don't scale the problem size by this fastest rate, that specific overhead term will cause the efficiency to drop.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يوضح مثال ضرب المصفوفات أهمية اختيار مقياس قابلية التوسع المناسب (مقيد بالذاكرة مقابل مقيد بالوقت)؟</template>
+          <template class="content-en">How does the matrix multiplication example illustrate the importance of choosing the right scalability metric (memory-constrained vs. time-constrained)?</template>
+          <span class="content-target">كيف يوضح مثال ضرب المصفوفات أهمية اختيار مقياس قابلية التوسع المناسب (مقيد بالذاكرة مقابل مقيد بالوقت)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يوضح المثال أن خوارزمية واحدة قد تبدو قابلة للتوسع بشكل ممتاز تحت مقياس معين (المقيد بالذاكرة أعطى $O(p)$)، بينما تبدو أقل كفاءة تحت مقياس آخر (المقيد بالوقت أعطى $O(p^{5/6})$). اختيار المقياس يجب أن يعكس القيود الحقيقية لبيئة التشغيل؛ فإذا كانت الذاكرة هي العائق، فالمقياس الأول أصح، وإذا كان وقت الاستجابة هو الحرج، فالمقياس الثاني هو الأدق.</p></template>
+          <template class="content-en"><p>It shows that a single algorithm might appear highly scalable under one metric (memory-constrained gave $O(p)$) but less efficient under another (time-constrained gave $O(p^{5/6})$). The choice of metric must reflect the real-world constraints of the operating environment; if memory is the bottleneck, the first is correct, but if response time is critical, the second is more accurate.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1447,6 +1482,40 @@
         "en": "If $f(p) = p \\log p$, then $W$ must be $\\ge c \\cdot p \\log p$."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف تحدد دالة تساوي الكفاءة إذا كانت دالة العبء الإضافي تحتوي على عدة حدود رياضية؟",
+      "en": "How do you determine the isoefficiency function if the overhead function contains multiple mathematical terms?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نقوم بحساب حجم المشكلة $W$ لكل حد على حدة، ثم نختار الحد الذي يتطلب أعلى معدل نمو مقارب (Asymptotic growth rate).",
+        "en": "We evaluate the problem size $W$ against each term separately, then select the term that requires the highest asymptotic growth rate."
+      },
+      "example": {
+        "ar": "إذا نتج عن الحد الأول $W = \\Theta(p^2)$ وعن الثاني $W = \\Theta(p^3)$، فإن دالة تساوي الكفاءة هي $\\Theta(p^3)$.",
+        "en": "If the first term yields $W = \\Theta(p^2)$ and the second $W = \\Theta(p^3)$, the isoefficiency function is $\\Theta(p^3)$."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "في خوارزمية ضرب المصفوفات، أيهما يعطي أداءً أفضل: التوسع المقيد بالذاكرة أم المقيد بالوقت؟",
+      "en": "In the matrix multiplication algorithm, which yields better performance: memory-constrained or time-constrained scaling?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التوسع المقيد بالذاكرة يعطي أداءً أفضل لأن تعقيد الذاكرة $\\Theta(n^2)$ ينمو أبطأ من تعقيد الوقت $\\Theta(n^3)$.",
+        "en": "Memory-constrained scaling yields better performance because the memory complexity $\\Theta(n^2)$ grows slower than the time complexity $\\Theta(n^3)$."
+      },
+      "example": {
+        "ar": "التسريع المقيد بالذاكرة هو $O(p)$، بينما المقيد بالوقت هو $O(p^{5/6})$.",
+        "en": "Memory-constrained speedup is $O(p)$, while time-constrained is $O(p^{5/6})$."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1456,7 +1525,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1472,7 +1541,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1797,6 +1866,70 @@
     },
     "difficulty": "easy",
     "conceptId": "effect-of-granularity"
+  },
+  {
+    "conceptId": "isoefficiency-metric",
+    "question": {
+      "ar": "إذا كانت دالة العبء الإضافي لنظام هي $T_o = p \\log p + p^{1.5}$، فما هي دالة تساوي الكفاءة لهذا النظام؟",
+      "en": "If the overhead function of a system is $T_o = p \\log p + p^{1.5}$, what is the isoefficiency function for this system?"
+    },
+    "options": {
+      "ar": [
+        "$\\Theta(p \\log p)$",
+        "$\\Theta(p^{1.5})$",
+        "$\\Theta(p^2)$",
+        "$\\Theta(p)$"
+      ],
+      "en": [
+        "$\\Theta(p \\log p)$",
+        "$\\Theta(p^{1.5})$",
+        "$\\Theta(p^2)$",
+        "$\\Theta(p)$"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "نحسب $W$ لكل حد. الحد الأول يعطي $W = \\Theta(p \\log p)$ والحد الثاني يعطي $W = \\Theta(p^{1.5})$. نختار الحد ذو معدل النمو الأكبر، وهو $\\Theta(p^{1.5})$.",
+      "en": "We evaluate $W$ for each term. The first gives $W = \\Theta(p \\log p)$ and the second gives $W = \\Theta(p^{1.5})$. We choose the term with the highest growth rate, which is $\\Theta(p^{1.5})$."
+    },
+    "hint": {
+      "ar": "قارن بين معدل نمو $p \\log p$ ومعدل نمو $p^{1.5}$. أيهما ينمو بشكل أسرع؟",
+      "en": "Compare the growth rate of $p \\log p$ and $p^{1.5}$. Which grows faster?"
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "scaled-speedup",
+    "question": {
+      "ar": "لماذا يختلف التسريع المقيد بالذاكرة عن التسريع المقيد بالوقت في خوارزمية ضرب المصفوفات؟",
+      "en": "Why does memory-constrained speedup differ from time-constrained speedup in the matrix multiplication algorithm?"
+    },
+    "options": {
+      "ar": [
+        "لأن تكلفة الاتصال معدومة في هذه الخوارزمية.",
+        "لأن تعقيد الذاكرة $\\Theta(n^2)$ يختلف عن تعقيد الوقت $\\Theta(n^3)$ للعملية.",
+        "لأن عدد المعالجات لا يؤثر على وقت التنفيذ.",
+        "لأن الجزء التسلسلي $f$ يساوي صفراً."
+      ],
+      "en": [
+        "Because communication cost is zero in this algorithm.",
+        "Because the memory complexity $\\Theta(n^2)$ differs from the time complexity $\\Theta(n^3)$ of the operation.",
+        "Because the number of processors does not affect execution time.",
+        "Because the serial fraction $f$ is zero."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "عندما يختلف تعقيد الذاكرة عن تعقيد الوقت، فإن معدل زيادة حجم المشكلة لملء الذاكرة سيختلف عن معدل زيادته للحفاظ على وقت ثابت، مما يؤدي إلى قيم تسريع مختلفة.",
+      "en": "When memory complexity differs from time complexity, the rate at which problem size increases to fill memory differs from the rate to keep time constant, leading to different speedup values."
+    },
+    "hint": {
+      "ar": "تذكر متى يكون المقياسان متطابقين (عندما يتطابق تعقيد الوقت والذاكرة).",
+      "en": "Remember when the two metrics are identical (when time and memory complexity match)."
+    },
+    "difficulty": "hard",
+    "id": 12
   }
 ]
 </script>

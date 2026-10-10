@@ -115,6 +115,16 @@
         <template class="content-en">Disk Caching and Prefetching</template>
         <span class="content-target">التخزين المخبئي للأقراص والجلب المسبق</span>
       </a>
+      <a href="#worked-examples-performance-means" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة محلولة: المتوسطات الحسابية والمرجحة</template>
+        <template class="content-en">Worked Examples: Arithmetic and Weighted Means</template>
+        <span class="content-target">أمثلة محلولة: المتوسطات الحسابية والمرجحة</span>
+      </a>
+      <a href="#system-simulation-and-traces" class="toc-link" data-bilingual>
+        <template class="content-ar">محاكاة النظام وتتبع الأداء</template>
+        <template class="content-en">System Simulation and Traces</template>
+        <span class="content-target">محاكاة النظام وتتبع الأداء</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -515,6 +525,26 @@ for (i = 0; i < N; i++) {
     C[i] = A[i] + B[i];
     D[i] = E[i] + C[i];
 }</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>c</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Loop Peeling Example
+// Before:
+for (i = 1; i &lt; N+1; i++) {
+    if (i==1) A[i] = 0;
+    else if (i == N) A[i] = N;
+    else A[i] = A[i] + 8;
+}
+
+// After (peeling the first and last iterations):
+A[1] = 0;
+for (i = 2; i &lt; N; i++) 
+    A[i] = A[i] + 8;
+A[N] = N;</code></pre>
   </div>
 
   <details class="thinking-question">
@@ -1019,14 +1049,100 @@ for (i = 0; i < N; i++) {
   </details>
 </section>
 
+<section id="worked-examples-performance-means" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> أمثلة محلولة: المتوسطات الحسابية والمرجحة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Worked Examples: Arithmetic and Weighted Means</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق عملي لحساب الوسط الحسابي والوسط المرجح لتقييم أداء النظام بناءً على أوقات التنفيذ وتردداتها.</p></template>
+    <template class="content-en"><p>Practical application of calculating the arithmetic and weighted means to evaluate system performance based on execution times and frequencies.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لحساب الوسط الحسابي (Arithmetic Mean)، نستخدم المعادلة: $\frac{1}{n} \sum_{i=1}^{n} x_i$. على سبيل المثال، إذا أنهت سيارة (أ) السباق في 3 دقائق، وسيارة (ب) في 4 دقائق، فإن أداء (أ) مقارنة بـ (ب) هو $4 / 3 = 1.33$ مرة أسرع (أو أسرع بنسبة $33\%$).</p><p>لحساب الوسط المرجح (Weighted Mean) لنظام بناءً على أوقات التنفيذ وتردداتها (أحمال العمل)، نتبع الخطوات التالية:</p><ol><li>البرنامج v: الوقت 50، التردد 50%. الناتج = $50 \times 0.5 = 25$.</li><li>البرنامج w: الوقت 200، التردد 30%. الناتج = $200 \times 0.3 = 60$.</li><li>البرنامج x: الوقت 250، التردد 10%. الناتج = $250 \times 0.1 = 25$.</li><li>البرنامج y: الوقت 400، التردد 5%. الناتج = $400 \times 0.05 = 20$.</li><li>البرنامج z: الوقت 5000، التردد 5%. الناتج = $5000 \times 0.05 = 250$.</li></ol><p>الوسط المرجح الإجمالي = $25 + 60 + 25 + 20 + 250 = 380$ ثانية.</p></template>
+    <template class="content-en"><p>To calculate the Arithmetic Mean, we use the formula: $\frac{1}{n} \sum_{i=1}^{n} x_i$. For example, if Car A finishes in 3 minutes and Car B in 4 minutes, Car A is $4 / 3 = 1.33$ times faster (or $33\%$ faster).</p><p>To calculate the Weighted Mean for a system based on execution times and frequencies (<span class="smart-term" data-term-en="Workload" data-ar="حمل العمل" data-en-def="The expected execution frequencies of various programs or tasks on a system.">workload<span class="smart-term-tooltip"></span></span>s), follow these steps:</p><ol><li>Program v: Time 50, Frequency 50%. Result = $50 \times 0.5 = 25$.</li><li>Program w: Time 200, Frequency 30%. Result = $200 \times 0.3 = 60$.</li><li>Program x: Time 250, Frequency 10%. Result = $250 \times 0.1 = 25$.</li><li>Program y: Time 400, Frequency 5%. Result = $400 \times 0.05 = 20$.</li><li>Program z: Time 5000, Frequency 5%. Result = $5000 \times 0.05 = 250$.</li></ol><p>Total Weighted Mean = $25 + 60 + 25 + 20 + 250 = 380$ seconds.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يبرز الوسط المرجح الأداء الحقيقي للنظام عندما تكون أحمال العمل (Workloads) معروفة مسبقاً، حيث يمنع البرامج الطويلة نادرة الاستخدام من تشويه التقييم العام.</p><p>ومع ذلك، إذا تم تحسين النظام لحمل عمل معين، فقد يقدم أداءً ضعيفاً جداً إذا تغيرت نسب استخدام البرامج في المستقبل.</p></template>
+    <template class="content-en"><p>The weighted mean reveals the true performance of a system when workloads are known, preventing long, rarely used programs from skewing the overall evaluation.</p><p>However, if a system is optimized for one specific workload, it may perform poorly if the usage frequencies of the programs change in the future.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث للوسط المرجح إذا تغيرت أحمال العمل (Workloads) بشكل جذري؟</template>
+      <template class="content-en">What happens to the weighted mean if workloads change drastically?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيتغير الوسط المرجح بشكل كبير، والنظام الذي كان يبدو محسناً لحمل العمل القديم قد يصبح أداؤه ضعيفاً تحت حمل العمل الجديد.</p></template>
+      <template class="content-en"><p>The weighted mean will change significantly, and a system optimized for the old workload might perform poorly under the new one.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="system-simulation-and-traces" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> محاكاة النظام وتتبع الأداء</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> System Simulation and Traces</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>استخدام أدوات المحاكاة وتتبع النظام (Traces) لتقييم الأداء وتحديد أحمال العمل الواقعية للمكونات.</p></template>
+    <template class="content-en"><p>Using simulation tools and system traces to evaluate performance and determine realistic workloads for components.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتقييم أداء نظام غير موجود بعد أو لتحسين نظام حالي تحت ظروف نادرة، نستخدم أدوات المحاكاة. التحدي الأكبر هو تحديد حمل عمل (Workload) واقعي، ويتم ذلك عبر تتبع النظام (System Traces):</p><ol><li>تُجمع التتبعات باستخدام <span class="smart-term" data-term-en="Probes" data-ar="مجسات" data-en-def="Hardware or software tools used to gather system traces by monitoring component activity.">مجسات<span class="smart-term-tooltip"></span></span> (Probes) عتادية أو برمجية.</li><li>تقوم المجسات بجمع معلومات مفصلة عن نشاط مكون معين قيد الاهتمام.</li><li>نظراً للكمية الهائلة من البيانات التي تُجمع، تُشغل المجسات لثوانٍ معدودة فقط.</li><li>تُكرر عملية التتبع عدة مرات للحصول على معلومات مفيدة إحصائياً.</li></ol><p>يجب أن يكون المحاكي متوازناً؛ فالمحاكي شديد التفصيل مكلف وبطيء، والمحاكي المبسط جداً يتجاهل تفاصيل مهمة.</p></template>
+    <template class="content-en"><p>To evaluate a non-existent system or optimize an existing one under rare conditions, we use simulation tools. The greatest challenge is determining a realistic workload, which is done using <span class="smart-term" data-term-en="System Traces" data-ar="تتبعات النظام" data-en-def="Detailed logs of system activity used to determine realistic workloads for simulation.">system traces<span class="smart-term-tooltip"></span></span>:</p><ol><li>Traces are gathered using hardware or software <span class="smart-term" data-term-en="Probes" data-ar="مجسات" data-en-def="Hardware or software tools used to gather system traces by monitoring component activity.">probes<span class="smart-term-tooltip"></span></span>.</li><li>Probes collect detailed information concerning the activity of a specific component.</li><li>Because of the enormous amount of data collected, probes are usually engaged for only a few seconds.</li><li>Several trace runs are required to obtain statistically useful information.</li></ol><p>A simulator must be balanced; a highly detailed model is costly and time-consuming, while an overly simplistic one ignores important details.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يجب <span class="smart-term" data-term-en="Simulator Validation" data-ar="التحقق من صحة المحاكي" data-en-def="The process of proving that a simulation model accurately represents the system it is intended to model.">التحقق من صحة المحاكي<span class="smart-term-tooltip"></span></span> (Validation) لإثبات أنه يحقق الهدف المرجو منه. المحاكي البسيط أسهل بكثير في التحقق من صحته مقارنة بالمحاكي المعقد.</p><p>تُعد معايير TPC نوعاً من أدوات المحاكاة التي تعتمد على أحمال عمل قياسية لنمذجة بيئات الأعمال الحقيقية.</p></template>
+    <template class="content-en"><p>A simulator should be validated to show that it achieves its intended goal. A simple simulator is much easier to validate than a complex one.</p><p>TPC benchmarks are a kind of simulation tool that relies on standardized workloads to model real-world business environments.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تُشغل مجسات تتبع النظام (Probes) لثوانٍ معدودة فقط؟</template>
+      <template class="content-en">Why are system probes engaged for only a few seconds?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأنها تجمع كمية هائلة جداً من المعلومات التفصيلية في وقت قصير، مما قد يستهلك موارد التخزين ويجعل تحليل البيانات مستحيلاً إذا تُركت لفترة أطول.</p></template>
+      <template class="content-en"><p>Because they collect an enormous amount of detailed information very quickly, which would consume storage resources and make data analysis impossible if left running longer.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. لقد أمضينا فصولاً في دراسة المعمارية، والآن حان وقت الحصاد: كيف نقيس الأداء ونحسنه؟ تذكروا دائماً قانون أمداهل، فهو بوصلتكم؛ لا تحسنوا ما لا يُستخدم بكثرة، بل 'اجعلوا الحالة الشائعة سريعة'. في الامتحان، ركزوا على الفروق بين المتوسطات الرياضية (متى نستخدم الهندسي مقابل التوافقي؟)، ولا تنخدعوا بسرعة الساعة (GHz) كدليل وحيد للأداء. لقد ناقشنا أيضاً كيف يخدعنا المترجم بذكاء عبر 'التفرع المؤجل' و'فك الحلقات' لإنقاذ خط الأنابيب. وأخيراً، الأقراص الصلبة هي عنق الزجاجة الأكبر؛ افهموا جيداً لماذا نعتبر 80% خطاً أحمر للاستخدام، وكيف تنقذنا خوارزمية SCAN من 'المجاعة' التي تسببها SSTF. راجعوا هذه المفاهيم، فهي ليست للامتحان فقط، بل لتصميم أنظمة حقيقية لا تنهار تحت الضغط.</template>
-    <template class="content-en">Welcome, future architects, to this crucial module. We've spent chapters studying architecture, and now it's time to measure and optimize it. Always remember Amdahl's Law as your compass: 'Make the common case fast.' For the exam, focus heavily on when to use which mathematical mean (Geometric vs. Harmonic) and why clock speed (GHz) is a trap when comparing different ISAs. We also explored how compilers cleverly use 'Delayed Branching' and 'Loop Unrolling' to save the pipeline. Finally, disks are our biggest bottleneck. Understand why 80% utilization is the red line, and how the SCAN algorithm saves us from the 'starvation' caused by SSTF. Master these, not just for the exam, but to build systems that survive the real world.</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة الحاسمة. لقد أمضينا فصولاً في دراسة المعمارية، والآن حان وقت الحصاد: كيف نقيس الأداء ونحسنه؟ تذكروا دائماً قانون أمداهل، فهو بوصلتكم؛ لا تحسنوا ما لا يُستخدم بكثرة، بل 'اجعلوا الحالة الشائعة سريعة'. في الامتحان، ركزوا على الفروق بين المتوسطات الرياضية (متى نستخدم الهندسي مقابل التوافقي؟)، ولا تنخدعوا بسرعة الساعة (GHz) كدليل وحيد للأداء. لقد ناقشنا أيضاً كيف يخدعنا المترجم بذكاء عبر 'التفرع المؤجل' و'فك الحلقات' لإنقاذ خط الأنابيب. وأخيراً، الأقراص الصلبة هي عنق الزجاجة الأكبر؛ افهموا جيداً لماذا نعتبر 80% خطاً أحمر للاستخدام، وكيف تنقذنا خوارزمية SCAN من 'المجاعة' التي تسببها SSTF. راجعوا هذه المفاهيم، فهي ليست للامتحان فقط، بل لتصميم أنظمة حقيقية لا تنهار تحت الضغط.<p>فهم الأداء النظري هو نصف المعركة فقط؛ النصف الآخر يكمن في القدرة على قياسه بموضوعية. من خلال إتقان المتوسطات الرياضية واستخدام أدوات المحاكاة والتتبع، ستتمكن من كشف الحيل التسويقية وتحديد الاختناقات الحقيقية في النظام، مما يضمن توجيه جهود التحسين نحو الأماكن التي تُحدث فرقاً حقيقياً.</p><p>لقد أضفنا تفاصيل دقيقة حول كيفية فهرسة مخازن توقع التفرع، بالإضافة إلى التمييز الرياضي الهام بين وقت الاستجابة والإنتاجية. هذه المفاهيم ضرورية لفهم كيف تُترجم التحسينات المعمارية الدقيقة إلى مكاسب ملموسة في أداء النظام ككل.</p></template>
+    <template class="content-en">Welcome, future architects, to this crucial module. We've spent chapters studying architecture, and now it's time to measure and optimize it. Always remember Amdahl's Law as your compass: 'Make the common case fast.' For the exam, focus heavily on when to use which mathematical mean (Geometric vs. Harmonic) and why clock speed (GHz) is a trap when comparing different ISAs. We also explored how compilers cleverly use 'Delayed Branching' and 'Loop Unrolling' to save the pipeline. Finally, disks are our biggest bottleneck. Understand why 80% utilization is the red line, and how the SCAN algorithm saves us from the 'starvation' caused by SSTF. Master these, not just for the exam, but to build systems that survive the real world.<p>Understanding theoretical performance is only half the battle; the other half is measuring it objectively. By mastering mathematical means and utilizing simulation and tracing tools, you will be able to cut through marketing hype and identify true system bottlenecks, ensuring optimization efforts are directed where they make a real difference.</p><p>We have added precise details on how branch prediction buffers are indexed, along with the crucial mathematical distinction between response time and throughput. These concepts are essential for understanding how microarchitectural optimizations translate into tangible system-wide performance gains.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1200,6 +1316,59 @@ for (i = 0; i < N; i++) {
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">يخبرنا أنه يجب استثمار المال في ترقية المكون الذي يقوم بمعظم العمل. ترقية مكون نادر الاستخدام لن تعطي عائداً ملحوظاً على الأداء العام.</template>
           <template class="content-en">It tells us to invest money in upgrading the component that does the most work. Upgrading a rarely used component won't yield a noticeable return on overall performance.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يساعدنا الوسط المرجح (Weighted Mean) في تجنب فخاخ تحسين الأداء؟</template>
+          <template class="content-en">How does the Weighted Mean help us avoid performance optimization traps?</template>
+          <span class="content-target">كيف يساعدنا الوسط المرجح (Weighted Mean) في تجنب فخاخ تحسين الأداء؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الوسط المرجح يأخذ في الاعتبار تردد تنفيذ كل برنامج (حمل العمل). هذا يمنعنا من إهدار الموارد في تحسين برنامج طويل جداً ولكنه يُنفذ بنسبة 1% فقط من الوقت، ويوجهنا للتركيز على البرامج التي تُنفذ بشكل متكرر، تماشياً مع قانون أمداهل.</p></template>
+          <template class="content-en"><p>The weighted mean accounts for the execution frequency of each program (workload). This prevents us from wasting resources optimizing a very long program that only runs 1% of the time, guiding us to focus on frequently executed programs, in line with Amdahl's Law.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ما هي أهمية التحقق من صحة المحاكي (Simulator Validation)؟</template>
+          <template class="content-en">What is the importance of Simulator Validation?</template>
+          <span class="content-target">ما هي أهمية التحقق من صحة المحاكي (Simulator Validation)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>المحاكي هو نموذج رياضي وبرمجي لواقع معقد. بدون التحقق من صحته بمقارنة نتائجه مع أنظمة حقيقية معروفة، قد نبني قرارات تصميمية مكلفة على بيانات خاطئة. المحاكيات البسيطة أسهل في التحقق، لكنها قد تتجاهل تفاصيل دقيقة.</p></template>
+          <template class="content-en"><p>A simulator is a mathematical and software model of a complex reality. Without validating it by comparing its results with known real systems, we might base costly design decisions on flawed data. Simple simulators are easier to validate but might miss fine details.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يهتم المستخدم بوقت الاستجابة بينما يهتم مدير النظام بالإنتاجية؟</template>
+          <template class="content-en">Why does a user care about response time while a system administrator cares about throughput?</template>
+          <span class="content-target">لماذا يهتم المستخدم بوقت الاستجابة بينما يهتم مدير النظام بالإنتاجية؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>المستخدم يتفاعل مع النظام بشكل فردي ويريد إنجاز مهمته بأسرع وقت ممكن (وقت الاستجابة). أما مدير النظام فيدير الموارد المشتركة ويهتم بزيادة عدد المهام الكلية التي يمكن للنظام معالجتها في وقت واحد (الإنتاجية) لخدمة أكبر عدد من المستخدمين بكفاءة دون التسبب في اختناقات.</p></template>
+          <template class="content-en"><p>A user interacts with the system individually and wants their specific task done as quickly as possible (response time). A system administrator manages shared resources and focuses on maximizing the total number of tasks the system can process simultaneously (throughput) to serve many users efficiently without causing bottlenecks.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1467,6 +1636,57 @@ for (i = 0; i < N; i++) {
         "en": "Prefetcher reads wrong sectors that fill up the cache."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "مجسات النظام (System Probes)",
+      "en": "System Probes"
+    },
+    "back": {
+      "definition": {
+        "ar": "أدوات عتادية أو برمجية تُستخدم لجمع معلومات مفصلة (تتبعات) عن نشاط مكون معين لتحديد أحمال العمل.",
+        "en": "Hardware or software tools used to gather detailed information (traces) about a component's activity to determine workloads."
+      },
+      "example": {
+        "ar": "تشغيل مجس لثوانٍ معدودة لجمع تتبع لطلبات الذاكرة.",
+        "en": "Running a probe for a few seconds to collect a trace of memory requests."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "تقشير الحلقات (Loop Peeling)",
+      "en": "Loop Peeling"
+    },
+    "back": {
+      "definition": {
+        "ar": "تقنية من تقنيات انشطار الحلقات تعتمد على إزالة تعليمات البداية والنهاية من داخل الحلقة وتنفيذها بشكل منفصل.",
+        "en": "A loop fission technique that removes the beginning and ending statements from inside the loop and executes them separately."
+      },
+      "example": {
+        "ar": "إخراج شرط (if i==1) خارج الحلقة لتجنب فحصه في كل تكرار.",
+        "en": "Moving an (if i==1) condition outside the loop to avoid checking it every iteration."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "فهرسة مخزن توقع التفرع",
+      "en": "Branch Prediction Buffer Indexing"
+    },
+    "back": {
+      "definition": {
+        "ar": "تتم فهرسة المخزن باستخدام الجزء السفلي من عنوان تعليمة التفرع للوصول السريع إلى تاريخ التفرع.",
+        "en": "The buffer is indexed using the lower portion of the branch instruction's address for fast access to branch history."
+      },
+      "example": {
+        "ar": "استخدام البتات الأقل أهمية (LSBs) من عنوان التعليمة لتحديد موقع التوقع في المخزن.",
+        "en": "Using the Least Significant Bits (LSBs) of the instruction address to locate the prediction in the buffer."
+      }
+    },
+    "id": 18
   }
 ]
 </script>
@@ -1476,7 +1696,7 @@ for (i = 0; i < N; i++) {
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 13</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1492,7 +1712,7 @@ for (i = 0; i < N; i++) {
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 13</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1817,6 +2037,102 @@ for (i = 0; i < N; i++) {
     },
     "difficulty": "medium",
     "conceptId": "disk-caching-prefetching"
+  },
+  {
+    "conceptId": "worked-examples-performance-means",
+    "question": {
+      "ar": "إذا كان لدينا برنامج يستغرق 200 ثانية ويُنفذ بنسبة 30% من الوقت، وبرنامج آخر يستغرق 50 ثانية ويُنفذ بنسبة 70% من الوقت، فما هو الوسط المرجح (Weighted Mean)؟",
+      "en": "If a program takes 200 seconds and runs 30% of the time, and another takes 50 seconds and runs 70% of the time, what is the Weighted Mean?"
+    },
+    "options": {
+      "ar": [
+        "125 ثانية",
+        "95 ثانية",
+        "250 ثانية",
+        "85 ثانية"
+      ],
+      "en": [
+        "125 seconds",
+        "95 seconds",
+        "250 seconds",
+        "85 seconds"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الوسط المرجح = (200 × 0.3) + (50 × 0.7) = 60 + 35 = 95 ثانية.",
+      "en": "Weighted Mean = (200 × 0.3) + (50 × 0.7) = 60 + 35 = 95 seconds."
+    },
+    "hint": {
+      "ar": "اضرب كل وقت في نسبة تنفيذه ثم اجمع النواتج.",
+      "en": "Multiply each time by its execution percentage and sum the results."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "system-simulation-and-traces",
+    "question": {
+      "ar": "لماذا يتم تشغيل مجسات النظام (Probes) عادةً لثوانٍ معدودة فقط؟",
+      "en": "Why are system probes usually engaged for only a few seconds?"
+    },
+    "options": {
+      "ar": [
+        "لأنها تستهلك طاقة المعالج بالكامل وتسبب إيقاف النظام.",
+        "لأنها تجمع كمية هائلة من المعلومات التفصيلية بسرعة كبيرة.",
+        "لأن المحاكيات لا تستطيع قراءة بيانات تزيد عن بضع ثوانٍ.",
+        "لأن أحمال العمل تتغير كل بضع ثوانٍ."
+      ],
+      "en": [
+        "Because they consume all CPU power and crash the system.",
+        "Because they collect an enormous amount of detailed information very quickly.",
+        "Because simulators cannot read data longer than a few seconds.",
+        "Because workloads change every few seconds."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "المجسات تسجل كل نشاط دقيق، مما يولد بيانات ضخمة جداً في وقت قصير، لذا تُشغل لفترات قصيرة وتُكرر للحصول على عينة إحصائية.",
+      "en": "Probes log every minute activity, generating massive data quickly, so they are run for short bursts and repeated for statistical sampling."
+    },
+    "hint": {
+      "ar": "فكر في حجم البيانات الناتجة عن تتبع كل تعليمة.",
+      "en": "Think about the volume of data generated by tracking every instruction."
+    },
+    "difficulty": "easy",
+    "id": 12
+  },
+  {
+    "conceptId": "cpu-optimization-branch-prediction",
+    "question": {
+      "ar": "كيف تتم فهرسة مخزن توقع التفرع (Branch prediction buffer) في التوقع الديناميكي؟",
+      "en": "How is the branch prediction buffer indexed in dynamic prediction?"
+    },
+    "options": {
+      "ar": [
+        "باستخدام الجزء العلوي من عنوان التعليمة",
+        "باستخدام الجزء السفلي من عنوان تعليمة التفرع",
+        "باستخدام شفرة العملية (Opcode) للتعليمة",
+        "باستخدام عنوان الذاكرة المخبئية (Cache address)"
+      ],
+      "en": [
+        "Using the upper portion of the instruction address",
+        "Using the lower portion of the branch instruction's address",
+        "Using the instruction's Opcode",
+        "Using the Cache address"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "تتم فهرسة المخزن باستخدام الجزء السفلي من عنوان تعليمة التفرع لضمان الوصول السريع والفعال لتاريخ التفرع.",
+      "en": "The buffer is indexed by the lower portion of the address of the branch instruction to ensure fast and efficient access to branch history."
+    },
+    "hint": {
+      "ar": "تذكر أن الفهرسة تعتمد على جزء من عنوان التعليمة نفسها.",
+      "en": "Remember that indexing relies on a part of the instruction's address itself."
+    },
+    "difficulty": "medium",
+    "id": 13
   }
 ]
 </script>
@@ -1861,6 +2177,14 @@ for (i = 0; i < N; i++) {
       <template class="content-ar">منحنى استخدام القرص غير خطي. بمجرد تجاوز الاستخدام حاجز 80%، يرتفع وقت الانتظار بشكل أسي. الترقية أو تقليل الحمل ضروري قبل الوصول لهذه النقطة.</template>
       <template class="content-en">The disk utilization curve is non-linear. Once utilization passes the 80% knee, queue time grows exponentially. Upgrading or load balancing is required before hitting this point.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">احذر من الممارسات التسويقية المضللة عند تقييم الأداء، مثل الاستشهاد بالإحصائيات الانتقائية (Selective statistics)، أو عرض أرقام الأداء في أوقات الذروة (Peak performance) مع تجاهل الحالة المتوسطة، أو مقارنة أنظمة بمعماريات مختلفة تماماً (مقارنة التفاح بالبرتقال).</template>
+    <template class="content-en">Beware of deceptive marketing practices when evaluating performance, such as citing selective statistics, showing only peak performance numbers while ignoring the average case, or comparing systems with entirely different architectures (comparing apples to oranges).</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

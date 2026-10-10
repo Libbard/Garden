@@ -1,0 +1,66 @@
+.gsl {
+  --gsl-frame: var(--bg-body);
+  --gsl-tile: color-mix(in oklab, var(--text-muted) 16%, var(--bg-card));
+  --gsl-edge: color-mix(in oklab, var(--text-primary) 9%, transparent);
+  --gsl-gap: clamp(5px, 1.8vw, 10px);
+  --gsl-fs: .44;
+  inline-size: min(100%, 600px, max(260px, 100dvh - 305px));
+  display: grid; gap: .7rem; justify-items: center;
+}
+[data-theme="light"] .gsl {
+  --gsl-frame: color-mix(in oklab, var(--text-muted) 22%, var(--bg-card));
+  --gsl-tile: var(--bg-card);
+  --gsl-edge: color-mix(in oklab, var(--text-primary) 12%, transparent);
+}
+.gsl--n4 { --gsl-gap: clamp(4px, 1.5vw, 9px); }
+.gsl--n5 { --gsl-gap: clamp(4px, 1.2vw, 8px); }
+
+.gsl-board {
+  position: relative; inline-size: 100%; aspect-ratio: 1; direction: ltr; container-type: inline-size;
+  touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+  border-radius: var(--radius-lg); background: var(--gsl-frame); border: 1px solid var(--border-color);
+  cursor: pointer; outline: none;
+}
+.gsl-board:focus-visible { outline: 2px solid var(--gm-tint); outline-offset: 3px; }
+.gsl-layer { position: absolute; inset: var(--gsl-gap); }
+
+.gsl-tile {
+  position: absolute; inset-block-start: 0; inset-inline-start: 0;
+  inline-size: calc((100% - (var(--n) - 1) * var(--gsl-gap)) / var(--n));
+  block-size: calc((100% - (var(--n) - 1) * var(--gsl-gap)) / var(--n));
+  transition: transform 120ms cubic-bezier(.2, .7, .3, 1); will-change: transform;
+}
+.gsl-in {
+  display: grid; place-items: center; inline-size: 100%; block-size: 100%;
+  border-radius: clamp(6px, 1.6vw, var(--radius-md)); background: var(--gsl-tile); color: var(--text-primary);
+  box-shadow: inset 0 0 0 1px var(--gsl-edge), 0 2px 0 color-mix(in oklab, var(--bg-body) 55%, transparent);
+  font-family: 'Inter', 'Cairo', sans-serif; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; letter-spacing: -.02em;
+  font-size: calc(min(100vw - 2.5rem, 600px) / var(--n) * var(--gsl-fs));
+  transition: background-color .2s ease, box-shadow .2s ease, color .2s ease;
+}
+@supports (font-size: 1cqi) { .gsl-in { font-size: calc(100cqi / var(--n) * var(--gsl-fs)); } }
+.gsl-d2 { --gsl-fs: .38; }
+.gsl-ok .gsl-in {
+  background: color-mix(in oklab, var(--gm-ok) 18%, var(--gsl-tile));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--gm-ok) 42%, transparent), 0 2px 0 color-mix(in oklab, var(--bg-body) 55%, transparent);
+}
+
+.gsl-no .gsl-in { animation: gslNo .28s ease; }
+@keyframes gslNo { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+.gsl--won .gsl-in { animation: gslWin .5s ease both; }
+.gsl--won .gsl-tile:nth-child(odd) .gsl-in { animation-delay: 60ms; }
+@keyframes gslWin { 40% { transform: scale(1.06); } }
+
+.gsl--hide .gsl-board { filter: blur(14px); pointer-events: none; }
+
+.gsl-tip { margin: 0; font-size: .8rem; line-height: 1.9; color: var(--text-muted); text-align: center; max-inline-size: 46ch; }
+
+.gsl--still .gsl-tile, .gsl--still .gsl-in { transition: none; }
+.gsl--still .gsl-in { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  .gsl-tile, .gsl-in { transition: none; }
+  .gsl-in { animation: none !important; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .gsl-board:hover .gsl-tile:hover .gsl-in { box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--gm-tint) 45%, transparent), 0 2px 0 color-mix(in oklab, var(--bg-body) 55%, transparent); }
+}

@@ -77,6 +77,8 @@
 | **المعدل** | حسابُ المعدل على مقياس PMAU 4.0، ومستشرِفٌ يرسم ما تحتاجه لتبلغ هدفك |
 | **الأساتذة** | تقييماتُ الطلاب لأعضاء هيئة التدريس — وتقييماتُ المقرَّرات نفسِها |
 | **المختبرات** | تطبيقاتُ ويبٍ كاملةٌ تُشغَّل في المتصفّح |
+| **الاختبارُ المخصّص** | اخترْ موادَّك ووحداتِها وشكلَ الأسئلة وصعوبتَها ووقتَها، أو ابدأ من قالبٍ جاهز: سريع · محاكاةُ منتصف الفصل والنهائيّ · أخطائي — وما أخطأتَ فيه يعود حتى تتقنه |
+| **ألعابُ الذهن** | ثلاثَ عشرةَ لعبةً بقواعدها المعروفة — سودوكو · 2048 · كاسحةُ الألغام · سوليتير · أربعةٌ في صفّ · برجُ هانوي · سايمون · ستروب · الثعبان وغيرُها — وأزواجُ ذاكرةٍ من مصطلحات موادّك، وتمرينٌ يوميٌّ من ثلاث ألعاب |
 | **البحث** | مفاهيمُ الوحدات والفيديوهات وأمثلةُ الكود والموادُّ والأساتذةُ والشعب في مكانٍ واحد (`Ctrl K`)، ومعها ملاحظاتُك ومهامّك تُبحث في جهازك وحده |
 | **المظهر** | ستّةَ عشرَ جلداً يعيد كلٌّ منها رسمَ الموقع، وخلفيّاتٌ تختارها — انظر القسمَ أدناه |
 | **الإعدادات** | الثيم · اللغة · حجمُ الخطّ ومكتبةُ خطوطِ قراءة · المزامنة · التنبيهات · تصديرُ بياناتك كاملةً |
@@ -180,7 +182,8 @@ root/
 **Digital Garden** is a free, bilingual (Arabic / English) study platform for Computer Science,
 Information Technology and Data Science students at PMAU (جامعة الأمير مساعد بن عبدالرحمن, formerly
 the Saudi Electronic University): 82 courses and 1,029 units with explanations at three depths,
-spaced-repetition flashcards, quizzes, a notes app with PDF annotation, pen input and a colouring
+spaced-repetition flashcards, quizzes, a custom test builder with midterm and final simulations, thirteen
+brain games (Sudoku, 2048, Minesweeper, Solitaire and more), a notes app with PDF annotation, pen input and a colouring
 studio, site-wide search, a schedule, GPA calculator, section finder, sixteen skins that redraw the
 whole site, offline PWA and cross-device sync without accounts. Free for non-commercial use with
 attribution; no commercial use or resale.

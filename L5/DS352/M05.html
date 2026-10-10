@@ -119,6 +119,11 @@
         <template class="content-en">The Closest-Pair Problem</template>
         <span class="content-target">مشكلة أقرب زوج</span>
       </a>
+      <a href="#master-theorem" class="toc-link" data-bilingual>
+        <template class="content-ar">النظرية الرئيسية (Master Theorem)</template>
+        <template class="content-en">Master Theorem</template>
+        <span class="content-target">النظرية الرئيسية (Master Theorem)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -312,10 +317,10 @@
   <div class="depth-layer" data-layer="full" data-bilingual>
     <template class="content-ar"><p>الترتيب بالدمج هو مثال مثالي لتطبيق 'فرّق تسد'.</p>
 <p>يقوم بترتيب مصفوفة عن طريق تقسيمها إلى نصفين، ثم ترتيب كل نصف بشكل عودي، وأخيراً دمج المصفوفتين المرتبتين في مصفوفة واحدة.</p>
-<p>عملية الدمج تستخدم مؤشرين يقارنان العناصر ويضعان الأصغر في المصفوفة الجديدة.</p></template>
+<p>عملية الدمج تستخدم مؤشرين يقارنان العناصر ويضعان الأصغر في المصفوفة الجديدة.</p><p>لنتتبع خوارزمية الترتيب بالدمج على المصفوفة <code>[6, 5, 3, 1, 8, 7, 2, 4]</code>:</p><ol><li><b>التقسيم:</b> نقسم المصفوفة إلى نصفين: <code>[6, 5, 3, 1]</code> و <code>[8, 7, 2, 4]</code>.</li><li><b>الفتح (الحل):</b> نرتب كلا النصفين بشكل عودي. النصف الأيسر يصبح <code>[1, 3, 5, 6]</code> والنصف الأيمن يصبح <code>[2, 4, 7, 8]</code>.</li><li><b>الدمج:</b> ندمج النصفين المرتبين بمقارنة العناصر الأمامية واحداً تلو الآخر لإنتاج المصفوفة النهائية المرتبة: <code>[1, 2, 3, 4, 5, 6, 7, 8]</code>.</li></ol></template>
     <template class="content-en"><p>Mergesort is a perfect example of a successful application of the divide-and-conquer technique.</p>
 <p>It sorts an array by dividing it into two halves, sorting each recursively, and then merging the two smaller sorted arrays into a single sorted one.</p>
-<p>The merging process uses two pointers to compare elements and copy the smaller one to a new array.</p></template>
+<p>The merging process uses two pointers to compare elements and copy the smaller one to a new array.</p><p>Let's trace Mergesort on the array <code>[6, 5, 3, 1, 8, 7, 2, 4]</code>:</p><ol><li><b>Divide:</b> Split into two halves: <code>[6, 5, 3, 1]</code> and <code>[8, 7, 2, 4]</code>.</li><li><b>Conquer:</b> Recursively sort both halves. The left half becomes <code>[1, 3, 5, 6]</code> and the right half becomes <code>[2, 4, 7, 8]</code>.</li><li><b>Combine:</b> Merge the two sorted halves by comparing their front elements one by one to produce the final sorted array: <code>[1, 2, 3, 4, 5, 6, 7, 8]</code>.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -335,6 +340,35 @@
       <div class="content-target"></div>
     </div>
     <div class="math-block">$$C_{worst}(n) = n \log_2 n - n + 1$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>pseudocode</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>ALGORITHM Mergesort(A[0..n-1])
+//Sorts array A[0..n-1] by recursive mergesort
+if n &gt; 1
+  copy A[0..floor(n/2)-1] to B[0..floor(n/2)-1]
+  copy A[floor(n/2)..n-1] to C[0..ceil(n/2)-1]
+  Mergesort(B)
+  Mergesort(C)
+  Merge(B, C, A)
+
+ALGORITHM Merge(B[0..p-1], C[0..q-1], A[0..p+q-1])
+//Merges two sorted arrays into one sorted array
+i &lt;- 0; j &lt;- 0; k &lt;- 0
+while i &lt; p and j &lt; q do
+  if B[i] &lt;= C[j]
+    A[k] &lt;- B[i]; i &lt;- i + 1
+  else
+    A[k] &lt;- C[j]; j &lt;- j + 1
+  k &lt;- k + 1
+if i = p
+  copy C[j..q-1] to A[k..p+q-1]
+else
+  copy B[i..p-1] to A[k..p+q-1]</code></pre>
   </div>
 
   <!-- DIAGRAM[4]: Detailed SVG generation prompt: Array [6, 5, 3, 1, 8, 7, 2, 4] splitting into [6, 5, 3, 1] and [8, 7, 2, 4] (Divide Part). Then showing sorted sub-arrays [1, 3, 5, 6] and [2, 4, 7, 8] (Conquer Part). Finally merging into [1, 2, 3, 4, 5, 6, 7, 8] (Combine Part). Style: educational, dark background #0d1117, accent colors, viewBox 0 0 800 400. -->
@@ -405,10 +439,10 @@
   <div class="depth-layer" data-layer="full" data-bilingual>
     <template class="content-ar"><p>على عكس الترتيب بالدمج الذي يقسم حسب الموقع، الترتيب السريع يقسم حسب القيمة.</p>
 <p>يتم اختيار عنصر كمحور (Pivot)، ويتم إعادة ترتيب المصفوفة (Partitioning) بحيث تصبح جميع العناصر التي تسبق المحور أصغر منه أو تساويه، والعناصر التي تليه أكبر منه أو تساويه.</p>
-<p>ثم يتم ترتيب الجزأين بشكل مستقل.</p></template>
+<p>ثم يتم ترتيب الجزأين بشكل مستقل.</p><p>لنتتبع تقسيم هور (Hoare Partitioning) على المصفوفة <code>[3, 8, 6, 7, 1, 5, 2, 4]</code> مع المحور <code>3</code>:</p><ol><li>نهيئ المؤشرين <code>i</code> (يسار) و <code>j</code> (يمين). نزيد <code>i</code> حتى نجد قيمة $\ge 3$ (نجد 8). وننقص <code>j</code> حتى نجد قيمة $\le 3$ (نجد 2).</li><li>نبدل بينهما: تصبح المصفوفة <code>[3, 2, 6, 7, 1, 5, 8, 4]</code>.</li><li>نواصل المسح: يجد <code>i</code> القيمة 6، ويجد <code>j</code> القيمة 1. نبدل بينهما: <code>[3, 2, 1, 7, 6, 5, 8, 4]</code>.</li><li>نواصل المسح: يجد <code>i</code> القيمة 7، ويجد <code>j</code> القيمة 1. تتقاطع المؤشرات (<code>j &lt; i</code>)، لذا نتوقف ونلغي التبديل الأخير.</li><li>أخيراً، نبدل المحور (3) مع <code>A[j]</code> (1). النتيجة: <code>[1, 2, 3, 7, 6, 5, 8, 4]</code>. المحور 3 الآن في موقعه النهائي المرتب.</li></ol><p>لتحليل كفاءة الترتيب السريع في الحالات المختلفة:</p><ul><li><b>أفضل حالة (Best Case):</b> تحدث عندما تنقسم المصفوفة دائماً في المنتصف. معادلة التكرار هي $C_{best}(n) = 2C_{best}(n/2) + n$. بحلها، نحصل على $C_{best}(n) = n \log_2 n$.</li><li><b>متوسط الحالة (Average Case):</b> بفرض أن التقسيم يمكن أن يحدث في أي موقع بنفس الاحتمالية، فإن متوسط عدد المقارنات هو $C_{avg}(n) \approx 1.39n \log_2 n$. هذا يعني أن الترتيب السريع في المتوسط يقوم بمقارنات أكثر بنسبة 39% فقط من أفضل حالة.</li></ul></template>
     <template class="content-en"><p>Unlike Mergesort which divides by position, Quicksort divides by value.</p>
 <p>A partition is an arrangement where all elements to the left of a pivot A[s] are less than or equal to it, and all elements to the right are greater than or equal to it.</p>
-<p>The two subarrays are then sorted independently.</p></template>
+<p>The two subarrays are then sorted independently.</p><p>Let's trace Hoare Partitioning on <code>[3, 8, 6, 7, 1, 5, 2, 4]</code> with pivot <code>3</code>:</p><ol><li>Initialize pointers <code>i</code> (left) and <code>j</code> (right). Increment <code>i</code> until finding a value $\ge 3$ (finds 8). Decrement <code>j</code> until finding a value $\le 3$ (finds 2).</li><li>Swap them: array becomes <code>[3, 2, 6, 7, 1, 5, 8, 4]</code>.</li><li>Continue scanning: <code>i</code> finds 6, <code>j</code> finds 1. Swap them: <code>[3, 2, 1, 7, 6, 5, 8, 4]</code>.</li><li>Continue scanning: <code>i</code> finds 7, <code>j</code> finds 1. Pointers cross (<code>j &lt; i</code>), so we stop and undo the last swap if it happened.</li><li>Finally, swap the pivot (3) with <code>A[j]</code> (1). Result: <code>[1, 2, 3, 7, 6, 5, 8, 4]</code>. The pivot 3 is now in its final sorted position.</li></ol><p>To analyze the efficiency of Quicksort in different cases:</p><ul><li><b>Best Case:</b> Occurs when the array is always split in the middle. The recurrence relation is $C_{best}(n) = 2C_{best}(n/2) + n$. Solving this yields $C_{best}(n) = n \log_2 n$.</li><li><b>Average Case:</b> Assuming the partition split can happen in any position with equal probability, the average number of comparisons is $C_{avg}(n) \approx 1.39n \log_2 n$. This means Quicksort on average makes only 39% more comparisons than in the best case.</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -428,6 +462,32 @@
       <div class="content-target"></div>
     </div>
     <div class="math-block">$$C_{worst}(n) = \frac{(n+1)(n+2)}{2} - 3 \in O(n^2)$$</div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>pseudocode</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>ALGORITHM Quicksort(A[l..r])
+//Sorts a subarray by quicksort
+if l &lt; r
+  s &lt;- HoarePartition(A[l..r])
+  Quicksort(A[l..s-1])
+  Quicksort(A[s+1..r])
+
+ALGORITHM HoarePartition(A[l..r])
+//Partitions a subarray by Hoare's algorithm
+p &lt;- A[l]
+i &lt;- l; j &lt;- r + 1
+repeat
+  repeat i &lt;- i + 1 until A[i] &gt;= p
+  repeat j &lt;- j - 1 until A[j] &lt;= p
+  swap(A[i], A[j])
+until i &gt;= j
+swap(A[i], A[j]) // undo last swap when i &gt;= j
+swap(A[l], A[j])
+return j</code></pre>
   </div>
 
   <!-- DIAGRAM[3]: Detailed SVG generation prompt: Visualizing Hoare Partitioning. Array with a pivot element highlighted. Left pointer 'i' moving right, right pointer 'j' moving left. Showing swapping of elements when A[i] >= pivot and A[j] <= pivot. Style: educational, dark background #0d1117, accent colors yellow and red, viewBox 0 0 800 400. -->
@@ -474,13 +534,13 @@
 <li><strong>الاجتياز المسبق (Preorder):</strong> زيارة الجذر، ثم الشجرة الفرعية اليسرى، ثم اليمنى.</li>
 <li><strong>الاجتياز الداخلي (Inorder):</strong> زيارة الشجرة الفرعية اليسرى، ثم الجذر، ثم اليمنى.</li>
 <li><strong>الاجتياز اللاحق (Postorder):</strong> زيارة الشجرة الفرعية اليسرى، ثم اليمنى، ثم الجذر.</li>
-</ol></template>
+</ol><p>تأمل شجرة ثنائية جذرها <code>a</code>، وابنها الأيسر <code>b</code>، والأيمن <code>c</code>. العقدة <code>b</code> لها ابن أيسر <code>d</code> وأيمن <code>e</code>. العقدة <code>d</code> لها ابن أيمن <code>g</code>. العقدة <code>c</code> لها ابن أيسر <code>f</code>. ينتج عن الاجتيازات ما يلي:</p><ul><li><b>الاجتياز المسبق (جذر، يسار، يمين):</b> a, b, d, g, e, c, f</li><li><b>الاجتياز الداخلي (يسار، جذر، يمين):</b> d, g, b, e, a, f, c</li><li><b>الاجتياز اللاحق (يسار، يمين، جذر):</b> g, d, e, b, f, c, a</li></ul></template>
     <template class="content-en"><p>There are three classic traversals:</p>
 <ol>
 <li><strong>Preorder:</strong> root is visited before left and right subtrees.</li>
 <li><strong>Inorder:</strong> root is visited after left subtree but before right subtree.</li>
 <li><strong>Postorder:</strong> root is visited after left and right subtrees.</li>
-</ol></template>
+</ol><p>Consider a binary tree where the root is <code>a</code>, its left child is <code>b</code>, and its right child is <code>c</code>. Node <code>b</code> has a left child <code>d</code> and a right child <code>e</code>. Node <code>d</code> has a right child <code>g</code>. Node <code>c</code> has a left child <code>f</code>. The traversals yield:</p><ul><li><b>Preorder (Root, Left, Right):</b> a, b, d, g, e, c, f</li><li><b>Inorder (Left, Root, Right):</b> d, g, b, e, a, f, c</li><li><b>Postorder (Left, Right, Root):</b> g, d, e, b, f, c, a</li></ul></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -532,10 +592,10 @@
   <div class="depth-layer" data-layer="full" data-bilingual>
     <template class="content-ar"><p>الطريقة المدرسية التقليدية لضرب عددين من n خانة تتطلب \(O(n^2)\) عملية ضرب.</p>
 <p>باستخدام 'فرّق تسد'، يمكننا تقسيم كل عدد إلى نصفين. الطريقة الساذجة (First Cut) تعطي 4 عمليات ضرب وتبقى \(O(n^2)\).</p>
-<p>لكن الطريقة المحسنة (Second Cut) تستخدم خدعة جبرية لتقليل عمليات الضرب إلى 3 فقط.</p></template>
+<p>لكن الطريقة المحسنة (Second Cut) تستخدم خدعة جبرية لتقليل عمليات الضرب إلى 3 فقط.</p><p>الخدعة الجبرية (القطع الثاني) تقلل 4 عمليات ضرب إلى 3. عند ضرب $(A_1 \cdot 10^{n/2} + A_2)$ في $(B_1 \cdot 10^{n/2} + B_2)$، يكون الحد الأوسط هو $(A_1 \cdot B_2 + A_2 \cdot B_1)$. بدلاً من حساب $A_1 \cdot B_2$ و $A_2 \cdot B_1$ بشكل منفصل، نقوم بحساب:</p><p>$(A_1 + A_2) \cdot (B_1 + B_2) = A_1 \cdot B_1 + (A_1 \cdot B_2 + A_2 \cdot B_1) + A_2 \cdot B_2$</p><p>بإعادة الترتيب، يمكن إيجاد الحد الأوسط باستخدام عملية ضرب واحدة جديدة فقط إلى جانب $A_1 \cdot B_1$ و $A_2 \cdot B_2$ المحسوبة مسبقاً:</p><p>$(A_1 \cdot B_2 + A_2 \cdot B_1) = (A_1 + A_2) \cdot (B_1 + B_2) - A_1 \cdot B_1 - A_2 \cdot B_2$</p></template>
     <template class="content-en"><p>The grade-school algorithm for multiplying two n-digit numbers requires \(O(n^2)\) multiplications.</p>
 <p>Using divide-and-conquer, we split each number in half. The naive approach (First Cut) requires 4 multiplications, still yielding \(O(n^2)\).</p>
-<p>The optimized approach (Second Cut) uses an algebraic trick to reduce it to 3 multiplications.</p></template>
+<p>The optimized approach (Second Cut) uses an algebraic trick to reduce it to 3 multiplications.</p><p>The algebraic trick (Second Cut) reduces 4 multiplications to 3. When multiplying $(A_1 \cdot 10^{n/2} + A_2)$ and $(B_1 \cdot 10^{n/2} + B_2)$, the middle term is $(A_1 \cdot B_2 + A_2 \cdot B_1)$. Instead of computing $A_1 \cdot B_2$ and $A_2 \cdot B_1$ separately, we compute:</p><p>$(A_1 + A_2) \cdot (B_1 + B_2) = A_1 \cdot B_1 + (A_1 \cdot B_2 + A_2 \cdot B_1) + A_2 \cdot B_2$</p><p>By rearranging, the middle term is found using only one new multiplication alongside the already computed $A_1 \cdot B_1$ and $A_2 \cdot B_2$:</p><p>$(A_1 \cdot B_2 + A_2 \cdot B_1) = (A_1 + A_2) \cdot (B_1 + B_2) - A_1 \cdot B_1 - A_2 \cdot B_2$</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -591,10 +651,10 @@
   <div class="depth-layer" data-layer="full" data-bilingual>
     <template class="content-ar"><p>ضرب مصفوفتين 2x2 بالطريقة التقليدية يتطلب 8 عمليات ضرب.</p>
 <p>اكتشف شتراسن طريقة لحساب الناتج باستخدام 7 عمليات ضرب فقط، مع زيادة في عمليات الجمع والطرح.</p>
-<p>يتم تطبيق هذه الفكرة بشكل عودي على مصفوفات بحجم n x n.</p></template>
+<p>يتم تطبيق هذه الفكرة بشكل عودي على مصفوفات بحجم n x n.</p><p>تحسب خوارزمية شتراسن حاصل ضرب مصفوفتين $2 \times 2$ باستخدام عمليات الضرب السبع المحددة التالية:</p><ul><li>$m_1 = (a_{00} + a_{11}) \cdot (b_{00} + b_{11})$</li><li>$m_2 = (a_{10} + a_{11}) \cdot b_{00}$</li><li>$m_3 = a_{00} \cdot (b_{01} - b_{11})$</li><li>$m_4 = a_{11} \cdot (b_{10} - b_{00})$</li><li>$m_5 = (a_{00} + a_{01}) \cdot b_{11}$</li><li>$m_6 = (a_{10} - a_{00}) \cdot (b_{00} + b_{01})$</li><li>$m_7 = (a_{01} - a_{11}) \cdot (b_{10} + b_{11})$</li></ul><p>ثم يتم تجميع المصفوفة النهائية $C$ باستخدام عمليات الجمع والطرح لهذه القيم $m$ (على سبيل المثال، $c_{00} = m_1 + m_4 - m_5 + m_7$).</p></template>
     <template class="content-en"><p>Multiplying two 2x2 matrices traditionally requires 8 multiplications.</p>
 <p>Strassen discovered a way to compute the product using only 7 multiplications, with an increase in additions/subtractions.</p>
-<p>This idea is applied recursively to n x n matrices.</p></template>
+<p>This idea is applied recursively to n x n matrices.</p><p>Strassen's algorithm computes the product of two $2 \times 2$ matrices using these 7 specific multiplications:</p><ul><li>$m_1 = (a_{00} + a_{11}) \cdot (b_{00} + b_{11})$</li><li>$m_2 = (a_{10} + a_{11}) \cdot b_{00}$</li><li>$m_3 = a_{00} \cdot (b_{01} - b_{11})$</li><li>$m_4 = a_{11} \cdot (b_{10} - b_{00})$</li><li>$m_5 = (a_{00} + a_{01}) \cdot b_{11}$</li><li>$m_6 = (a_{10} - a_{00}) \cdot (b_{00} + b_{01})$</li><li>$m_7 = (a_{01} - a_{11}) \cdot (b_{10} + b_{11})$</li></ul><p>The final matrix $C$ is then assembled using additions and subtractions of these $m$ values (e.g., $c_{00} = m_1 + m_4 - m_5 + m_7$).</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -694,14 +754,66 @@
   </details>
 </section>
 
+<section id="master-theorem" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> النظرية الرئيسية (Master Theorem)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Master Theorem</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>طريقة رياضية مباشرة لحل معادلات التكرار لخوارزميات 'فرّق تسد' بمقارنة عدد المشاكل الفرعية بحجم العمل المنجز خارجها.</p></template>
+    <template class="content-en"><p>A direct mathematical method to solve recurrence relations for divide-and-conquer algorithms by comparing the number of subproblems to the work done outside them.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لحل معادلة التكرار $T(n) = aT(n/b) + f(n)$ حيث $f(n) \in O(n^d)$ و $d \ge 0$، تقارن النظرية بين $a$ و $b^d$ في ثلاث حالات:</p><ol><li>إذا كان $a < b^d$، فإن $T(n) \in O(n^d)$.</li><li>إذا كان $a = b^d$، فإن $T(n) \in O(n^d \log n)$.</li><li>إذا كان $a > b^d$، فإن $T(n) \in O(n^{\log_b a})$.</li></ol><p><b>مثال تطبيقي:</b> خوارزمية حساب المجموع بمعادلة $A(n) = 2A(n/2) + 1$.</p><ol><li>نحدد المعاملات: $a = 2$، $b = 2$، و $f(n) = 1$ مما يعني أن $d = 0$.</li><li>نقارن $a$ مع $b^d$: نجد أن $2 > 2^0$ (أي $2 > 1$).</li><li>نطبق الحالة الثالثة: النتيجة هي $A(n) \in O(n^{\log_2 2}) = O(n)$.</li></ol></template>
+    <template class="content-en"><p>To solve the recurrence $T(n) = aT(n/b) + f(n)$ where $f(n) \in O(n^d)$ and $d \ge 0$, the theorem compares $a$ and $b^d$ in three cases:</p><ol><li>If $a < b^d$, then $T(n) \in O(n^d)$.</li><li>If $a = b^d$, then $T(n) \in O(n^d \log n)$.</li><li>If $a > b^d$, then $T(n) \in O(n^{\log_b a})$.</li></ol><p><b>Worked Example:</b> Sum-computation algorithm with recurrence $A(n) = 2A(n/2) + 1$.</p><ol><li>Identify parameters: $a = 2$, $b = 2$, and $f(n) = 1$ which means $d = 0$.</li><li>Compare $a$ with $b^d$: we find $2 > 2^0$ (i.e., $2 > 1$).</li><li>Apply the third case: The result is $A(n) \in O(n^{\log_2 2}) = O(n)$.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>توفر النظرية الرئيسية حداً تقاربياً (Asymptotic bound) دون الحاجة لرسم شجرة التكرار بالكامل.</p><p>الشرط الأساسي لتطبيقها هو أن تكون جميع المشاكل الفرعية متساوية الحجم تقريباً.</p></template>
+    <template class="content-en"><p>The Master Theorem provides an <span class="smart-term" data-term-en="Asymptotic Bound" data-ar="الحد التقاربي" data-en-def="A line that a curve approaches as it heads towards infinity, used to describe algorithm efficiency.">asymptotic bound<span class="smart-term-tooltip"></span></span> without the need to fully expand the recurrence tree.</p><p>A primary condition for its application is that all subproblems must be of approximately equal size.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="formula-block">
+    <div data-bilingual>
+      <template class="content-ar"><strong>الحالات الثلاث للنظرية الرئيسية.</strong></template>
+      <template class="content-en"><strong>The three cases of the Master Theorem.</strong></template>
+      <div class="content-target"></div>
+    </div>
+    <div class="math-block">$$T(n) = \begin{cases} O(n^d) &amp; \text{if } a &lt; b^d \\ O(n^d \log n) &amp; \text{if } a = b^d \\ O(n^{\log_b a}) &amp; \text{if } a &gt; b^d \end{cases}$$</div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">هل يمكن تطبيق النظرية الرئيسية على معادلة التكرار $T(n) = 2T(n/2) + n \log n$ مباشرة؟</template>
+      <template class="content-en">Can the Master Theorem be applied directly to the recurrence $T(n) = 2T(n/2) + n \log n$?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لا، لأن $f(n) = n \log n$ ليست دالة متعددة الحدود (Polynomial) بحتة بصيغة $n^d$. (تتطلب نسخة متقدمة من النظرية).</p></template>
+      <template class="content-en"><p>No, because $f(n) = n \log n$ is not a strictly polynomial function of the form $n^d$. (It requires an advanced version of the theorem).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم في الوحدة الخامسة! استراتيجية 'فرّق تسد' هي واحدة من أجمل وأقوى الأفكار في علوم الحاسب. الفكرة بسيطة: إذا كانت المشكلة كبيرة جداً، قسّمها إلى أجزاء صغيرة، حل كل جزء، ثم ادمج الحلول. للامتحان، ركزوا بشدة على مقارنة الترتيب بالدمج (Merge Sort) والترتيب السريع (Quick Sort). تذكروا أن الترتيب بالدمج يضمن O(n log n) دائماً لكنه يستهلك ذاكرة، بينما الترتيب السريع ممتاز في المتوسط لكنه قد ينهار إلى \(O(n^2)\) في أسوأ الحالات. أيضاً، لا تفوتوا فهم كيف استطاع شتراسن تقليل عمليات ضرب المصفوفات من 8 إلى 7، وكيف قللنا ضرب الأعداد الكبيرة من 4 إلى 3 عمليات. هذه الخدع الرياضية هي التي تصنع الفارق في تصميم الخوارزميات وتحليلها المتقدمة. راجعوا معادلات التكرار (Recurrence Relations) جيداً، فهي لغة تحليل هذه تصميم الخوارزميات وتحليلها!</template>
-    <template class="content-en">Welcome to Module 5! Divide-and-Conquer is one of the most elegant and powerful paradigms in computer science. The core idea is simple: if a problem is too big, break it into smaller pieces, solve them, and merge the results. For the exam, focus heavily on comparing Merge Sort and Quick Sort. Remember that Merge Sort guarantees O(n log n) but eats up memory, while Quick Sort is great on average but can degrade to \(O(n^2)\) in the worst case. Also, make sure you understand how Strassen reduced matrix multiplications from 8 to 7, and how large integer multiplication was reduced from 4 to 3. These mathematical tricks are what make advanced algorithms shine. Review your recurrence relations carefully—they are the language we use to analyze these algorithms!</template>
+    <template class="content-ar">أهلاً بكم في الوحدة الخامسة! استراتيجية 'فرّق تسد' هي واحدة من أجمل وأقوى الأفكار في علوم الحاسب. الفكرة بسيطة: إذا كانت المشكلة كبيرة جداً، قسّمها إلى أجزاء صغيرة، حل كل جزء، ثم ادمج الحلول. للامتحان، ركزوا بشدة على مقارنة الترتيب بالدمج (Merge Sort) والترتيب السريع (Quick Sort). تذكروا أن الترتيب بالدمج يضمن O(n log n) دائماً لكنه يستهلك ذاكرة، بينما الترتيب السريع ممتاز في المتوسط لكنه قد ينهار إلى \(O(n^2)\) في أسوأ الحالات. أيضاً، لا تفوتوا فهم كيف استطاع شتراسن تقليل عمليات ضرب المصفوفات من 8 إلى 7، وكيف قللنا ضرب الأعداد الكبيرة من 4 إلى 3 عمليات. هذه الخدع الرياضية هي التي تصنع الفارق في تصميم الخوارزميات وتحليلها المتقدمة. راجعوا معادلات التكرار (Recurrence Relations) جيداً، فهي لغة تحليل هذه تصميم الخوارزميات وتحليلها!<p>من خلال تتبع تصميم الخوارزميات وتحليلها خطوة بخطوة، مثل تقسيم هور أو الخدعة الجبرية في ضرب الأعداد، ندرك أن قوة 'فرّق تسد' لا تكمن فقط في التقسيم العودي، بل في الذكاء الرياضي والمنطقي المستخدم في مرحلتي التقسيم والدمج لتقليل العمليات المكلفة.</p><p>إتقان 'النظرية الرئيسية' (Master Theorem) هو سلاحك السري في هذه الوحدة. إنها تفتح لك فوراً أبواب التعقيد الزمني لخوارزميات مثل الترتيب بالدمج، وشتراسن، وضرب الأعداد الكبيرة دون الحاجة لرسم أشجار التكرار المعقدة. تأكد دائماً من استخراج قيم a و b و d بدقة قبل التطبيق!</p></template>
+    <template class="content-en">Welcome to Module 5! Divide-and-Conquer is one of the most elegant and powerful paradigms in computer science. The core idea is simple: if a problem is too big, break it into smaller pieces, solve them, and merge the results. For the exam, focus heavily on comparing Merge Sort and Quick Sort. Remember that Merge Sort guarantees O(n log n) but eats up memory, while Quick Sort is great on average but can degrade to \(O(n^2)\) in the worst case. Also, make sure you understand how Strassen reduced matrix multiplications from 8 to 7, and how large integer multiplication was reduced from 4 to 3. These mathematical tricks are what make advanced algorithms shine. Review your recurrence relations carefully—they are the language we use to analyze these algorithms!<p>By tracing algorithms step-by-step, such as Hoare partitioning or the algebraic trick in integer multiplication, we realize that the power of Divide-and-Conquer lies not just in recursion, but in the mathematical and logical ingenuity used during the divide and combine phases to minimize costly operations.</p><p>Mastering the Master Theorem is your secret weapon for this module. It instantly unlocks the time complexity for algorithms like Mergesort, Strassen's, and large integer multiplication without the need to draw tedious recurrence trees. Always extract your a, b, and d values carefully before applying it!</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -875,6 +987,42 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">تمثل f(n) الوقت المستغرق في تقسيم المشكلة إلى أجزاء ودمج الحلول الفرعية معاً.</template>
           <template class="content-en">f(n) represents the time spent dividing the problem into subproblems and combining their solutions.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر خوارزمية تقسيم هور (Hoare Partitioning) فعالة عملياً في الترتيب السريع؟</template>
+          <template class="content-en">Why is Hoare Partitioning considered practically efficient in Quick Sort?</template>
+          <span class="content-target">لماذا نعتبر خوارزمية تقسيم هور (Hoare Partitioning) فعالة عملياً في الترتيب السريع؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها تستخدم مؤشرين يتحركان باتجاه بعضهما البعض، مما يقلل من عدد التبديلات (Swaps) مقارنة بطرق التقسيم الأخرى (مثل Lomuto). كما أنها تتعامل بشكل أفضل مع المصفوفات التي تحتوي على عناصر متكررة كثيرة.</p></template>
+          <template class="content-en"><p>Because it uses two pointers moving towards each other, which minimizes the number of swaps compared to other partitioning schemes (like Lomuto). It also performs better on arrays with many duplicate elements.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نهتم بمعرفة أن متوسط حالة الترتيب السريع يتطلب 39% مقارنات إضافية فقط مقارنة بأفضل حالة؟</template>
+          <template class="content-en">Why do we care that Quicksort's average case requires only 39% more comparisons than its best case?</template>
+          <span class="content-target">لماذا نهتم بمعرفة أن متوسط حالة الترتيب السريع يتطلب 39% مقارنات إضافية فقط مقارنة بأفضل حالة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>هذا الرقم يثبت رياضياً قوة الترتيب السريع في الواقع. فهو يوضح أن الخوارزمية لا تنحدر بسرعة نحو أسوأ حالة (O(n^2))، بل تظل قريبة جداً من الأداء المثالي (O(n log n)) لمعظم المدخلات العشوائية، مما يبرر استخدامها الواسع في مكتبات البرمجة القياسية.</p></template>
+          <template class="content-en"><p>This figure mathematically proves Quicksort's practical power. It shows that the algorithm doesn't easily degrade toward its worst case (O(n^2)), but stays remarkably close to optimal performance (O(n log n)) for most random inputs, justifying its widespread use in standard libraries.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1176,6 +1324,74 @@
         "en": null
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف يتم تقليل عمليات الضرب من 4 إلى 3 في ضرب الأعداد الكبيرة؟",
+      "en": "How are multiplications reduced from 4 to 3 in large integer multiplication?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام خدعة جبرية لحساب الحد الأوسط: $(A_1+A_2)(B_1+B_2) - A_1 B_1 - A_2 B_2$.",
+        "en": "By using an algebraic trick to compute the middle term: $(A_1+A_2)(B_1+B_2) - A_1 B_1 - A_2 B_2$."
+      },
+      "example": {
+        "ar": "هذا يستبدل عمليتي ضرب بعملية ضرب واحدة وعدة عمليات جمع/طرح.",
+        "en": "This replaces two multiplications with one multiplication and several additions/subtractions."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "في النظرية الرئيسية، ماذا يحدث إذا كان $a > b^d$؟",
+      "en": "In the Master Theorem, what happens if $a > b^d$?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التعقيد الزمني يكون $O(n^{\\log_b a})$.",
+        "en": "The time complexity is $O(n^{\\log_b a})$."
+      },
+      "example": {
+        "ar": "مثل خوارزمية شتراسن حيث $7 > 2^2$.",
+        "en": "Like Strassen's algorithm where $7 > 2^2$."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "في النظرية الرئيسية، ماذا يحدث إذا كان $a = b^d$؟",
+      "en": "In the Master Theorem, what happens if $a = b^d$?"
+    },
+    "back": {
+      "definition": {
+        "ar": "التعقيد الزمني يكون $O(n^d \\log n)$.",
+        "en": "The time complexity is $O(n^d \\log n)$."
+      },
+      "example": {
+        "ar": "مثل الترتيب بالدمج حيث $2 = 2^1$.",
+        "en": "Like Merge Sort where $2 = 2^1$."
+      }
+    },
+    "id": 20
+  },
+  {
+    "front": {
+      "ar": "ما هي معادلة التكرار لأفضل حالة في الترتيب السريع؟",
+      "en": "What is the recurrence relation for the best case in Quicksort?"
+    },
+    "back": {
+      "definition": {
+        "ar": "$C_{best}(n) = 2C_{best}(n/2) + n$",
+        "en": "$C_{best}(n) = 2C_{best}(n/2) + n$"
+      },
+      "example": {
+        "ar": "تحدث عندما ينقسم المحور المصفوفة إلى نصفين متساويين دائماً.",
+        "en": "Occurs when the pivot always splits the array into two equal halves."
+      }
+    },
+    "id": 21
   }
 ]
 </script>
@@ -1185,7 +1401,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1201,7 +1417,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1526,6 +1742,70 @@
     },
     "difficulty": "easy",
     "conceptId": "binary-tree-traversals"
+  },
+  {
+    "conceptId": "large-integer-multiplication",
+    "question": {
+      "ar": "في خوارزمية ضرب الأعداد الكبيرة المحسنة، ما هي الصيغة المستخدمة لحساب الحد الأوسط $(A_1 B_2 + A_2 B_1)$ لتقليل عمليات الضرب؟",
+      "en": "In the optimized large integer multiplication algorithm, what formula is used to compute the middle term $(A_1 B_2 + A_2 B_1)$ to reduce multiplications?"
+    },
+    "options": {
+      "ar": [
+        "$(A_1 - A_2)(B_1 - B_2) + A_1 B_1 + A_2 B_2$",
+        "$(A_1 + A_2)(B_1 + B_2) - A_1 B_1 - A_2 B_2$",
+        "$(A_1 B_1)(A_2 B_2) - (A_1 + B_1)$",
+        "$(A_1 + B_1)(A_2 + B_2) - A_1 A_2 - B_1 B_2$"
+      ],
+      "en": [
+        "$(A_1 - A_2)(B_1 - B_2) + A_1 B_1 + A_2 B_2$",
+        "$(A_1 + A_2)(B_1 + B_2) - A_1 B_1 - A_2 B_2$",
+        "$(A_1 B_1)(A_2 B_2) - (A_1 + B_1)$",
+        "$(A_1 + B_1)(A_2 + B_2) - A_1 A_2 - B_1 B_2$"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "هذه الخدعة الجبرية تسمح لنا بإيجاد الحد الأوسط باستخدام عملية ضرب واحدة جديدة فقط $(A_1 + A_2)(B_1 + B_2)$، حيث أن $A_1 B_1$ و $A_2 B_2$ محسوبتان مسبقاً.",
+      "en": "This algebraic trick allows us to find the middle term using only one new multiplication $(A_1 + A_2)(B_1 + B_2)$, since $A_1 B_1$ and $A_2 B_2$ are already computed."
+    },
+    "hint": {
+      "ar": "تذكر أننا نطرح الأجزاء التي لا نحتاجها من حاصل ضرب المجموعين.",
+      "en": "Remember we subtract the parts we don't need from the product of the sums."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "master-theorem",
+    "question": {
+      "ar": "باستخدام النظرية الرئيسية، ما هو التعقيد الزمني لمعادلة التكرار $T(n) = 4T(n/2) + n$؟",
+      "en": "Using the Master Theorem, what is the time complexity of the recurrence $T(n) = 4T(n/2) + n$?"
+    },
+    "options": {
+      "ar": [
+        "O(n)",
+        "O(n log n)",
+        "O(n^2)",
+        "O(n^3)"
+      ],
+      "en": [
+        "O(n)",
+        "O(n log n)",
+        "O(n^2)",
+        "O(n^3)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "هنا $a=4$، $b=2$، و $d=1$. بما أن $4 > 2^1$، نطبق الحالة الثالثة: $O(n^{\\log_2 4}) = O(n^2)$.",
+      "en": "Here $a=4$, $b=2$, and $d=1$. Since $4 > 2^1$, we apply the third case: $O(n^{\\log_2 4}) = O(n^2)$."
+    },
+    "hint": {
+      "ar": "قارن بين قيمة 'a' وقيمة 'b' مرفوعة للأس 'd'.",
+      "en": "Compare the value of 'a' with 'b' raised to the power of 'd'."
+    },
+    "difficulty": "medium",
+    "id": 12
   }
 ]
 </script>
@@ -1562,6 +1842,14 @@
       <template class="content-ar">الخلط بين طريقة التقسيم في Merge Sort و Quick Sort. الترتيب بالدمج يقسم حسب 'الموقع' (النصف الأيمن والأيسر)، بينما الترتيب السريع يقسم حسب 'القيمة' (أكبر وأصغر من المحور).</template>
       <template class="content-en">Confusing the division method of Merge Sort and Quick Sort. Merge Sort divides by 'position' (left/right halves), while Quick Sort divides by 'value' (greater/less than pivot).</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في الترتيب السريع، متوسط الحالة (Average Case) قريب جداً من أفضل حالة (Best Case)، حيث يتطلب فقط 39% مقارنات إضافية. هذا هو السبب الرئيسي الذي يجعله الخوارزمية المفضلة عملياً رغم أن أسوأ حالة له هي O(n^2).</template>
+    <template class="content-en">In Quicksort, the average case is very close to the best case, requiring only 39% more comparisons. This is the primary reason it is the preferred algorithm in practice despite its O(n^2) worst case.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

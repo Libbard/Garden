@@ -220,12 +220,21 @@
   var PL_MAX = 12, PL_LISTS_MAX = 8, PL_REC_MAX = 8;
   var PL_DEFAULTS = {
     pen: [['ink', 'red', 'sky', 'emerald', 'orange', 'violet'],
-          ['black', 'brown', 'teal', 'indigo', 'pink', 'yellow'],
-          ['lime', 'amber', 'rose', 'white', 'indigo', 'brown']],
-    hi:  [['yellow', 'lime', 'emerald', 'sky', 'pink', 'orange'],
-          ['teal', 'indigo', 'violet', 'red', 'amber', 'rose'],
-          ['brown', 'ink', 'amber', 'teal', 'violet', 'rose']]
+          ['teal', 'indigo', 'brown', 'pink', 'lime', 'ink'],
+          ['red', 'orange', 'yellow', 'lime', 'sky', 'pink']],
+    hi:  [['yellow', 'lime', 'sky', 'pink', 'orange', 'violet'],
+          ['amber', 'emerald', 'teal', 'rose', 'indigo', 'brown'],
+          ['yellow', 'pink', 'sky', 'lime', 'red', 'teal']]
   };
+  var PL_NAMES = {
+    pen: [['أساسيّ', 'Basic'], ['هادئ', 'Calm'], ['زاهٍ', 'Bright']],
+    hi:  [['للمراجعة', 'Revision'], ['هادئ', 'Soft'], ['مفاتيحُ الامتحان', 'Exam keys']]
+  };
+  function plName(kind, i, list) {
+    var dft = PL_DEFAULTS[kind][i];
+    if (dft && list && list.join(',') === dft.join(',')) return L(PL_NAMES[kind][i][0], PL_NAMES[kind][i][1]);
+    return L('لوحتي ', 'My palette ') + arDigits(i + 1);
+  }
   function plKind(cv) { return (cv && cv.tool === 'hi') ? 'hi' : 'pen'; }
   function plOk(c) {
     return typeof c === 'string' && (ALL_TONES.indexOf(c) >= 0 || TONES.indexOf(c) >= 0 ||
@@ -309,27 +318,38 @@
 
   /*@3.NODJ.1*/
   var RING1 = [
-    { k: 'pen',   icon: 'fa-pen',           ar: 'قلم',        en: 'Pen',         tool: 'pen' },
+    { k: 'pen',   icon: 'fa-pen',           ar: 'قلم — المسْه ثانيةً لرأسه وسماكته', en: 'Pen — tap again for tip and thickness', tool: 'pen', set: 'pen' },
     /*@3.NODJ.39*/
-    { k: 'nib',   icon: 'fa-pen-nib',       ar: 'رأسُ القلم', en: 'Pen tip',     ring: 'nib' },
-    { k: 'color', icon: 'fa-palette',       ar: 'اللون',      en: 'Colour',      ring: 'color' },
-    { k: 'size',  html: ICONS.width,        ar: 'السماكة',    en: 'Thickness',   ring: 'size' },
-    { k: 'hi',    icon: 'fa-highlighter',   ar: 'تظليل',     en: 'Highlighter', tool: 'hi',    ring: 'hiw' },
-    { k: 'era',   html: ICONS.eraser,       ar: 'ممحاة',      en: 'Eraser',      tool: 'era', ring: 'era' },
+    { k: 'hi',    icon: 'fa-highlighter',   ar: 'تظليل — المسْه ثانيةً لطريقته', en: 'Highlighter — tap again for its options', tool: 'hi', set: 'hiw' },
+    { k: 'era',   html: ICONS.eraser,       ar: 'ممحاة — المسْها ثانيةً لنوعها', en: 'Eraser — tap again for its kind', tool: 'era', set: 'era' },
     { k: 'shape', icon: 'fa-shapes',        ar: 'أشكال',      en: 'Shapes',      ring: 'shape' },
     /*@3.NODJ.63*/
     { k: 'text',  icon: 'fa-i-cursor',      ar: 'حقلُ نصّ',    en: 'Text field',  tool: 'text',
       cap: 'canText' },
-    { k: 'shp',   icon: 'fa-shapes',        ar: 'شكلٌ بالسحب', en: 'Drag a shape', tool: 'shp',
+    { k: 'shp',   icon: 'fa-vector-square', ar: 'شكلٌ بالسحب', en: 'Drag a shape', tool: 'shp',
       cap: 'canText' },
+    { k: 'sel',   icon: 'fa-arrow-pointer', ar: 'تحديد',      en: 'Select',      tool: 'sel' },
     /*@3.NODJ.9*/
     { k: 'lasso', html: LASSO_SVG,          ar: 'لاسو حرّ',   en: 'Free lasso',  tool: 'lasso' },
-    { k: 'sel',   icon: 'fa-arrow-pointer', ar: 'تحديد',      en: 'Select',      tool: 'sel' },
     { k: 'hand',  icon: 'fa-hand',          ar: 'تمرير الصفحة', en: 'Scroll page', tool: 'hand' },
-    { k: 'undo',  icon: 'fa-rotate-left',   ar: 'تراجع',      en: 'Undo' },
     { k: 'redo',  icon: 'fa-rotate-right',  ar: 'إعادة',      en: 'Redo' },
+    { k: 'undo',  icon: 'fa-rotate-left',   ar: 'تراجع',      en: 'Undo' },
     { k: 'exit',  icon: 'fa-xmark',         ar: 'إنهاء الرسم', en: 'Exit drawing' }
   ];
+
+  var HALO_KEY = 'garden_ink_halo', HALO_R = 46;
+  function haloPrefs() {
+    try {
+      var o = JSON.parse(localStorage.getItem(HALO_KEY) || 'null');
+      if (o && typeof o === 'object') return { on: o.on !== 0, swap: o.swap !== 0 };
+    } catch (e) {}
+    return { on: true, swap: true };
+  }
+  function rad1() { return haloPrefs().on ? 98 : R1; }
+  function rad2() { return haloPrefs().on ? 148 : R2; }
+  function haloSet(p) {
+    try { localStorage.setItem(HALO_KEY, JSON.stringify({ on: p.on ? 1 : 0, swap: p.swap ? 1 : 0 })); } catch (e) {}
+  }
 
   var R1 = 78, R2 = 128, POS_KEY = 'garden_ink_dial', FAV_KEY = 'garden_ink_favs2';
   /*@3.NODJ.59*/
@@ -2446,6 +2466,7 @@
     d.setAttribute('data-open', '0');
     d.hidden = true;
     d.innerHTML =
+      '<div class="ndl-halo" data-role="halo"></div>' +
       '<button type="button" class="ndl-hub" aria-expanded="false"' +
       ' aria-label="' + esc(L('لوحة القلم', 'Pen palette')) + '"' +
       ' data-ar-title="لوحة القلم — اسحبها لأيّ مكان"' +
@@ -2464,6 +2485,7 @@
     this.r1 = d.querySelector('[data-role="r1"]');
     this.r2 = d.querySelector('[data-role="r2"]');
     this.tip = d.querySelector('[data-role="tip"]');
+    this.halo = d.querySelector('[data-role="halo"]');
     i18n(d);
     this.paintRing1();
     this.bind();
@@ -2507,12 +2529,13 @@
     }).map(function (t) {
       return { k: t.k, icon: t.icon, html: t.html, ar: t.ar, en: t.en,
                cls: t.k === 'exit' ? 'ndl-i--danger' : '' };
-    }), R1);
+    }), rad1());
   };
 
   /*@3.NODJ.3*/
   Dial.prototype.subItems = function (kind) {
     var cv = this.getCv();
+    if (kind === 'pen') return this.subItems('size').concat(this.subItems('nib'));
     if (kind === 'nib') {
       return pickNibs().map(function (n) {
         return { k: 'nib:' + n.k, ar: n.ar, en: n.en,
@@ -2595,15 +2618,118 @@
     return [];
   };
 
-  Dial.prototype.openSub = function (kind) {
+  Dial.prototype.openSub = function (kind, anchor) {
     if (this.sub === kind) { this.closeSub(); return; }
     var items = this.subItems(kind);
     if (!items.length) { this.closeSub(); return; }
-    this.arc(this.r2, items, R2, kind);
+    var btn = anchor ? this.r1.querySelector('[data-k="' + anchor + '"]') : null;
+    if (btn) {
+      var bx = parseFloat(btn.style.left) || 0, by = parseFloat(btn.style.top) || 0;
+      this.fan(this.r2, items, rad2(), Math.atan2(by, bx) * 180 / Math.PI, kind);
+    } else this.arc(this.r2, items, rad2(), kind);
     this.r2.hidden = false;
     this.sub = kind;
     this.clamp();
   };
+
+  Dial.prototype.fan = function (host, items, radius, center, cls) {
+    var n = items.length;
+    var step = Math.max(15, Math.min(22, 300 / Math.max(1, n)));
+    var start = center - step * (n - 1) / 2;
+    this.arc(host, items, radius, cls);
+    var btns = host.querySelectorAll('.ndl-i');
+    for (var i = 0; i < btns.length; i++) {
+      var a = (start + i * step) * Math.PI / 180;
+      btns[i].style.left = (Math.cos(a) * radius).toFixed(1) + 'px';
+      btns[i].style.top = (Math.sin(a) * radius).toFixed(1) + 'px';
+    }
+  };
+
+  Dial.prototype.paintHalo = function () {
+    var h = this.halo;
+    if (!h) return;
+    var pr = haloPrefs();
+    h.hidden = !pr.on;
+    this.el.setAttribute('data-halo', pr.on ? '1' : '0');
+    if (!pr.on) { h.innerHTML = ''; return; }
+    var cv = this.getCv(), kind = plKind(cv), d = plRead(), P = d[kind];
+    var list = ((P.lists[P.cur] || {}).c || []).slice(0, 6);
+    var isHi = !!(cv && cv.tool === 'hi');
+    var C0 = window.GardenCanvas;
+    var hx = function (t) { return (isHi && C0 && C0.hiHexOf) ? C0.hiHexOf(t) : hexOf(t); };
+    var pos = function (i) {
+      var a = (-90 + i * 45) * Math.PI / 180;
+      return 'left:' + (Math.cos(a) * HALO_R).toFixed(1) + 'px;top:' + (Math.sin(a) * HALO_R).toFixed(1) + 'px';
+    };
+    var cur = cv ? cv.color : '';
+    var out = list.map(function (t, i) {
+      var nm = TONE_AR[t] ? L(TONE_AR[t], TONE_EN[t]) : t;
+      return '<button type="button" class="ndl-hc" data-hc="' + esc(t) + '" style="' + pos(i) + ';--t:' + esc(hx(t)) + '"' +
+        ' aria-pressed="' + (cur === t) + '" aria-label="' + esc(nm) + '" data-ar="' + esc(TONE_AR[t] || t) + '" data-en="' + esc(TONE_EN[t] || t) + '"></button>';
+    });
+    var pn = plName(kind, P.cur, list);
+    out.push('<button type="button" class="ndl-hp" data-hp="1" style="' + pos(6) + '"' +
+      ' aria-label="' + esc(L('اللوحةُ: ' + pn + ' — المسْ للتالية', 'Palette: ' + pn + ' — tap for the next')) + '"' +
+      ' data-ar="' + esc('اللوحةُ: ' + pn + ' — المسْ للتالية') + '" data-en="' + esc('Palette: ' + pn + ' — tap for the next') + '">' +
+      '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i></button>');
+    if (pr.swap) {
+      var toHi = !isHi;
+      out.push('<button type="button" class="ndl-hs" data-hs="' + (toHi ? 'hi' : 'pen') + '" style="' + pos(7) + '"' +
+        ' aria-label="' + esc(toHi ? L('بدّلْ إلى التظليل', 'Switch to the highlighter') : L('بدّلْ إلى القلم', 'Switch to the pen')) + '"' +
+        ' data-ar="' + (toHi ? 'بدّلْ إلى التظليل' : 'بدّلْ إلى القلم') + '" data-en="' + (toHi ? 'Switch to the highlighter' : 'Switch to the pen') + '">' +
+        '<i class="fa-solid ' + (toHi ? 'fa-highlighter' : 'fa-pen') + '" aria-hidden="true"></i></button>');
+    }
+    h.innerHTML = out.join('');
+  };
+
+  Dial.prototype.haloPick = function (e) {
+    var b = e.target && e.target.closest ? e.target.closest('button') : null;
+    if (!b || !this.halo.contains(b)) return;
+    var cv = this.getCv();
+    if (!cv) return;
+    e.preventDefault();
+    if (b.hasAttribute('data-hc')) {
+      var t = b.getAttribute('data-hc');
+      cv.setColor(t);
+      noteRecentColor(plKind(cv), t);
+    } else if (b.hasAttribute('data-hp')) {
+      var d = plRead(), k = plKind(cv), P = d[k];
+      P.cur = (P.cur + 1) % Math.max(1, P.lists.length);
+      plWrite(d);
+      this.paintHalo();
+      var nb = this.halo.querySelector('[data-hp]');
+      if (nb) this.showTip(nb);
+      if (this.panel && this.panel.open) this.panel.render();
+      return;
+    } else if (b.hasAttribute('data-hs')) {
+      this.pick(b.getAttribute('data-hs'));
+    }
+    this.sync();
+  };
+
+  Dial.prototype.showTip = function (b) {
+    var tip = this.tip;
+    if (!tip || !b) return;
+    tip.textContent = L(b.getAttribute('data-ar') || '', b.getAttribute('data-en') || '');
+    clearTimeout(this._tipT);
+    tip.setAttribute('data-on', '1');
+    this._tipT = setTimeout(function () { tip.setAttribute('data-on', '0'); }, 1600);
+  };
+
+  Dial.prototype.palettes = function () {
+    var cv = this.getCv(), k = plKind(cv), d = plRead(), P = d[k];
+    return { kind: k, cur: P.cur, lists: P.lists.map(function (l, i) { return { c: l.c, name: plName(k, i, l.c) }; }) };
+  };
+
+  Dial.prototype.setPalette = function (i) {
+    var cv = this.getCv(), k = plKind(cv), d = plRead();
+    d[k].cur = Math.max(0, Math.min(d[k].lists.length - 1, i));
+    plWrite(d);
+    this.paintHalo();
+  };
+
+  Dial.prototype.haloPrefs = function () { return haloPrefs(); };
+  Dial.prototype.setHalo = function (p) { haloSet(p); this.paintHalo(); this.paintRing1(); this.clamp(); };
 
   Dial.prototype.closeSub = function () {
     this.r2.hidden = true;
@@ -2617,14 +2743,91 @@
     this.hub.setAttribute('aria-expanded', this.open ? 'true' : 'false');
     this.r1.hidden = !this.open;
     if (!this.open) this.closeSub();
+    this.hubFace();
     this.clamp();
   };
 
+  Dial.prototype.hubFace = function () {
+    var gear = this.open && !!window.GardenInkPanel;
+    this.el.setAttribute('data-gear', gear ? '1' : '0');
+    var g = this.hub.querySelector('[data-role="hub-g"]');
+    if (gear && !g) {
+      g = document.createElement('i');
+      g.className = 'fa-solid fa-gear ndl-gear';
+      g.setAttribute('aria-hidden', 'true');
+      g.setAttribute('data-role', 'hub-g');
+      this.hub.appendChild(g);
+    }
+    var t = gear
+      ? (this.panelOpen ? ['أخفِ أدواتِ الرسم كاملة', 'Hide all drawing tools'] : ['كلُّ أدواتِ الرسم وإعداداتُها', 'All drawing tools and settings'])
+      : ['لوحة القلم — اسحبها لأيّ مكان', 'Pen palette — drag it anywhere'];
+    this.hub.setAttribute('data-ar-title', t[0]);
+    this.hub.setAttribute('data-en-title', t[1]);
+    this.hub.setAttribute('aria-label', L(t[0], t[1]));
+    this.hub.setAttribute('aria-pressed', gear && this.panelOpen ? 'true' : 'false');
+  };
+
+  Dial.prototype.togglePanel = function (on) {
+    if (!window.GardenInkPanel) return false;
+    if (!this.panel) this.panel = GardenInkPanel.mount(this);
+    return this.panel.toggle(on);
+  };
+
+  Dial.prototype.onPanel = function (on) {
+    this.panelOpen = !!on;
+    this.hubFace();
+  };
+
+  Dial.prototype.home = function () {
+    try { localStorage.removeItem('garden_ink_dial'); } catch (e) {}
+    this.place(null);
+  };
+
+  Dial.prototype.runKey = function (act, phase) {
+    var cv = this.getCv();
+    if (!cv) return;
+    if (phase === 'cmd') { this.cmd(act); return; }
+    if (phase === 'down') { if (cv.beginMod) cv.beginMod(act); }
+    else {
+      if (cv.endMod) cv.endMod({ act: act, tap: false, moved: 0, held: 0 });
+      if (phase === 'tap' && cv.toggleAct) cv.toggleAct(act);
+    }
+    this.sync();
+    if (this.panel && this.panel.open) this.panel.render();
+  };
+
+  Dial.prototype.cmd = function (act) {
+    var cv = this.getCv();
+    if (act === 'dial') { this.setOpen(!this.open); return; }
+    if (act === 'panel') { this.togglePanel(); return; }
+    if (act === 'tools') { this.setOpen(false); this.onExit(); return; }
+    if (!cv) return;
+    if (act === 'undo' || act === 'redo') { this.pick(act); }
+    else if (act === 'color:next' || act === 'color:prev') {
+      var i = TONES.indexOf(cv.color), n = TONES.length;
+      cv.setColor(TONES[((i < 0 ? 0 : i) + (act === 'color:next' ? 1 : n - 1)) % n]);
+    } else if (act === 'width:up' || act === 'width:down') {
+      var ws = cv.tool === 'hi' ? HI_W : PEN_W, j = 0, k;
+      for (k = 0; k < ws.length; k++) if (Math.abs(ws[k] - cv.width) < Math.abs(ws[j] - cv.width)) j = k;
+      j = Math.max(0, Math.min(ws.length - 1, j + (act === 'width:up' ? 1 : -1)));
+      cv.setWidth(ws[j]);
+    } else if (cv.toggleAct) cv.toggleAct(act);
+    this.sync();
+    if (this.panel && this.panel.open) this.panel.render();
+  };
+
   /*@3.NODJ.4*/
+  Dial.prototype.uiZ = function () {
+    var z = 1;
+    try { z = parseFloat(getComputedStyle(this.el).zoom) || 1; } catch (e) {}
+    return (isFinite(z) && z > 0.2) ? z : 1;
+  };
+
   Dial.prototype.place = function (p) {
     var pad = 10;
-    var reach = (this.open ? (this.sub ? R2 : R1) : 0) + 26;
-    var vw = window.innerWidth, vh = window.innerHeight;
+    var reach = (this.open ? (this.sub ? rad2() : rad1()) : (haloPrefs().on ? HALO_R + 18 : 0)) + 26;
+    var z = this.uiZ();
+    var vw = window.innerWidth / z, vh = window.innerHeight / z;
     var x, y;
     if (p) { x = p.x; y = p.y; }
     else { x = isAr() ? (vw - 76) : 76; y = vh - 110; }
@@ -2643,22 +2846,24 @@
     var self = this;
 
     /*@3.NODJ.26*/
-    this._keys = function (e) {
-      if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
-      var t = e.target;
-      if (t && (t.isContentEditable || t.tagName === 'INPUT' ||
-                t.tagName === 'TEXTAREA' || t.tagName === 'SELECT')) return;
-      if (t && t.closest && t.closest('dialog[open]')) return;
-      var I2 = window.GardenInkInput;
-      if (!I2 || !I2.penKeys) return;
-      var act = I2.penKeys()[String(e.key || '').toLowerCase()];
-      if (!act || act === 'none') return;
+    var I2 = window.GardenInkInput;
+    this._keys = (I2 && I2.keyEngine) ? I2.keyEngine({
+      active: function () { return !self.el.hidden && !!self.getCv(); },
+      apply: function (act, phase) { self.runKey(act, phase); }
+    }) : null;
+    this._bus = (I2 && I2.on) ? I2.on(function (act, info) {
+      if (self.el.hidden || act === 'profile') return;
       var cv = self.getCv();
-      if (!cv) return;
-      e.preventDefault();
-      self.applyAct(act);
+      if (info && info.el && cv && cv.wet && info.el !== cv.wet) return;
+      self.cmd(act);
+    }) : null;
+    this._outside = function (e) {
+      if (!self.open || self.el.hidden) return;
+      var t = e.target;
+      if (t && t.closest && (t.closest('.ndl') || t.closest('.nip') || t.closest('.ndl-dock') || t.closest('dialog'))) return;
+      self.setOpen(false);
     };
-    document.addEventListener('keydown', this._keys);
+    document.addEventListener('pointerdown', this._outside, true);
 
     /*@3.NODJ.5*/
     var st = null;
@@ -2672,17 +2877,22 @@
       var dx = e.clientX - st.x, dy = e.clientY - st.y;
       if (!st.moved && (Math.abs(dx) + Math.abs(dy)) < 6) return;
       st.moved = true;
-      self.place({ x: st.ox + dx, y: st.oy + dy });
+      var zz = self.uiZ();
+      self.place({ x: st.ox + dx / zz, y: st.oy + dy / zz });
     });
     var end = function (e) {
       if (!st || e.pointerId !== st.id) return;
       try { self.hub.releasePointerCapture(st.id); } catch (e2) {}
       if (st.moved) writePos(self.pos);
+      else if (self.open && window.GardenInkPanel) self.togglePanel();
       else self.setOpen(!self.open);
       st = null;
     };
     this.hub.addEventListener('pointerup', end);
     this.hub.addEventListener('pointercancel', function (e) { if (st && e.pointerId === st.id) st = null; });
+
+    this.halo.addEventListener('click', function (e) { self.haloPick(e); });
+    this.halo.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
 
     this.zoomBtn.addEventListener('click', function () {
       if (!self.open) self.setOpen(true);
@@ -2701,7 +2911,7 @@
     });
 
     var hov = function (e) {
-      var b = e.target.closest('[data-k]');
+      var b = e.target.closest('[data-k], [data-hc], [data-hp], [data-hs]');
       if (!b) { self.tip.setAttribute('data-on', '0'); return; }
       self.tip.textContent = L(b.getAttribute('data-ar') || '', b.getAttribute('data-en') || '');
       self.tip.setAttribute('data-on', '1');
@@ -2747,6 +2957,11 @@
       if (item.k === 'undo') { if (cv) { if (cv.hist) cv.hist.undo(); else cv.undo(); } this.sync(); return; }
       if (item.k === 'redo') { if (cv) { if (cv.hist) cv.hist.redo(); else cv.redo(); } this.sync(); return; }
       /*@3.NODJ.58*/
+      if (item.tool && cv && item.set && cv.tool === item.tool) {
+        this.openSub(item.set, item.k);
+        this.sync();
+        return;
+      }
       if (item.tool && cv) {
         cv.setTool(item.tool);
         if (item.tool === 'hi' && typeof cv.color === 'string' &&
@@ -2757,7 +2972,7 @@
           if (!hx || hx === pn) cv.setColor('yellow');
         }
       }
-      if (item.ring) this.openSub(item.ring);
+      if (item.ring) this.openSub(item.ring, item.k);
       else this.closeSub();
       this.sync();
       return;
@@ -2858,6 +3073,12 @@
       if (svg) hi.outerHTML = '<span class="ni-host" data-role="hub-i">' + svg + '</span>';
       else hi.outerHTML = '<i class="fa-solid ' + ic + '" aria-hidden="true" data-role="hub-i"></i>';
     }
+    this.hubFace();
+    this.paintHalo();
+    if (this.panel && this.panel.open && !this._inPanelSync) {
+      this._inPanelSync = 1;
+      try { this.panel.render(); } finally { this._inPanelSync = 0; }
+    }
     /*@3.NODJ.53*/
     this.hub.style.color = hexOf(s.color);
     var C0 = window.GardenCanvas;
@@ -2918,7 +3139,7 @@
     if (this.toolBar) this.toolBar.hidden = !live || !barOf(st, 'tools').on;
     if (this.mineBar) this.mineBar.hidden = !live || !barOf(st, 'mine').on;
     if (on) { this.paintRing1(); this.paintColors(); this.paintTools(); this.paintMine(); this.clamp(); this.sync(); }
-    else { this.setOpen(false); }
+    else { this.setOpen(false); if (this.panel && this.panel.open) this.panel.toggle(false); }
   };
 
   /*@3.NODJ.16*/
@@ -2939,7 +3160,10 @@
     if (this._themeObs) { try { this._themeObs.disconnect(); } catch (e) {} }
     document.removeEventListener('keydown', this._onKey);
     /*@3.NODJ.28*/
-    if (this._keys) document.removeEventListener('keydown', this._keys);
+    if (this._keys) this._keys();
+    if (this._bus) this._bus();
+    document.removeEventListener('pointerdown', this._outside, true);
+    if (this.panel) { try { this.panel.destroy(); } catch (eP) {} this.panel = null; }
     if (this._onRestore) this.el.removeEventListener('pointerenter', this._onRestore);
     window.removeEventListener('resize', this._onRz);
     document.removeEventListener('garden:languageChanged', this._onLang);

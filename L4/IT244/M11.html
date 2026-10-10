@@ -119,6 +119,16 @@
         <template class="content-en">Third Normal Form (3NF)</template>
         <span class="content-target">النموذج العادي الثالث (3NF)</span>
       </a>
+      <a href="#minimal-sets-fds" class="toc-link" data-bilingual>
+        <template class="content-ar">المجموعات الصغرى للاعتمادات الوظيفية</template>
+        <template class="content-en">Minimal Sets of Functional Dependencies</template>
+        <span class="content-target">المجموعات الصغرى للاعتمادات الوظيفية</span>
+      </a>
+      <a href="#properties-of-decompositions" class="toc-link" data-bilingual>
+        <template class="content-ar">خصائص التفكيك</template>
+        <template class="content-en">Properties of Decompositions</template>
+        <span class="content-target">خصائص التفكيك</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -358,7 +368,14 @@
 <li><strong>التعدي (Transitive):</strong> إذا كان X -> Y و Y -> Z، فإن X -> Z.</li>
 </ol>
 <p>هذه القواعد تعتبر سليمة (Sound) وكاملة (Complete).</p>
-<p>هناك قواعد إضافية مشتقة مثل التفكيك (Decomposition) والاتحاد (Union).</p></template>
+<p>هناك قواعد إضافية مشتقة مثل التفكيك (Decomposition) والاتحاد (Union).</p><p>دعونا نحسب إغلاق مجموعة من السمات X، والذي يُرمز له بـ X+، باستخدام مجموعة من الاعتمادات الوظيفية F كـ <b>مثال عملي</b>:</p>
+<p>لنفترض أن لدينا السمات {A, B, C, D} ومجموعة الاعتمادات F = {A -> B, B -> C}. ما هو إغلاق السمة A (أي A+)؟</p>
+<ol>
+<li>نبدأ بـ X+ = {A} (حسب قاعدة الانعكاس: السمة A تحدد نفسها).</li>
+<li>بما أن A -> B موجودة في F، و A موجودة حالياً في X+، فإننا نضيف B إلى X+. تصبح X+ = {A, B}.</li>
+<li>بما أن B -> C موجودة في F، و B موجودة حالياً في X+، فإننا نضيف C إلى X+. تصبح X+ = {A, B, C}.</li>
+</ol>
+<p>النتيجة: A+ = {A, B, C}. بما أن A+ لا تحتوي على جميع السمات (تفتقر إلى السمة D)، فإن A لا يمكن أن تكون مفتاحاً فائقاً (Superkey) لهذا الجدول.</p></template>
     <template class="content-en"><p>Given a set of FDs F, we can infer additional FDs using Armstrong's inference rules:</p>
 <ol>
 <li><strong>Reflexive:</strong> If Y is a subset of X, then X -> Y.</li>
@@ -366,7 +383,14 @@
 <li><strong>Transitive:</strong> If X -> Y and Y -> Z, then X -> Z.</li>
 </ol>
 <p>These rules are sound and complete.</p>
-<p>Additional useful rules derived from these include Decomposition, Union, and Pseudotransitivity.</p></template>
+<p>Additional useful rules derived from these include Decomposition, Union, and Pseudotransitivity.</p><p>Let's calculate the closure of an attribute set X, denoted as X+, using a set of functional dependencies F as a <b>worked example</b>:</p>
+<p>Suppose we have attributes {A, B, C, D} and F = {A -> B, B -> C}. What is the closure of A (i.e., A+)?</p>
+<ol>
+<li>Start with X+ = {A} (Reflexive rule: A determines itself).</li>
+<li>Since A -> B is in F, and A is currently in X+, we add B to X+. Now X+ = {A, B}.</li>
+<li>Since B -> C is in F, and B is currently in X+, we add C to X+. Now X+ = {A, B, C}.</li>
+</ol>
+<p>Result: A+ = {A, B, C}. Since A+ does not contain all attributes (it is missing D), A cannot be a superkey for this relation.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -961,14 +985,128 @@
   </details>
 </section>
 
+<section id="minimal-sets-fds" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">8</span> المجموعات الصغرى للاعتمادات الوظيفية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Minimal Sets of Functional Dependencies</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>المجموعة الصغرى هي نسخة مبسطة ومكافئة من الاعتمادات حيث يكون لكل طرف أيمن سمة واحدة، ولا يمكن إزالة أي اعتماد أو سمة دون تغيير المعنى الأساسي.</p></template>
+    <template class="content-en"><p>A minimal set of FDs is a simplified, equivalent version of dependencies where every right-hand side is a single attribute, and no dependency or attribute can be removed without changing the closure.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تُعتبر مجموعة الاعتمادات الوظيفية F <b>صغرى (Minimal)</b> إذا استوفت ثلاثة شروط صارمة:</p>
+<ol>
+<li>كل اعتماد في F يحتوي على سمة واحدة فقط في الطرف الأيمن (RHS).</li>
+<li>لا يمكننا إزالة أي اعتماد من F والحصول على مجموعة مكافئة لـ F (أي لا توجد اعتمادات زائدة).</li>
+<li>لا يمكننا استبدال أي اعتماد X -> A بـ Y -> A (حيث Y مجموعة فرعية فعلية من X) مع بقاء المجموعة مكافئة (أي لا توجد سمات زائدة في الطرف الأيسر).</li>
+</ol>
+<p>كل مجموعة من الاعتمادات لها مجموعة صغرى مكافئة واحدة على الأقل. هذه <span class="smart-term" data-term-en="Minimal Set" data-ar="المجموعة الصغرى" data-en-def="A set of functional dependencies that is as small as possible without losing any information or inferable dependencies.">المجموعة الصغرى<span class="smart-term-tooltip"></span></span> ضرورية كنقطة انطلاق لتوليف المخططات العلائقية (Synthesizing relations).</p></template>
+    <template class="content-en"><p>A set of functional dependencies F is considered <b>minimal</b> if it satisfies three strict conditions:</p>
+<ol>
+<li>Every dependency in F has a single attribute on its right-hand side (RHS).</li>
+<li>We cannot remove any dependency from F and still have a set of dependencies equivalent to F (no redundant dependencies).</li>
+<li>We cannot replace any dependency X -> A with Y -> A (where Y is a proper subset of X) and keep the set equivalent (no redundant attributes on the left-hand side).</li>
+</ol>
+<p>Every set of FDs has at least one equivalent <span class="smart-term" data-term-en="Minimal Set" data-ar="المجموعة الصغرى" data-en-def="A set of functional dependencies that is as small as possible without losing any information or inferable dependencies.">minimal set<span class="smart-term-tooltip"></span></span>. This minimal set is crucial as a starting point for synthesizing relational schemas.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا نحتاج إلى المجموعات الصغرى؟ عند تصميم قاعدة بيانات، يؤدي وجود اعتمادات زائدة إلى فحوصات غير ضرورية واحتمال حدوث شذوذ.</p>
+<p><b>مثال عملي:</b> إذا كانت F = {A -> B, B -> C, A -> C}، فإن الاعتماد A -> C زائد لأنه يمكن استنتاجه من الاعتمادين الأولين باستخدام قاعدة التعدي. المجموعة الصغرى ستزيل A -> C.</p>
+<p>وبالمثل، إذا كان {A, B} -> C، ولكن A -> C صحيحة بالفعل، فإن السمة B زائدة في الطرف الأيسر، مما ينتهك الشرط الثالث للمجموعة الصغرى.</p>
+<p>مفهوم <b>التكافؤ (Equivalence)</b>: تكون المجموعتان F و G متكافئتين إذا كانت F تغطي G (أي يمكن استنتاج كل اعتماد في G من F) وكانت G تغطي F.</p></template>
+    <template class="content-en"><p>Why do we need minimal sets? When designing a database, having redundant dependencies leads to unnecessary checks and potential anomalies.</p>
+<p><b>Worked Example:</b> If F = {A -> B, B -> C, A -> C}, the dependency A -> C is redundant because it can be inferred from the first two using the Transitive Rule. A minimal set would remove A -> C.</p>
+<p>Similarly, if {A, B} -> C, but A -> C is already true, then attribute B is redundant on the left side, violating the third condition of a minimal set.</p>
+<p>Concept of <b>Equivalence</b>: Two sets F and G are equivalent if F <span class="smart-term" data-term-en="Cover" data-ar="تغطية" data-en-def="Set F covers set G if every functional dependency in G can be inferred from F.">cover<span class="smart-term-tooltip"></span></span>s G (every FD in G can be inferred from F) and G covers F.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كانت مجموعة الاعتمادات هي F = {X -&gt; Y, X -&gt; Z}، فهل هي صغرى؟</template>
+      <template class="content-en">If a set of FDs is F = {X -&gt; Y, X -&gt; Z}, is it minimal?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نعم، بافتراض عدم وجود اعتمادات أخرى. كل طرف أيمن يحتوي على سمة واحدة، ولا يمكن إزالة أو تبسيط أي منهما دون فقدان المعلومات.</p></template>
+      <template class="content-en"><p>Yes, assuming no other dependencies exist. Each RHS has a single attribute, and neither can be removed or simplified without losing information.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="properties-of-decompositions" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> خصائص التفكيك</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Properties of Decompositions</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>عند تفكيك الجداول، هناك خاصيتان مهمتان: الربط غير المفقود (Lossless Join) وهو إلزامي، والحفاظ على الاعتمادات (Dependency Preservation) وهو أقل صرامة ويمكن التضحية به.</p></template>
+    <template class="content-en"><p>When decomposing tables, there are two important properties: Lossless Join (mandatory) and Dependency Preservation (less stringent, can be sacrificed).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>عندما نقوم بتفكيك (Decomposition) مخطط علاقة إلى مخططات أصغر للوصول إلى نماذج عادية أعلى، يجب أن نأخذ في الاعتبار خاصيتين مهمتين:</p>
+<ol>
+<li><strong><span class="smart-term" data-term-en="Lossless Join" data-ar="الربط غير المفقود" data-en-def="A property of decomposition ensuring that a natural join of the decomposed relations results in exactly the original relation, with no extra (spurious) tuples.">الربط غير المفقود<span class="smart-term-tooltip"></span></span> (Lossless Join):</strong> أو الربط غير المضاف (Non-additive). تضمن هذه الخاصية عدم توليد سجلات زائفة (Spurious Tuples) عند إعادة دمج الجداول. هذه الخاصية <b>بالغة الأهمية ولا يمكن التضحية بها أبداً</b>.</li>
+<li><strong><span class="smart-term" data-term-en="Dependency Preservation" data-ar="الحفاظ على الاعتمادات" data-en-def="A property of decomposition where all functional dependencies can be enforced without joining the decomposed relations.">الحفاظ على الاعتمادات<span class="smart-term-tooltip"></span></span> الوظيفية (Preservation of FDs):</strong> تضمن هذه الخاصية أن جميع الاعتمادات الوظيفية الأصلية لا تزال قابلة للتحقق داخل الجداول الجديدة دون الحاجة إلى إجراء عمليات ربط (JOIN) بينها.</li>
+</ol></template>
+    <template class="content-en"><p>When we decompose a relation schema into smaller schemas to achieve higher normal forms, we must consider two important properties:</p>
+<ol>
+<li><strong><span class="smart-term" data-term-en="Lossless Join" data-ar="الربط غير المفقود" data-en-def="A property of decomposition ensuring that a natural join of the decomposed relations results in exactly the original relation, with no extra (spurious) tuples.">Lossless Join<span class="smart-term-tooltip"></span></span> (Non-additive join):</strong> This ensures that no spurious tuples are generated when the tables are recombined using a natural join. This property is <b>extremely important and cannot be sacrificed</b>.</li>
+<li><strong>Preservation of functional dependencies:</strong> This ensures that all original functional dependencies can still be checked within the individual new relations without needing to join them.</li>
+</ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>لماذا قد نضحي بالحفاظ على الاعتمادات؟ في بعض الأحيان، يكون من المستحيل الوصول إلى نماذج عادية صارمة (مثل BCNF) مع الحفاظ على جميع الاعتمادات الوظيفية في نفس الوقت.</p>
+<p>في هذه الحالات، تعتبر خاصية الحفاظ على الاعتمادات أقل صرامة (Less stringent) ويمكن التضحية بها، بينما يظل الربط غير المفقود خطاً أحمر لا يمكن تجاوزه للحفاظ على صحة البيانات.</p></template>
+    <template class="content-en"><p>Why might we sacrifice <span class="smart-term" data-term-en="Dependency Preservation" data-ar="الحفاظ على الاعتمادات" data-en-def="A property of decomposition where all functional dependencies can be enforced without joining the decomposed relations.">dependency preservation<span class="smart-term-tooltip"></span></span>? Sometimes, it is mathematically impossible to achieve strict normal forms (like BCNF) while simultaneously preserving all functional dependencies.</p>
+<p>In such cases, the dependency preservation property is considered less stringent and may be sacrificed. However, the lossless join property remains a strict requirement to maintain data integrity.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا كان عليك الاختيار بين تفكيك يحافظ على الاعتمادات ولكنه يولد سجلات زائفة، وتفكيك يفقد بعض الاعتمادات ولكنه ربط غير مفقود، فأيهما تختار ولماذا؟</template>
+      <template class="content-en">If you had to choose between a decomposition that preserves dependencies but generates spurious tuples, and one that loses dependencies but is a lossless join, which do you choose and why?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>أختار الربط غير المفقود. توليد السجلات الزائفة يدمر صحة البيانات تماماً، بينما فقدان الاعتمادات يجعل التحقق من القيود أبطأ (يتطلب JOIN) ولكنه لا يفسد البيانات الموجودة.</p></template>
+      <template class="content-en"><p>I would choose the lossless join. Generating spurious tuples completely destroys data accuracy, whereas losing dependency preservation only makes constraint checking slower (requires a JOIN) but doesn't corrupt existing data.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي البيانات. في هذه الوحدة، نضع الأساس لتصميم قواعد بيانات قوية لا تنهار تحت وطأة التكرار. تخيل أنك تدير مكتبة، وكلما أردت تغيير اسم ناشر، اضطررت لتعديل 1000 كتاب! هذا هو 'شذوذ التحديث' الذي نحاربه. سلاحنا الأول هو 'الاعتمادات الوظيفية' (FDs)؛ وهي القواعد الرياضية التي تخبرنا كيف ترتبط البيانات ببعضها. باستخدام بديهيات أرمسترونغ، نستنتج هذه الروابط. ثم ننتقل إلى 'التطبيع' (Normalization). فكر في 1NF كعملية تنظيف للبيانات لتصبح ذرية. 2NF يضمن أن كل معلومة تعتمد على المفتاح بالكامل (لا أنصاف حلول!). و 3NF يطرد أي وسيط (لا اعتمادات متعدية). للامتحان، ركزوا جيداً على التمييز بين الاعتماد الجزئي (2NF) والاعتماد المتعدي (3NF)، وتأكدوا من فهمكم للفرق بين المفتاح الفائق والمفتاح المرشح. بالتوفيق!</template>
-    <template class="content-en">Welcome, data engineers. In this module, we lay the groundwork for robust databases that don't collapse under redundancy. Imagine running a library where changing a publisher's name requires updating 1,000 books! That's the 'Update Anomaly' we are fighting. Our primary weapon is 'Functional Dependencies' (FDs)—the mathematical rules dictating how data points relate. Using Armstrong's axioms, we map these out. Then comes 'Normalization'. Think of 1NF as cleaning up data to be atomic. 2NF ensures every piece of info depends on the WHOLE key (no half-measures!). 3NF kicks out the middlemen (no transitive dependencies). For the exam, focus heavily on distinguishing partial dependencies (2NF) from transitive ones (3NF), and master the difference between a Superkey and a Candidate Key. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي البيانات. في هذه الوحدة، نضع الأساس لتصميم قواعد بيانات قوية لا تنهار تحت وطأة التكرار. تخيل أنك تدير مكتبة، وكلما أردت تغيير اسم ناشر، اضطررت لتعديل 1000 كتاب! هذا هو 'شذوذ التحديث' الذي نحاربه. سلاحنا الأول هو 'الاعتمادات الوظيفية' (FDs)؛ وهي القواعد الرياضية التي تخبرنا كيف ترتبط البيانات ببعضها. باستخدام بديهيات أرمسترونغ، نستنتج هذه الروابط. ثم ننتقل إلى 'التطبيع' (Normalization). فكر في 1NF كعملية تنظيف للبيانات لتصبح ذرية. 2NF يضمن أن كل معلومة تعتمد على المفتاح بالكامل (لا أنصاف حلول!). و 3NF يطرد أي وسيط (لا اعتمادات متعدية). للامتحان، ركزوا جيداً على التمييز بين الاعتماد الجزئي (2NF) والاعتماد المتعدي (3NF)، وتأكدوا من فهمكم للفرق بين المفتاح الفائق والمفتاح المرشح. بالتوفيق!<p>إتقان حساب الإغلاق (Closure) وتحديد المجموعات الصغرى (Minimal Sets) ليس مجرد تمرين رياضي؛ بل هو الخطوة العملية الأولى التي تسبق تطبيق قواعد التطبيع (Normalization). هذه الأدوات تضمن لنا تفكيك الجداول المعقدة إلى بنية نظيفة وفعالة دون فقدان أي معلومات أو قيود أساسية.</p><p>لقد قمنا الآن بتأطير القواعد الرياضية الصارمة التي تحكم تصميم قواعد البيانات. تذكر دائماً أن التطبيع (Normalization) هو أداة للتفكيك المنهجي، ولكن هذا التفكيك يجب أن يخضع لشرط 'الربط غير المفقود' الصارم. في العالم الحقيقي، ستوازن باستمرار بين المثالية الأكاديمية (النماذج العادية العليا) والاحتياجات العملية للأداء (إلغاء التطبيع).</p></template>
+    <template class="content-en">Welcome, data engineers. In this module, we lay the groundwork for robust databases that don't collapse under redundancy. Imagine running a library where changing a publisher's name requires updating 1,000 books! That's the 'Update Anomaly' we are fighting. Our primary weapon is 'Functional Dependencies' (FDs)—the mathematical rules dictating how data points relate. Using Armstrong's axioms, we map these out. Then comes 'Normalization'. Think of 1NF as cleaning up data to be atomic. 2NF ensures every piece of info depends on the WHOLE key (no half-measures!). 3NF kicks out the middlemen (no transitive dependencies). For the exam, focus heavily on distinguishing partial dependencies (2NF) from transitive ones (3NF), and master the difference between a Superkey and a Candidate Key. Good luck!<p>Mastering closure calculation and identifying minimal sets is not just a mathematical exercise; it is the first practical step before applying normalization rules. These tools ensure we decompose complex tables into a clean, efficient structure without losing any essential information or constraints.</p><p>We have now framed the strict mathematical rules governing database design. Always remember that Normalization is a tool for systematic decomposition, but this decomposition must obey the strict 'Lossless Join' condition. In the real world, you will constantly balance academic idealism (higher normal forms) with practical performance needs (Denormalization).</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1142,6 +1280,76 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">نستخدمه في الممارسة العملية لتخزين الجداول المدمجة (JOINs) كجدول أساسي واحد، وذلك لتحسين أداء الاستعلامات وتقليل وقت القراءة، رغم أنه يضيف تكراراً للبيانات.</template>
           <template class="content-en">We use it in practice to store joined tables as a single base relation to improve query performance and reduce read time, even though it introduces data redundancy.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف نستخدم إغلاق السمات (X+) بشكل عملي في قواعد البيانات؟</template>
+          <template class="content-en">How do we practically use the closure of attributes (X+) in databases?</template>
+          <span class="content-target">كيف نستخدم إغلاق السمات (X+) بشكل عملي في قواعد البيانات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>نستخدمه بشكل أساسي لاكتشاف المفاتيح المرشحة (Candidate Keys). إذا قمنا بحساب إغلاق مجموعة من السمات X ووجدنا أنه يشمل جميع سمات الجدول، فهذا يثبت أن X هو مفتاح فائق (Superkey).</p></template>
+          <template class="content-en"><p>We primarily use it to discover candidate keys. If we calculate the closure of a set of attributes X and find that it includes all attributes in the relation, it proves that X is a superkey.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يعتبر إيجاد 'المجموعة الصغرى' (Minimal Set) خطوة مهمة قبل البدء في التطبيع (Normalization)؟</template>
+          <template class="content-en">Why is finding a 'Minimal Set' an important step before starting Normalization?</template>
+          <span class="content-target">لماذا يعتبر إيجاد 'المجموعة الصغرى' (Minimal Set) خطوة مهمة قبل البدء في التطبيع (Normalization)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأنها تزيل الاعتمادات الزائدة والمعقدة. البدء بمجموعة صغرى يضمن أنه عند تفكيك الجداول (Decomposition)، فإننا لا ننشئ جداول غير ضرورية أو قيوداً متداخلة ومعقدة يصعب الحفاظ عليها.</p></template>
+          <template class="content-en"><p>Because it removes redundant and complex dependencies. Starting with a minimal set ensures that when we decompose relations, we don't create unnecessary tables or complex, overlapping constraints that are hard to maintain.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر خاصية 'الحفاظ على الاعتمادات' (Dependency Preservation) قابلة للتضحية عند تفكيك الجداول، بينما 'الربط غير المفقود' (Lossless Join) لا يمكن التضحية به؟</template>
+          <template class="content-en">Why do we consider 'Dependency Preservation' a property that can be sacrificed during decomposition, while 'Lossless Join' cannot be?</template>
+          <span class="content-target">لماذا نعتبر خاصية 'الحفاظ على الاعتمادات' (Dependency Preservation) قابلة للتضحية عند تفكيك الجداول، بينما 'الربط غير المفقود' (Lossless Join) لا يمكن التضحية به؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن فقدان 'الربط غير المفقود' يؤدي إلى توليد سجلات زائفة (Spurious Tuples) عند دمج الجداول، مما يعني استرجاع بيانات خاطئة تماماً وتدمير موثوقية قاعدة البيانات. أما التضحية بـ 'الحفاظ على الاعتمادات'، فتعني فقط أن التحقق من بعض القيود سيصبح أبطأ لأنه سيتطلب إجراء عملية ربط (JOIN) بين الجداول، لكنه لا يفسد البيانات نفسها.</p></template>
+          <template class="content-en"><p>Because losing the 'Lossless Join' property generates spurious tuples when tables are joined, meaning completely incorrect data is retrieved, destroying database reliability. Sacrificing 'Dependency Preservation' only means that checking some constraints becomes slower because it requires a JOIN operation, but it does not corrupt the data itself.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يختلف التطبيع (Normalization) عن إلغاء التطبيع (Denormalization) من حيث الهدف النهائي؟</template>
+          <template class="content-en">How does Normalization differ from Denormalization in terms of their ultimate goal?</template>
+          <span class="content-target">كيف يختلف التطبيع (Normalization) عن إلغاء التطبيع (Denormalization) من حيث الهدف النهائي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>التطبيع يهدف إلى حماية سلامة البيانات ومنع شذوذ التحديث (الإدراج، الحذف، التعديل) عن طريق تفكيك الجداول وتقليل التكرار. في المقابل، إلغاء التطبيع يتخلى عن بعض هذه الحماية ويعيد دمج الجداول (مما يزيد التكرار) بهدف واحد محدد: تسريع أداء استعلامات القراءة المعقدة التي تتطلب عمليات ربط (JOIN) مكلفة.</p></template>
+          <template class="content-en"><p>Normalization aims to protect data integrity and prevent update anomalies (insert, delete, modify) by decomposing tables and reducing redundancy. Conversely, Denormalization sacrifices some of this protection and recombines tables (increasing redundancy) for one specific goal: speeding up the performance of complex read queries that require costly JOIN operations.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1443,6 +1651,57 @@
         "en": "Merging Employee and Department tables to speed up read queries despite redundancy."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "تكافؤ مجموعات الاعتمادات (Equivalence of FDs)",
+      "en": "Equivalence of Sets of FDs"
+    },
+    "back": {
+      "definition": {
+        "ar": "تكون المجموعتان F و G متكافئتين إذا كانت F تغطي G (يمكن استنتاج G من F) وكانت G تغطي F.",
+        "en": "Two sets F and G are equivalent if F covers G (every FD in G can be inferred from F) and G covers F."
+      },
+      "example": {
+        "ar": "F = {A->B, B->C} تكافئ G = {A->B, B->C, A->C}",
+        "en": "F = {A->B, B->C} is equivalent to G = {A->B, B->C, A->C}"
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "الربط غير المفقود (Lossless Join)",
+      "en": "Lossless Join Property"
+    },
+    "back": {
+      "definition": {
+        "ar": "خاصية تفكيك تضمن عدم توليد سجلات زائفة عند دمج الجداول المفككة، وهي خاصية لا يمكن التضحية بها.",
+        "en": "A decomposition property ensuring no spurious tuples are generated upon joining decomposed tables; it cannot be sacrificed."
+      },
+      "example": {
+        "ar": "تفكيك جدول الموظفين والأقسام باستخدام مفتاح القسم كمفتاح أجنبي يضمن ربطاً غير مفقود.",
+        "en": "Decomposing Employee and Department tables using Department ID as a foreign key ensures a lossless join."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "الحفاظ على الاعتمادات (Dependency Preservation)",
+      "en": "Dependency Preservation"
+    },
+    "back": {
+      "definition": {
+        "ar": "خاصية تفكيك تسمح بالتحقق من جميع الاعتمادات الوظيفية دون الحاجة لربط الجداول، ويمكن التضحية بها أحياناً.",
+        "en": "A decomposition property allowing all FDs to be checked without joining tables; it can sometimes be sacrificed."
+      },
+      "example": {
+        "ar": "القدرة على التأكد من أن (الرمز البريدي -> المدينة) داخل جدول واحد دون الرجوع لجدول آخر.",
+        "en": "Being able to verify (ZipCode -> City) within a single table without referencing another."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1452,7 +1711,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 13</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1468,7 +1727,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 13</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1793,6 +2052,102 @@
     },
     "difficulty": "hard",
     "conceptId": "informal-design-guidelines"
+  },
+  {
+    "conceptId": "minimal-sets-fds",
+    "question": {
+      "ar": "أي من الخيارات التالية ليس من شروط المجموعة الصغرى (Minimal Set) للاعتمادات الوظيفية؟",
+      "en": "Which of the following is NOT a condition for a set of FDs to be a minimal set?"
+    },
+    "options": {
+      "ar": [
+        "كل اعتماد له سمة واحدة فقط في الطرف الأيمن",
+        "لا يمكن إزالة أي اعتماد دون تغيير الإغلاق",
+        "لا يمكن إزالة أي سمة من الطرف الأيسر دون تغيير الإغلاق",
+        "يجب أن تحتوي المجموعة على جميع المفاتيح المرشحة الممكنة"
+      ],
+      "en": [
+        "Every dependency has a single attribute on its RHS",
+        "No dependency can be removed without changing the closure",
+        "No attribute from the LHS can be removed without changing the closure",
+        "The set must contain all possible candidate keys"
+      ]
+    },
+    "correctIndex": 3,
+    "explanation": {
+      "ar": "المجموعة الصغرى تتعلق بتبسيط الاعتمادات نفسها وإزالة التكرار، ولا يُشترط أن تسرد أو تحتوي صراحة على جميع المفاتيح المرشحة.",
+      "en": "A minimal set is about simplifying the dependencies and removing redundancy; it is not required to explicitly list or contain all candidate keys."
+    },
+    "hint": {
+      "ar": "تذكر أن الشروط الثلاثة تركز على تبسيط شكل الاعتمادات (RHS و LHS) وإزالة الاعتمادات الزائدة.",
+      "en": "Remember the three conditions focus on simplifying the shape of the FDs (RHS and LHS) and removing redundant dependencies."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "properties-of-decompositions",
+    "question": {
+      "ar": "أي من خصائص التفكيك التالية تعتبر بالغة الأهمية ولا يمكن التضحية بها تحت أي ظرف؟",
+      "en": "Which of the following decomposition properties is extremely important and CANNOT be sacrificed under any circumstances?"
+    },
+    "options": {
+      "ar": [
+        "الحفاظ على الاعتمادات الوظيفية",
+        "الربط غير المفقود (Lossless Join)",
+        "الوصول إلى النموذج العادي الثالث (3NF)",
+        "إزالة جميع القيم الفارغة"
+      ],
+      "en": [
+        "Preservation of functional dependencies",
+        "Lossless Join (Non-additive join)",
+        "Reaching Third Normal Form (3NF)",
+        "Removal of all NULL values"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "الربط غير المفقود يمنع توليد السجلات الزائفة. التضحية به تعني إفساد البيانات عند الاستعلام عنها، بينما يمكن التضحية بالحفاظ على الاعتمادات إذا لزم الأمر.",
+      "en": "Lossless join prevents the generation of spurious tuples. Sacrificing it corrupts data upon querying, whereas dependency preservation can be sacrificed if necessary."
+    },
+    "hint": {
+      "ar": "فكر في الخاصية التي تمنع ظهور بيانات وهمية (Spurious Tuples).",
+      "en": "Think of the property that prevents fake data (Spurious Tuples) from appearing."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "inference-rules-fds",
+    "question": {
+      "ar": "إذا كان لدينا الاعتمادات X -> Y و WY -> Z، فإننا نستنتج WX -> Z. ما اسم هذه القاعدة؟",
+      "en": "If we have the dependencies X -> Y and WY -> Z, we infer WX -> Z. What is the name of this rule?"
+    },
+    "options": {
+      "ar": [
+        "قاعدة التفكيك (Decomposition)",
+        "قاعدة الاتحاد (Union)",
+        "قاعدة التعدي الزائف (Pseudotransitivity)",
+        "قاعدة الزيادة (Augmentation)"
+      ],
+      "en": [
+        "Decomposition Rule",
+        "Union Rule",
+        "Pseudotransitivity Rule",
+        "Augmentation Rule"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "قاعدة التعدي الزائف تدمج بين التعدي والزيادة، حيث يحل X محل Y في الاعتماد الثاني بوجود W.",
+      "en": "The Pseudotransitivity rule combines transitivity and augmentation, where X substitutes Y in the second dependency alongside W."
+    },
+    "hint": {
+      "ar": "إنها تشبه قاعدة التعدي ولكن مع إضافة سمة إضافية (W) في الطرف الأيسر.",
+      "en": "It looks like the transitive rule but with an extra attribute (W) on the left side."
+    },
+    "difficulty": "hard",
+    "id": 13
   }
 ]
 </script>
@@ -1833,6 +2188,22 @@
       <template class="content-ar">الاعتقاد بأن التطبيع (Normalization) دائماً يحسن الأداء. في الواقع، التطبيع المفرط يكثر من عمليات الربط (JOIN) مما يبطئ الاستعلامات. لذا نلجأ أحياناً لـ 'إلغاء التطبيع' (Denormalization).</template>
       <template class="content-en">Believing Normalization ALWAYS improves performance. Actually, over-normalization requires too many JOINs, slowing down queries. That's why we sometimes use 'Denormalization'.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن هناك مجموعة صغرى (Minimal Set) واحدة فقط لكل مجموعة من الاعتمادات الوظيفية. في الواقع، يمكن أن يكون هناك عدة مجموعات صغرى مكافئة لنفس المجموعة الأصلية.</template>
+    <template class="content-en">Believing there is only ONE unique minimal set for a given set of FDs. In reality, there can be several equivalent minimal sets for the same original set.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأنه يمكن التضحية بخاصية 'الربط غير المفقود' (Lossless Join) للوصول إلى نموذج عادي أعلى. هذا خطأ فادح؛ الربط غير المفقود لا يمكن التنازل عنه أبداً، بينما يمكن التضحية بـ 'الحفاظ على الاعتمادات'.</template>
+    <template class="content-en">Believing that the 'Lossless Join' property can be sacrificed to achieve a higher normal form. This is a fatal error; Lossless Join can NEVER be sacrificed, whereas 'Dependency Preservation' can be.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

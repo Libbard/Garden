@@ -87,6 +87,16 @@
         <template class="content-en">External Sorting</template>
         <span class="content-target">الترتيب الخارجي (External Sorting)</span>
       </a>
+      <a href="#worked-examples-mergesort" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة عملية: ترتيب الدمج</template>
+        <template class="content-en">Worked Examples: Mergesort</template>
+        <span class="content-target">أمثلة عملية: ترتيب الدمج</span>
+      </a>
+      <a href="#worked-examples-quicksort" class="toc-link" data-bilingual>
+        <template class="content-ar">أمثلة عملية: الترتيب السريع واستراتيجية التقسيم</template>
+        <template class="content-en">Worked Examples: Quicksort and Partitioning Strategy</template>
+        <span class="content-target">أمثلة عملية: الترتيب السريع واستراتيجية التقسيم</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -229,6 +239,22 @@ if firstItem < lastItem
   mergesort(data[], firstItem, middleItem);
   mergesort(data[], middleItem +1, lastItem);
   merge(data[], firstItem, lastItem);</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>private static &lt;AnyType extends Comparable&lt;? super AnyType&gt;&gt;
+void mergeSort( AnyType [ ] a, AnyType [ ] tmpArray, int left, int right ) {
+    if( left &lt; right ) {
+        int center = ( left + right ) / 2;
+        mergeSort( a, tmpArray, left, center );
+        mergeSort( a, tmpArray, center + 1, right );
+        merge( a, tmpArray, left, center + 1, right );
+    }
+}</code></pre>
   </div>
 
   <!-- DIAGRAM[2]: A tree diagram showing the Mergesort process. Start with an array [66, 17, 69, 63, 22, 57, 32, 50, 7, 90]. Show it splitting into two halves, then recursively splitting until single elements remain. Then show the merging process upwards, combining into sorted sub-arrays until the final sorted array is formed. Dark background #0d1117, accent color #007acc, clear Arabic and English labels. -->
@@ -621,6 +647,32 @@ if firstItem < lastItem
     <div class="math-block">$$O(N^2)$$</div>
   </div>
 
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>Java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>public static void sort( List&lt;Integer&gt; items ) {
+    if( items.size( ) &gt; 1 ) {
+        List&lt;Integer&gt; smaller = new ArrayList&lt;&gt;( );
+        List&lt;Integer&gt; same    = new ArrayList&lt;&gt;( );
+        List&lt;Integer&gt; larger  = new ArrayList&lt;&gt;( );
+        Integer chosenItem = items.get( items.size( ) / 2 );
+        for( Integer i : items ) {
+            if( i &lt; chosenItem ) smaller.add( i );
+            else if( i &gt; chosenItem ) larger.add( i );
+            else same.add( i );
+        }
+        sort( smaller ); // Recursive call!
+        sort( larger );  // Recursive call!
+        items.clear( );
+        items.addAll( smaller );
+        items.addAll( same );
+        items.addAll( larger );
+    }
+}</code></pre>
+  </div>
+
   <!-- DIAGRAM[1]: A diagram illustrating Quicksort partitioning. Show an array with a selected Pivot. Show arrows moving elements smaller than the pivot to 'Group 1' (left) and elements larger to 'Group 3' (right). Dark background #0d1117, accent colors for groups. -->
 <div class="svg-diagram" data-diagram-id="1">
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
@@ -884,14 +936,100 @@ if firstItem < lastItem
   </details>
 </section>
 
+<section id="worked-examples-mergesort" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">4</span> أمثلة عملية: ترتيب الدمج</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Worked Examples: Mergesort</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق عملي خطوة بخطوة لخوارزمية ترتيب الدمج، يوضح كيفية تقسيم المصفوفة إلى عناصر مفردة ثم دمجها تدريجياً لإنتاج مصفوفة مرتبة بالكامل.</p></template>
+    <template class="content-en"><p>A step-by-step practical application of the Mergesort algorithm, demonstrating how an array is divided into single elements and then gradually merged to produce a fully sorted array.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>المثال الأول: تقسيم ودمج المصفوفة</b></p><p>لترتيب المصفوفة <code>{66, 17, 69, 63, 22, 57, 32, 50, 7, 90}</code>:</p><ol><li><b>التقسيم:</b> نقسم المصفوفة إلى نصفين <code>{66, 17, 69, 63, 22}</code> و <code>{57, 32, 50, 7, 90}</code>.</li><li><b>التقسيم العودي:</b> نستمر بالتقسيم حتى نصل لعناصر مفردة مثل <code>{66}</code>, <code>{17}</code>.</li><li><b>الدمج:</b> ندمج كل عنصرين في قائمة مرتبة، مثلاً <code>{17, 66}</code>.</li><li><b>الاستمرار:</b> نواصل دمج القوائم الفرعية حتى نحصل على المصفوفة النهائية المرتبة <code>{7, 17, 22, 32, 50, 57, 63, 66, 69, 90}</code>.</li></ol><p><b>المثال الثاني: خوارزمية دمج مصفوفتين</b></p><p>لدمج المصفوفتين المرتبتين <code>X{8, 12, 14, 17}</code> و <code>Y{9, 16, 19, 20}</code> في المصفوفة <code>Z</code>:</p><ol><li>نقارن 8 من X مع 9 من Y. 8 أصغر، نضيفها: <code>Z{8}</code>.</li><li>نقارن 12 من X مع 9 من Y. 9 أصغر، نضيفها: <code>Z{8, 9}</code>.</li><li>نقارن 12 من X مع 16 من Y. 12 أصغر، نضيفها: <code>Z{8, 9, 12}</code>.</li><li>نقارن 14 من X مع 16 من Y. 14 أصغر، نضيفها: <code>Z{8, 9, 12, 14}</code>.</li><li>نستمر حتى تضاف جميع العناصر: <code>Z{8, 9, 12, 14, 16, 17, 19, 20}</code>.</li></ol></template>
+    <template class="content-en"><p><b>Example 1: Dividing and Merging an Array</b></p><p>To sort the array <code>{66, 17, 69, 63, 22, 57, 32, 50, 7, 90}</code>:</p><ol><li><b>Divide:</b> Split the array into two halves <code>{66, 17, 69, 63, 22}</code> and <code>{57, 32, 50, 7, 90}</code>.</li><li><b>Recursive Divide:</b> Continue splitting until single elements are reached, like <code>{66}</code>, <code>{17}</code>.</li><li><b>Merge:</b> Merge every two parts into a sorted list, e.g., <code>{17, 66}</code>.</li><li><b>Continue:</b> Keep merging <span class="smart-term" data-term-en="Sub-list" data-ar="قائمة فرعية" data-en-def="A smaller portion of the original array created during the divide phase.">sub-list<span class="smart-term-tooltip"></span></span>s until the final sorted array is formed: <code>{7, 17, 22, 32, 50, 57, 63, 66, 69, 90}</code>.</li></ol><p><b>Example 2: Merging Two Sorted Arrays</b></p><p>To merge the sorted arrays <code>X{8, 12, 14, 17}</code> and <code>Y{9, 16, 19, 20}</code> into array <code>Z</code>:</p><ol><li>Compare 8 from X with 9 from Y. 8 is smaller, add it: <code>Z{8}</code>.</li><li>Compare 12 from X with 9 from Y. 9 is smaller, add it: <code>Z{8, 9}</code>.</li><li>Compare 12 from X with 16 from Y. 12 is smaller, add it: <code>Z{8, 9, 12}</code>.</li><li>Compare 14 from X with 16 from Y. 14 is smaller, add it: <code>Z{8, 9, 12, 14}</code>.</li><li>Continue until all elements are added: <code>Z{8, 9, 12, 14, 16, 17, 19, 20}</code>.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>في <span class="smart-term" data-term-en="Merge Step" data-ar="خطوة الدمج" data-en-def="The process of combining two sorted arrays into a single, larger sorted array.">خطوة الدمج<span class="smart-term-tooltip"></span></span> (Merge Step)، يتم استخدام مؤشرين، واحد لكل مصفوفة فرعية. يتم مقارنة العناصر التي يشير إليها المؤشران، ويتم نسخ العنصر الأصغر إلى المصفوفة المؤقتة، ثم يتحرك المؤشر الخاص به خطوة واحدة للأمام.</p><p>إذا انتهت إحدى المصفوفتين قبل الأخرى، يتم ببساطة نسخ جميع العناصر المتبقية من المصفوفة الأخرى مباشرة إلى المصفوفة المؤقتة، لأنها مرتبة بالفعل.</p></template>
+    <template class="content-en"><p>In the <span class="smart-term" data-term-en="Merge Step" data-ar="خطوة الدمج" data-en-def="The process of combining two sorted arrays into a single, larger sorted array.">Merge Step<span class="smart-term-tooltip"></span></span>, two pointers are used, one for each sub-array. The elements pointed to are compared, the smaller element is copied to the temporary array, and its respective pointer is advanced.</p><p>If one array is exhausted before the other, all remaining elements from the non-exhausted array are simply copied directly into the temporary array, as they are already sorted.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا انتهت عناصر المصفوفة X قبل المصفوفة Y أثناء عملية الدمج؟</template>
+      <template class="content-en">What happens if the elements of array X are exhausted before array Y during the merge process?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتم نسخ جميع العناصر المتبقية في المصفوفة Y مباشرة إلى المصفوفة النهائية Z بالترتيب.</p></template>
+      <template class="content-en"><p>All remaining elements in array Y are copied directly into the final array Z in their current order.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="worked-examples-quicksort" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">5</span> أمثلة عملية: الترتيب السريع واستراتيجية التقسيم</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Worked Examples: Quicksort and Partitioning Strategy</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تطبيق عملي يوضح كيفية اختيار المحور (Pivot) وتقسيم المصفوفة، مع التركيز على حركة المؤشرات (i و j) لتبديل العناصر في مكانها (In-place).</p></template>
+    <template class="content-en"><p>A practical application showing how to select a pivot and partition the array, focusing on the movement of pointers (i and j) to swap elements in-place.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p><b>المثال الأول: التقسيم حول المحور</b></p><p>لترتيب المصفوفة <code>{17, 90, 69, 63, 50, 57, 32, 66, 22, 7}</code>:</p><ol><li><b>اختيار المحور:</b> نختار <code>50</code> كمحور (Pivot).</li><li><b>التقسيم:</b> ننقل العناصر الأصغر إلى اليسار <code>{17, 7, 22, 32}</code> والأكبر إلى اليمين <code>{57, 63, 66, 69, 90}</code>.</li><li><b>الاستدعاء العودي:</b> نكرر الخطوات على القسمين.</li><li><b>الدمج:</b> نربط الأقسام مع المحور للحصول على المصفوفة المرتبة.</li></ol><p><b>المثال الثاني: استراتيجية التقسيم بال<span class="smart-term" data-term-en="Pointers" data-ar="مؤشرات" data-en-def="Variables (like i and j) used to traverse the array from opposite ends during partitioning.">مؤشرات<span class="smart-term-tooltip"></span></span> (i و j)</b></p><p>لتقسيم المصفوفة <code>{6, 1, 4, 9, 0, 3, 5, 2, 7, 8}</code> باختيار المحور <code>6</code>:</p><ol><li><b>تبديل المحور:</b> نبدل المحور (6) مع العنصر الأخير (8). تصبح المصفوفة <code>{8, 1, 4, 9, 0, 3, 5, 2, 7, 6}</code>.</li><li><b>تهيئة المؤشرات:</b> المؤشر <code>i</code> يشير للعنصر الأول (8)، و <code>j</code> للعنصر قبل الأخير (7).</li><li><b>تحريك المؤشرات والتبديل:</b> يتحرك <code>i</code> يميناً متخطياً العناصر الأصغر من 6 (يتوقف عند 8). يتحرك <code>j</code> يساراً متخطياً العناصر الأكبر من 6 (يتوقف عند 2). نبدل 8 مع 2. المصفوفة: <code>{2, 1, 4, 9, 0, 3, 5, 8, 7, 6}</code>.</li><li><b>التكرار:</b> يتحرك <code>i</code> ليتوقف عند 9، و <code>j</code> يتوقف عند 5. نبدل 9 مع 5. المصفوفة: <code>{2, 1, 4, 5, 0, 3, 9, 8, 7, 6}</code>.</li><li><b>التقاطع:</b> يتحرك <code>i</code> ليتوقف عند 9، و <code>j</code> يتوقف عند 3. هنا يتقاطع المؤشران (i > j).</li><li><b>استعادة المحور:</b> نبدل المحور (6) مع العنصر الذي يشير إليه <code>i</code> (9). المصفوفة النهائية للتقسيم: <code>{2, 1, 4, 5, 0, 3, 6, 8, 7, 9}</code>.</li></ol></template>
+    <template class="content-en"><p><b>Example 1: Partitioning around the Pivot</b></p><p>To sort the array <code>{17, 90, 69, 63, 50, 57, 32, 66, 22, 7}</code>:</p><ol><li><b>Select Pivot:</b> Choose <code>50</code> as the pivot.</li><li><b>Partition:</b> Move smaller elements to the left <code>{17, 7, 22, 32}</code> and larger to the right <code>{57, 63, 66, 69, 90}</code>.</li><li><b>Recursive Call:</b> Repeat the steps on both partitions.</li><li><b>Concatenate:</b> Combine the partitions and the pivot to get the sorted array.</li></ol><p><b>Example 2: Partitioning Strategy with <span class="smart-term" data-term-en="Pointers" data-ar="مؤشرات" data-en-def="Variables (like i and j) used to traverse the array from opposite ends during partitioning.">Pointers<span class="smart-term-tooltip"></span></span> (i and j)</b></p><p>To partition the array <code>{6, 1, 4, 9, 0, 3, 5, 2, 7, 8}</code> with pivot <code>6</code>:</p><ol><li><b>Swap Pivot:</b> Swap the pivot (6) with the last item (8). Array becomes <code>{8, 1, 4, 9, 0, 3, 5, 2, 7, 6}</code>.</li><li><b>Initialize Pointers:</b> Pointer <code>i</code> points to the first item (8), and <code>j</code> to the next-to-last item (7).</li><li><b>Move and Swap:</b> Move <code>i</code> right, skipping elements smaller than 6 (stops at 8). Move <code>j</code> left, skipping elements larger than 6 (stops at 2). Swap 8 and 2. Array: <code>{2, 1, 4, 9, 0, 3, 5, 8, 7, 6}</code>.</li><li><b>Repeat:</b> Move <code>i</code> to 9, move <code>j</code> to 5. Swap 9 and 5. Array: <code>{2, 1, 4, 5, 0, 3, 9, 8, 7, 6}</code>.</li><li><b>Cross:</b> Move <code>i</code> to 9, move <code>j</code> to 3. The pointers cross (i > j).</li><li><b>Restore Pivot:</b> Swap the pivot (6) with the element pointed to by <code>i</code> (9). Final partitioned array: <code>{2, 1, 4, 5, 0, 3, 6, 8, 7, 9}</code>.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السبب وراء تبديل المحور مع العنصر الأخير في بداية عملية التقسيم هو إبعاده عن مسار المؤشرات <code>i</code> و <code>j</code>، مما يبسط شروط التوقف للحلقات التكرارية (Loops).</p><p>عندما يتقاطع المؤشران، نكون متأكدين أن المؤشر <code>i</code> يقف على عنصر أكبر من المحور (أو يساويه)، لذلك نقوم بتبديل المحور مع العنصر عند <code>i</code> لوضعه في مكانه النهائي الصحيح، حيث تكون كل العناصر على يساره أصغر منه وكل العناصر على يمينه أكبر منه.</p></template>
+    <template class="content-en"><p>The reason we swap the pivot with the last element at the beginning of partitioning is to get it out of the way of pointers <code>i</code> and <code>j</code>, which simplifies the stopping conditions for the loops.</p><p>When the pointers cross, we are guaranteed that pointer <code>i</code> is resting on an element greater than (or equal to) the pivot. Therefore, we swap the pivot with the element at <code>i</code> to place it in its final correct position, ensuring all elements to its left are smaller and all to its right are larger.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا يتم استعادة المحور بتبديله مع العنصر الذي يشير إليه المؤشر i وليس j بعد تقاطعهما؟</template>
+      <template class="content-en">Why is the pivot restored by swapping it with the element pointed to by i and not j after they cross?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن المؤشر i يتوقف دائماً عند عنصر أكبر من المحور، وهو المكان الصحيح لبداية النصف الأيمن (الأكبر)، بينما j يتوقف عند عنصر أصغر من المحور.</p></template>
+      <template class="content-en"><p>Because pointer i always stops on an element larger than the pivot, which is the correct starting boundary for the right (larger) half, whereas j stops on a smaller element.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا شباب في الجزء الثاني من خوارزميات الترتيب. في هذا الموديول، ننتقل من الخوارزميات البسيطة إلى الخوارزميات الاحترافية التي تُستخدم في العالم الحقيقي. ركزوا معي جيداً على خوارزميتين أساسيتين: ترتيب الدمج (Mergesort) والترتيب السريع (Quicksort). في الامتحان، غالباً ما أقارن بينهما. تذكروا دائماً: الدمج يضمن لك O(N log N) لكنه يطمع في ذاكرة إضافية O(N). أما الترتيب السريع فهو بطل الذاكرة (In-place) وسريع جداً، لكن احذر من 'فخ المحور السيء' الذي قد يهبط بك إلى \(O(N^2)\)! لذلك نستخدم 'وسيط الثلاثة'. أخيراً، إذا سألتكم في الامتحان: 'ماذا لو كانت البيانات بحجم تيرابايت والذاكرة 8 جيجا؟' الإجابة فوراً هي: الترتيب الخارجي (External Sorting) باستخدام تقنية الدمج. راجعوا تتبع المؤشرات i و j في Quicksort، فهي سؤال كلاسيكي في الاختبارات!</template>
-    <template class="content-en">Welcome to Sorting II. Here we transition from basic algorithms to the heavyweights used in the real world. Focus heavily on Mergesort and Quicksort. In exams, I love comparing them. Always remember: Mergesort guarantees O(N log N) but is greedy for extra memory O(N). Quicksort is the memory champion (in-place) and blazing fast, but beware the 'bad pivot trap' that drops it to \(O(N^2)\)! That's why we use 'Median of three'. Finally, if I ask: 'What if you have a Terabyte of data and 8GB of RAM?' The immediate answer is External Sorting using merging techniques. Make sure you trace the i and j pointers in Quicksort—it's a classic exam question!</template>
+    <template class="content-ar">أهلاً بكم يا شباب في الجزء الثاني من خوارزميات الترتيب. في هذا الموديول، ننتقل من الخوارزميات البسيطة إلى الخوارزميات الاحترافية التي تُستخدم في العالم الحقيقي. ركزوا معي جيداً على خوارزميتين أساسيتين: ترتيب الدمج (Mergesort) والترتيب السريع (Quicksort). في الامتحان، غالباً ما أقارن بينهما. تذكروا دائماً: الدمج يضمن لك O(N log N) لكنه يطمع في ذاكرة إضافية O(N). أما الترتيب السريع فهو بطل الذاكرة (In-place) وسريع جداً، لكن احذر من 'فخ المحور السيء' الذي قد يهبط بك إلى \(O(N^2)\)! لذلك نستخدم 'وسيط الثلاثة'. أخيراً، إذا سألتكم في الامتحان: 'ماذا لو كانت البيانات بحجم تيرابايت والذاكرة 8 جيجا؟' الإجابة فوراً هي: الترتيب الخارجي (External Sorting) باستخدام تقنية الدمج. راجعوا تتبع المؤشرات i و j في Quicksort، فهي سؤال كلاسيكي في الاختبارات!<p>الآن بعد أن فهمنا النظريات، فإن تتبع هذه الخوارزميات خطوة بخطوة هو المفتاح لإتقانها للامتحان. تذكروا دائماً كيف تتحرك المؤشرات في الترتيب السريع وكيف تتفاعل القوائم الفرعية في ترتيب الدمج. هذه التفاصيل الدقيقة هي التي تصنع الفارق بين الكود الذي يعمل والكود المحسن بالكامل.</p></template>
+    <template class="content-en">Welcome to Sorting II. Here we transition from basic algorithms to the heavyweights used in the real world. Focus heavily on Mergesort and Quicksort. In exams, I love comparing them. Always remember: Mergesort guarantees O(N log N) but is greedy for extra memory O(N). Quicksort is the memory champion (in-place) and blazing fast, but beware the 'bad pivot trap' that drops it to \(O(N^2)\)! That's why we use 'Median of three'. Finally, if I ask: 'What if you have a Terabyte of data and 8GB of RAM?' The immediate answer is External Sorting using merging techniques. Make sure you trace the i and j pointers in Quicksort—it's a classic exam question!<p>Now that we grasp the theories, tracing these algorithms step-by-step is the key to mastering them for the exam. Always remember how the pointers move in Quicksort and how sub-lists interact in Mergesort. These fine details make the difference between code that merely works and code that is fully optimized.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1065,6 +1203,41 @@ if firstItem < lastItem
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">العملية الأساسية هي دمج قائمتين مرتبتين مسبقاً لإنتاج قائمة واحدة مرتبة.</template>
           <template class="content-en">The basic operation is merging two previously sorted lists to produce a single sorted list.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في استراتيجية تقسيم Quicksort، لماذا نستخدم حلقة (Loop) لا نهائية &lt;code&gt;for( ; ; )&lt;/code&gt; ونكسرها بـ &lt;code&gt;break&lt;/code&gt; عندما يتقاطع المؤشران؟</template>
+          <template class="content-en">In the Quicksort partitioning strategy, why do we use an infinite loop &lt;code&gt;for( ; ; )&lt;/code&gt; and break it when the pointers cross?</template>
+          <span class="content-target">في استراتيجية تقسيم Quicksort، لماذا نستخدم حلقة (Loop) لا نهائية &lt;code&gt;for( ; ; )&lt;/code&gt; ونكسرها بـ &lt;code&gt;break&lt;/code&gt; عندما يتقاطع المؤشران؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>نستخدم هذه البنية لأننا لا نعرف مسبقاً عدد التبديلات التي سنحتاجها قبل أن يتقاطع المؤشران. الحلقة تستمر في تحريك المؤشرات وتبديل العناصر الخاطئة حتى يتحقق شرط التقاطع <code>i >= j</code>، وحينها نكسر الحلقة لنقوم بالخطوة النهائية وهي استعادة المحور.</p></template>
+          <template class="content-en"><p>We use this structure because we don't know in advance how many swaps are needed before the pointers cross. The loop continuously moves pointers and swaps misplaced elements until the crossing condition <code>i >= j</code> is met, at which point we break to perform the final step of restoring the pivot.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">ماذا يحدث في خطوة الدمج (Merge) إذا كانت جميع عناصر المصفوفة الفرعية اليسرى أصغر من جميع عناصر المصفوفة الفرعية اليمنى؟</template>
+          <template class="content-en">What happens in the Merge step if all elements of the left sub-array are smaller than all elements of the right sub-array?</template>
+          <span class="content-target">ماذا يحدث في خطوة الدمج (Merge) إذا كانت جميع عناصر المصفوفة الفرعية اليسرى أصغر من جميع عناصر المصفوفة الفرعية اليمنى؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>في هذه الحالة، سيقوم المؤشر الأيسر بنسخ جميع عناصره إلى المصفوفة المؤقتة أولاً. بمجرد انتهاء المصفوفة اليسرى، سيتم ببساطة نسخ جميع عناصر المصفوفة اليمنى المتبقية دفعة واحدة، مما يجعل العملية سريعة جداً وفعالة.</p></template>
+          <template class="content-en"><p>In this case, the left pointer will copy all its elements into the temporary array first. Once the left array is exhausted, all remaining elements of the right array will simply be copied over sequentially, making the operation very fast and efficient.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1332,6 +1505,40 @@ if firstItem < lastItem
         "en": "Reading 1GB of data at a time if the available memory is 1GB."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "في استراتيجية تقسيم Quicksort، متى يتوقف المؤشر i والمؤشر j عن الحركة؟",
+      "en": "In the Quicksort partitioning strategy, when do pointer i and pointer j stop moving?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يتوقف i عندما يجد عنصراً أكبر من المحور، ويتوقف j عندما يجد عنصراً أصغر من المحور.",
+        "en": "Pointer i stops when it finds an element larger than the pivot, and j stops when it finds an element smaller than the pivot."
+      },
+      "example": {
+        "ar": "إذا كان المحور 6، سيتوقف i عند 8 ويتوقف j عند 2 لتبديلهما.",
+        "en": "If the pivot is 6, i will stop at 8 and j will stop at 2 to swap them."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "ما هي الخطوة النهائية في عملية التقسيم (Partitioning) بعد تقاطع المؤشرين i و j؟",
+      "en": "What is the final step in the partitioning process after pointers i and j cross?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تبديل المحور (الموجود في نهاية المصفوفة) مع العنصر الذي يشير إليه المؤشر i.",
+        "en": "Swap the pivot (located at the end of the array) with the element pointed to by pointer i."
+      },
+      "example": {
+        "ar": "هذا يضع المحور في مكانه النهائي، حيث الأصغر يساراً والأكبر يميناً.",
+        "en": "This places the pivot in its final position, with smaller elements to the left and larger to the right."
+      }
+    },
+    "id": 17
   }
 ]
 </script>
@@ -1341,7 +1548,7 @@ if firstItem < lastItem
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 12</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1357,7 +1564,7 @@ if firstItem < lastItem
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 12</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1682,6 +1889,70 @@ if firstItem < lastItem
     },
     "difficulty": "medium",
     "conceptId": "external-sorting"
+  },
+  {
+    "conceptId": "worked-examples-quicksort",
+    "question": {
+      "ar": "أثناء عملية التقسيم في الترتيب السريع (Quicksort)، إذا كان المحور هو 5، والمؤشر i يشير إلى 7، والمؤشر j يشير إلى 3. ماذا يجب أن تفعل الخوارزمية في هذه الخطوة (بافتراض أن i و j لم يتقاطعا بعد)؟",
+      "en": "During Quicksort partitioning, if the pivot is 5, pointer i points to 7, and pointer j points to 3. What should the algorithm do at this step (assuming i and j have not crossed)?"
+    },
+    "options": {
+      "ar": [
+        "تحريك المؤشر i إلى اليمين",
+        "تحريك المؤشر j إلى اليسار",
+        "تبديل العنصر 7 مع العنصر 3",
+        "تبديل المحور 5 مع العنصر 7"
+      ],
+      "en": [
+        "Move pointer i to the right",
+        "Move pointer j to the left",
+        "Swap element 7 with element 3",
+        "Swap pivot 5 with element 7"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "بما أن i وجد عنصراً أكبر من المحور (7) و j وجد عنصراً أصغر من المحور (3)، وهما لم يتقاطعا، يجب تبديل هذين العنصرين لوضعهما في الجانب الصحيح من المحور.",
+      "en": "Since i found an element larger than the pivot (7) and j found an element smaller than the pivot (3), and they haven't crossed, these two elements must be swapped to place them on the correct side of the pivot."
+    },
+    "hint": {
+      "ar": "المؤشر i يبحث عن العناصر الكبيرة الخاطئة في اليسار، و j يبحث عن العناصر الصغيرة الخاطئة في اليمين.",
+      "en": "Pointer i looks for misplaced large elements on the left, and j looks for misplaced small elements on the right."
+    },
+    "difficulty": "medium",
+    "id": 11
+  },
+  {
+    "conceptId": "worked-examples-mergesort",
+    "question": {
+      "ar": "في خطوة الدمج (Merge Step) لترتيب مصفوفتين <code>X{2, 5}<\/code> و <code>Y{1, 6}<\/code>، ما هو العنصر الذي سيتم إضافته أولاً إلى المصفوفة النهائية <code>Z<\/code>؟",
+      "en": "In the Merge Step of sorting two arrays <code>X{2, 5}<\/code> and <code>Y{1, 6}<\/code>, which element will be added first to the final array <code>Z<\/code>?"
+    },
+    "options": {
+      "ar": [
+        "2",
+        "5",
+        "1",
+        "6"
+      ],
+      "en": [
+        "2",
+        "5",
+        "1",
+        "6"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "تقوم خوارزمية الدمج بمقارنة العنصر الأول من X (وهو 2) مع العنصر الأول من Y (وهو 1). بما أن 1 أصغر، سيتم إضافته أولاً.",
+      "en": "The merge algorithm compares the first element of X (which is 2) with the first element of Y (which is 1). Since 1 is smaller, it is added first."
+    },
+    "hint": {
+      "ar": "قارن دائماً العناصر التي تقف عليها المؤشرات في بداية كل مصفوفة فرعية.",
+      "en": "Always compare the elements currently pointed to at the start of each sub-array."
+    },
+    "difficulty": "easy",
+    "id": 12
   }
 ]
 </script>
@@ -1726,6 +1997,14 @@ if firstItem < lastItem
       <template class="content-ar">الترتيب الخارجي يعتمد على الوصول التسلسلي (Sequential Access). لذلك، خوارزمية الدمج هي الملكة هنا، لأنها تقرأ وتكتب البيانات بشكل متسلسل، مما يتناسب مع طبيعة الأقراص الصلبة.</template>
       <template class="content-en">External sorting relies on Sequential Access. Therefore, Mergesort is king here, as it reads and writes data sequentially, matching the physical nature of hard drives.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">في استراتيجية تقسيم Quicksort، نسيان تبديل المحور مع العنصر الأخير قبل بدء تحريك المؤشرات. هذا التبديل ضروري جداً لإبعاد المحور عن منطقة العمل وتجنب الأخطاء المنطقية.</template>
+    <template class="content-en">In the Quicksort partitioning strategy, forgetting to swap the pivot with the last element before moving the pointers. This swap is crucial to keep the pivot out of the working area and avoid logical errors.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>

@@ -134,6 +134,31 @@
         <template class="content-en">Free-Space Management</template>
         <span class="content-target">إدارة المساحة الحرة</span>
       </a>
+      <a href="#directory-operations" class="toc-link" data-bilingual>
+        <template class="content-ar">العمليات على الأدلة</template>
+        <template class="content-en">Directory Operations</template>
+        <span class="content-target">العمليات على الأدلة</span>
+      </a>
+      <a href="#disk-and-volume-structure" class="toc-link" data-bilingual>
+        <template class="content-ar">هيكل القرص والمجلدات</template>
+        <template class="content-en">Disk and Volume Structure</template>
+        <span class="content-target">هيكل القرص والمجلدات</span>
+      </a>
+      <a href="#file-system-performance" class="toc-link" data-bilingual>
+        <template class="content-ar">أداء وكفاءة نظام الملفات</template>
+        <template class="content-en">File System Performance and Efficiency</template>
+        <span class="content-target">أداء وكفاءة نظام الملفات</span>
+      </a>
+      <a href="#current-working-directory" class="toc-link" data-bilingual>
+        <template class="content-ar">الدليل الحالي (بيئة العمل)</template>
+        <template class="content-en">Current (Working) Directory</template>
+        <span class="content-target">الدليل الحالي (بيئة العمل)</span>
+      </a>
+      <a href="#on-disk-file-system-structures" class="toc-link" data-bilingual>
+        <template class="content-ar">هياكل نظام الملفات على القرص</template>
+        <template class="content-en">On-Disk File System Structures</template>
+        <span class="content-target">هياكل نظام الملفات على القرص</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -1136,8 +1161,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><ol><li><b>التخصيص المتجاور (Contiguous):</b> يحتل الملف مجموعة من الكتل المتتالية. يوفر أفضل أداء وسهل الإدارة (يحتاج فقط موقع البداية والطول). مشاكله: إيجاد مساحة كافية، معرفة حجم الملف مسبقاً، والتجزئة الخارجية (External fragmentation).</li><li><b>التخصيص المترابط (Linked):</b> كل ملف هو قائمة مرتبطة من الكتل. لا توجد تجزئة خارجية. مشاكله: بطيء جداً في الوصول العشوائي، وموثوقية ضعيفة (تلف مؤشر واحد يفسد الملف). <b>FAT</b> هو تحسين لهذه الطريقة بوضع المؤشرات في جدول بداية القرص.</li><li><b>التخصيص المفهرس (Indexed):</b> يمتلك كل ملف كتلة فهرس (Index block) تحتوي على مؤشرات لجميع كتل البيانات. يدعم الوصول العشوائي ولا يعاني من تجزئة خارجية، لكنه يستهلك مساحة إضافية لكتلة الفهرس.</li></ol></template>
-    <template class="content-en"><ol><li><b>Contiguous:</b> File occupies a set of contiguous blocks. Best performance, simple (needs starting location and length). Problems: finding space, knowing file size in advance, and external fragmentation.</li><li><b>Linked:</b> Each file is a linked list of blocks. No external fragmentation. Problems: slow random access, reliability (one bad pointer ruins the file). <b>FAT</b> is a variation storing pointers in a table at the volume start.</li><li><b>Indexed:</b> Each file has its own index block of pointers to data blocks. Supports random access, no external fragmentation, but has index block overhead.</li></ol></template>
+    <template class="content-ar"><ol><li><b>التخصيص المتجاور (Contiguous):</b> يحتل الملف مجموعة من الكتل المتتالية. يوفر أفضل أداء وسهل الإدارة (يحتاج فقط موقع البداية والطول). مشاكله: إيجاد مساحة كافية، معرفة حجم الملف مسبقاً، والتجزئة الخارجية (External fragmentation).</li><li><b>التخصيص المترابط (Linked):</b> كل ملف هو قائمة مرتبطة من الكتل. لا توجد تجزئة خارجية. مشاكله: بطيء جداً في الوصول العشوائي، وموثوقية ضعيفة (تلف مؤشر واحد يفسد الملف). <b>FAT</b> هو تحسين لهذه الطريقة بوضع المؤشرات في جدول بداية القرص.</li><li><b>التخصيص المفهرس (Indexed):</b> يمتلك كل ملف كتلة فهرس (Index block) تحتوي على مؤشرات لجميع كتل البيانات. يدعم الوصول العشوائي ولا يعاني من تجزئة خارجية، لكنه يستهلك مساحة إضافية لكتلة الفهرس.</li></ol><p>لحساب العناوين المادية من العناوين المنطقية (LA) بافتراض حجم الكتلة 512 بايت/كلمة:</p><ol><li><b>التخصيص المترابط (Linked):</b> يُستخدم جزء من الكتلة (مثلاً 1 بايت) للمؤشر، فيتبقى 511 للبيانات. نحسب $LA / 511 = Q$ والباقي $R$. الكتلة المطلوبة هي الكتلة رقم $Q$ في السلسلة، والإزاحة (Displacement) داخلها هي $R + 1$.</li><li><b>التخصيص المفهرس للملفات الصغيرة:</b> نحسب $LA / 512 = Q$ والباقي $R$. $Q$ هي الإزاحة داخل جدول الفهرس، و $R$ هي الإزاحة داخل كتلة البيانات.</li><li><b>التخصيص المفهرس ثنائي المستوى (Two-Level):</b> نحسب $LA / (512 \times 512) = Q_1$ والباقي $R_1$. $Q_1$ هو مؤشر الفهرس الخارجي. ثم نحسب $R_1 / 512 = Q_2$ والباقي $R_2$. $Q_2$ هو الإزاحة داخل كتلة الفهرس الداخلي، و $R_2$ الإزاحة داخل كتلة الملف.</li></ol><p>في <b><span class="smart-term" data-term-en="Linked Scheme" data-ar="المخطط المترابط" data-en-def="A mechanism in indexed allocation where multiple index blocks are linked together to support files of unbounded length.">المخطط المترابط<span class="smart-term-tooltip"></span></span> للتخصيص المفهرس (Linked Scheme for Indexed Allocation)</b>، حيث يتم ربط كتل الفهارس معاً (بافتراض حجم الكتلة 512 كلمة، ويُستخدم مؤشر واحد للربط تاركاً 511 مؤشراً للبيانات):</p><ol><li>نحسب الإزاحة في الفهرس الخارجي: $LA / (512 \times 511) = Q_1$ والباقي $R_1$. الكتلة $Q_1$ هي كتلة الفهرس المطلوبة.</li><li>نحسب الإزاحة الداخلية باستخدام الباقي: $R_1 / 512 = Q_2$ والباقي $R_2$. $Q_2$ هو الإزاحة داخل كتلة الفهرس، و $R_2$ هو الإزاحة داخل كتلة بيانات الملف.</li></ol></template>
+    <template class="content-en"><ol><li><b>Contiguous:</b> File occupies a set of contiguous blocks. Best performance, simple (needs starting location and length). Problems: finding space, knowing file size in advance, and external fragmentation.</li><li><b>Linked:</b> Each file is a linked list of blocks. No external fragmentation. Problems: slow random access, reliability (one bad pointer ruins the file). <b>FAT</b> is a variation storing pointers in a table at the volume start.</li><li><b>Indexed:</b> Each file has its own index block of pointers to data blocks. Supports random access, no external fragmentation, but has index block overhead.</li></ol><p>To calculate physical addresses from Logical Addresses (LA) assuming a 512-byte/word block size:</p><ol><li><b>Linked Allocation:</b> A portion of the block (e.g., 1 byte) is used for the pointer, leaving 511 for data. Calculate $LA / 511 = Q$ with remainder $R$. The target block is the $Q$-th block in the linked chain, and displacement into the block is $R + 1$.</li><li><b>Indexed Allocation (Small Files):</b> Calculate $LA / 512 = Q$ with remainder $R$. $Q$ is the displacement into the index table, and $R$ is the displacement into the data block.</li><li><b>Two-Level Indexed Allocation:</b> Calculate $LA / (512 \times 512) = Q_1$ with remainder $R_1$. $Q_1$ is the displacement into the outer index. Then calculate $R_1 / 512 = Q_2$ with remainder $R_2$. $Q_2$ is the displacement into the inner index table, and $R_2$ is the displacement into the file block.</li></ol><p>In the <b><span class="smart-term" data-term-en="Linked Scheme" data-ar="المخطط المترابط" data-en-def="A mechanism in indexed allocation where multiple index blocks are linked together to support files of unbounded length.">Linked Scheme<span class="smart-term-tooltip"></span></span> for Indexed Allocation</b>, where index blocks are linked together (assuming a block size of 512 words, using 1 word for the link, leaving 511 for data pointers):</p><ol><li>Calculate the outer index displacement: $LA / (512 \times 511) = Q_1$ with remainder $R_1$. $Q_1$ is the required index block.</li><li>Calculate the inner displacement using the remainder: $R_1 / 512 = Q_2$ with remainder $R_2$. $Q_2$ is the displacement into the index block, and $R_2$ is the displacement into the file data block.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1580,14 +1605,229 @@
   </details>
 </section>
 
+<section id="directory-operations" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">11</span> العمليات على الأدلة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Directory Operations</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تدعم الأدلة (Directories) ست عمليات أساسية لإدارة الملفات بداخلها: البحث، الإنشاء، الحذف، السرد، إعادة التسمية، والتصفح.</p></template>
+    <template class="content-en"><p>Directories support six fundamental operations to manage the files within them: Search, Create, Delete, List, Rename, and Traverse.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لإدارة الملفات وتنظيمها بفعالية، يوفر نظام التشغيل مجموعة من العمليات الأساسية التي يمكن إجراؤها على الدليل (Directory):</p><ol><li><b>البحث عن ملف (Search for a file):</b> العثور على مدخل ملف معين داخل هيكل الدليل لمعرفة موقعه أو خصائصه.</li><li><b>إنشاء ملف (Create a file):</b> إضافة مدخل جديد لملف تم إنشاؤه حديثاً إلى الدليل.</li><li><b>حذف ملف (Delete a file):</b> إزالة مدخل ملف من الدليل عندما لا يعود الملف مطلوباً.</li><li><b>سرد الدليل (List a directory):</b> عرض قائمة بجميع الملفات الموجودة في الدليل ومحتوياته.</li><li><b>إعادة تسمية ملف (Rename a file):</b> تغيير اسم ملف موجود، مما يمثل تغييراً في <span class="smart-term" data-term-en="Directory Entry" data-ar="مدخل الدليل" data-en-def="A record within a directory that maps a human-readable file name to the file&#x27;s metadata or physical location.">مدخل الدليل<span class="smart-term-tooltip"></span></span> الخاص به دون المساس ببيانات الملف نفسه.</li><li><b>تصفح نظام الملفات (Traverse the file system):</b> الوصول إلى كل دليل وملف داخل هيكل نظام الملفات بشكل منهجي، وهي عملية ضرورية لمهام مثل النسخ الاحتياطي (Backup).</li></ol></template>
+    <template class="content-en"><p>To manage and organize files effectively, the OS provides a set of fundamental operations that can be performed on a directory:</p><ol><li><b>Search for a file:</b> Finding a specific file entry within the directory structure to locate it or read its attributes.</li><li><b>Create a file:</b> Adding a new entry for a newly created file to the directory.</li><li><b>Delete a file:</b> Removing a file entry from the directory when the file is no longer needed.</li><li><b>List a directory:</b> Displaying a list of all files present in the directory and its contents.</li><li><b>Rename a file:</b> Changing the name of an existing file, which represents a change in its <span class="smart-term" data-term-en="Directory Entry" data-ar="مدخل الدليل" data-en-def="A record within a directory that maps a human-readable file name to the file&#x27;s metadata or physical location.">directory entry<span class="smart-term-tooltip"></span></span> without affecting the file data itself.</li><li><b><span class="smart-term" data-term-en="Traverse" data-ar="تصفح / اجتياز" data-en-def="Systematically visiting every node (directory and file) in the file system structure.">Traverse<span class="smart-term-tooltip"></span></span> the file system:</b> Accessing every directory and file within the file system structure systematically, essential for tasks like backups.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>تتطلب عملية التصفح (Traversal) حذراً خاصاً في هياكل الأدلة التي تسمح بالروابط (مثل الرسم البياني العام - General Graph)، لتجنب الدخول في حلقات لا نهائية (Infinite loops) أثناء النسخ الاحتياطي أو البحث.</p><p>إعادة التسمية تُعتبر عملية على الدليل لأن اسم الملف يُخزن كجزء من البيانات الوصفية للدليل (Directory Entry) وليس داخل كتلة بيانات الملف الفعلية.</p></template>
+    <template class="content-en"><p>The Traverse operation requires special care in directory structures that allow links (like General Graphs) to avoid falling into infinite loops during backups or searches.</p><p>Renaming is considered a directory operation because the file's name is stored as part of the directory metadata (Directory Entry), not within the actual file data blocks.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر عملية 'إعادة التسمية' أسرع بكثير من عملية 'نسخ' الملف؟</template>
+      <template class="content-en">Why is the 'Rename' operation much faster than 'Copying' a file?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن إعادة التسمية تتطلب فقط تعديل سلسلة نصية صغيرة داخل مدخل الدليل (Directory Entry)، بينما النسخ يتطلب قراءة وكتابة جميع كتل البيانات الفعلية للملف على القرص.</p></template>
+      <template class="content-en"><p>Because renaming only requires modifying a small text string within the directory entry, whereas copying requires reading and writing all the actual data blocks of the file on the disk.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="disk-and-volume-structure" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">12</span> هيكل القرص والمجلدات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">12</span> Disk and Volume Structure</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يمكن تقسيم القرص المادي إلى أقسام (Partitions) تُعرف بالمجلدات (Volumes)، والتي يمكن تهيئتها بأنظمة ملفات مختلفة أو استخدامها كأقراص خام (Raw).</p></template>
+    <template class="content-en"><p>A physical disk can be subdivided into partitions known as Volumes, which can be formatted with different file systems or used as raw disks.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تنظيم الأقراص المادية بعدة طرق لتلبية احتياجات النظام:</p><ol><li><b>الأقسام (Partitions):</b> يمكن تقسيم القرص إلى أقسام فرعية (تُعرف أيضاً بـ minidisks أو slices).</li><li><b>الحماية (RAID):</b> يمكن حماية الأقراص أو الأقسام ضد الأعطال باستخدام تقنيات مصفوفة الأقراص المستقلة (RAID).</li><li><b>الاستخدام الخام مقابل المهيأ (Raw vs Formatted):</b> يمكن استخدام القسم بدون نظام ملفات (Raw disk) لتطبيقات معينة، أو تهيئته بنظام ملفات (Formatted).</li><li><b>المجلد (Volume):</b> الكيان الذي يحتوي على نظام الملفات يُعرف بالمجلد. كل مجلد يتتبع معلومات نظام الملفات الخاص به في دليل الجهاز (Device directory) أو جدول محتويات المجلد.</li></ol><p>بالإضافة إلى أنظمة الملفات العامة (مثل UFS, ZFS, NTFS)، يحتوي نظام التشغيل غالباً على أنظمة ملفات خاصة، مثل <code>tmpfs</code> (نظام ملفات متطاير مبني على الذاكرة للإدخال/الإخراج السريع) و <code>procfs</code> (واجهة النواة لهياكل العمليات).</p></template>
+    <template class="content-en"><p>Physical disks can be organized in several ways to meet system needs:</p><ol><li><b>Partitions:</b> A disk can be subdivided into partitions (also known as minidisks or slices).</li><li><b>Protection (RAID):</b> Disks or partitions can be RAID protected against hardware failure.</li><li><b>Raw vs Formatted:</b> A partition can be used raw (without a file system) for specific applications, or formatted with a file system.</li><li><b><span class="smart-term" data-term-en="Volume" data-ar="المجلد / وحدة التخزين" data-en-def="An entity, typically a partition, that contains a formatted file system.">Volume<span class="smart-term-tooltip"></span></span>:</b> The entity containing a file system is known as a volume. Each volume tracks its file system's info in a device directory or volume table of contents.</li></ol><p>In addition to general-purpose file systems (like UFS, ZFS, NTFS), an OS often has special-purpose file systems, such as <code>tmpfs</code> (memory-based volatile FS for fast I/O) and <code>procfs</code> (kernel interface to process structures).</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام الأقراص الخام (Raw Disks) شائع جداً في أنظمة إدارة قواعد البيانات العلائقية (RDBMS) الضخمة. هذه الأنظمة تفضل تجاوز نظام ملفات نظام التشغيل لتدير التخزين والذاكرة المخبئية بنفسها، مما يمنحها تحكماً أدق وأداءً أعلى.</p><p>أنظمة الملفات الخاصة مثل <code>tmpfs</code> لا تكتب بياناتها على القرص الصلب أبداً، بل تستخدم الذاكرة الرئيسية (RAM)، مما يجعلها مثالية للملفات المؤقتة التي تتطلب سرعة فائقة ولا تحتاج إلى البقاء بعد إعادة التشغيل.</p></template>
+    <template class="content-en"><p>Using <span class="smart-term" data-term-en="Raw Disk" data-ar="القرص الخام" data-en-def="A disk partition that has not been formatted with a file system, allowing direct block-level access.">Raw Disk<span class="smart-term-tooltip"></span></span>s is very common in large Relational Database Management Systems (RDBMS). These systems prefer to bypass the OS file system to manage storage and caching themselves, granting them finer control and higher performance.</p><p>Special-purpose file systems like <code>tmpfs</code> never write their data to the hard drive; they use main memory (RAM), making them ideal for temporary files that require blazing speed and do not need to persist across reboots.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمت بحفظ ملف في مسار يستخدم نظام <code>tmpfs</code>، ماذا سيحدث للملف عند انقطاع التيار الكهربائي؟</template>
+      <template class="content-en">If you save a file in a path that uses the <code>tmpfs</code> file system, what will happen to the file upon a power outage?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>سيتم فقدان الملف تماماً، لأن نظام <code>tmpfs</code> يخزن البيانات في الذاكرة المتطايرة (RAM) وليس على وسيط تخزين دائم.</p></template>
+      <template class="content-en"><p>The file will be completely lost, because the <code>tmpfs</code> file system stores data in volatile memory (RAM) and not on persistent storage.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="file-system-performance" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">13</span> أداء وكفاءة نظام الملفات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">13</span> File System Performance and Efficiency</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>يعتمد أداء نظام الملفات على طريقة التخصيص ونوع وسيط التخزين. مع أقراص SSD السريعة، يتحول عنق الزجاجة من حركة رأس القرص إلى <span class="smart-term" data-term-en="CPU Overhead" data-ar="العبء على وحدة المعالجة المركزية" data-en-def="The processing time required by the CPU to execute file system algorithms and manage I/O operations.">العبء على وحدة المعالجة المركزية<span class="smart-term-tooltip"></span></span> (CPU).</p></template>
+    <template class="content-en"><p>File system performance depends on the allocation method and storage medium type. With fast SSDs, the bottleneck shifts from disk head movement to CPU overhead.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتأثر كفاءة نظام الملفات بشكل مباشر بطريقة تخصيص الكتل:</p><ul><li><b>التخصيص المتجاور (Contiguous):</b> رائع للوصول التسلسلي والعشوائي، لكنه يعاني من التجزئة.</li><li><b>التخصيص المترابط (Linked):</b> جيد للوصول التسلسلي، لكنه سيء للوصول العشوائي.</li><li><b>التخصيص المفهرس (Indexed):</b> أكثر تعقيداً؛ الوصول لكتلة بيانات واحدة قد يتطلب قراءة كتلة الفهرس أولاً ثم قراءة البيانات (عمليتي I/O).</li></ul><p>لتحسين الإنتاجية وتقليل العبء على المعالج (CPU overhead)، تُستخدم تقنية <b>التجميع (Clustering)</b> لجمع الكتل معاً. </p><p>في الأقراص الصلبة التقليدية (HDD)، كانت الخوارزميات تركز على تقليل حركة رأس القراءة الميكانيكي. أما في الذاكرة غير المتطايرة (NVM) وأقراص الحالة الصلبة (SSD)، فلا يوجد رأس متحرك. لذلك، تتطلب هذه الأقراص خوارزميات مختلفة تهدف إلى تقليل دورات المعالج (CPU cycles) وتقصير مسار التنفيذ لعمليات الإدخال والإخراج.</p><p>لتوضيح لماذا يُعد استهلاك دورات المعالج لتجنب الوصول للقرص أمراً منطقياً، لنتأمل هذا المثال الحسابي:</p><ol><li>معالج (Intel Core i7) بسرعة 3.46GHz ينفذ حوالي 159,000 <span class="smart-term" data-term-en="MIPS (Million Instructions Per Second)" data-ar="مليون تعليمة في الثانية" data-en-def="A measure of a computer&#x27;s processor speed and power.">مليون تعليمة في الثانية<span class="smart-term-tooltip"></span></span> (MIPS).</li><li>القرص الصلب التقليدي ينفذ حوالي 250 عملية إدخال/إخراج في الثانية (IOPS).</li><li>إذن، خلال عملية I/O واحدة للقرص، يمكن للمعالج تنفيذ: 159,000 ÷ 250 ≈ 636 مليون تعليمة.</li><li>حتى مع أقراص SSD السريعة التي توفر 60,000 IOPS، يمكن للمعالج تنفيذ: 159,000 ÷ 60,000 ≈ 2.65 مليون تعليمة خلال عملية I/O واحدة.</li></ol><p>هذا يثبت أن إضافة ملايين التعليمات البرمجية (مثل خوارزميات التخزين المؤقت المعقدة) لتوفير قراءة واحدة من القرص هو استثمار ممتاز للأداء.</p></template>
+    <template class="content-en"><p>File system efficiency is directly impacted by the block allocation method:</p><ul><li><b>Contiguous:</b> Great for sequential and random access, but suffers from fragmentation.</li><li><b>Linked:</b> Good for sequential, but poor for random access.</li><li><b>Indexed:</b> More complex; a single block access could require reading the index block first, then the data block (two I/Os).</li></ul><p>To improve throughput and reduce <span class="smart-term" data-term-en="CPU Overhead" data-ar="العبء على وحدة المعالجة المركزية" data-en-def="The processing time required by the CPU to execute file system algorithms and manage I/O operations.">CPU overhead<span class="smart-term-tooltip"></span></span>, <b>Clustering</b> blocks into groups is used.</p><p>In traditional HDDs, algorithms focused on minimizing the mechanical head movement. For Non-Volatile Memory (NVM) and SSDs, there is no moving head. Therefore, these drives require different algorithms and optimizations aimed at reducing CPU cycles and the overall execution path needed for I/O.</p><p>To illustrate why consuming CPU cycles to avoid disk access makes sense, consider this calculation:</p><ol><li>An Intel Core i7 at 3.46GHz executes about 159,000 Million Instructions Per Second (MIPS).</li><li>A typical hard drive performs about 250 I/Os per second (IOPS).</li><li>Thus, during one disk I/O, the CPU can execute: 159,000 ÷ 250 ≈ 636 million instructions.</li><li>Even with fast SSD drives providing 60,000 IOPS, the CPU can execute: 159,000 ÷ 60,000 ≈ 2.65 million instructions during a single disk I/O.</li></ol><p>This proves that adding millions of instructions (like complex caching algorithms) to save a single disk read is an excellent performance investment.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>إضافة تعليمات برمجية إضافية إلى مسار التنفيذ لتوفير عملية إدخال/إخراج (I/O) واحدة للقرص يُعتبر مقايضة رابحة جداً. على سبيل المثال، معالج حديث (مثل Intel Core i7) يمكنه تنفيذ مئات الملايين من التعليمات في الوقت الذي يستغرقه القرص الصلب لإجراء عملية I/O واحدة (حوالي 250 IOPS للقرص العادي).</p><p>حتى مع أقراص SSD السريعة التي توفر 60,000 IOPS، لا يزال بإمكان المعالج تنفيذ ملايين التعليمات خلال عملية I/O واحدة، مما يبرر استخدام خوارزميات معقدة في الذاكرة (مثل التخزين المؤقت المتقدم) لتجنب الوصول الفعلي للقرص.</p></template>
+    <template class="content-en"><p>Adding instructions to the execution path to save a single disk I/O is a highly reasonable trade-off. For instance, a modern CPU (like an Intel Core i7) can execute hundreds of millions of instructions in the time it takes a typical hard drive to perform one I/O (around 250 IOPS).</p><p>Even with fast SSD drives providing 60,000 IOPS, the CPU can still execute millions of instructions during a single disk I/O, justifying the use of complex in-memory algorithms (like advanced caching) to avoid physical disk access.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا تعتبر خوارزميات جدولة حركة رأس القرص (مثل SCAN و C-SCAN) غير مفيدة لأقراص SSD؟</template>
+      <template class="content-en">Why are disk head scheduling algorithms (like SCAN and C-SCAN) useless for SSDs?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن أقراص SSD لا تحتوي على أجزاء ميكانيكية متحركة (لا يوجد رأس قراءة/كتابة). الوصول إلى أي موقع في SSD يستغرق نفس الوقت تقريباً، لذا فإن محاولة ترتيب الطلبات بناءً على الموقع المادي تستهلك دورات المعالج دون أي فائدة.</p></template>
+      <template class="content-en"><p>Because SSDs have no moving mechanical parts (no read/write head). Accessing any location in an SSD takes roughly the same amount of time, so trying to sort requests based on physical location consumes CPU cycles for no benefit.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="current-working-directory" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">14</span> الدليل الحالي (بيئة العمل)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">14</span> Current (Working) Directory</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>تعيين دليل كدليل حالي يسهل العمليات، حيث تُنفذ أوامر الإنشاء والحذف داخله افتراضياً دون الحاجة لكتابة المسار الكامل.</p></template>
+    <template class="content-en"><p>Designating a directory as the current one simplifies operations, as creation and deletion default to it without needing full paths.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>يمكن تعيين أحد الأدلة ليكون <span class="smart-term" data-term-en="Current Directory" data-ar="الدليل الحالي" data-en-def="The directory in the file system where a user or process is currently working, used as the default starting point for relative paths.">الدليل الحالي<span class="smart-term-tooltip"></span></span> (Working Directory) للمستخدم أو العملية. هذا يسهل التعامل مع الملفات بشكل كبير. على سبيل المثال، إذا كان الدليل الحالي هو <code>/spell/mail/prog</code>، فإن أي عملية إنشاء أو حذف ستتم داخله افتراضياً.</p><p>إذا كان الدليل الحالي هو <code>/mail</code>، فإن أمر إنشاء دليل جديد <code>mkdir &lt;dir-name&gt;</code> سيقوم بإنشائه كدليل فرعي مباشر داخل <code>/mail</code>. كما يجب الانتباه إلى أن حذف دليل معين (مثل <code>mail</code>) سيؤدي إلى حذف <span class="smart-term" data-term-en="Subtree" data-ar="الشجرة الفرعية" data-en-def="A directory and all the files and nested directories contained within it.">الشجرة الفرعية<span class="smart-term-tooltip"></span></span> بأكملها (التي جذرها <code>mail</code>).</p></template>
+    <template class="content-en"><p>One of the directories can be designated as the current (working) directory for a user or process. This greatly simplifies file handling. For example, if the <span class="smart-term" data-term-en="Current Directory" data-ar="الدليل الحالي" data-en-def="The directory in the file system where a user or process is currently working, used as the default starting point for relative paths.">current directory<span class="smart-term-tooltip"></span></span> is <code>/spell/mail/prog</code>, creating and deleting a file is done in this current directory by default.</p><p>If the current directory is <code>/mail</code>, the command <code>mkdir &lt;dir-name&gt;</code> creates a subdirectory directly within <code>/mail</code>. Also, it is important to note that deleting a directory (like <code>mail</code>) deletes the entire <span class="smart-term" data-term-en="Subtree" data-ar="الشجرة الفرعية" data-en-def="A directory and all the files and nested directories contained within it.">subtree<span class="smart-term-tooltip"></span></span> rooted by it.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>استخدام الدليل الحالي يقلل من العبء على نظام التشغيل في تحليل المسارات المطلقة (Absolute paths) الطويلة في كل مرة، حيث يعتمد على المسارات النسبية (Relative paths) انطلاقاً من الدليل الحالي.</p><p>تحتفظ كل عملية (Process) في نظام التشغيل بمؤشر خاص بها يشير إلى دليلها الحالي، مما يسمح لعمليات متعددة بالعمل في أجزاء مختلفة من نظام الملفات دون تداخل.</p></template>
+    <template class="content-en"><p>Using a current directory reduces the OS overhead of parsing long absolute paths every time, relying instead on relative paths starting from the current directory.</p><p>Each process in the OS maintains its own pointer to its current working directory, allowing multiple processes to operate in different parts of the file system without interference.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا حاولت حذف الدليل الحالي الذي تعمل بداخله؟</template>
+      <template class="content-en">What happens if you try to delete the current directory you are working in?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>يتوقّف على نظام التشغيل: ويندوز يرفض لأن الدليل مستعمَلٌ من العمليّة، أمّا يونكس/لينكس فيسمح بحذفه إن كان فارغاً — فتبقى العمليّة في دليلٍ محذوفٍ يفشل فيه إنشاءُ أيِّ ملف.</p></template>
+      <template class="content-en"><p>It depends on the OS: Windows refuses because the directory is in use by the process, while Unix/Linux lets you remove it if it is empty — the process is then left in a deleted directory where creating files fails.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
+<section id="on-disk-file-system-structures" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">15</span> هياكل نظام الملفات على القرص</h2></template>
+    <template class="content-en"><h2><span class="concept-number">15</span> On-Disk File System Structures</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>لتنفيذ عمليات نظام الملفات، يُخزن القرص هياكل أساسية مثل كتلة التحكم في الإقلاع، كتلة التحكم في المجلد (Superblock)، وهيكل الدليل.</p></template>
+    <template class="content-en"><p>To implement file system operations, the disk stores key structures like the boot control block, <span class="smart-term" data-term-en="Volume Control Block (Superblock)" data-ar="كتلة التحكم في المجلد (سوبر بلوك)" data-en-def="A block containing critical metadata about the file system volume, such as total blocks, block size, and free space information.">volume control block (superblock)<span class="smart-term-tooltip"></span></span>, and directory structure.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لتنفيذ دوال واجهة برمجة التطبيقات (API) لنظام الملفات، يعتمد النظام على هياكل مخزنة فعلياً على القرص:</p><ol><li><b><span class="smart-term" data-term-en="Boot Control Block" data-ar="كتلة التحكم في الإقلاع" data-en-def="The first block of a volume containing the code and data needed to boot an operating system.">كتلة التحكم في الإقلاع<span class="smart-term-tooltip"></span></span> (Boot Control Block):</b> تحتوي على المعلومات اللازمة للنظام لتمهيد (Boot) نظام التشغيل من ذلك المجلد. تكون مطلوبة فقط إذا كان المجلد يحتوي على نظام تشغيل، وعادة ما تكون الكتلة الأولى في المجلد.</li><li><b>كتلة التحكم في المجلد (Volume Control Block):</b> تُعرف أيضاً بالـ Superblock أو Master File Table. تحتوي على تفاصيل المجلد مثل إجمالي عدد الكتل، عدد الكتل الحرة، حجم الكتلة، ومؤشرات الكتل الحرة أو مصفوفاتها.</li><li><b>هيكل الدليل (Directory Structure):</b> يُنظم الملفات ويحتوي على أسماء الملفات وأرقام الـ inode الخاصة بها (أو مؤشرات لكتل التحكم بالملفات).</li></ol></template>
+    <template class="content-en"><p>To implement file system API functions, the system relies on structures physically stored on the disk:</p><ol><li><b><span class="smart-term" data-term-en="Boot Control Block" data-ar="كتلة التحكم في الإقلاع" data-en-def="The first block of a volume containing the code and data needed to boot an operating system.">Boot Control Block<span class="smart-term-tooltip"></span></span>:</b> Contains info needed by the system to boot the OS from that volume. It is needed if the volume contains an OS, and is usually the first block of the volume.</li><li><b>Volume Control Block:</b> Also known as a superblock or master file table. Contains volume details like total number of blocks, number of free blocks, block size, and free block pointers or arrays.</li><li><b>Directory Structure:</b> Organizes the files and contains names and inode numbers (or pointers to file control blocks).</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>فصل هذه الهياكل يسمح بمرونة وموثوقية عالية. فكتلة الإقلاع ثابتة الموقع لتجدها اللوحة الأم (BIOS/UEFI).</p><p>أمّا الـ Superblock فيحتوي على بيانات وصفية حرجة جداً، لذا تقوم أنظمة الملفات الحديثة بإنشاء نسخ احتياطية منه وتوزيعها في أماكن مختلفة من القرص للحماية من التلف.</p></template>
+    <template class="content-en"><p>Separating these structures allows high flexibility and reliability. The boot block is fixed in location for the motherboard (BIOS/UEFI) to find.</p><p>The superblock, by contrast, contains highly critical metadata, so modern file systems create backups of it and distribute them across different locations on the disk to protect against corruption.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">لماذا لا تحتوي جميع المجلدات (Volumes) على كتلة تحكم في الإقلاع (Boot Control Block)؟</template>
+      <template class="content-en">Why don't all volumes have a Boot Control Block?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>لأن كتلة الإقلاع مطلوبة فقط إذا كان المجلد يحتوي على نظام تشغيل قابل للتمهيد. مجلدات التخزين العادية (مثل أقراص USB أو أقسام البيانات) لا تحتاجها.</p></template>
+      <template class="content-en"><p>Because a boot block is only needed if the volume contains a bootable operating system. Standard storage volumes (like USB drives or data partitions) do not need it.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب نظام التشغيل: نظام الملفات. تخيلوا القرص الصلب كمكتبة ضخمة فارغة. كيف سننظم الكتب (الملفات)؟ أولاً، نحتاج إلى 'مفهوم الملف' و'كتلة تحكم الملف (FCB)' التي تعمل كبطاقة هوية لكل كتاب. ثم نحتاج إلى 'هيكل الدليل' (فهرس المكتبة) لترتيبها، وقد تطور هذا من صندوق واحد بسيط (Single-level) إلى شجرة معقدة (Tree-structured) تسمح بالتنظيم الدقيق. لكن الأهم هو: كيف نضع هذه الكتب فعلياً على الرفوف (الأقراص)؟ هنا تأتي 'طرق التخصيص'. التخصيص المتجاور سريع جداً لكنه يترك فجوات (تجزئة خارجية). التخصيص المترابط يحل الفجوات لكنه بطيء في البحث. التخصيص المفهرس يجمع بين السرعة والمرونة، ونظام UNIX UFS أبدع في دمجه ليدعم الملفات الصغيرة والضخمة بكفاءة. ولا ننسى إدارة 'المساحة الحرة' باستخدام متجه البتات لنجد الرفوف الفارغة بسرعة. ركزوا في الاختبار على مقارنة طرق التخصيص، وفهم جداول الملفات المفتوحة في الذاكرة، وكيفية عمل الأقفال. بالتوفيق!</template>
-    <template class="content-en">Welcome, future engineers, to the heart of the OS: the File System. Imagine the hard drive as a massive empty library. How do we organize the books (files)? First, we need the 'File Concept' and the 'FCB' which acts as an ID card for each book. Then, we need a 'Directory Structure' (the library catalog) to arrange them, evolving from a simple single box to a complex tree. But the most critical part is: how do we physically place these books on the shelves (disks)? Enter 'Allocation Methods'. Contiguous allocation is blazing fast but leaves gaps (external fragmentation). Linked allocation fixes gaps but is slow to search. Indexed allocation combines speed and flexibility, and UNIX UFS brilliantly combined them to support both tiny and massive files. Don't forget 'Free-Space Management' using bit vectors to quickly find empty shelves. For the exam, focus heavily on comparing allocation methods, understanding in-memory open-file tables, and how file locking works. Good luck!</template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في قلب نظام التشغيل: نظام الملفات. تخيلوا القرص الصلب كمكتبة ضخمة فارغة. كيف سننظم الكتب (الملفات)؟ أولاً، نحتاج إلى 'مفهوم الملف' و'كتلة تحكم الملف (FCB)' التي تعمل كبطاقة هوية لكل كتاب. ثم نحتاج إلى 'هيكل الدليل' (فهرس المكتبة) لترتيبها، وقد تطور هذا من صندوق واحد بسيط (Single-level) إلى شجرة معقدة (Tree-structured) تسمح بالتنظيم الدقيق. لكن الأهم هو: كيف نضع هذه الكتب فعلياً على الرفوف (الأقراص)؟ هنا تأتي 'طرق التخصيص'. التخصيص المتجاور سريع جداً لكنه يترك فجوات (تجزئة خارجية). التخصيص المترابط يحل الفجوات لكنه بطيء في البحث. التخصيص المفهرس يجمع بين السرعة والمرونة، ونظام UNIX UFS أبدع في دمجه ليدعم الملفات الصغيرة والضخمة بكفاءة. ولا ننسى إدارة 'المساحة الحرة' باستخدام متجه البتات لنجد الرفوف الفارغة بسرعة. ركزوا في الاختبار على مقارنة طرق التخصيص، وفهم جداول الملفات المفتوحة في الذاكرة، وكيفية عمل الأقفال. بالتوفيق!<p>فهم الرياضيات وراء تحويل العناوين المنطقية إلى مادية ليس مجرد تمرين نظري؛ بل هو جوهر تصميم أنظمة التشغيل. كل بايت يُحسب وكل دورة معالج تُوفر تُترجم مباشرة إلى نظام أسرع وأكثر استجابة، خاصة عند التعامل مع المفاضلات بين الأقراص الميكانيكية البطيئة و SSDs الحديثة.</p><p>لفهم كيفية عمل نظام الملفات حقاً، يجب أن نربط بين الهياكل المنطقية والمادية. الأقراص تُقسم إلى مجلدات (Volumes)، وكل مجلد يحتاج إلى هياكل على القرص (مثل Superblock و FCB) ليعرف أين تبدأ الملفات وأين تنتهي، مما يمهد الطريق لخوارزميات تخصيص الكتل التي درسناها.</p><p>إن فهم كيفية معالجة الأدلة من خلال عملياتها الأساسية، وكيفية تقسيم الأقراص إلى مجلدات (Volumes) أو استخدامها كأقراص خام، يمنحك الصورة الكاملة لإدارة التخزين. علاوة على ذلك، فإن إدراك مفاضلات الأداء—خاصة كيف تنقل أقراص SSD الحديثة عنق الزجاجة من حركة رأس القرص إلى العبء على المعالج—يُعد أمراً حاسماً لتصميم أنظمة التشغيل الحديثة.</p><p>لقد استكملنا الآن الصورة الشاملة لنظام الملفات بإضافة الهياكل المادية على القرص (مثل Superblock) ومفهوم الدليل الحالي. تذكر دائماً أن تصميم أنظمة التشغيل هو لعبة توازنات؛ فنحن نضحي بدورات المعالج الوفيرة لتوفير عمليات الإدخال والإخراج البطيئة جداً على الأقراص، وهو المبدأ الذي يحكم أداء النظام بأكمله.</p></template>
+    <template class="content-en">Welcome, future engineers, to the heart of the OS: the File System. Imagine the hard drive as a massive empty library. How do we organize the books (files)? First, we need the 'File Concept' and the 'FCB' which acts as an ID card for each book. Then, we need a 'Directory Structure' (the library catalog) to arrange them, evolving from a simple single box to a complex tree. But the most critical part is: how do we physically place these books on the shelves (disks)? Enter 'Allocation Methods'. Contiguous allocation is blazing fast but leaves gaps (external fragmentation). Linked allocation fixes gaps but is slow to search. Indexed allocation combines speed and flexibility, and UNIX UFS brilliantly combined them to support both tiny and massive files. Don't forget 'Free-Space Management' using bit vectors to quickly find empty shelves. For the exam, focus heavily on comparing allocation methods, understanding in-memory open-file tables, and how file locking works. Good luck!<p>Understanding the math behind logical to physical address translation isn't just a theoretical exercise; it's the core of OS design. Every byte accounted for and every CPU cycle saved translates directly into a faster, more responsive system, especially when navigating the trade-offs between slow mechanical disks and modern SSDs.</p><p>To truly understand how a file system works, we must bridge the logical and physical structures. Disks are divided into Volumes, and each volume requires on-disk structures (like the Superblock and FCB) to know where files begin and end, paving the way for the block allocation algorithms we studied.</p><p>Understanding how directories are manipulated through their fundamental operations, and how disks are partitioned into volumes or used raw, gives you the complete picture of storage management. Furthermore, recognizing performance trade-offs—especially how modern SSDs shift the bottleneck from disk head movement to CPU overhead—is crucial for modern operating system design.</p><p>We have now completed the comprehensive picture of the file system by adding physical on-disk structures (like the Superblock) and the concept of the current directory. Always remember that OS design is a game of trade-offs; we sacrifice abundant CPU cycles to save extremely slow disk I/O operations, a principle that governs overall system performance.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1761,6 +2001,129 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar">إما بتقييد الروابط لتكون للملفات فقط (وليس للأدلة)، أو باستخدام خوارزميات اكتشاف الحلقات (Cycle detection) عند إضافة أي رابط جديد، بالإضافة إلى خوارزميات جمع القمامة (Garbage collection) لاستعادة المساحات.</template>
           <template class="content-en">Either by restricting links to files only (not directories), or by using cycle detection algorithms whenever a new link is added, along with garbage collection algorithms to reclaim space.</template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في التخصيص المترابط، لماذا نضيف 1 إلى الباقي (R + 1) عند حساب الإزاحة داخل الكتلة؟</template>
+          <template class="content-en">In Linked Allocation, why do we add 1 to the remainder (R + 1) when calculating the displacement into the block?</template>
+          <span class="content-target">في التخصيص المترابط، لماذا نضيف 1 إلى الباقي (R + 1) عند حساب الإزاحة داخل الكتلة؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن البايت الأول (أو الكلمة الأولى) في الكتلة المادية محجوز لتخزين المؤشر الذي يشير إلى الكتلة التالية في السلسلة. لذلك، تبدأ بيانات الملف الفعلية من البايت الثاني (الإزاحة 1)، مما يستوجب إزاحة جميع الحسابات بمقدار 1 لتجاوز المؤشر.</p></template>
+          <template class="content-en"><p>Because the first byte (or word) of the physical block is reserved to store the pointer to the next block in the chain. Therefore, the actual file data starts at the second byte (displacement 1), requiring all calculations to be shifted by 1 to bypass the pointer.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يغير استخدام أقراص SSD من فلسفة تصميم خوارزميات أنظمة الملفات؟</template>
+          <template class="content-en">How does the use of SSDs change the design philosophy of file system algorithms?</template>
+          <span class="content-target">كيف يغير استخدام أقراص SSD من فلسفة تصميم خوارزميات أنظمة الملفات؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>تاريخياً، صُممت الخوارزميات لتقليل حركة رأس القراءة الميكانيكي في الأقراص الصلبة (لأنه أبطأ جزء). مع SSDs، لا يوجد رأس متحرك والوصول عشوائي وسريع جداً. لذا، الفلسفة الجديدة تركز على تقليل العبء البرمجي (CPU overhead) وتقصير مسار التعليمات بدلاً من محاولة تحسين ترتيب الكتل على القرص.</p></template>
+          <template class="content-en"><p>Historically, algorithms were designed to minimize the mechanical read head movement in HDDs (the slowest part). With SSDs, there is no moving head and access is uniformly fast. Thus, the new philosophy focuses on reducing CPU overhead and shortening the instruction path rather than trying to optimize block layout on the disk.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نفصل كتلة التحكم في الإقلاع (Boot Block) عن كتلة التحكم في المجلد (Superblock)؟</template>
+          <template class="content-en">Why do we separate the Boot Control Block from the Volume Control Block (Superblock)?</template>
+          <span class="content-target">لماذا نفصل كتلة التحكم في الإقلاع (Boot Block) عن كتلة التحكم في المجلد (Superblock)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>كتلة الإقلاع تعتمد على العتاد (Hardware-dependent) ويجب أن تكون في موقع ثابت (الكتلة 0) ليجدها المعالج عند التشغيل. أما الـ Superblock فهو يعتمد على نظام الملفات (File-system specific) ويصف تخطيط البيانات، ويمكن أن يتواجد في مجلدات لا تحتوي على نظام تشغيل أصلاً.</p></template>
+          <template class="content-en"><p>The Boot Block is hardware-dependent and must be at a fixed location (block 0) for the CPU to find it at startup. The Superblock is file-system specific, describes data layout, and can exist on volumes that don't even contain an OS.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في المخطط المترابط للتخصيص المفهرس، لماذا نقسم على (512 × 511) لحساب الفهرس الخارجي؟</template>
+          <template class="content-en">In the Linked Scheme for Indexed Allocation, why do we divide by (512 × 511) to calculate the outer index?</template>
+          <span class="content-target">في المخطط المترابط للتخصيص المفهرس، لماذا نقسم على (512 × 511) لحساب الفهرس الخارجي؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن كل كتلة فهرس داخلي تحتوي على 511 مؤشراً للبيانات (بافتراض أن المؤشر الأخير يُستخدم لربط كتلة الفهرس التالية). وكل مؤشر بيانات يشير إلى كتلة حجمها 512 كلمة. لذا، كل كتلة فهرس تغطي (511 × 512) كلمة من الملف.</p></template>
+          <template class="content-en"><p>Because each inner index block contains 511 data pointers (assuming the last pointer is used to link to the next index block). Each data pointer points to a block of 512 words. Thus, each index block covers (511 × 512) words of the file.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا تُصنف عملية 'إعادة التسمية' (Rename) كعملية على الدليل وليس كعملية على الملف نفسه؟</template>
+          <template class="content-en">Why is the 'Rename' operation classified as a directory operation rather than a file operation?</template>
+          <span class="content-target">لماذا تُصنف عملية 'إعادة التسمية' (Rename) كعملية على الدليل وليس كعملية على الملف نفسه؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن اسم الملف ليس جزءاً من محتوى الملف الفعلي ولا يُخزن داخل كتل البيانات الخاصة به. الاسم يُخزن فقط كمدخل (Entry) داخل هيكل الدليل ليربط بين الاسم المقروء للبشر ورقم الـ FCB (أو inode). لذا، تغيير الاسم يتطلب فقط تعديل هذا المدخل في الدليل دون المساس ببيانات الملف.</p></template>
+          <template class="content-en"><p>Because the file name is not part of the actual file content and is not stored within its data blocks. The name is only stored as an entry within the directory structure to map the human-readable name to the FCB (or inode) number. Thus, changing the name only requires modifying this directory entry without touching the file's data.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يغير استخدام أقراص الحالة الصلبة (SSD) من أولويات تصميم أنظمة الملفات مقارنة بالأقراص الميكانيكية (HDD)؟</template>
+          <template class="content-en">How does the use of Solid State Drives (SSDs) change the priorities of file system design compared to mechanical Hard Disk Drives (HDDs)?</template>
+          <span class="content-target">كيف يغير استخدام أقراص الحالة الصلبة (SSD) من أولويات تصميم أنظمة الملفات مقارنة بالأقراص الميكانيكية (HDD)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>في الأقراص الميكانيكية، كان العدو الأكبر للأداء هو وقت البحث (Seek time) الناتج عن حركة رأس القراءة. لذلك، ركزت الخوارزميات على وضع الكتل المتجاورة مادياً. مع أقراص SSD، لا يوجد رأس متحرك والوصول عشوائي وسريع. بالتالي، تتحول الأولوية إلى تقليل العبء على المعالج (CPU overhead) وتقليل مسار التعليمات البرمجية اللازمة لإصدار أمر الإدخال/الإخراج.</p></template>
+          <template class="content-en"><p>In mechanical drives, the biggest enemy of performance was seek time caused by the read head's movement. Therefore, algorithms focused on placing blocks physically contiguous. With SSDs, there is no moving head and access is uniformly fast. Consequently, the priority shifts to reducing CPU overhead and shortening the code path required to issue an I/O command.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر الـ Superblock نقطة الفشل الفردية (Single Point of Failure) في نظام الملفات، وكيف نعالج ذلك؟</template>
+          <template class="content-en">Why do we consider the Superblock a Single Point of Failure in a file system, and how do we address this?</template>
+          <span class="content-target">لماذا نعتبر الـ Superblock نقطة الفشل الفردية (Single Point of Failure) في نظام الملفات، وكيف نعالج ذلك؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الـ Superblock يحتوي على معلومات حيوية مثل حجم الكتل وأماكن المساحات الحرة. إذا تلف، لن يتمكن نظام التشغيل من فهم أو قراءة أي شيء على المجلد. لمعالجة ذلك، تقوم أنظمة الملفات الحديثة بإنشاء نسخ احتياطية متعددة من الـ Superblock وتوزيعها في مواقع مختلفة على القرص.</p></template>
+          <template class="content-en"><p>The Superblock contains vital information like block size and free space locations. If it gets corrupted, the OS cannot understand or read anything on the volume. To address this, modern file systems create multiple backup copies of the Superblock and distribute them across different locations on the disk.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -2028,6 +2391,125 @@
         "en": "Allows fast access to small files while supporting terabyte-sized files."
       }
     }
+  },
+  {
+    "front": {
+      "ar": "كيف تحسب رقم الكتلة والإزاحة في التخصيص المترابط (Linked Allocation)؟",
+      "en": "How do you calculate the block number and displacement in Linked Allocation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "نقسم العنوان المنطقي (LA) على (حجم الكتلة - حجم المؤشر). ناتج القسمة (Q) هو رقم الكتلة في السلسلة، والإزاحة هي الباقي (R) + 1.",
+        "en": "Divide the Logical Address (LA) by (Block Size - Pointer Size). The quotient (Q) is the block number in the chain, and displacement is the remainder (R) + 1."
+      },
+      "example": {
+        "ar": "إذا كان LA = 1000 وحجم الكتلة 512 (مؤشر 1 بايت): 1000 / 511 = 1 والباقي 489. الكتلة هي الثانية في السلسلة، والإزاحة 490.",
+        "en": "If LA = 1000 and block size 512 (1 byte pointer): 1000 / 511 = 1, remainder 489. The block is the 2nd in the chain, displacement is 490."
+      }
+    },
+    "id": 16
+  },
+  {
+    "front": {
+      "ar": "كيف تحسب مؤشر الفهرس الخارجي في التخصيص المفهرس ثنائي المستوى؟",
+      "en": "How do you calculate the outer index pointer in Two-Level Indexed Allocation?"
+    },
+    "back": {
+      "definition": {
+        "ar": "بقسمة العنوان المنطقي (LA) على (حجم الكتلة × عدد المؤشرات في الكتلة).",
+        "en": "By dividing the Logical Address (LA) by (Block Size × Number of pointers per block)."
+      },
+      "example": {
+        "ar": "LA / (512 × 512) = Q1. حيث Q1 هو الإزاحة في الفهرس الخارجي.",
+        "en": "LA / (512 × 512) = Q1. Where Q1 is the displacement in the outer index."
+      }
+    },
+    "id": 17
+  },
+  {
+    "front": {
+      "ar": "ما هي العمليات الست الأساسية التي يمكن إجراؤها على الدليل؟",
+      "en": "What are the six fundamental operations that can be performed on a directory?"
+    },
+    "back": {
+      "definition": {
+        "ar": "البحث، الإنشاء، الحذف، السرد، إعادة التسمية، والتصفح.",
+        "en": "Search, Create, Delete, List, Rename, and Traverse."
+      },
+      "example": {
+        "ar": "استخدام أمر <code>ls<\/code> في لينكس هو مثال على عملية السرد (List).",
+        "en": "Using the <code>ls<\/code> command in Linux is an example of the List operation."
+      }
+    },
+    "id": 18
+  },
+  {
+    "front": {
+      "ar": "ما هو القرص الخام (Raw Disk)؟",
+      "en": "What is a Raw Disk?"
+    },
+    "back": {
+      "definition": {
+        "ar": "قسم من القرص غير مهيأ بنظام ملفات، يُستخدم للوصول المباشر إلى الكتل.",
+        "en": "A disk partition not formatted with a file system, used for direct block-level access."
+      },
+      "example": {
+        "ar": "تستخدمه أنظمة قواعد البيانات مثل Oracle لإدارة التخزين بنفسها.",
+        "en": "Used by database systems like Oracle to manage storage themselves."
+      }
+    },
+    "id": 19
+  },
+  {
+    "front": {
+      "ar": "كيف تؤثر أقراص SSD على تصميم خوارزميات نظام الملفات؟",
+      "en": "How do SSDs affect the design of file system algorithms?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تلغي الحاجة لخوارزميات تقليل حركة رأس القرص، وتركز بدلاً من ذلك على تقليل العبء على المعالج (CPU cycles).",
+        "en": "They eliminate the need for algorithms reducing head movement, focusing instead on minimizing CPU cycles."
+      },
+      "example": {
+        "ar": "تجاهل خوارزميات جدولة الأقراص مثل SCAN.",
+        "en": "Ignoring disk scheduling algorithms like SCAN."
+      }
+    },
+    "id": 20
+  },
+  {
+    "front": {
+      "ar": "ما هي الفائدة الرئيسية من استخدام الدليل الحالي (Current Directory)؟",
+      "en": "What is the main benefit of using a Current Directory?"
+    },
+    "back": {
+      "definition": {
+        "ar": "يسهل العمليات من خلال السماح للمستخدمين والبرامج باستخدام مسارات نسبية قصيرة بدلاً من كتابة المسار المطلق الكامل في كل مرة.",
+        "en": "It simplifies operations by allowing users and programs to use short relative paths instead of typing the full absolute path every time."
+      },
+      "example": {
+        "ar": "كتابة <code>mkdir test<\/code> بدلاً من <code>mkdir /home/user/documents/test<\/code>.",
+        "en": "Typing <code>mkdir test<\/code> instead of <code>mkdir /home/user/documents/test<\/code>."
+      }
+    },
+    "id": 21
+  },
+  {
+    "front": {
+      "ar": "ما هي كتلة التحكم في المجلد (Volume Control Block)؟",
+      "en": "What is the Volume Control Block?"
+    },
+    "back": {
+      "definition": {
+        "ar": "تُعرف أيضاً بالـ Superblock، وهي هيكل على القرص يحتوي على تفاصيل المجلد مثل إجمالي الكتل، حجم الكتلة، ومؤشرات المساحة الحرة.",
+        "en": "Also known as the Superblock, it is an on-disk structure containing volume details like total blocks, block size, and free space pointers."
+      },
+      "example": {
+        "ar": "يقرأها نظام التشغيل لمعرفة أين يمكنه تخصيص كتل لملف جديد.",
+        "en": "The OS reads it to know where it can allocate blocks for a new file."
+      }
+    },
+    "id": 22
   }
 ]
 </script>
@@ -2037,7 +2519,7 @@
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 10</span>
+      <span id="quiz-counter">1 / 16</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -2053,7 +2535,7 @@
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 10</div>
+    <div class="score-display" id="quiz-score-display">0 / 16</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2378,6 +2860,198 @@
     },
     "difficulty": "medium",
     "conceptId": "file-operations-and-locking"
+  },
+  {
+    "conceptId": "allocation-methods",
+    "question": {
+      "ar": "في التخصيص المترابط (Linked Allocation)، إذا كان حجم الكتلة 512 بايت ويُستخدم بايت واحد للمؤشر، ما هي الإزاحة (Displacement) للعنوان المنطقي 1022؟",
+      "en": "In Linked Allocation, if the block size is 512 bytes and 1 byte is used for the pointer, what is the displacement for Logical Address 1022?"
+    },
+    "options": {
+      "ar": [
+        "510",
+        "511",
+        "1",
+        "0"
+      ],
+      "en": [
+        "510",
+        "511",
+        "1",
+        "0"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المساحة المتاحة للبيانات هي 511 بايت. 1022 / 511 = 2 والباقي 0. الإزاحة داخل الكتلة تُحسب كـ (الباقي + 1)، إذن 0 + 1 = 1.",
+      "en": "Available data space is 511 bytes. 1022 / 511 = 2 with remainder 0. Displacement into the block is (Remainder + 1), so 0 + 1 = 1."
+    },
+    "hint": {
+      "ar": "تذكر أن الإزاحة = R + 1، حيث R هو باقي قسمة LA على 511.",
+      "en": "Remember that displacement = R + 1, where R is the remainder of LA divided by 511."
+    },
+    "difficulty": "hard",
+    "id": 11
+  },
+  {
+    "id": 12,
+    "conceptId": "directory-operations",
+    "question": {
+      "ar": "أي من العمليات التالية لا تُعتبر من العمليات الأساسية الست التي تُجرى على الدليل (Directory)؟",
+      "en": "Which of the following is NOT considered one of the six fundamental operations performed on a directory?"
+    },
+    "options": {
+      "ar": [
+        "إعادة التسمية (Rename)",
+        "التصفح (Traverse)",
+        "الترجمة (Compile)",
+        "السرد (List)"
+      ],
+      "en": [
+        "Rename",
+        "Traverse",
+        "Compile",
+        "List"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "الترجمة هي عملية برمجية لتحويل الكود المصدري إلى برنامج تنفيذي، وليست عملية إدارة أدلة. العمليات هي: البحث، الإنشاء، الحذف، السرد، إعادة التسمية، والتصفح.",
+      "en": "Compiling is a software process to convert source code into an executable, not a directory management operation. The operations are: Search, Create, Delete, List, Rename, Traverse."
+    },
+    "hint": {
+      "ar": "ابحث عن العملية التي تتعلق بالبرمجة وليس بإدارة الملفات.",
+      "en": "Look for the operation related to programming rather than file management."
+    },
+    "difficulty": "easy"
+  },
+  {
+    "id": 13,
+    "conceptId": "disk-and-volume-structure",
+    "question": {
+      "ar": "ما هي الميزة الرئيسية لاستخدام نظام الملفات <code>tmpfs<\/code>؟",
+      "en": "What is the main advantage of using the <code>tmpfs<\/code> file system?"
+    },
+    "options": {
+      "ar": [
+        "يوفر حماية قوية ضد فقدان البيانات عند انقطاع الكهرباء",
+        "يسمح بإنشاء ملفات بحجم غير محدود",
+        "يوفر عمليات إدخال/إخراج سريعة جداً لأنه مبني على الذاكرة (RAM)",
+        "يضغط الملفات تلقائياً لتوفير مساحة القرص الصلب"
+      ],
+      "en": [
+        "Provides strong protection against data loss during power outages",
+        "Allows creating files of unlimited size",
+        "Provides very fast I/O operations because it is memory-based (RAM)",
+        "Automatically compresses files to save hard drive space"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "نظام <code>tmpfs<\/code> يستخدم الذاكرة الرئيسية (RAM) لتخزين الملفات المؤقتة، مما يجعله أسرع بكثير من الأقراص الصلبة، ولكنه متطاير (يفقد البيانات عند إعادة التشغيل).",
+      "en": "<code>tmpfs<\/code> uses main memory (RAM) to store temporary files, making it much faster than hard drives, but it is volatile (loses data on reboot)."
+    },
+    "hint": {
+      "ar": "تذكر أن 'tmp' تعني مؤقت، وأين تُخزن البيانات المؤقتة السريعة؟",
+      "en": "Remember that 'tmp' stands for temporary, and where is fast temporary data stored?"
+    },
+    "difficulty": "medium"
+  },
+  {
+    "id": 14,
+    "conceptId": "file-system-performance",
+    "question": {
+      "ar": "لماذا يُعتبر إضافة تعليمات برمجية معقدة في الذاكرة لتجنب عملية I/O واحدة للقرص أمراً مبرراً؟",
+      "en": "Why is adding complex in-memory instructions to avoid a single disk I/O considered justified?"
+    },
+    "options": {
+      "ar": [
+        "لأن المعالج يمكنه تنفيذ ملايين التعليمات في الوقت الذي يستغرقه القرص لإجراء عملية I/O واحدة",
+        "لأن الذاكرة الرئيسية أرخص من مساحة القرص الصلب",
+        "لأن عمليات I/O للقرص تستهلك طاقة كهربائية أقل",
+        "لأن الأقراص الصلبة لا تدعم الخوارزميات المعقدة"
+      ],
+      "en": [
+        "Because the CPU can execute millions of instructions in the time it takes the disk to perform one I/O",
+        "Because main memory is cheaper than hard drive space",
+        "Because disk I/O operations consume less electrical power",
+        "Because hard drives do not support complex algorithms"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "الفرق في السرعة بين المعالج (CPU) والقرص الصلب هائل جداً. استهلاك دورات المعالج لتجنب الوصول البطيء للقرص يحسن الأداء العام للنظام بشكل كبير.",
+      "en": "The speed difference between the CPU and the hard drive is massive. Consuming CPU cycles to avoid slow disk access significantly improves overall system performance."
+    },
+    "hint": {
+      "ar": "قارن بين سرعة المعالج (بالملايين في الثانية) وسرعة القرص (بالمئات في الثانية).",
+      "en": "Compare CPU speed (millions per second) with disk speed (hundreds per second)."
+    },
+    "difficulty": "medium"
+  },
+  {
+    "conceptId": "current-working-directory",
+    "question": {
+      "ar": "إذا قمت بحذف دليل معين، ماذا يحدث للملفات والأدلة الفرعية الموجودة بداخله؟",
+      "en": "If you delete a specific directory, what happens to the files and subdirectories inside it?"
+    },
+    "options": {
+      "ar": [
+        "تنتقل إلى الدليل الجذر (Root)",
+        "تُحذف الشجرة الفرعية بأكملها",
+        "يُمنع الحذف حتى يتم إفراغ الدليل يدوياً",
+        "تُضغط وتُخزن في سلة المهملات"
+      ],
+      "en": [
+        "They are moved to the Root directory",
+        "The entire subtree is deleted",
+        "Deletion is prevented until the directory is manually emptied",
+        "They are compressed and stored in the recycle bin"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "حذف دليل يؤدي إلى حذف الشجرة الفرعية (Subtree) بأكملها التي تقع تحته، بما في ذلك جميع الملفات والأدلة المتداخلة.",
+      "en": "Deleting a directory deletes the entire subtree rooted by it, including all nested files and directories."
+    },
+    "hint": {
+      "ar": "فكر في الدليل كجذر لشجرة.",
+      "en": "Think of the directory as the root of a tree."
+    },
+    "difficulty": "easy",
+    "id": 15
+  },
+  {
+    "conceptId": "on-disk-file-system-structures",
+    "question": {
+      "ar": "أين توجد عادة كتلة التحكم في الإقلاع (Boot Control Block)؟",
+      "en": "Where is the Boot Control Block usually located?"
+    },
+    "options": {
+      "ar": [
+        "في نهاية القرص الصلب",
+        "موزعة عشوائياً لحمايتها",
+        "في الكتلة الأولى من المجلد (Volume)",
+        "داخل جدول الملفات المفتوحة في الذاكرة"
+      ],
+      "en": [
+        "At the end of the hard drive",
+        "Distributed randomly for protection",
+        "In the first block of the volume",
+        "Inside the open-file table in memory"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "يجب أن تكون كتلة الإقلاع في موقع ثابت ومعروف مسبقاً (عادة الكتلة الأولى) لكي يتمكن العتاد من العثور عليها وتنفيذ كود الإقلاع.",
+      "en": "The boot block must be in a fixed, pre-known location (usually the first block) so the hardware can find it and execute the boot code."
+    },
+    "hint": {
+      "ar": "العتاد يحتاج إلى نقطة بداية ثابتة عند تشغيل الجهاز.",
+      "en": "Hardware needs a fixed starting point when powering on."
+    },
+    "difficulty": "medium",
+    "id": 16
   }
 ]
 </script>
@@ -2422,6 +3096,46 @@
       <template class="content-ar">المخطط الهجين في UNIX UFS (المؤشرات المباشرة وغير المباشرة) هو تطبيق لمبدأ 'تحسين الحالة الشائعة'. معظم الملفات صغيرة، لذا تُستخدم المؤشرات المباشرة لتوفير أقصى سرعة، مع الاحتفاظ بالقدرة على دعم الملفات الضخمة عند الحاجة.</template>
       <template class="content-en">The Combined Scheme in UNIX UFS (direct and indirect pointers) is an application of 'optimize the common case'. Most files are small, so direct pointers provide maximum speed, while retaining the ability to support massive files when needed.</template>
       <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">عند حساب الإزاحة في التخصيص المترابط (Linked Allocation)، احذر من القسمة على حجم الكتلة بالكامل (مثلاً 512). يجب أن تطرح حجم المؤشر أولاً (مثلاً 511)، لأن المؤشر يستهلك مساحة من الكتلة ولا يُعتبر جزءاً من بيانات الملف.</template>
+    <template class="content-en">When calculating displacement in Linked Allocation, beware of dividing by the full block size (e.g., 512). You must subtract the pointer size first (e.g., 511), because the pointer consumes block space and is not part of the file's data.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الخلط بين 'القرص الخام' (Raw Disk) و 'القرص المهيأ الفارغ'. القرص الخام لا يحتوي على نظام ملفات إطلاقاً (تستخدمه قواعد البيانات مباشرة)، بينما القرص المهيأ الفارغ يحتوي على نظام ملفات (مثل NTFS) وهياكل إدارية، لكنه لا يحتوي على ملفات مستخدمين بعد.</template>
+    <template class="content-en">Confusing a 'Raw Disk' with an 'Empty Formatted Disk'. A raw disk has no file system at all (used directly by databases), whereas an empty formatted disk has a file system (like NTFS) and administrative structures, but no user files yet.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن إعادة تسمية الملف (Rename) تتطلب نسخ بيانات الملف إلى موقع جديد. في الواقع، إعادة التسمية هي عملية على الدليل فقط وتعدل البيانات الوصفية (الاسم) دون المساس بكتل البيانات.</template>
+    <template class="content-en">Believing that renaming a file requires copying the file's data to a new location. In reality, renaming is purely a directory operation that modifies metadata (the name) without touching the data blocks.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--key"><i class="fa-solid fa-key" aria-hidden="true"></i> <span data-i18n="vault.key">مفهوم أساسي</span></div>
+    <div data-bilingual>
+    <template class="content-ar">مع ظهور أقراص SSD، تغيرت قواعد اللعبة في تصميم أنظمة الملفات. لم يعد الهدف تقليل حركة رأس القرص (لأنه غير موجود)، بل أصبح الهدف تقليل العبء على المعالج (CPU Overhead) وتقصير مسار التعليمات البرمجية.</template>
+    <template class="content-en">With the advent of SSDs, the rules of file system design changed. The goal is no longer to minimize disk head movement (since it doesn't exist), but rather to reduce CPU overhead and shorten the instruction path.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن امتداد الملف (مثل .txt أو .exe) يحدد محتواه الفعلي. في الواقع، الامتداد هو مجرد تلميح لنظام التشغيل والمستخدم، بينما المحتوى الفعلي يُحدد بواسطة منشئ الملف ويمكن أن يكون مختلفاً عن امتداده.</template>
+    <template class="content-en">Believing that a file extension (like .txt or .exe) dictates its actual content. In reality, the extension is just a hint for the OS and the user, while the actual content is defined by the file's creator and can differ from its extension.</template>
+    <div class="content-target"></div>
     </div>
   </div>
 </section>
