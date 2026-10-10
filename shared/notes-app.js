@@ -4956,6 +4956,7 @@
           onAdd: function (el) { inkAssign(el); },
           unview: function (el) { if (!pvLive() || !el || !el.b) return 0; var T = inkTopsSoon(); return T ? inkShift(el, T) : 0; },
           onPinch: docPinch,
+          onScratch: function (cl, mode) { return (ed && ed.scratchWords) ? ed.scratchWords(cl, mode) : 0; },
           onShapeBox: function (x, y, w, h, stage) { return shapeFromBox('note', 0, x, y, w, h, 794, stage); },
           onBand: function (r) {
             var b = toRootRect(r);

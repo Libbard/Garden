@@ -372,6 +372,224 @@
   }
 
 
+  var SCR_LS = 'garden_ink_scratch';
+  function scratchOn() { try { return localStorage.getItem(SCR_LS) !== 'off'; } catch (e) { return true; } }
+  function setScratch(on) {
+    try { if (on) localStorage.removeItem(SCR_LS); else localStorage.setItem(SCR_LS, 'off'); } catch (e) {}
+    try { document.dispatchEvent(new CustomEvent('garden:scratchPref', { detail: { on: !!on } })); } catch (e2) {}
+  }
+
+  function resample(pts, step) {
+    var out = [], i, acc = 0;
+    if (!pts.length) return out;
+    var prev = pts[0];
+    out.push({ x: prev.x, y: prev.y });
+    for (i = 1; i < pts.length; i++) {
+      var p = pts[i], dx = p.x - prev.x, dy = p.y - prev.y, d = Math.sqrt(dx * dx + dy * dy);
+      if (!(d > 0)) continue;
+      while (acc + d >= step) {
+        var t = (step - acc) / d;
+        prev = { x: prev.x + dx * t, y: prev.y + dy * t };
+        out.push(prev);
+        dx = p.x - prev.x; dy = p.y - prev.y; d = Math.sqrt(dx * dx + dy * dy);
+        acc = 0;
+      }
+      acc += d;
+      prev = p;
+    }
+    var last = pts[pts.length - 1];
+    out.push({ x: last.x, y: last.y });
+    return out;
+  }
+
+  function swings(arr, minExc) {
+    var dir = 0, ext = arr[0], start = arr[0], n = 0, amp = [], from = arr[0], at = 0, turns = [0], i;
+    for (i = 1; i < arr.length; i++) {
+      var v = arr[i];
+      if (dir === 0) {
+        if (v - start >= minExc) { dir = 1; ext = v; at = i; from = start; }
+        else if (start - v >= minExc) { dir = -1; ext = v; at = i; from = start; }
+      } else if (dir === 1) {
+        if (v > ext) { ext = v; at = i; }
+        else if (ext - v >= minExc) { n++; amp.push(ext - from); turns.push(at); from = ext; dir = -1; ext = v; at = i; }
+      } else {
+        if (v < ext) { ext = v; at = i; }
+        else if (v - ext >= minExc) { n++; amp.push(from - ext); turns.push(at); from = ext; dir = 1; ext = v; at = i; }
+      }
+    }
+    turns.push(arr.length - 1);
+    return { n: n, amp: amp, turns: turns };
+  }
+
+  function hullOf(ps) {
+    var a = ps.slice().sort(function (p, q) { return p.x - q.x || p.y - q.y; });
+    if (a.length < 3) return a;
+    var cross = function (o, p, q) { return (p.x - o.x) * (q.y - o.y) - (p.y - o.y) * (q.x - o.x); };
+    var lo = [], up = [], i;
+    for (i = 0; i < a.length; i++) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], a[i]) <= 0) lo.pop(); lo.push(a[i]); }
+    for (i = a.length - 1; i >= 0; i--) { while (up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], a[i]) <= 0) up.pop(); up.push(a[i]); }
+    up.pop(); lo.pop();
+    return lo.concat(up);
+  }
+
+  function segD2(px, py, a, b) {
+    var dx = b.x - a.x, dy = b.y - a.y, L2 = dx * dx + dy * dy;
+    var t = L2 ? Math.max(0, Math.min(1, ((px - a.x) * dx + (py - a.y) * dy) / L2)) : 0;
+    var x = a.x + t * dx - px, y = a.y + t * dy - py;
+    return x * x + y * y;
+  }
+
+  function inHull(h, pad, x, y) {
+    var n = h.length, i, inside = n >= 3;
+    for (i = 0; i < n && inside; i++) {
+      var a = h[i], b = h[(i + 1) % n];
+      if ((b.x - a.x) * (y - a.y) - (b.y - a.y) * (x - a.x) < 0) inside = false;
+    }
+    if (inside) return true;
+    var p2 = pad * pad;
+    for (i = 0; i < n; i++) if (segD2(x, y, h[i], h[(i + 1) % n]) <= p2) return true;
+    return false;
+  }
+
+  function cv(a) {
+    if (!a.length) return 0;
+    var m = 0, v = 0, i;
+    for (i = 0; i < a.length; i++) m += a[i];
+    m /= a.length;
+    for (i = 0; i < a.length; i++) v += (a[i] - m) * (a[i] - m);
+    return m ? Math.sqrt(v / a.length) / m : 0;
+  }
+
+  function scribbleOf(pts, z, w, speed) {
+    if (!pts || pts.length < 8) return null;
+    z = z || 1;
+    var px = 1 / z, i;
+    var mnx = Infinity, mny = Infinity, mxx = -Infinity, mxy = -Infinity;
+    for (i = 0; i < pts.length; i++) {
+      if (pts[i].x < mnx) mnx = pts[i].x; if (pts[i].x > mxx) mxx = pts[i].x;
+      if (pts[i].y < mny) mny = pts[i].y; if (pts[i].y > mxy) mxy = pts[i].y;
+    }
+    var diag = Math.sqrt((mxx - mnx) * (mxx - mnx) + (mxy - mny) * (mxy - mny));
+    if (diag < 14 * px) return null;
+    var rs = resample(pts, Math.max(1.2 * px, diag / 200));
+    if (rs.length < 12) return null;
+    var mx = 0, my = 0, L = 0;
+    for (i = 0; i < rs.length; i++) { mx += rs[i].x; my += rs[i].y; if (i) L += Math.sqrt(Math.pow(rs[i].x - rs[i - 1].x, 2) + Math.pow(rs[i].y - rs[i - 1].y, 2)); }
+    mx /= rs.length; my /= rs.length;
+    var hull = hullOf(rs), ha = 0, sa = 0;
+    for (i = 0; i < hull.length; i++) { var h0 = hull[i], h1 = hull[(i + 1) % hull.length]; ha += h0.x * h1.y - h1.x * h0.y; }
+    for (i = 0; i < rs.length; i++) { var s0 = rs[i], s1 = rs[(i + 1) % rs.length]; sa += s0.x * s1.y - s1.x * s0.y; }
+    ha = Math.abs(ha) / 2; sa = Math.abs(sa) / 2;
+    if (!(ha > 0) || sa / ha > 0.8) return null;
+    var cxx = 0, cyy = 0, cxy = 0;
+    for (i = 0; i < rs.length; i++) { var dx = rs[i].x - mx, dy = rs[i].y - my; cxx += dx * dx; cyy += dy * dy; cxy += dx * dy; }
+    var th = 0.5 * Math.atan2(2 * cxy, cxx - cyy);
+    var mode = '', axes = [th, th + Math.PI / 2], ax;
+    for (ax = 0; ax < 2 && !mode; ax++) {
+      var ux = Math.cos(axes[ax]), uy = Math.sin(axes[ax]), P = [], p0 = Infinity, p1 = -Infinity;
+      for (i = 0; i < rs.length; i++) {
+        var v = (rs[i].x - mx) * ux + (rs[i].y - my) * uy;
+        P.push(v); if (v < p0) p0 = v; if (v > p1) p1 = v;
+      }
+      var ext = p1 - p0;
+      if (ext < 8 * px) continue;
+      var sw = swings(P, Math.max(0.45 * ext, 5 * px));
+      if (sw.n < 3 || L < 3 * ext) continue;
+      var qx = -uy, qy = ux, ends = sw.turns.slice(1, -1), hs = 0, hr = 0, ls = 0, lr = 0, k;
+      for (k = 0; k < ends.length; k++) {
+        var t = ends[k], top = P[t], up = top > (p0 + p1) / 2, depth = 0.2 * Math.abs(top - (up ? p0 : p1)), wq0 = Infinity, wq1 = -Infinity, j;
+        for (j = t; j >= 0 && Math.abs(P[j] - top) <= depth; j--) { var qa = (rs[j].x - mx) * qx + (rs[j].y - my) * qy; if (qa < wq0) wq0 = qa; if (qa > wq1) wq1 = qa; }
+        for (j = t; j < rs.length && Math.abs(P[j] - top) <= depth; j++) { var qb = (rs[j].x - mx) * qx + (rs[j].y - my) * qy; if (qb < wq0) wq0 = qb; if (qb > wq1) wq1 = qb; }
+        var sharpK = (wq1 - wq0) <= 1.6 * depth + 1.5 * px;
+        if (up) { if (sharpK) hs++; else hr++; } else { if (sharpK) ls++; else lr++; }
+      }
+      var nh = hs + hr, nl = ls + lr;
+      var big = sw.amp.filter(function (a) { return a >= 0.6 * ext; }).length;
+      var q0 = Infinity, q1 = -Infinity;
+      for (i = 0; i < rs.length; i++) { var qv = (rs[i].x - mx) * qx + (rs[i].y - my) * qy; if (qv < q0) q0 = qv; if (qv > q1) q1 = qv; }
+      var pitch = (q1 - q0) / Math.max(1, sw.n), tight = pitch <= 0.3 * ext;
+      var mid = sw.amp.slice(1, -1), cvA = cv(mid.length >= 2 ? mid : sw.amp);
+      var bothSharp = nh && nl && hs >= 0.75 * nh && ls >= 0.75 * nl;
+      var bothRound = !ax && tight && nh && nl && hr >= 0.75 * nh && lr >= 0.75 * nl;
+      var fast = !ax || (speed != null && speed >= 0.4);
+      var Q = ends.map(function (t2) { return (rs[t2].x - mx) * qx + (rs[t2].y - my) * qy; }), gaps = [];
+      for (k = 1; k < Q.length; k++) gaps.push(Math.abs(Q[k] - Q[k - 1]));
+      if (fast && sw.n >= (ax ? 5 : 3) && (!ax || (cvA <= 0.22 && cv(gaps) <= 0.4)) && (bothSharp || bothRound) && Math.abs(nh - nl) <= 1 && big >= Math.max(3, sw.n - 1)) mode = ax ? 'zig' : 'rub';
+    }
+    if (!mode) return null;
+    return { mode: mode, hull: hull, pad: Math.max((w || 2) / 2, 3 * px), box: { x: mnx, y: mny, w: mxx - mnx, h: mxy - mny } };
+  }
+
+  function samplesOf(el) {
+    var out = [], i;
+    if (el.ty === 'st' && el.pts && el.pts.length) {
+      var len = 0;
+      for (i = 1; i < el.pts.length; i++) len += Math.sqrt(Math.pow(el.pts[i].x - el.pts[i - 1].x, 2) + Math.pow(el.pts[i].y - el.pts[i - 1].y, 2));
+      var rs = resample(el.pts, Math.max(0.5, len / 28));
+      var k = Math.max(1, Math.floor(rs.length / 40));
+      for (i = 0; i < rs.length; i += k) out.push(rs[i]);
+      if (el.hi && el.w) {
+        var hw = (el.w * ((NIBS[el.nib] && NIBS[el.nib].scale) || 1)) / 2 * 0.6, base = out.slice();
+        base.forEach(function (q) { out.push({ x: q.x, y: q.y - hw }); out.push({ x: q.x, y: q.y + hw }); });
+      }
+      return out;
+    }
+    var bb = bboxOf(el), cx, cy;
+    for (cx = 0; cx <= 4; cx++) for (cy = 0; cy <= 2; cy++) out.push({ x: bb.x + bb.w * cx / 4, y: bb.y + bb.h * cy / 2 });
+    return out;
+  }
+
+  function scratchHits(els, sc, skip) {
+    var ids = [], i, k;
+    for (i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el === skip || !el.id) continue;
+      var bb = boxOf(el);
+      if (bb.x > sc.box.x + sc.box.w + sc.pad || bb.x + bb.w < sc.box.x - sc.pad ||
+          bb.y > sc.box.y + sc.box.h + sc.pad || bb.y + bb.h < sc.box.y - sc.pad) continue;
+      var sm = samplesOf(el), inn = 0;
+      for (k = 0; k < sm.length; k++) if (inHull(sc.hull, sc.pad, sm[k].x, sm[k].y)) inn++;
+      if (sm.length && inn / sm.length >= 0.5) ids.push(el.id);
+    }
+    return ids;
+  }
+
+  var _scrToast = null;
+  function scrL(ar, en) { return document.documentElement.lang === 'en' ? en : ar; }
+  function scratchToast(n, undo) {
+    dropScratchToast();
+    var t = document.createElement('div');
+    t.className = 'gink-toast';
+    t.setAttribute('role', 'status');
+    t.innerHTML = '<i class="fa-solid fa-eraser" aria-hidden="true"></i><span></span>' +
+      '<button type="button" data-a="undo"></button><button type="button" data-a="off"></button>';
+    t.children[1].textContent = scrL('مُحي بالشخبطة', 'Scribbled away') + (n > 1 ? ' · ' + n : '');
+    t.children[2].textContent = scrL('تراجع', 'Undo');
+    t.children[3].textContent = scrL('أوقفْ هذه الميزة', 'Turn this off');
+    t.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    t.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('button') : null;
+      if (!b) return;
+      var a = b.getAttribute('data-a');
+      if (a === 'undo') { dropScratchToast(); undo(); return; }
+      if (a === 'off') {
+        setScratch(false);
+        t.innerHTML = '<i class="fa-solid fa-circle-check" aria-hidden="true"></i><span></span>';
+        t.children[1].textContent = scrL('أوقفتَ «الشخبطةُ تمحو» — تعيدها من ⚙ ثمّ «التخصيص»', 'Scribble-to-erase is off — turn it back on from ⚙ then “Customise”');
+        clearTimeout(t._t); t._t = setTimeout(dropScratchToast, 4200);
+      }
+    });
+    document.body.appendChild(t);
+    t._t = setTimeout(dropScratchToast, 6500);
+    _scrToast = t;
+  }
+  function dropScratchToast() {
+    if (!_scrToast) return;
+    clearTimeout(_scrToast._t);
+    if (_scrToast.parentNode) _scrToast.parentNode.removeChild(_scrToast);
+    _scrToast = null;
+  }
+
   function Canvas(host, opts) {
     var o = opts || {};
     this.host = host;
@@ -386,6 +604,7 @@
     this.onAdd = o.onAdd || function () {};
     this.onTap = o.onTap || function () {};
     this.onPass = o.onPass || null;
+    this.onScratch = o.onScratch || null;
     this.unview = o.unview || null;
     /*@3.NOCJ.116*/
     this.onTextAt = o.onTextAt || null;
@@ -1156,7 +1375,7 @@
     }
     if (!qs.length) return;
     g.save();
-    g.globalAlpha = 1;
+    g.globalAlpha = el._fade || 1;
     g.strokeStyle = hiHexOf(el.c);
     var nibS = (NIBS[el.nib] && NIBS[el.nib].scale) || 1;
     g.lineWidth = Math.max(1, (el.w || 2) * nibS * (this.cam.z || 1));
@@ -1186,10 +1405,12 @@
     var z = this.cam.z || 1;
     var x0 = (0 - this.cam.x) / z, x1 = (this.w - this.cam.x) / z;
     var y0 = (0 - this.cam.y) / z, y1 = (this.h - this.cam.y) / z;
+    var fade = this._scr || null;
     for (var i = 0; i < this.els.length; i++) {
       var el = this.els[i];
       var b = boxOf(el);
       if (b.x > x1 || b.x + b.w < x0 || b.y > y1 || b.y + b.h < y0) continue;
+      if (fade && fade[el.id]) el = Object.assign({}, el, { o: (el.o == null ? 1 : el.o) * 0.2, _fade: 0.2 });
       if (gh && isBand(el)) this.paintHi(gh, el);
       else this.paintEl(g, el);
     }
@@ -2011,8 +2232,86 @@
     return true;
   };
 
+  Canvas.prototype.scratchClient = function (sc) {
+    var r = this.wet.getBoundingClientRect(), hz = (this.wet.offsetWidth && r.width / this.wet.offsetWidth) || 1, self = this;
+    var hull = sc.hull.map(function (p) { var q = self.toScreen(p); return { x: r.left + q.x * hz, y: r.top + q.y * hz }; });
+    var pad = sc.pad * (this.cam.z || 1) * hz, x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    hull.forEach(function (p) { if (p.x < x0) x0 = p.x; if (p.x > x1) x1 = p.x; if (p.y < y0) y0 = p.y; if (p.y > y1) y1 = p.y; });
+    return { box: { x0: x0 - pad, y0: y0 - pad, x1: x1 + pad, y1: y1 + pad },
+             inside: function (x, y) { return inHull(hull, pad, x, y); } };
+  };
+
+  Canvas.prototype.scratchSpeed = function (st, id) {
+    var t0 = this._t0s && this._t0s[id], dt = t0 ? Date.now() - t0 : 0, L = 0, i, p = st.pts;
+    if (!(dt > 0)) return null;
+    for (i = 1; i < p.length; i++) L += Math.sqrt((p[i].x - p[i - 1].x) * (p[i].x - p[i - 1].x) + (p[i].y - p[i - 1].y) * (p[i].y - p[i - 1].y));
+    var r = this.wet.getBoundingClientRect(), hz = (this.wet.offsetWidth && r.width / this.wet.offsetWidth) || 1;
+    return L * (this.cam.z || 1) * hz / dt;
+  };
+
+  Canvas.prototype.scratchScan = function (st, id) {
+    if (!st || st.ty !== 'st' || st.hi || this.tool !== 'pen' || !scratchOn()) return null;
+    var sc = scribbleOf(st.pts, this.cam.z || 1, st.w, this.scratchSpeed(st, id));
+    if (!sc) return null;
+    var ids = scratchHits(this.els, sc, st), cl = null, words = 0;
+    if (this.onScratch) {
+      cl = this.scratchClient(sc);
+      try { words = this.onScratch(cl, 'peek') || 0; } catch (e) { words = 0; }
+    }
+    return { sc: sc, ids: ids, cl: cl, words: words };
+  };
+
+  Canvas.prototype.scratchPeek = function (st, id) {
+    var t = Date.now();
+    if (this._scrT && t - this._scrT < 70) return;
+    this._scrT = t;
+    var hit = this.scratchScan(st, id), map = null;
+    if (hit && hit.ids.length) { map = {}; hit.ids.forEach(function (id) { map[id] = 1; }); }
+    var was = this._scr ? Object.keys(this._scr).sort().join() : '', now = map ? Object.keys(map).sort().join() : '';
+    this._scr = map;
+    this._scrW = !!(hit && hit.words);
+    if (was !== now) this.paint();
+    if (!this._scrW && this._scrCl && this.onScratch) { try { this.onScratch(null, 'clear'); } catch (e) {} }
+    this._scrCl = this._scrW;
+  };
+
+  Canvas.prototype.scratchEnd = function () {
+    var had = !!this._scr;
+    this._scr = null; this._scrT = 0;
+    if (this._scrCl && this.onScratch) { try { this.onScratch(null, 'clear'); } catch (e) {} }
+    this._scrCl = false;
+    if (had) this.paint();
+  };
+
+  Canvas.prototype.scratchApply = function (st, id) {
+    var hit = this.scratchScan(st, id);
+    if (!hit || (!hit.ids.length && !hit.words)) return false;
+    var self = this, gone = {}, n = hit.ids.length, words = 0;
+    hit.ids.forEach(function (id) { gone[id] = 1; });
+    if (this.hist) this.hist.begin();
+    try {
+      if (n) {
+        this.push(this.snapshot());
+        this.els = this.els.filter(function (e) { return !gone[e.id]; });
+        this.sel = {};
+      }
+      if (hit.words && this.onScratch) { try { words = this.onScratch(hit.cl, 'apply') || 0; } catch (e) { words = 0; } }
+    } finally { if (this.hist) this.hist.end(); }
+    if (!n && !words) return false;
+    this._scr = null;
+    this.paint();
+    if (n) this.commit();
+    this.emit();
+    scratchToast(n + words, function () {
+      if (self.hist) self.hist.undo(); else self.undo();
+    });
+    try { document.dispatchEvent(new CustomEvent('garden:scratch', { detail: { ink: n, words: words } })); } catch (e2) {}
+    return true;
+  };
+
   Canvas.prototype.bindInput = function () {
     var self = this;
+    var modOf = function (t) { return !!(t && (t.act || t.mod)); };
     this.router = window.GardenInkInput.create({
       el: this.wet,
       mode: function () { return self.tool === 'hand' ? 'pan' : 'draw'; },
@@ -2021,6 +2320,8 @@
       onPass: function (x, y, src) { if (self.onPass) self.onPass(x, y, src); },
 
       onBegin: function (id, pt, ptype, act) {
+        dropScratchToast();
+        (self._t0s = self._t0s || {})[id] = Date.now();
         if (act) { self.beginMod(act); self._modDid = false; }
         var wp = self.toWorld(pt);
         /*@3.NOCJ.115*/
@@ -2208,6 +2509,7 @@
           st.pts.push(tiltPt(w3.x, w3.y, pts[i]));
         }
         self.wetTick();
+        if (!st.hi && !modOf(arguments[2]) && st.pts.length >= 10) self.scratchPeek(st, id);
       },
 
       onEnd: function (id, keep) {
@@ -2255,6 +2557,9 @@
         }
         var st = self.live[id];
         delete self.live[id];
+        var scr = !!self._scr || !!self._scrCl;
+        if (st && keep && st.ty === 'st' && !st.hi && !modOf(arguments[2]) && self.scratchApply(st, id)) { self.scratchEnd(); self.paintWet(); return; }
+        if (scr) self.scratchEnd();
         if (!st) { self.paintWet(); return; }
         if (st.blk && st.held && self.onShapeBox) {
           self.paintWet();
@@ -2496,6 +2801,9 @@
       try { return relLum(hex); } catch (e) { return null; }
     },
     bboxOf: bboxOf,
+    scratchOn: scratchOn,
+    setScratch: setScratch,
+    scribbleOf: scribbleOf,
     segDist: segDist,
     pointInPoly: pointInPoly,
     eachPoint: eachPoint,

@@ -32,6 +32,7 @@
     this.onBand = o.onBand || function () {};
     this.onTap = o.onTap || function () {};
     this.onPass = o.onPass || null;
+    this.onScratch = o.onScratch || null;
     /*@3.NOOJ.31*/
     this.onTextAt = o.onTextAt || null;
     this.onPinch = o.onPinch || null;
@@ -366,6 +367,7 @@
       onBand: function (r) { self.onBand(r); },
       onTap: function (p) { self.onTap(p); },
       onPass: function (x, y, src) { return self.onPass ? self.onPass(x, y, src) : false; },
+      onScratch: this.onScratch ? function (cl, mode) { return self.onScratch(cl, mode); } : null,
       /*@3.NOOJ.32*/
       onTextAt: self.onTextAt ? function (p, c) { self.onTextAt(p, c); } : null
     });

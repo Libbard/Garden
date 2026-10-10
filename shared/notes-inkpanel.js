@@ -305,6 +305,13 @@
         sw('on', hp.on, 'ألوانٌ ثابتة', 'Pinned colours', 'ستّةُ ألوانٍ من لوحتك حول الوسط — المسْ «⋯» لتبدّل اللوحة', 'Six colours from your palette around the centre — tap “⋯” to switch palette') +
         sw('swap', hp.swap, 'زرُّ القلم ⇄ التظليل', 'Pen ⇄ highlighter button', 'لمسةٌ واحدةٌ تبدّل بينهما', 'One tap switches between them') + '</div>');
     }
+    var G = window.GardenCanvas;
+    if (G && G.scratchOn) {
+      h += this.sec(L('الشخبطة', 'Scribble'), '<div class="nip-col"><button type="button" class="nip-switch" role="switch" data-scr="1" aria-checked="' + G.scratchOn() + '"><span>' +
+        esc(L('الشخبطةُ تمحو', 'Scribble to erase')) + '<br><small class="nip-note">' +
+        esc(L('اشطبْ بالقلم ذهاباً وإياباً فوق رسمٍ أو تظليلٍ أو كلمةٍ كتبتَها فتُمحى — وتراجعْ إن لم تقصد', 'Scratch back and forth over a drawing, highlight or word you typed to erase it — undo if you did not mean to')) +
+        '</small></span><b aria-hidden="true"></b></button></div>');
+    }
     var rows = '';
     if (d.favHost && d.barDialog) rows += '<button type="button" class="nip-btn" data-act="bar"><i class="fa-solid fa-table-cells" aria-hidden="true"></i><span>' + esc(L('عدّلْ شريطَ المفضّلة', 'Edit the favourites bar')) + '</span></button>';
     rows += '<button type="button" class="nip-btn" data-act="dial-home"><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i><span>' + esc(L('أعِدِ اللوحةَ الدائريّة إلى مكانها', 'Put the dial back in its place')) + '</span></button>';
@@ -340,6 +347,9 @@
       var m = t.getAttribute('data-touch');
       X.setPalmMode({ auto: 'auto', draw: 'never', pan: 'always', off: 'off' }[m]);
       this.render(); return;
+    }
+    if (t.hasAttribute('data-scr') && window.GardenCanvas && GardenCanvas.setScratch) {
+      GardenCanvas.setScratch(!GardenCanvas.scratchOn()); this.render(); return;
     }
     if (t.hasAttribute('data-pal') && d.setPalette) { d.setPalette(+t.getAttribute('data-pal')); this.render(); return; }
     if (t.hasAttribute('data-halo') && d.setHalo) {
