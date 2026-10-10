@@ -417,8 +417,8 @@ boolean subscribed = prefs.getBoolean("newsletter-subscriber", false);</code></p
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>مع تقدم ميزات التطبيق وزيادة البيانات، تبرز الحاجة لحفظ وتحميل كائنات جافا (Java Objects). يتم ذلك عبر عمليتين:</p><ol><li><b><span class="smart-term" data-term-en="Serialization" data-ar="التسلسل" data-en-def="The process of converting data objects into a format that can be stored or transmitted.">التسلسل<span class="smart-term-tooltip"></span></span> (Serialization):</b> تحويل كائنات البيانات إلى بتات وبايتات (أو نصوص) لتخزينها على القرص.</li><li><b><span class="smart-term" data-term-en="De-Serialization" data-ar="إلغاء التسلسل" data-en-def="The process of converting stored or transmitted format back into data objects.">إلغاء التسلسل<span class="smart-term-tooltip"></span></span> (De-Serialization):</b> تحويل البتات والبايتات المخزنة مرة أخرى إلى كائنات بيانات عند إعادة تحميل التطبيق.</li></ol><p>تُستخدم فئة <code>JSON</code> (JavaScript Object Notation) في أندرويد لإخفاء تعقيد عملية التسلسل. يتم تحميل متغيرات الكائن في <code>JSONObject</code> باستخدام دالة <code>put()</code>، ويمكن تجميعها في <code>JSONArray</code>.</p></template>
-    <template class="content-en"><p>As app features advance with more data, it is required to save and load Java objects. This involves two processes:</p><ol><li><b><span class="smart-term" data-term-en="Serialization" data-ar="التسلسل" data-en-def="The process of converting data objects into a format that can be stored or transmitted.">Serialization<span class="smart-term-tooltip"></span></span>:</b> Data objects are converted into bits and bytes to store on the disk.</li><li><b><span class="smart-term" data-term-en="De-Serialization" data-ar="إلغاء التسلسل" data-en-def="The process of converting stored or transmitted format back into data objects.">De-Serialization<span class="smart-term-tooltip"></span></span>:</b> The stored bits and bytes are converted back to data objects when reloading the app.</li></ol><p>The <code>JSON</code> (JavaScript Object Notation) class in Android hides the complexity of the serialization process. Variables of an object are loaded into a <code>JSONObject</code> using the <code>put()</code> method, and can be grouped in a <code>JSONArray</code>.</p></template>
+    <template class="content-ar"><p>مع تقدم ميزات التطبيق وزيادة البيانات، تبرز الحاجة لحفظ وتحميل كائنات جافا (Java Objects). يتم ذلك عبر عمليتين:</p><ol><li><b><span class="smart-term" data-term-en="Serialization" data-ar="التسلسل" data-en-def="The process of converting data objects into a format that can be stored or transmitted.">التسلسل<span class="smart-term-tooltip"></span></span> (Serialization):</b> تحويل كائنات البيانات إلى بتات وبايتات (أو نصوص) لتخزينها على القرص.</li><li><b><span class="smart-term" data-term-en="De-Serialization" data-ar="إلغاء التسلسل" data-en-def="The process of converting stored or transmitted format back into data objects.">إلغاء التسلسل<span class="smart-term-tooltip"></span></span> (De-Serialization):</b> تحويل البتات والبايتات المخزنة مرة أخرى إلى كائنات بيانات عند إعادة تحميل التطبيق.</li></ol><p>تُستخدم فئة <code>JSON</code> (JavaScript Object Notation) في أندرويد لإخفاء تعقيد عملية التسلسل. يتم تحميل متغيرات الكائن في <code>JSONObject</code> باستخدام دالة <code>put()</code>، ويمكن تجميعها في <code>JSONArray</code>.</p><p>لعمل نسخة احتياطية من بيانات المستخدم، نقوم بإنشاء فئة مخصصة (مثل <code>JSONSerializer</code>). بعد تحويل البيانات وتجميعها في <code>JSONArray</code>، يتم كتابة نص JSON المجمع في ملف على الجهاز. يتحقق ذلك عن طريق فتح <code>OutputStream</code> للملف، ثم تغليفه في مثيل <code>Writer</code> لكتابة البيانات النصية بكفاءة وبشكل آمن داخل كتلة <code>try-catch-finally</code>.</p></template>
+    <template class="content-en"><p>As app features advance with more data, it is required to save and load Java objects. This involves two processes:</p><ol><li><b><span class="smart-term" data-term-en="Serialization" data-ar="التسلسل" data-en-def="The process of converting data objects into a format that can be stored or transmitted.">Serialization<span class="smart-term-tooltip"></span></span>:</b> Data objects are converted into bits and bytes to store on the disk.</li><li><b><span class="smart-term" data-term-en="De-Serialization" data-ar="إلغاء التسلسل" data-en-def="The process of converting stored or transmitted format back into data objects.">De-Serialization<span class="smart-term-tooltip"></span></span>:</b> The stored bits and bytes are converted back to data objects when reloading the app.</li></ol><p>The <code>JSON</code> (JavaScript Object Notation) class in Android hides the complexity of the serialization process. Variables of an object are loaded into a <code>JSONObject</code> using the <code>put()</code> method, and can be grouped in a <code>JSONArray</code>.</p><p>To back up user data, we create a custom class (like <code>JSONSerializer</code>). After converting and grouping the data into a <code>JSONArray</code>, the combined JSON string is written into a file on the device. This is achieved by opening an <code>OutputStream</code> to the file, then wrapping it in a <code>Writer</code> instance to write the text data efficiently and safely within a <code>try-catch-finally</code> block.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -437,6 +437,27 @@ jo.put(JSON_TITLE, mTitle);
 // Grouping in an array
 JSONArray jArray = new JSONArray();
 jArray.put(jo);</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>// Writing JSON array to a file
+Writer writer = null;
+try {
+    // Open the file and wrap it in a Writer
+    OutputStream out = context.openFileOutput(mFilename, Context.MODE_PRIVATE);
+    writer = new OutputStreamWriter(out);
+    // Write the JSON string
+    writer.write(jArray.toString());
+} finally {
+    // Ensure the writer is closed to free resources
+    if (writer != null) {
+        writer.close();
+    }
+}</code></pre>
   </div>
 
   <!-- DIAGRAM[2]: Detailed SVG generation prompt: A flow diagram showing 'Java Object' converting to 'JSON String' (labeled Serialization) and saving to 'Disk'. An arrow pointing back from 'Disk' to 'JSON String' to 'Java Object' (labeled De-Serialization). Style: educational, dark background #0d1117, accent color #f2a900, viewBox 0 0 800 400, Arabic + English labels. -->
@@ -772,8 +793,8 @@ db = helper.getWritableDatabase();</code></pre>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة المحورية. حتى الآن، كانت تطبيقاتنا تفقد ذاكرتها بمجرد إغلاقها. اليوم، نتعلم كيف نمنح تطبيقاتنا 'ذاكرة دائمة'. نبدأ بالنوايا (Intents) لنقل البيانات بين الشاشات المؤقتة. ثم ننتقل إلى التفضيلات المشتركة (SharedPreferences) لحفظ الإعدادات البسيطة. لكن ماذا لو كبرت بياناتنا؟ هنا يأتي دور التسلسل (Serialization) باستخدام JSON لتحويل الكائنات المعقدة إلى نصوص يسهل حفظها ونقلها. وأخيراً، السلاح الأقوى: قواعد بيانات SQLite. تذكروا جيداً للاختبار الفرق بين <code>execSQL</code> (للتنفيذ) و <code>rawQuery</code> (للاسترجاع عبر المؤشر Cursor)، ولا تنسوا أبداً استدعاء <code>commit()</code> عند حفظ التفضيلات. هذه المفاهيم هي أساس أي تطبيق حقيقي في سوق العمل.<p>مع بناء تطبيقات أكثر تعقيداً، تذكر أن إنشاء فئة النشاط (Activity) هو نصف المهمة فقط؛ يجب أن يعلم نظام أندرويد بوجودها عبر ملف Manifest. علاوة على ذلك، تتطلب الإدارة الفعالة للبيانات معرفة <em>متى</em> تحفظها (مثل استخدام onPause للإعدادات) و*كيف* تصل إليها (مثل طلب getWritableDatabase لعمليات SQLite).</p></template>
-    <template class="content-en">Welcome, future engineers, to this pivotal module. Until now, our apps suffered from amnesia the moment they were closed. Today, we learn how to give our apps 'permanent memory'. We start with Intents to pass data between temporary screens. Then, we move to SharedPreferences for saving simple settings. But what if our data grows? That's where Serialization using JSON comes in, converting complex objects into easily storable text. Finally, the ultimate tool: SQLite databases. For the exam, strictly remember the difference between <code>execSQL</code> (for execution) and <code>rawQuery</code> (for retrieval via a Cursor), and never forget to call <code>commit()</code> when saving preferences. These concepts are the bedrock of any real-world application.<p>As you build more complex apps, remember that creating an Activity class is only half the task; the Android OS must know it exists via the Manifest. Furthermore, effective data management requires knowing <em>when</em> to save (like using onPause for settings) and <em>how</em> to access it (like requesting getWritableDatabase for SQLite operations).</p></template>
+    <template class="content-ar">أهلاً بكم يا مهندسي المستقبل في هذه الوحدة المحورية. حتى الآن، كانت تطبيقاتنا تفقد ذاكرتها بمجرد إغلاقها. اليوم، نتعلم كيف نمنح تطبيقاتنا 'ذاكرة دائمة'. نبدأ بالنوايا (Intents) لنقل البيانات بين الشاشات المؤقتة. ثم ننتقل إلى التفضيلات المشتركة (SharedPreferences) لحفظ الإعدادات البسيطة. لكن ماذا لو كبرت بياناتنا؟ هنا يأتي دور التسلسل (Serialization) باستخدام JSON لتحويل الكائنات المعقدة إلى نصوص يسهل حفظها ونقلها. وأخيراً، السلاح الأقوى: قواعد بيانات SQLite. تذكروا جيداً للاختبار الفرق بين <code>execSQL</code> (للتنفيذ) و <code>rawQuery</code> (للاسترجاع عبر المؤشر Cursor)، ولا تنسوا أبداً استدعاء <code>commit()</code> عند حفظ التفضيلات. هذه المفاهيم هي أساس أي تطبيق حقيقي في سوق العمل.<p>مع بناء تطبيقات أكثر تعقيداً، تذكر أن إنشاء فئة النشاط (Activity) هو نصف المهمة فقط؛ يجب أن يعلم نظام أندرويد بوجودها عبر ملف Manifest. علاوة على ذلك، تتطلب الإدارة الفعالة للبيانات معرفة <em>متى</em> تحفظها (مثل استخدام onPause للإعدادات) و*كيف* تصل إليها (مثل طلب getWritableDatabase لعمليات SQLite).</p><p>إتقان حفظ البيانات يعني معرفة متى تستخدم كل أداة. فبينما تعتبر SharedPreferences ممتازة للمفاتيح البسيطة، وتتعامل SQLite مع البيانات العلائقية المعقدة، فإن تسلسل JSON المدمج مع تيارات الملفات (مثل Writer و OutputStream) يمنحك المرونة لعمل نسخ احتياطية لهياكل الكائنات المخصصة ونقلها بكفاءة.</p></template>
+    <template class="content-en">Welcome, future engineers, to this pivotal module. Until now, our apps suffered from amnesia the moment they were closed. Today, we learn how to give our apps 'permanent memory'. We start with Intents to pass data between temporary screens. Then, we move to SharedPreferences for saving simple settings. But what if our data grows? That's where Serialization using JSON comes in, converting complex objects into easily storable text. Finally, the ultimate tool: SQLite databases. For the exam, strictly remember the difference between <code>execSQL</code> (for execution) and <code>rawQuery</code> (for retrieval via a Cursor), and never forget to call <code>commit()</code> when saving preferences. These concepts are the bedrock of any real-world application.<p>As you build more complex apps, remember that creating an Activity class is only half the task; the Android OS must know it exists via the Manifest. Furthermore, effective data management requires knowing <em>when</em> to save (like using onPause for settings) and <em>how</em> to access it (like requesting getWritableDatabase for SQLite operations).</p><p>Mastering data persistence means knowing when to use which tool. While SharedPreferences is great for simple toggles, and SQLite handles complex relational data, JSON serialization combined with file streams (like Writer and OutputStream) gives you the flexibility to back up and transmit custom object structures efficiently.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -982,6 +1003,24 @@ db = helper.getWritableDatabase();</code></pre>
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar"><p>تقوم هذه الدالة بالطلب من <code>SQLiteOpenHelper</code> فتح ملف قاعدة البيانات وإرجاع كائن <code>SQLiteDatabase</code> يسمح بعمليات القراءة والكتابة. كما أنها تتكفل باستدعاء دالتي <code>onCreate</code> أو <code>onUpgrade</code> تلقائياً إذا كانت قاعدة البيانات غير موجودة أو تحتاج إلى تحديث.</p></template>
           <template class="content-en"><p>This method requests the <code>SQLiteOpenHelper</code> to open the database file and return an <code>SQLiteDatabase</code> object that allows both read and write operations. It also automatically triggers the <code>onCreate</code> or <code>onUpgrade</code> methods if the database does not exist or needs updating.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نستخدم <code>Writer</code> مع <code>OutputStream</code> عند حفظ بيانات JSON في ملف، بدلاً من استخدام <code>OutputStream</code> لوحده؟</template>
+          <template class="content-en">Why do we use a <code>Writer</code> along with an <code>OutputStream</code> when saving JSON data to a file, instead of just using <code>OutputStream</code> alone?</template>
+          <span class="content-target">لماذا نستخدم <code>Writer</code> مع <code>OutputStream</code> عند حفظ بيانات JSON في ملف، بدلاً من استخدام <code>OutputStream</code> لوحده؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يتعامل <code>OutputStream</code> مع البايتات الخام (Raw Bytes)، وهي الطريقة التي يخزن بها نظام الملفات البيانات. ومع ذلك، فإن JSON يعتمد على النصوص (Characters). يعمل <code>Writer</code> (مثل <code>OutputStreamWriter</code>) كجسر، حيث يحول الحروف النصية بكفاءة إلى بايتات قبل إرسالها إلى <code>OutputStream</code>، مما يسهل عملية كتابة النصوص ويقلل من الأخطاء.</p></template>
+          <template class="content-en"><p>An <code>OutputStream</code> deals with raw bytes, which is how the file system stores data. However, JSON is text-based (characters). A <code>Writer</code> (like <code>OutputStreamWriter</code>) acts as a bridge, efficiently converting our text characters into bytes before sending them to the <code>OutputStream</code>, simplifying text writing and reducing errors.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1300,6 +1339,23 @@ db = helper.getWritableDatabase();</code></pre>
       }
     },
     "id": 18
+  },
+  {
+    "front": {
+      "ar": "كيف يتم كتابة بيانات JSON المجمعة في ملف محلي في أندرويد؟",
+      "en": "How is combined JSON data written to a local file in Android?"
+    },
+    "back": {
+      "definition": {
+        "ar": "باستخدام مثيل Writer يغلف كائن OutputStream.",
+        "en": "By using a Writer instance wrapped around an OutputStream object."
+      },
+      "example": {
+        "ar": "writer = new OutputStreamWriter(out); writer.write(jArray.toString());",
+        "en": "writer = new OutputStreamWriter(out); writer.write(jArray.toString());"
+      }
+    },
+    "id": 19
   }
 ]
 </script>
@@ -1309,7 +1365,7 @@ db = helper.getWritableDatabase();</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 12</span>
+      <span id="quiz-counter">1 / 13</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1325,7 +1381,7 @@ db = helper.getWritableDatabase();</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 12</div>
+    <div class="score-display" id="quiz-score-display">0 / 13</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1714,6 +1770,38 @@ db = helper.getWritableDatabase();</code></pre>
     },
     "difficulty": "medium",
     "id": 12
+  },
+  {
+    "conceptId": "json-serialization",
+    "question": {
+      "ar": "أي الفئات تُستخدم معاً لكتابة نص JSON مجمع في ملف داخل نظام أندرويد؟",
+      "en": "Which classes are used together to write a combined JSON string into a file in Android?"
+    },
+    "options": {
+      "ar": [
+        "SharedPreferences و Editor",
+        "Writer و OutputStream",
+        "Intent و Bundle",
+        "SQLiteDatabase و Cursor"
+      ],
+      "en": [
+        "SharedPreferences and Editor",
+        "Writer and OutputStream",
+        "Intent and Bundle",
+        "SQLiteDatabase and Cursor"
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "يفتح OutputStream الملف للتعامل مع البايتات، ويُستخدم Writer كجسر لكتابة بيانات JSON النصية بكفاءة داخل هذا الملف.",
+      "en": "An OutputStream opens the file to handle bytes, and a Writer is used as a bridge to efficiently write the JSON text data into it."
+    },
+    "hint": {
+      "ar": "فكر في الفئات التي تتعامل مع تيارات الإدخال والإخراج (Streams).",
+      "en": "Think of classes that deal with Input/Output streams."
+    },
+    "difficulty": "medium",
+    "id": 13
   }
 ]
 </script>
@@ -1765,6 +1853,14 @@ db = helper.getWritableDatabase();</code></pre>
     <div data-bilingual>
     <template class="content-ar">نسيان تسجيل النشاط الجديد في ملف AndroidManifest.xml. بدون هذا التسجيل، لن يتمكن النظام من تشغيل النشاط وسينهار التطبيق.</template>
     <template class="content-en">Forgetting to register a new Activity in the AndroidManifest.xml file. Without this registration, the OS cannot launch the Activity and the app will crash.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">نسيان إغلاق كائن <code>Writer</code> أو <code>OutputStream</code> بعد الانتهاء من كتابة الملف. يجب دائماً إغلاقها داخل كتلة <code>finally</code> لتجنب تسرب الذاكرة وقفل الملفات.</template>
+    <template class="content-en">Forgetting to close the <code>Writer</code> or <code>OutputStream</code> object after writing to the file. They must always be closed inside a <code>finally</code> block to prevent memory leaks and file locks.</template>
     <div class="content-target"></div>
     </div>
   </div>

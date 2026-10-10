@@ -121,6 +121,11 @@
         <template class="content-en">Granularity of Data Items and Multiple Granularity Locking</template>
         <span class="content-target">دقة عناصر البيانات والقفل متعدد الدقة</span>
       </a>
+      <a href="#worked-example-2pl" class="toc-link" data-bilingual>
+        <template class="content-ar">مثال عملي: القفل ثنائي الطور والجمود</template>
+        <template class="content-en">Worked Example: 2PL and Deadlock</template>
+        <span class="content-target">مثال عملي: القفل ثنائي الطور والجمود</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -283,8 +288,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>تتطلب قاعدة البيانات أن تكون جميع المعاملات جيدة التكوين (well-formed)، مما يعني أنه يجب قفل العنصر قبل قراءته أو كتابته، وعدم قفل عنصر مقفول مسبقاً. يعتمد 2PL على مرحلتين:</p><ol><li><b>مرحلة القفل (النمو - Growing):</b> تطبق المعاملة الأقفال (قراءة أو كتابة) على العناصر المطلوبة واحداً تلو الآخر.</li><li><b>مرحلة إلغاء القفل (الانكماش - Shrinking):</b> تقوم المعاملة بتحرير الأقفال واحداً تلو الآخر.</li></ol><p>الشرط الأساسي: يجب أن تكون هاتان المرحلتان متنافيتين؛ أي لا يمكن بدء تحرير الأقفال أثناء <span class="smart-term" data-term-en="Growing Phase" data-ar="مرحلة النمو" data-en-def="The phase in 2PL where a transaction acquires locks but cannot release any.">مرحلة النمو<span class="smart-term-tooltip"></span></span>، ولا يمكن طلب أقفال جديدة بعد بدء <span class="smart-term" data-term-en="Shrinking Phase" data-ar="مرحلة الانكماش" data-en-def="The phase in 2PL where a transaction releases locks but cannot acquire new ones.">مرحلة الانكماش<span class="smart-term-tooltip"></span></span>.</p><p>أنواع الأقفال:</p><ul><li><b>قفل مشترك (Shared - Read):</b> يمكن لعدة معاملات قراءة العنصر، لكن لا يمكن لأي منها الكتابة.</li><li><b>قفل حصري (Exclusive - Write):</b> معاملة واحدة فقط تمتلك القفل، ولا يُسمح بأي أقفال أخرى (لا قراءة ولا كتابة).</li></ul></template>
-    <template class="content-en"><p>The database requires all transactions to be well-formed, meaning an item must be locked before reading/writing, and an already locked item cannot be locked again. 2PL relies on two phases:</p><ol><li><b>Locking (Growing) Phase:</b> A transaction applies locks (read or write) on desired data items one at a time.</li><li><b>Unlocking (Shrinking) Phase:</b> A transaction unlocks its locked data items one at a time.</li></ol><p>Requirement: These two phases must be mutually exclusive. During the locking phase, unlocking must not start, and during the unlocking phase, locking must not begin.</p><p>Lock Modes:</p><ul><li><b>Shared mode (Read):</b> More than one transaction can apply a share lock for reading, but no write lock can be applied.</li><li><b>Exclusive mode (Write):</b> Only one write lock can exist at any time, and no shared lock can be applied.</li></ul></template>
+    <template class="content-ar"><p>تتطلب قاعدة البيانات أن تكون جميع المعاملات جيدة التكوين (well-formed)، مما يعني أنه يجب قفل العنصر قبل قراءته أو كتابته، وعدم قفل عنصر مقفول مسبقاً. يعتمد 2PL على مرحلتين:</p><ol><li><b>مرحلة القفل (النمو - Growing):</b> تطبق المعاملة الأقفال (قراءة أو كتابة) على العناصر المطلوبة واحداً تلو الآخر.</li><li><b>مرحلة إلغاء القفل (الانكماش - Shrinking):</b> تقوم المعاملة بتحرير الأقفال واحداً تلو الآخر.</li></ol><p>الشرط الأساسي: يجب أن تكون هاتان المرحلتان متنافيتين؛ أي لا يمكن بدء تحرير الأقفال أثناء <span class="smart-term" data-term-en="Growing Phase" data-ar="مرحلة النمو" data-en-def="The phase in 2PL where a transaction acquires locks but cannot release any.">مرحلة النمو<span class="smart-term-tooltip"></span></span>، ولا يمكن طلب أقفال جديدة بعد بدء <span class="smart-term" data-term-en="Shrinking Phase" data-ar="مرحلة الانكماش" data-en-def="The phase in 2PL where a transaction releases locks but cannot acquire new ones.">مرحلة الانكماش<span class="smart-term-tooltip"></span></span>.</p><p>أنواع الأقفال:</p><ul><li><b>قفل مشترك (Shared - Read):</b> يمكن لعدة معاملات قراءة العنصر، لكن لا يمكن لأي منها الكتابة.</li><li><b>قفل حصري (Exclusive - Write):</b> معاملة واحدة فقط تمتلك القفل، ولا يُسمح بأي أقفال أخرى (لا قراءة ولا كتابة).</li></ul><p><b>تحويل الأقفال (Lock Conversion):</b> يسمح البروتوكول بترقية أو تخفيض الأقفال بشروط صارمة:</p><ol><li><b>ترقية القفل (Lock Upgrade):</b> من قراءة إلى كتابة. إذا كانت المعاملة $T_i$ تمتلك قفل قراءة على $X$، ولا توجد أي معاملة أخرى $T_j$ تمتلك قفل قراءة على $X$، يتم تحويل القفل إلى كتابة. وإلا، تُجبر $T_i$ على الانتظار حتى تحرر $T_j$ قفلها. يُسمح بالترقية فقط في مرحلة النمو.</li><li><b>تخفيض القفل (Lock Downgrade):</b> من كتابة إلى قراءة. يتم تحويل قفل الكتابة الذي تمتلكه $T_i$ على $X$ إلى قفل قراءة (لا يمكن لأي معاملة أخرى امتلاك أي قفل على $X$ في هذه الحالة). يُسمح بالتخفيض فقط في مرحلة الانكماش.</li></ol></template>
+    <template class="content-en"><p>The database requires all transactions to be well-formed, meaning an item must be locked before reading/writing, and an already locked item cannot be locked again. 2PL relies on two phases:</p><ol><li><b>Locking (Growing) Phase:</b> A transaction applies locks (read or write) on desired data items one at a time.</li><li><b>Unlocking (Shrinking) Phase:</b> A transaction unlocks its locked data items one at a time.</li></ol><p>Requirement: These two phases must be mutually exclusive. During the locking phase, unlocking must not start, and during the unlocking phase, locking must not begin.</p><p>Lock Modes:</p><ul><li><b>Shared mode (Read):</b> More than one transaction can apply a share lock for reading, but no write lock can be applied.</li><li><b>Exclusive mode (Write):</b> Only one write lock can exist at any time, and no shared lock can be applied.</li></ul><p><b>Lock Conversion:</b> The protocol allows upgrading or downgrading locks under strict conditions:</p><ol><li><b>Lock Upgrade:</b> From read to write. If transaction $T_i$ has a read-lock on $X$ and no other transaction $T_j$ has a read-lock on $X$, convert the read-lock to a write-lock. Else, force $T_i$ to wait until $T_j$ unlocks $X$. Upgrading is only allowed during the growing phase.</li><li><b>Lock Downgrade:</b> From write to read. Convert the write-lock held by $T_i$ on $X$ to a read-lock (no other transaction can have any lock on $X$ in this state). Downgrading is only allowed during the shrinking phase.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1192,14 +1197,57 @@
   </details>
 </section>
 
+<section id="worked-example-2pl" class="concept-card glass-card fade-up">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">9</span> مثال عملي: القفل ثنائي الطور والجمود</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Worked Example: 2PL and Deadlock</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>مثال يوضح كيف تلتزم المعاملات ببروتوكول القفل ثنائي الطور (2PL) من خلال مرحلتي النمو والانكماش، وكيف يمكن أن يؤدي هذا الالتزام إلى حالة جمود (Deadlock) إذا تقاطعت طلبات الأقفال.</p></template>
+    <template class="content-en"><p>An example illustrating how transactions obey the 2PL protocol through growing and shrinking phases, and how this compliance can lead to a deadlock if lock requests intersect.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>لنفترض أن لدينا معاملتين $T'_1$ و $T'_2$ تلتزمان ببروتوكول 2PL (تطلبان جميع الأقفال قبل تحرير أي منها):</p><ol><li>تبدأ $T'_1$ بطلب <code>read_lock(Y)</code> وتقرأ $Y$.</li><li>تبدأ $T'_2$ بطلب <code>read_lock(X)</code> وتقرأ $X$.</li><li>تطلب $T'_1$ <code>write_lock(X)</code>. بما أن $X$ مقفول بواسطة $T'_2$، تُجبر $T'_1$ على الانتظار.</li><li>تطلب $T'_2$ <code>write_lock(Y)</code>. بما أن $Y$ مقفول بواسطة $T'_1$، تُجبر $T'_2$ على الانتظار.</li></ol><p>النتيجة: كلتا المعاملتين في مرحلة النمو (Growing Phase) وتنتظران بعضهما البعض، مما يؤدي إلى <b>جمود (Deadlock)</b> مؤكد، على الرغم من التزامهما التام ببروتوكول 2PL.</p></template>
+    <template class="content-en"><p>Suppose we have two transactions $T'_1$ and $T'_2$ that obey the 2PL protocol (requesting all locks before releasing any):</p><ol><li>$T'_1$ starts by requesting <code>read_lock(Y)</code> and reads $Y$.</li><li>$T'_2$ starts by requesting <code>read_lock(X)</code> and reads $X$.</li><li>$T'_1$ requests <code>write_lock(X)</code>. Since $X$ is locked by $T'_2$, $T'_1$ is forced to wait.</li><li>$T'_2$ requests <code>write_lock(Y)</code>. Since $Y$ is locked by $T'_1$, $T'_2$ is forced to wait.</li></ol><p>Result: Both transactions are in their Growing Phase and waiting for each other, resulting in a guaranteed <b>Deadlock</b>, despite their strict adherence to the 2PL protocol.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>يوضح هذا المثال التمييز الحاسم بين قابلية التسلسل (Serializability) والجمود. بروتوكول 2PL يضمن أن أي جدول زمني يكتمل بنجاح سيكون قابلاً للتسلسل، لكنه لا يضمن اكتمال التنفيذ من الأساس.</p><p>لحل هذه المشكلة في الواقع، يجب دمج 2PL مع آليات التعامل مع الجمود، مثل استخدام الرسم البياني للانتظار (Wait-for-graph) لاكتشاف الحلقة وإجهاض إحدى المعاملتين (الضحية).</p></template>
+    <template class="content-en"><p>This example highlights the critical distinction between Serializability and Deadlock. The 2PL protocol guarantees that any schedule that successfully completes will be serializable, but it does not guarantee that the execution will complete at all.</p><p>To resolve this in practice, 2PL must be combined with deadlock handling mechanisms, such as using a Wait-for-graph to detect the cycle and abort one of the transactions (the victim).</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">في هذا المثال، كيف يمكن لخوارزمية 2PL المحافظ (Conservative 2PL) أن تمنع هذا الجمود؟</template>
+      <template class="content-en">In this example, how would Conservative 2PL prevent this deadlock?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>في 2PL المحافظ، ستطلب T'1 قفل Y و X معاً قبل أن تبدأ. إذا نجحت، ستعمل وتنتهي. إذا لم تنجح، ستنتظر دون قفل أي شيء، مما يمنع T'2 من التورط في حلقة انتظار.</p></template>
+      <template class="content-en"><p>In Conservative 2PL, T'1 would request locks on both Y and X before starting. If successful, it runs to completion. If not, it waits without locking anything, preventing T'2 from getting caught in a circular wait.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبنائي في واحدة من أهم وحدات قواعد البيانات: التحكم في التزامن. تخيلوا قاعدة البيانات كتقاطع طرق مزدحم؛ بدون إشارات مرور (التحكم في التزامن)، ستتصادم السيارات (المعاملات) وتتدمر البيانات. لقد درسنا كيف نستخدم 'الأقفال' (Locks) كإشارات مرور، وتحديداً بروتوكول 2PL الذي يضمن عدم حدوث أخطاء، لكنه قد يسبب زحاماً خانقاً (الجمود - Deadlock). لذلك تعلمنا كيف نكتشف هذا الجمود أو نتجنبه. ثم انتقلنا لطرق أذكى لا تستخدم الأقفال أصلاً، مثل 'الترتيب الزمني' (Timestamps) الذي ينظم المرور حسب أقدمية السيارات، و'التحكم المتفائل' الذي يفترض أن الشوارع فارغة ولا يتحقق من الحوادث إلا في نهاية الرحلة. ركزوا جيداً في الامتحان على الفرق بين 2PL الأساسي والصارم، وكيفية عمل قاعدة توماس للكتابة، ومتى نستخدم أقفال النوايا (Intention Locks). بالتوفيق!<p>الآن وبعد أن استوعبت المفاهيم العامة للتحكم في التزامن، فإن إتقان القواعد الخوارزمية الدقيقة هو مفتاح نجاحك في الاختبار. انتبه جيداً للشروط الثلاثة المحددة للتحقق في التحكم المتفائل، ومقارنات الطوابع الزمنية في تقنية النسخ المتعددة، وقواعد القفل الصارمة من أعلى لأسفل والتحرير من أسفل لأعلى في القفل متعدد الدقة. هذه التفاصيل هي أهداف رئيسية للأسئلة الدقيقة!</p></template>
-    <template class="content-en">Welcome to one of the most critical database modules: Concurrency Control. Imagine the database as a busy intersection; without traffic lights (concurrency control), cars (transactions) will crash, destroying data. We studied using 'Locks' as traffic lights, specifically the 2PL protocol, which guarantees no logical errors but can cause gridlock (Deadlock). Thus, we learned to detect or avoid deadlocks. We then explored lock-free methods like 'Timestamp Ordering', which directs traffic by age, and 'Optimistic CC', which assumes empty streets and only checks for crashes at the end of the trip. For the exam, focus heavily on the difference between Basic and Strict 2PL, how Thomas's Write Rule works, and when to use Intention Locks. Good luck!<p>Now that you grasp the high-level concepts of concurrency control, mastering the exact algorithmic rules is your key to exam success. Pay close attention to the three specific validation conditions in Optimistic CC, the timestamp comparisons in Multiversion CC, and the strict top-down locking/bottom-up unlocking rules in Multiple Granularity Locking. These details are prime targets for tricky exam questions!</p></template>
+    <template class="content-ar">أهلاً بكم يا أبنائي في واحدة من أهم وحدات قواعد البيانات: التحكم في التزامن. تخيلوا قاعدة البيانات كتقاطع طرق مزدحم؛ بدون إشارات مرور (التحكم في التزامن)، ستتصادم السيارات (المعاملات) وتتدمر البيانات. لقد درسنا كيف نستخدم 'الأقفال' (Locks) كإشارات مرور، وتحديداً بروتوكول 2PL الذي يضمن عدم حدوث أخطاء، لكنه قد يسبب زحاماً خانقاً (الجمود - Deadlock). لذلك تعلمنا كيف نكتشف هذا الجمود أو نتجنبه. ثم انتقلنا لطرق أذكى لا تستخدم الأقفال أصلاً، مثل 'الترتيب الزمني' (Timestamps) الذي ينظم المرور حسب أقدمية السيارات، و'التحكم المتفائل' الذي يفترض أن الشوارع فارغة ولا يتحقق من الحوادث إلا في نهاية الرحلة. ركزوا جيداً في الامتحان على الفرق بين 2PL الأساسي والصارم، وكيفية عمل قاعدة توماس للكتابة، ومتى نستخدم أقفال النوايا (Intention Locks). بالتوفيق!<p>الآن وبعد أن استوعبت المفاهيم العامة للتحكم في التزامن، فإن إتقان القواعد الخوارزمية الدقيقة هو مفتاح نجاحك في الاختبار. انتبه جيداً للشروط الثلاثة المحددة للتحقق في التحكم المتفائل، ومقارنات الطوابع الزمنية في تقنية النسخ المتعددة، وقواعد القفل الصارمة من أعلى لأسفل والتحرير من أسفل لأعلى في القفل متعدد الدقة. هذه التفاصيل هي أهداف رئيسية للأسئلة الدقيقة!</p><p>إن فهم القواعد النظرية لبروتوكول 2PL والقفل متعدد الدقة هو نصف المعركة فقط. توضح الأمثلة العملية التي أضفناها كيف تتصرف هذه البروتوكولات أثناء التنفيذ الفعلي، وتحديداً كيف يمكن لـ 2PL أن يؤدي عن غير قصد إلى الجمود، وكيف تحل أقفال النوايا التعارضات الهرمية بأناقة دون الحاجة لفحص جداول بأكملها.</p></template>
+    <template class="content-en">Welcome to one of the most critical database modules: Concurrency Control. Imagine the database as a busy intersection; without traffic lights (concurrency control), cars (transactions) will crash, destroying data. We studied using 'Locks' as traffic lights, specifically the 2PL protocol, which guarantees no logical errors but can cause gridlock (Deadlock). Thus, we learned to detect or avoid deadlocks. We then explored lock-free methods like 'Timestamp Ordering', which directs traffic by age, and 'Optimistic CC', which assumes empty streets and only checks for crashes at the end of the trip. For the exam, focus heavily on the difference between Basic and Strict 2PL, how Thomas's Write Rule works, and when to use Intention Locks. Good luck!<p>Now that you grasp the high-level concepts of concurrency control, mastering the exact algorithmic rules is your key to exam success. Pay close attention to the three specific validation conditions in Optimistic CC, the timestamp comparisons in Multiversion CC, and the strict top-down locking/bottom-up unlocking rules in Multiple Granularity Locking. These details are prime targets for tricky exam questions!</p><p>Understanding the theoretical rules of 2PL and Multiple Granularity Locking is only half the battle. The worked examples we added demonstrate how these protocols behave in real-time execution, particularly how 2PL can inadvertently lead to deadlocks, and how intention locks elegantly solve hierarchical conflicts without scanning entire tables.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1408,6 +1456,41 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar"><p>تطبيق الأقفال من أعلى لأسفل يضمن أن المعاملة تعلن عن نواياها على المستويات العليا قبل التعمق، مما يمنع المعاملات الأخرى من قفل الهيكل بأكمله. التحرير من أسفل لأعلى يضمن عدم ترك أي 'أقفال يتيمة' بالأسفل بدون حماية قفل النية بالأعلى.</p></template>
           <template class="content-en"><p>Top-down locking ensures a transaction declares its intentions at higher levels before diving deep, preventing others from locking the whole structure. Bottom-up unlocking ensures no 'orphan locks' are left below without the protective intention lock above.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">كيف يمكن لمعاملتين تلتزمان تماماً ببروتوكول القفل ثنائي الطور (2PL) أن تقعا في حالة جمود (Deadlock)؟</template>
+          <template class="content-en">How can two transactions strictly adhering to the Two-Phase Locking (2PL) protocol fall into a Deadlock?</template>
+          <span class="content-target">كيف يمكن لمعاملتين تلتزمان تماماً ببروتوكول القفل ثنائي الطور (2PL) أن تقعا في حالة جمود (Deadlock)؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>يحدث ذلك عندما تتقاطع طلبات الأقفال في مرحلة النمو. إذا قفلت المعاملة الأولى العنصر A وطلبت B، بينما قفلت المعاملة الثانية B وطلبت A، فإن كلتيهما ستنتظران إلى الأبد، رغم أنهما لم تخالفا قواعد 2PL.</p></template>
+          <template class="content-en"><p>This happens when lock requests intersect during the growing phase. If the first transaction locks A and requests B, while the second locks B and requests A, both will wait forever, even though neither violated 2PL rules.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في القفل متعدد الدقة (MGL)، لماذا يُسمح لمعاملتين مختلفتين بوضع قفل نية حصرية (IX) على نفس الجدول في نفس الوقت؟</template>
+          <template class="content-en">In Multiple Granularity Locking (MGL), why are two different transactions allowed to place an Intention-Exclusive (IX) lock on the same table simultaneously?</template>
+          <span class="content-target">في القفل متعدد الدقة (MGL)، لماذا يُسمح لمعاملتين مختلفتين بوضع قفل نية حصرية (IX) على نفس الجدول في نفس الوقت؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>لأن قفل IX يعني فقط أن المعاملة تنوي تحديث 'جزء ما' داخل الجدول (مثل صف معين). طالما أن المعاملتين تنويان تحديث صفوف مختلفة، فلا يوجد تعارض فعلي، وهذا التوافق هو ما يمنح MGL أداءه العالي.</p></template>
+          <template class="content-en"><p>Because an IX lock only means the transaction intends to update 'some part' inside the table (like a specific row). As long as the two transactions intend to update different rows, there is no actual conflict, and this compatibility is what gives MGL its high concurrency.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1743,6 +1826,23 @@
       }
     },
     "id": 19
+  },
+  {
+    "front": {
+      "ar": "ترقية القفل (Lock Upgrade)",
+      "en": "Lock Upgrade"
+    },
+    "back": {
+      "definition": {
+        "ar": "تحويل قفل القراءة (S) إلى قفل كتابة (X). مسموح به فقط في مرحلة النمو، ويشترط عدم وجود معاملات أخرى تقرأ نفس العنصر.",
+        "en": "Converting a read lock (S) to a write lock (X). Only allowed in the growing phase, provided no other transactions are reading the item."
+      },
+      "example": {
+        "ar": "معاملة تقرأ رصيد الحساب ثم تقرر سحب مبلغ منه، فتقوم بترقية القفل.",
+        "en": "A transaction reads an account balance, then decides to withdraw from it, upgrading its lock."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1752,7 +1852,7 @@
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
         <div id="quiz-content" class="quiz-card glass-card">
           <div class="quiz-header">
-            <span id="quiz-counter">1 / 13</span>
+            <span id="quiz-counter">1 / 14</span>
             <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
           </div>
           <div class="quiz-question" id="quiz-question-text"></div>
@@ -1768,7 +1868,7 @@
         </div>
         <div id="quiz-results" class="quiz-results glass-card hidden">
           <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-          <div class="score-display" id="quiz-score-display">0 / 13</div>
+          <div class="score-display" id="quiz-score-display">0 / 14</div>
           <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
         </div>
       </section>
@@ -2189,6 +2289,38 @@
     },
     "difficulty": "medium",
     "id": 13
+  },
+  {
+    "conceptId": "two-phase-locking",
+    "question": {
+      "ar": "ما هو الشرط اللازم لنجاح ترقية القفل (Lock Upgrade) لمعاملة Ti على عنصر X؟",
+      "en": "What is the necessary condition for a successful Lock Upgrade by transaction Ti on item X?"
+    },
+    "options": {
+      "ar": [
+        "أن تكون Ti في مرحلة الانكماش (Shrinking Phase)",
+        "أن تمتلك معاملة أخرى Tj قفل قراءة على X",
+        "ألا تمتلك أي معاملة أخرى Tj قفل قراءة على X",
+        "أن يكون X مقفولاً بقفل نية (IX) مسبقاً"
+      ],
+      "en": [
+        "Ti must be in the Shrinking Phase",
+        "Another transaction Tj must hold a read lock on X",
+        "No other transaction Tj can hold a read lock on X",
+        "X must be previously locked with an intention lock (IX)"
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "لترقية القفل إلى حصري (كتابة)، يجب ألا يكون هناك أي شخص آخر يقرأ العنصر في نفس اللحظة. إذا كان هناك من يقرأ، يجب أن تنتظر Ti.",
+      "en": "To upgrade to an exclusive (write) lock, no one else can be reading the item at the same time. If someone is, Ti must wait."
+    },
+    "hint": {
+      "ar": "القفل الحصري لا يقبل الشراكة.",
+      "en": "An exclusive lock does not accept sharing."
+    },
+    "difficulty": "medium",
+    "id": 14
   }
 ]
 </script>
@@ -2248,6 +2380,14 @@
     <div data-bilingual>
     <template class="content-ar">في تقنية النسخ المتعددة (MVTO)، إذا حاولت معاملة كتابة بيانات، وكان طابع القراءة للنسخة الحالية أكبر من طابع المعاملة (أي أن معاملة أحدث قد قرأتها بالفعل)، فيجب إجهاض المعاملة الحالية لمنع التناقض.</template>
     <template class="content-en">In Multi-version Timestamp Ordering (MVTO), if a transaction tries to write, and the read_TS of the current version is greater than the transaction's TS (meaning a younger transaction already read it), the current transaction must be aborted to prevent inconsistency.</template>
+    <div class="content-target"></div>
+    </div>
+  </div>
+  <div class="vault-entry">
+    <div class="vault-type vault-type--trap"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> <span data-i18n="vault.trap">فخ امتحاني</span></div>
+    <div data-bilingual>
+    <template class="content-ar">الاعتقاد بأن ترقية القفل (Lock Upgrade) مسموحة في أي وقت. ترقية القفل (من قراءة إلى كتابة) تعتبر بمثابة 'اكتساب قفل جديد'، ولذلك يُسمح بها حصرياً في مرحلة النمو (Growing Phase) من بروتوكول 2PL.</template>
+    <template class="content-en">Believing lock upgrade is allowed at any time. Lock upgrade (from read to write) is considered 'acquiring a new lock', and therefore is exclusively allowed during the Growing Phase of the 2PL protocol.</template>
     <div class="content-target"></div>
     </div>
   </div>
