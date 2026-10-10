@@ -144,6 +144,7 @@
     if (!act) {
       act = add(D.createElement('nav'), D.body);
       act.className = 'ed-act';
+      R.classList.add('ed-has-act');
       act.setAttribute('aria-label', tx('شريط النشاط', 'Activity bar'));
       act.addEventListener('click', onAct);
     }
@@ -366,6 +367,7 @@
     cured = null;
     els.slice().forEach(drop);
     els = [];
+    R.classList.remove('ed-has-act');
     status = act = tabs = crumbs = gut = probs = null;
     lastGut = '';
   }

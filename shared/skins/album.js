@@ -1,6 +1,6 @@
 ;(function () {
   'use strict';
-  var on = false, art = null, obs = null, io = null, queued = 0, watched = [];
+  var on = false, art = null, obs = null, hold = null, io = null, queued = 0, watched = [];
   var CREDIT = 'https://unsplash.com/@yvettedewit?utm_source=digital_garden&utm_medium=referral';
 
   function lang() { return document.documentElement.getAttribute('lang') === 'en' ? 'en' : 'ar'; }
@@ -149,7 +149,17 @@
     side();
   }
   function soon() { if (!queued) queued = requestAnimationFrame(apply); }
-  function vis() { document.documentElement.classList.toggle('al-paused', document.hidden); }
+  function vis() {
+    var R = document.documentElement, b = document.body;
+    R.classList.toggle('al-paused', document.hidden || !!document.querySelector('dialog[open]') || /overflow:\s*hidden/.test((b && b.getAttribute('style')) || ''));
+    R.classList.toggle('al-sheet', !!document.querySelector('.bn-sheet.on'));
+  }
+  function held(list) {
+    for (var i = 0; i < list.length; i++) {
+      var t = list[i].target;
+      if (t === document.body || t.tagName === 'DIALOG' || (t.classList && t.classList.contains('bn-sheet'))) { vis(); return; }
+    }
+  }
   function onLang() { relabel(); var s = document.querySelector('.widget[data-widget="semester"] .al-wave'); if (s) s.removeAttribute('data-k'); soon(); }
 
   function mount() {
@@ -166,6 +176,10 @@
         obs.observe(n, o); watched.push(n);
       });
     }
+    if ('MutationObserver' in window && document.body) {
+      hold = new MutationObserver(held);
+      hold.observe(document.body, { attributes: true, attributeFilter: ['open', 'style', 'class'], subtree: true });
+    }
     document.addEventListener('garden:languageChanged', onLang);
     document.addEventListener('visibilitychange', vis);
     vis();
@@ -175,12 +189,13 @@
     if (queued) cancelAnimationFrame(queued);
     queued = 0;
     if (obs) obs.disconnect();
-    obs = null; watched = [];
+    if (hold) hold.disconnect();
+    obs = null; hold = null; watched = [];
     if (io) io.disconnect();
     io = null;
     document.removeEventListener('garden:languageChanged', onLang);
     document.removeEventListener('visibilitychange', vis);
-    document.documentElement.classList.remove('al-paused');
+    document.documentElement.classList.remove('al-paused', 'al-sheet');
     var rm = document.querySelectorAll('.al-art, .al-wave, .al-eq');
     for (var i = 0; i < rm.length; i++) if (rm[i].parentNode) rm[i].parentNode.removeChild(rm[i]);
     var d = document.querySelectorAll('[data-al-dur]');
