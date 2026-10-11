@@ -451,73 +451,102 @@
     return false;
   }
 
-  function cv(a) {
-    if (!a.length) return 0;
-    var m = 0, v = 0, i;
-    for (i = 0; i < a.length; i++) m += a[i];
-    m /= a.length;
-    for (i = 0; i < a.length; i++) v += (a[i] - m) * (a[i] - m);
-    return m ? Math.sqrt(v / a.length) / m : 0;
+  var SCR_GATE = { rub: 0.45, zig: 0.45, zigN: 6, rubN: 0 };
+
+  function windOf(rs) {
+    var sm = [], tot = 0, i, k;
+    for (i = 0; i < rs.length; i++) {
+      var sx = 0, sy = 0, c = 0;
+      for (k = Math.max(0, i - 2); k <= Math.min(rs.length - 1, i + 2); k++) { sx += rs[k].x; sy += rs[k].y; c++; }
+      sm.push({ x: sx / c, y: sy / c });
+    }
+    for (i = 2; i < sm.length; i++) {
+      var a1 = Math.atan2(sm[i - 1].y - sm[i - 2].y, sm[i - 1].x - sm[i - 2].x);
+      var a2 = Math.atan2(sm[i].y - sm[i - 1].y, sm[i].x - sm[i - 1].x), d = a2 - a1;
+      while (d > Math.PI) d -= 2 * Math.PI;
+      while (d < -Math.PI) d += 2 * Math.PI;
+      if (Math.abs(d) < 2.3) tot += d;
+    }
+    return Math.abs(tot) / Math.PI;
   }
 
-  function scribbleOf(pts, z, w, speed) {
-    if (!pts || pts.length < 8) return null;
-    z = z || 1;
-    var px = 1 / z, i;
-    var mnx = Infinity, mny = Infinity, mxx = -Infinity, mxy = -Infinity;
+  function frame(pts, px) {
+    var mnx = Infinity, mny = Infinity, mxx = -Infinity, mxy = -Infinity, i;
     for (i = 0; i < pts.length; i++) {
       if (pts[i].x < mnx) mnx = pts[i].x; if (pts[i].x > mxx) mxx = pts[i].x;
       if (pts[i].y < mny) mny = pts[i].y; if (pts[i].y > mxy) mxy = pts[i].y;
     }
     var diag = Math.sqrt((mxx - mnx) * (mxx - mnx) + (mxy - mny) * (mxy - mny));
-    if (diag < 14 * px) return null;
-    var rs = resample(pts, Math.max(1.2 * px, diag / 200));
-    if (rs.length < 12) return null;
-    var mx = 0, my = 0, L = 0;
-    for (i = 0; i < rs.length; i++) { mx += rs[i].x; my += rs[i].y; if (i) L += Math.sqrt(Math.pow(rs[i].x - rs[i - 1].x, 2) + Math.pow(rs[i].y - rs[i - 1].y, 2)); }
-    mx /= rs.length; my /= rs.length;
+    var rs = resample(pts, Math.max(1.2 * px, diag / 200, 0)), L = 0;
+    for (i = 1; i < rs.length; i++) L += Math.sqrt(Math.pow(rs[i].x - rs[i - 1].x, 2) + Math.pow(rs[i].y - rs[i - 1].y, 2));
     var hull = hullOf(rs), ha = 0, sa = 0;
     for (i = 0; i < hull.length; i++) { var h0 = hull[i], h1 = hull[(i + 1) % hull.length]; ha += h0.x * h1.y - h1.x * h0.y; }
     for (i = 0; i < rs.length; i++) { var s0 = rs[i], s1 = rs[(i + 1) % rs.length]; sa += s0.x * s1.y - s1.x * s0.y; }
-    ha = Math.abs(ha) / 2; sa = Math.abs(sa) / 2;
-    if (!(ha > 0) || sa / ha > 0.8) return null;
-    var cxx = 0, cyy = 0, cxy = 0;
-    for (i = 0; i < rs.length; i++) { var dx = rs[i].x - mx, dy = rs[i].y - my; cxx += dx * dx; cyy += dy * dy; cxy += dx * dy; }
-    var th = 0.5 * Math.atan2(2 * cxy, cxx - cyy);
-    var mode = '', axes = [th, th + Math.PI / 2], ax;
-    for (ax = 0; ax < 2 && !mode; ax++) {
-      var ux = Math.cos(axes[ax]), uy = Math.sin(axes[ax]), P = [], p0 = Infinity, p1 = -Infinity;
-      for (i = 0; i < rs.length; i++) {
-        var v = (rs[i].x - mx) * ux + (rs[i].y - my) * uy;
-        P.push(v); if (v < p0) p0 = v; if (v > p1) p1 = v;
-      }
-      var ext = p1 - p0;
-      if (ext < 8 * px) continue;
-      var sw = swings(P, Math.max(0.45 * ext, 5 * px));
-      if (sw.n < 3 || L < 3 * ext) continue;
-      var qx = -uy, qy = ux, ends = sw.turns.slice(1, -1), hs = 0, hr = 0, ls = 0, lr = 0, k;
-      for (k = 0; k < ends.length; k++) {
-        var t = ends[k], top = P[t], up = top > (p0 + p1) / 2, depth = 0.2 * Math.abs(top - (up ? p0 : p1)), wq0 = Infinity, wq1 = -Infinity, j;
-        for (j = t; j >= 0 && Math.abs(P[j] - top) <= depth; j--) { var qa = (rs[j].x - mx) * qx + (rs[j].y - my) * qy; if (qa < wq0) wq0 = qa; if (qa > wq1) wq1 = qa; }
-        for (j = t; j < rs.length && Math.abs(P[j] - top) <= depth; j++) { var qb = (rs[j].x - mx) * qx + (rs[j].y - my) * qy; if (qb < wq0) wq0 = qb; if (qb > wq1) wq1 = qb; }
-        var sharpK = (wq1 - wq0) <= 1.6 * depth + 1.5 * px;
-        if (up) { if (sharpK) hs++; else hr++; } else { if (sharpK) ls++; else lr++; }
-      }
-      var nh = hs + hr, nl = ls + lr;
-      var big = sw.amp.filter(function (a) { return a >= 0.6 * ext; }).length;
-      var q0 = Infinity, q1 = -Infinity;
-      for (i = 0; i < rs.length; i++) { var qv = (rs[i].x - mx) * qx + (rs[i].y - my) * qy; if (qv < q0) q0 = qv; if (qv > q1) q1 = qv; }
-      var pitch = (q1 - q0) / Math.max(1, sw.n), tight = pitch <= 0.3 * ext;
-      var mid = sw.amp.slice(1, -1), cvA = cv(mid.length >= 2 ? mid : sw.amp);
-      var bothSharp = nh && nl && hs >= 0.75 * nh && ls >= 0.75 * nl;
-      var bothRound = !ax && tight && nh && nl && hr >= 0.75 * nh && lr >= 0.75 * nl;
-      var fast = !ax || (speed != null && speed >= 0.4);
-      var Q = ends.map(function (t2) { return (rs[t2].x - mx) * qx + (rs[t2].y - my) * qy; }), gaps = [];
-      for (k = 1; k < Q.length; k++) gaps.push(Math.abs(Q[k] - Q[k - 1]));
-      if (fast && sw.n >= (ax ? 5 : 3) && (!ax || (cvA <= 0.22 && cv(gaps) <= 0.4)) && (bothSharp || bothRound) && Math.abs(nh - nl) <= 1 && big >= Math.max(3, sw.n - 1)) mode = ax ? 'zig' : 'rub';
+    return { rs: rs, L: L, diag: diag, hull: hull, fill: ha ? Math.abs(sa) / Math.abs(ha) : 1, box: { x: mnx, y: mny, w: mxx - mnx, h: mxy - mny } };
+  }
+
+  function spanOf(a) {
+    var lo = Infinity, hi = -Infinity, i;
+    for (i = 0; i < a.length; i++) { if (a[i] < lo) lo = a[i]; if (a[i] > hi) hi = a[i]; }
+    return { lo: lo, hi: hi, ext: hi - lo };
+  }
+
+  function sweep(rs, th, px) {
+    var ux = Math.cos(th), uy = Math.sin(th), A = [], B = [], i;
+    for (i = 0; i < rs.length; i++) { A.push(rs[i].x * ux + rs[i].y * uy); B.push(rs[i].y * ux - rs[i].x * uy); }
+    var sa = spanOf(A), sb = spanOf(B);
+    if (sa.ext < 8 * px) return null;
+    var sw = swings(A, Math.max(0.3 * sa.ext, 4 * px));
+    if (!sw.n) return null;
+    var big = 0, k, hs = 0, ht = 0, ls = 0, lt = 0, ends = sw.turns.slice(1, -1);
+    var srt = sw.amp.slice().sort(function (x, y) { return y - x; }), ref = Math.min(sa.ext, srt[Math.floor(srt.length / 4)]);
+    for (k = 0; k < sw.amp.length; k++) if (sw.amp[k] >= 0.5 * ref) big++;
+    for (k = 0; k < ends.length; k++) {
+      var t = ends[k], top = A[t], up = top > (sa.lo + sa.hi) / 2, depth = 0.2 * Math.abs(top - (up ? sa.lo : sa.hi)), w0 = Infinity, w1 = -Infinity, j;
+      for (j = t; j >= 0 && Math.abs(A[j] - top) <= depth; j--) { if (B[j] < w0) w0 = B[j]; if (B[j] > w1) w1 = B[j]; }
+      for (j = t; j < A.length && Math.abs(A[j] - top) <= depth; j++) { if (B[j] < w0) w0 = B[j]; if (B[j] > w1) w1 = B[j]; }
+      var sharp = (w1 - w0) <= 1.6 * depth + 1.5 * px;
+      if (up) { ht++; if (sharp) hs++; } else { lt++; if (sharp) ls++; }
     }
-    if (!mode) return null;
-    return { mode: mode, hull: hull, pad: Math.max((w || 2) / 2, 3 * px), box: { x: mnx, y: mny, w: mxx - mnx, h: mxy - mny } };
+    return { th: th, n: sw.n, big: big, ext: sa.ext, prog: sb.ext, pitch: sb.ext / sw.n, hs: ht ? hs / ht : 0, ls: lt ? ls / lt : 0 };
+  }
+
+  function bestSweep(rs, px) {
+    var best = null, k;
+    for (k = 0; k < 12; k++) {
+      var s = sweep(rs, k * Math.PI / 12, px);
+      if (s && (!best || s.big * s.ext > best.big * best.ext)) best = s;
+    }
+    return best;
+  }
+
+  /*@3.NOCJ.137*/
+  function scribbleOf(pts, z, w, speed, gate) {
+    if (!pts || pts.length < 8) return null;
+    z = z || 1;
+    var g = gate || SCR_GATE, px = 1 / z, f = frame(pts, px);
+    if (f.diag < 14 * px || f.rs.length < 12) return null;
+    var s = bestSweep(f.rs, px);
+    if (!s) return null;
+    var turns = windOf(resample(f.rs, Math.max(2 * px, f.diag / 80)));
+    var rub = s.prog <= s.ext && s.pitch <= 0.45 * s.ext;
+    var few = s.n < 6;
+    if (f.fill > 0.8 || s.big < 3 || s.big < 0.4 * s.n || turns > 0.6 * s.n || f.L < 3 * s.ext || (!few && Math.abs(s.hs - s.ls) > 0.35)) return null;
+    var quick = speed != null && speed >= g.rub, even = few || (s.hs >= 0.9 && s.ls >= 0.9) || (s.hs <= 0.5 && s.ls <= 0.5);
+    var dense = quick && even && s.pitch <= 0.45 * s.ext && s.n >= 4 + (g.rubN || 0);
+    if (rub || dense) {
+      if (s.n < (quick ? 3 : 4) + (g.rubN || 0)) return null;
+      rub = true;
+    } else if (!(speed != null && speed >= g.zig) || s.n < g.zigN || s.pitch > 0.6 * s.ext || !even) return null;
+    return { mode: rub ? 'rub' : 'zig', hull: f.hull, pad: Math.max((w || 2) / 2, 3 * px), box: f.box };
+  }
+
+  function backForth(pts, z) {
+    if (!pts || pts.length < 6) return false;
+    var px = 1 / (z || 1), f = frame(pts, px);
+    if (f.diag < 10 * px) return false;
+    var s = bestSweep(f.rs, px);
+    return !!(s && s.big >= 1);
   }
 
   function samplesOf(el) {
@@ -540,10 +569,11 @@
   }
 
   function scratchHits(els, sc, skip) {
-    var ids = [], i, k;
+    var ids = [], i, k, also = {};
+    (sc.chain || []).forEach(function (id) { also[id] = 1; });
     for (i = 0; i < els.length; i++) {
       var el = els[i];
-      if (el === skip || !el.id) continue;
+      if (el === skip || !el.id || also[el.id]) continue;
       var bb = boxOf(el);
       if (bb.x > sc.box.x + sc.box.w + sc.pad || bb.x + bb.w < sc.box.x - sc.pad ||
           bb.y > sc.box.y + sc.box.h + sc.pad || bb.y + bb.h < sc.box.y - sc.pad) continue;
@@ -588,6 +618,37 @@
     clearTimeout(_scrToast._t);
     if (_scrToast.parentNode) _scrToast.parentNode.removeChild(_scrToast);
     _scrToast = null;
+  }
+
+  /*@3.NOCJ.139*/
+  var SCR_LEARN = 'garden_ink_scrlearn';
+  function scrLearn() {
+    try { var o = JSON.parse(localStorage.getItem(SCR_LEARN) || 'null'); if (o && Array.isArray(o.sp)) return o; } catch (e) {}
+    return { sp: [], fp: { rub: 0, zig: 0 } };
+  }
+  function scrKeep(o) { try { localStorage.setItem(SCR_LEARN, JSON.stringify(o)); } catch (e) {} }
+  function scrGate() {
+    var o = scrLearn(), g = { rub: SCR_GATE.rub, zig: SCR_GATE.zig, zigN: SCR_GATE.zigN, rubN: 0 };
+    if (o.sp.length >= 4) {
+      var a = o.sp.slice().sort(function (x, y) { return x - y; }), med = a[a.length >> 1];
+      g.rub = Math.max(0.3, Math.min(SCR_GATE.rub, 0.6 * med));
+      g.zig = Math.max(0.35, Math.min(SCR_GATE.zig, 0.7 * med));
+    }
+    g.rubN = Math.min(3, Math.floor((o.fp && o.fp.rub) || 0));
+    g.zigN += 2 * Math.min(3, Math.floor((o.fp && o.fp.zig) || 0));
+    return g;
+  }
+  function scrNote(mode, speed, undone) {
+    var o = scrLearn();
+    o.fp = o.fp || { rub: 0, zig: 0 };
+    if (undone) {
+      o.fp[mode] = (o.fp[mode] || 0) + 1;
+      if (o.sp.length) o.sp.pop();
+    } else {
+      if (speed > 0) { o.sp.push(Math.round(speed * 100) / 100); if (o.sp.length > 12) o.sp.shift(); }
+      o.fp[mode] = Math.max(0, (o.fp[mode] || 0) - 0.25);
+    }
+    scrKeep(o);
   }
 
   function Canvas(host, opts) {
@@ -2249,10 +2310,44 @@
     return L * (this.cam.z || 1) * hz / dt;
   };
 
+  function ptsBox(p) {
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity, i;
+    for (i = 0; i < p.length; i++) { if (p[i].x < x0) x0 = p[i].x; if (p[i].x > x1) x1 = p[i].x; if (p[i].y < y0) y0 = p[i].y; if (p[i].y > y1) y1 = p[i].y; }
+    return { x: x0, y: y0, w: x1 - x0, h: y1 - y0 };
+  }
+
+  Canvas.prototype.chainFits = function (ch, st, id) {
+    var t0 = (this._t0s && this._t0s[id]) || Date.now();
+    if (t0 - ch.t > 900 || t0 < ch.t) return false;
+    var live = {}, i;
+    for (i = 0; i < this.els.length; i++) live[this.els[i].id] = 1;
+    for (i = 0; i < ch.ids.length; i++) if (!live[ch.ids[i]]) return false;
+    var a = ch.box, b = ptsBox(st.pts), m = 0.25 * Math.max(a.w, a.h, b.w, b.h);
+    return !(b.x > a.x + a.w + m || b.x + b.w < a.x - m || b.y > a.y + a.h + m || b.y + b.h < a.y - m);
+  };
+
+  /*@3.NOCJ.138*/
+  Canvas.prototype.chainAdd = function (st, id) {
+    var ch = this._scrChain;
+    if (!st || st.ty !== 'st' || st.hi || this.tool !== 'pen' || !scratchOn() || !backForth(st.pts, this.cam.z || 1)) { this._scrChain = null; return; }
+    var sp = this.scratchSpeed(st, id) || 0;
+    if (ch && ch.ids.length < 4 && this.chainFits(ch, st, id)) {
+      var pts = ch.pts.concat(st.pts);
+      this._scrChain = { pts: pts, ids: ch.ids.concat(st.id), t: Date.now(), sp: Math.max(ch.sp, sp), box: ptsBox(pts) };
+    } else {
+      this._scrChain = { pts: st.pts.slice(), ids: [st.id], t: Date.now(), sp: sp, box: ptsBox(st.pts) };
+    }
+  };
+
   Canvas.prototype.scratchScan = function (st, id) {
     if (!st || st.ty !== 'st' || st.hi || this.tool !== 'pen' || !scratchOn()) return null;
-    var sc = scribbleOf(st.pts, this.cam.z || 1, st.w, this.scratchSpeed(st, id));
+    var z = this.cam.z || 1, sp = this.scratchSpeed(st, id), g = scrGate(), sc = scribbleOf(st.pts, z, st.w, sp, g), ch = this._scrChain;
+    if (!sc && ch && this.chainFits(ch, st, id)) {
+      sc = scribbleOf(ch.pts.concat(st.pts), z, st.w, Math.max(sp || 0, ch.sp || 0), g);
+      if (sc) sc.chain = ch.ids.slice();
+    }
     if (!sc) return null;
+    sc.sp = sp;
     var ids = scratchHits(this.els, sc, st), cl = null, words = 0;
     if (this.onScratch) {
       cl = this.scratchClient(sc);
@@ -2286,11 +2381,13 @@
   Canvas.prototype.scratchApply = function (st, id) {
     var hit = this.scratchScan(st, id);
     if (!hit || (!hit.ids.length && !hit.words)) return false;
-    var self = this, gone = {}, n = hit.ids.length, words = 0;
+    var self = this, gone = {}, n = hit.ids.length, words = 0, chain = hit.sc.chain || [];
     hit.ids.forEach(function (id) { gone[id] = 1; });
+    chain.forEach(function (id) { gone[id] = 1; });
+    this._scrChain = null;
     if (this.hist) this.hist.begin();
     try {
-      if (n) {
+      if (n || chain.length) {
         this.push(this.snapshot());
         this.els = this.els.filter(function (e) { return !gone[e.id]; });
         this.sel = {};
@@ -2300,9 +2397,11 @@
     if (!n && !words) return false;
     this._scr = null;
     this.paint();
-    if (n) this.commit();
+    if (n || chain.length) this.commit();
     this.emit();
+    scrNote(hit.sc.mode, hit.sc.sp, false);
     scratchToast(n + words, function () {
+      scrNote(hit.sc.mode, hit.sc.sp, true);
       if (self.hist) self.hist.undo(); else self.undo();
     });
     try { document.dispatchEvent(new CustomEvent('garden:scratch', { detail: { ink: n, words: words } })); } catch (e2) {}
@@ -2611,6 +2710,7 @@
                         straight: st.hi ? (self.hiStraight ? 1 : 0) : 0 };
         }
         self.onAdd(st);
+        self.chainAdd(st, id);
         self.growIfNeeded();
         /*@3.NOCJ.7*/
         if (st.ty !== 'st') {

@@ -104,7 +104,7 @@
       var set = {}, del = {};
       keys.forEach(function (k) {
         if (pend[k] === 'del') del[k] = (st.dt && st.dt[k]) || Date.now();
-        else if (st.L[k]) set[k] = { v: JSON.stringify({ ink: st.L[k].ink || '', shapes: st.L[k].shapes || [], ts: st.L[k].ts || null }), t: st.L[k].t || Date.now() };
+        else if (st.L[k]) set[k] = { v: JSON.stringify({ ink: st.L[k].ink || '', shapes: st.L[k].shapes || [], ts: st.L[k].ts || null, lg: st.L[k].lg ? 1 : 0 }), t: st.L[k].t || Date.now() };
       });
       return fetch(inkUrl(id), { method: 'POST', cache: 'no-store',
         headers: hdrs(id, { 'Content-Type': 'application/json' }),
@@ -120,18 +120,18 @@
             if (cur && tWas === tNow) { delete now.pend[k]; if (now.dt) delete now.dt[k]; }
           });
           writeStore(now);
-          return (j.stale && j.stale.length) ? pull().then(function () { return true; }) : true;
+          return (j.stale && j.stale.length) ? pull(true).then(function () { return true; }) : true;
         });
       });
     }).catch(function () { return false; }).then(function (v) { pushing = null; return v; });
     return pushing;
   }
 
-  function pull() {
+  function pull(full) {
     return vault().then(function (id) {
       if (!id) return false;
       var st0 = readStore();
-      return fetch(inkUrl(id) + '?since=' + (st0.syncT || 0), { cache: 'no-store', headers: hdrs(id) }).then(function (r) {
+      return fetch(inkUrl(id) + '?since=' + (full ? 0 : (st0.syncT || 0)), { cache: 'no-store', headers: hdrs(id) }).then(function (r) {
         if (!r.ok) return false;
         return r.json().then(function (j) {
           var st = readStore(), got = j.layers || {}, changed = [];
@@ -140,13 +140,14 @@
             var it = got[k], local = st.L[k], lt = local ? (local.t || 0) : ((st.dt && st.dt[k]) || 0);
             if (!(it.t > lt)) return;
             if (st.pend[k] && lt >= it.t) return;
-            if (it.v == null) delete st.L[k];
+            if (it.v == null) { delete st.L[k]; st.dt = st.dt || {}; st.dt[k] = it.t; }
             else {
               var d = null;
               try { d = JSON.parse(it.v); } catch (e) { d = null; }
               if (!d) return;
               st.L[k] = { ink: d.ink || '', shapes: d.shapes || [], ts: d.ts || undefined, t: it.t };
               if (!st.L[k].ts) delete st.L[k].ts;
+              if (d.lg) st.L[k].lg = 1;
             }
             delete st.pend[k];
             changed.push(k);
@@ -198,13 +199,33 @@
     return out;
   }
 
+  /*@3.MOIJ.1*/
+  function langTag() { return document.documentElement.lang === 'en' ? '__en' : ''; }
+
+  /*@3.MOIJ.2*/
+  function twinLegacy() {
+    var st = readStore(), n = 0;
+    st.pend = st.pend || {};
+    Object.keys(st.L).forEach(function (k) {
+      var d = st.L[k], cut = k.lastIndexOf('|');
+      if (!d || d.lg || cut < 1 || k.slice(cut - 4, cut) === '__en') return;
+      var en = k.slice(0, cut) + '__en' + k.slice(cut);
+      if (st.L[en] || (st.dt && st.dt[en])) return;
+      st.L[en] = Object.assign({}, d, { lg: 1 });
+      st.pend[en] = 'set';
+      n++;
+    });
+    if (n) { writeStore(st); schedulePush(); }
+    return n;
+  }
+
   function layout() {
-    var secs = sections(), regs = [], i;
+    var secs = sections(), regs = [], i, tag = langTag();
     var mr = S.main.getBoundingClientRect(), z = (S.main.offsetWidth && mr.width / S.main.offsetWidth) || 1;
     for (i = 0; i < secs.length; i++) {
       var sr = secs[i].getBoundingClientRect();
       var top = Math.round((sr.top - mr.top) / z * 8) / 8, bot = top + Math.round(sr.height / z * 8) / 8;
-      regs.push({ el: secs[i], top: top, bot: bot, key: secs[i].id + '|' + depthOf(secs[i]) });
+      regs.push({ el: secs[i], kid: secs[i].id + tag, top: top, bot: bot, key: secs[i].id + tag + '|' + depthOf(secs[i]) });
     }
     for (i = 0; i < regs.length; i++) {
       regs[i].start = i ? Math.round((regs[i - 1].bot + regs[i].top) / 2) : 0;
@@ -224,14 +245,14 @@
   function bridgeKey(lay, a, b) {
     var c = '', i;
     for (i = a; i <= b; i++) c += mcode(lay[i].key);
-    return 'x-' + (b - a + 1) + '-' + lay[a].el.id + '|' + c;
+    return 'x-' + (b - a + 1) + '-' + lay[a].kid + '|' + c;
   }
   function bridgeAt(lay, key) {
     var m = /^x-(\d+)-(.+)\|([a-z]+)$/.exec(key);
     if (!m) return -1;
     var n = +m[1], i;
     for (i = 0; i < lay.length; i++) {
-      if (lay[i].el.id !== m[2]) continue;
+      if (lay[i].kid !== m[2]) continue;
       if (i + n - 1 >= lay.length || bridgeKey(lay, i, i + n - 1) !== key) return -1;
       return i;
     }
@@ -328,7 +349,7 @@
       var col = (K.canCarry && !K.canCarry(e.c)) ? G.hexOf(e.c) : e.c;
       return { tool: e.hi ? 'hi' : 'pen', color: col, w: e.w, nib: e.nib, o: e.o, pts: e.pts };
     })).then(function (ink) {
-      var d = { ink: strokes.length ? ink : '', shapes: shapes, t: Date.now() };
+      var d = { ink: strokes.length ? ink : '', shapes: shapes, t: Date.now(), lg: 1 };
       if (ts.some(function (t) { return t > 0; })) d.ts = ts;
       return d;
     });
@@ -746,6 +767,7 @@
     }).then(function () {
       return Promise.race([pull(), new Promise(function (r) { setTimeout(r, 2500); })]);
     }).then(function () {
+      twinLegacy();
       S.store = readStore();
       S.mem = {}; S.sig = {}; S.dirty = {};
       S.lay = layout();
@@ -762,6 +784,7 @@
       buildFab();
       document.addEventListener('click', onDepthClick, true);
       document.addEventListener('click', blockFold, true);
+      document.addEventListener('garden:languageChanged', relayout);
       window.addEventListener('pointerdown', onPenWake, true);
       window.addEventListener('resize', onResize);
       if (window.ResizeObserver) {
@@ -794,6 +817,7 @@
     var flush = persist();
     document.removeEventListener('click', onDepthClick, true);
     document.removeEventListener('click', blockFold, true);
+    document.removeEventListener('garden:languageChanged', relayout);
     window.removeEventListener('pointerdown', onPenWake, true);
     window.removeEventListener('resize', onResize);
     if (S.ro) { S.ro.disconnect(); S.ro = null; }
