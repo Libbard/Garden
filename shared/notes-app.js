@@ -10641,6 +10641,13 @@
     crsMenu = null;
     if (els.crs) els.crs.setAttribute('aria-expanded', 'false');
   }
+  function crsGo(href, pdf) {
+    var desk = false;
+    try { desk = pdf && !isPhone() && window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) {}
+    var w = desk ? window.open(href, '_blank') : null;
+    if (w) { try { w.opener = null; } catch (e2) {} return; }
+    location.href = href;
+  }
   function openCrs(anchor) {
     closeCrs();
     closeMore();
@@ -10684,7 +10691,7 @@
       if (!b) return;
       var act = b.getAttribute('data-crs');
       closeCrs();
-      if (act === 'go' && x) location.href = x.href;
+      if (act === 'go' && x) crsGo(x.href, !!rec && rec.k === 'pdf');
       else if (act === 'ask') courseAsk([id], x && x.c, x && x.m);
       else if (act === 'un') linkCourse([id], '');
     });

@@ -1207,7 +1207,8 @@
     var mid = function (e) {
       if (e.pts && e.pts.length) return e.pts[Math.floor(e.pts.length / 2)];
       if (e.x1 != null) return { x: (e.x1 + e.x2) / 2, y: (e.y1 + e.y2) / 2 };
-      return null;
+      var bb = e.ty === 'hl' ? bboxOf(e) : null;
+      return bb ? { x: (bb.x0 + bb.x1) / 2, y: (bb.y0 + bb.y1) / 2 } : null;
     };
     return this.ready.then(function () { return pagesOf(self.id); }).then(function (list) {
       var ns = {}, out = [];
@@ -2377,7 +2378,7 @@
     var before = p.els.slice();
     var mine = areaOf(fresh);
     var keep = [], merged = fresh, i;
-    var twin = false;
+    var twin = false, ts0 = Date.now();
     for (i = 0; i < p.els.length; i++) {
       var e = p.els[i];
       /*@3.NOPJ8.143*/
@@ -2389,9 +2390,10 @@
       /*@3.NOPJ8.59*/
       if (over > mine * 0.85 && over > his * 0.85) { twin = true; keep.push(e); continue; }
       merged = foldRects(merged.concat(e.r));
+      if (e.ts > 0 && e.ts < ts0) ts0 = e.ts;
     }
-    keep.push(under ? { ty: 'hl', c: colour, r: merged, u: 1 }
-                    : { ty: 'hl', c: colour, r: merged });
+    keep.push(under ? { ty: 'hl', c: colour, r: merged, u: 1, ts: ts0 }
+                    : { ty: 'hl', c: colour, r: merged, ts: ts0 });
     void twin;
     p.els = keep;
     this.push({ act: 'set', n: n, before: before, after: p.els.slice() });
