@@ -929,6 +929,7 @@
   }
 
   function openShare() {
+    try { if (window.GardenEv) window.GardenEv('feat', { f: 'notes', a: 'share' }); } catch (eV) {}
     var dlg = document.getElementById('na-share');
     if (!dlg || !edId) return;
     var Sy = window.GardenNotesSync;
@@ -7682,6 +7683,7 @@
     if (!board) { pgvSeed(doc); doc.pg = 2; }
     if (board) doc.kind = 'board';
     var go = function () { reload({ keepOpen: true }); openNote(id, { focus: !board }); };
+    try { if (window.GardenEv) window.GardenEv('feat', { f: 'notes', a: board ? 'create_board' : 'create' }); } catch (eV) {}
     if (St) putBorn(id, doc, now).then(go, go); else go();
   }
 

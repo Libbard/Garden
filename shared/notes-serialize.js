@@ -414,6 +414,7 @@
   function exportNote(fmt, doc, meta) {
     var f = FORMATS[fmt];
     if (!f) return Promise.resolve(false);
+    try { if (window.GardenEv) window.GardenEv('feat', { f: 'notes', a: 'export_' + fmt }); } catch (eV) {}
     var m = meta || {};
     if (fmt !== 'json' && isEmptyDoc(doc)) return Promise.resolve(false);
     return render(fmt, doc, m).then(function (text) {

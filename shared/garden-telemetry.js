@@ -7,6 +7,8 @@
   var FLUSH_MS = 20000;
   var JITTER = 0.25;
   var IDLE_MS = 60000;
+  var HB_MS = 45000;
+  var HB_IDLE_MS = 10 * 60 * 1000;
   var GAP_MS = 30 * 60 * 1000;
   var MAX_BATCH = 60;
   var MAX_SESSION = 200;
@@ -38,7 +40,8 @@
     ai_open: 1, ai_answer: 1, ai_followup: 1, ai_explain_feedback: 1,
     lab_open: 1, lab_run: 1, lab_error: 1,
     js_error: 1, perf: 1, api_fail: 1, rage_click: 1,
-    dropped: 1, queue_replay: 1
+    dropped: 1, queue_replay: 1,
+    p_hb: 1, brain_game: 1, custom_quiz: 1, feat: 1
   };
 
   /*@3.GATJ.3*/
@@ -514,6 +517,12 @@
     lsDel(K_Q); lsDel(K_LAST);
   }
 
+  function beat(now) {
+    if (dead || !enabled() || document.visibilityState !== 'visible') return;
+    if (Date.now() - lastAct > HB_IDLE_MS) return;
+    q.push({ n: 'p_hb', t: Date.now(), p: { pg: pg, u: cleanPath(), a: Math.round(attn / 1000), v: 1 } });
+    if (now) flush(false);
+  }
   function leave() {
     ev('p_leave', { a: Math.round(attn / 1000), sd: Math.max(maxScroll, scrollDepth()), pg: pg });
     /*@3.GATJ.35*/
@@ -561,10 +570,11 @@
     window.addEventListener('click', watchRage, true);
 
     timer = setInterval(tick, 1000);
+    setInterval(function () { beat(false); }, HB_MS);
     schedule();
 
     document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'hidden') leave(); else act();
+      if (document.visibilityState === 'hidden') leave(); else { act(); beat(true); }
     });
     window.addEventListener('pagehide', leave);
 
