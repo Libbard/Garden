@@ -2285,7 +2285,10 @@
       if (rec) {
         /*@3.NOAJ.172*/
         rec.t = notPh(typed) || notPh(rec.t) || deriveTitle(doc) || '';
-        if (rec.pv && (typed || docHasContent(doc))) delete rec.pv;
+        if (rec.pv && (typed || docHasContent(doc))) {
+          delete rec.pv;
+          try { if (window.GardenEv) window.GardenEv('feat', { f: 'notes', a: rec.k === 'board' ? 'create_board' : 'create' }); } catch (eV) {}
+        }
         /*@3.NOAJ.166*/
         if (!quiet && moved) rec.updated_at = t;
         rec.sz = res.bytes;
@@ -7683,7 +7686,6 @@
     if (!board) { pgvSeed(doc); doc.pg = 2; }
     if (board) doc.kind = 'board';
     var go = function () { reload({ keepOpen: true }); openNote(id, { focus: !board }); };
-    try { if (window.GardenEv) window.GardenEv('feat', { f: 'notes', a: board ? 'create_board' : 'create' }); } catch (eV) {}
     if (St) putBorn(id, doc, now).then(go, go); else go();
   }
 
