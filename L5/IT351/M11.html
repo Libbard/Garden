@@ -919,6 +919,105 @@
     <div class="content-target"></div>
   </div>
 
+  <!-- DIAGRAM[5]: A sequence diagram showing a client and server. Client sends Seq 501-600. Server receives it. Client sends Seq 701-800 (Seq 601-700 is lost). Server immediately sends Ack 601 (indicating it expects 601). Client resends Seq 601-700. Server sends Ack 801. Labels in Arabic and English. -->
+<div class="svg-diagram" data-diagram-id="5">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" font-family="system-ui, 'Cairo', 'Inter', sans-serif">
+    <defs>
+        <!-- Arrowhead for Client to Server -->
+        <marker id="arrow-right" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Arrowhead for Server to Client -->
+        <marker id="arrow-left" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 10 0 L 0 5 L 10 10 z" fill="var(--brand-500)" />
+        </marker>
+        <!-- Arrowhead for Lost Packet -->
+        <marker id="arrow-right-muted" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+        </marker>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Diagram Title -->
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">TCP Acknowledgment Scenario: Lost Segment</text>
+    <text x="400" y="35" text-anchor="middle" font-size="20" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">سيناريو إقرار TCP: مقطع مفقود</text>
+
+    <!-- Lifelines -->
+    <line x1="200" y1="110" x2="200" y2="610" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+    <line x1="600" y1="110" x2="600" y2="610" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+    <!-- Headers -->
+    <!-- Client Header -->
+    <rect x="120" y="70" width="160" height="40" rx="6" fill="var(--brand-800)" />
+    <text x="200" y="96" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Client</text>
+    <text x="200" y="96" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">العميل</text>
+
+    <!-- Server Header -->
+    <rect x="520" y="70" width="160" height="40" rx="6" fill="var(--brand-800)" />
+    <text x="600" y="96" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-en">Server</text>
+    <text x="600" y="96" text-anchor="middle" font-size="18" font-weight="bold" fill="var(--on-brand-hi)" class="gsvg-ar">الخادم</text>
+
+    <!-- Step 1: Seq 501-600 -->
+    <line x1="200" y1="140" x2="590" y2="180" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-right)" />
+    <text x="400" y="155" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Seq 501-600</text>
+    <text x="400" y="155" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">Seq 501-600</text>
+    
+    <!-- Server Note 1 -->
+    <rect x="620" y="165" width="160" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="700" y="185" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Delays ACK</text>
+    <text x="700" y="185" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">يؤخر الإقرار</text>
+
+    <!-- Step 2: Seq 601-700 (Lost) -->
+    <line x1="200" y1="220" x2="390" y2="240" stroke="var(--text-muted)" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#arrow-right-muted)" />
+    <!-- Red X for lost packet -->
+    <path d="M 395 235 L 415 255 M 415 235 L 395 255" stroke="var(--text-muted)" stroke-width="3" />
+    <text x="300" y="225" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Seq 601-700 (Lost)</text>
+    <text x="300" y="225" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">Seq 601-700 (مفقود)</text>
+
+    <!-- Step 3: Seq 701-800 -->
+    <line x1="200" y1="290" x2="590" y2="330" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-right)" />
+    <text x="400" y="305" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Seq 701-800</text>
+    <text x="400" y="305" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">Seq 701-800</text>
+
+    <!-- Server Note 2 -->
+    <rect x="620" y="325" width="160" height="46" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="700" y="343" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Out-of-order!</text>
+    <text x="700" y="343" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">وصول غير مرتب!</text>
+    <text x="700" y="361" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Immediate ACK</text>
+    <text x="700" y="361" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">إقرار فوري</text>
+
+    <!-- Step 4: Ack 601 -->
+    <line x1="600" y1="360" x2="210" y2="400" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-left)" />
+    <text x="400" y="375" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Ack 601</text>
+    <text x="400" y="375" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">Ack 601</text>
+
+    <!-- Client Note -->
+    <rect x="20" y="410" width="160" height="30" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="100" y="430" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Retransmits missing</text>
+    <text x="100" y="430" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">يعيد إرسال المفقود</text>
+
+    <!-- Step 5: Resend Seq 601-700 -->
+    <line x1="200" y1="460" x2="590" y2="500" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-right)" />
+    <text x="400" y="475" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Resend Seq 601-700</text>
+    <text x="400" y="475" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">إعادة إرسال Seq 601-700</text>
+
+    <!-- Server Note 3 -->
+    <rect x="620" y="505" width="160" height="46" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+    <text x="700" y="523" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">Gap filled</text>
+    <text x="700" y="523" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">تم سد الفجوة</text>
+    <text x="700" y="541" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-en">ACK next expected</text>
+    <text x="700" y="541" text-anchor="middle" font-size="13" fill="var(--text-secondary)" class="gsvg-ar">إقرار بالتالي</text>
+
+    <!-- Step 6: Ack 801 -->
+    <line x1="600" y1="530" x2="210" y2="570" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-left)" />
+    <text x="400" y="545" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Ack 801</text>
+    <text x="400" y="545" text-anchor="middle" font-size="15" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">Ack 801</text>
+
+</svg>
+</div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">لماذا يتجاهل المستقبل المقطع المكرر بدلاً من معالجته؟</template>

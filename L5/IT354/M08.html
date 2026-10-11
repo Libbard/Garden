@@ -1004,6 +1004,106 @@
     <div class="content-target"></div>
   </div>
 
+  <!-- DIAGRAM[3]: A timeline diagram showing three transactions (T1, T2, T3). T3 writes B, then T2 reads B and writes D. T1 reads and writes D before T2 writes it. Then T3 fails and rolls back. Arrows should show the dependency: T3's rollback forces T2 to roll back because T2 read B written by T3; T1 is not affected and commits. -->
+<div class="svg-diagram" data-diagram-id="3">
+<svg viewBox="0 0 900 650" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow-head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+    </marker>
+    <marker id="arrow-time" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+  <!-- Title -->
+  <text x="450" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Cascading Rollback</text>
+  <text x="450" y="40" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="22" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">التراجع المتتالي</text>
+
+  <!-- Time Axis -->
+  <line x1="50" y1="100" x2="50" y2="610" stroke="var(--text-muted)" stroke-width="2" marker-end="url(#arrow-time)" />
+  <text x="50" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-muted)" class="gsvg-en">Time</text>
+  <text x="50" y="85" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="bold" fill="var(--text-muted)" class="gsvg-ar">الزمن</text>
+
+  <!-- Timelines (Dashed) -->
+  <line x1="180" y1="110" x2="180" y2="610" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+  <line x1="450" y1="110" x2="450" y2="610" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+  <line x1="720" y1="110" x2="720" y2="610" stroke="var(--border-color)" stroke-width="2" stroke-dasharray="6,6" />
+
+  <!-- Column Headers -->
+  <rect x="110" y="70" width="140" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="180" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Transaction T1</text>
+  <text x="180" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المعاملة T1</text>
+
+  <rect x="380" y="70" width="140" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="450" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Transaction T2</text>
+  <text x="450" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المعاملة T2</text>
+
+  <rect x="650" y="70" width="140" height="40" rx="8" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" />
+  <text x="720" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Transaction T3</text>
+  <text x="720" y="96" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">المعاملة T3</text>
+
+  <!-- T1: read_item(D) -->
+  <rect x="110" y="130" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="180" y="156" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">read_item(D)</text>
+  <text x="180" y="156" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">قراءة(D)</text>
+
+  <!-- T1: write_item(D) -->
+  <rect x="110" y="190" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="180" y="216" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">write_item(D)</text>
+  <text x="180" y="216" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">كتابة(D)</text>
+
+  <!-- T3: write_item(B) -->
+  <rect x="650" y="250" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="720" y="276" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">write_item(B)</text>
+  <text x="720" y="276" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">كتابة(B)</text>
+
+  <!-- T1: Commit -->
+  <rect x="110" y="310" width="140" height="40" rx="6" fill="var(--brand-500)" />
+  <text x="180" y="336" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Commit</text>
+  <text x="180" y="336" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">اعتماد</text>
+  
+  <text x="180" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-en">Committed (Safe)</text>
+  <text x="180" y="375" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--text-secondary)" class="gsvg-ar">معتمدة (آمنة)</text>
+
+  <!-- T2: read_item(B) -->
+  <rect x="380" y="370" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="450" y="396" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">read_item(B)</text>
+  <text x="450" y="396" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">قراءة(B)</text>
+
+  <!-- T2: write_item(D) -->
+  <rect x="380" y="430" width="140" height="40" rx="6" fill="var(--bg-elevated)" stroke="var(--brand-500)" stroke-width="2" />
+  <text x="450" y="456" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-en">write_item(D)</text>
+  <text x="450" y="456" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" fill="var(--text-primary)" class="gsvg-ar">كتابة(D)</text>
+
+  <!-- T3: Failure / Rollback -->
+  <rect x="650" y="490" width="140" height="40" rx="6" fill="var(--brand-500)" />
+  <text x="720" y="516" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Failure / Rollback</text>
+  <text x="720" y="516" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">فشل / تراجع</text>
+
+  <!-- T2: Cascading Rollback -->
+  <rect x="380" y="550" width="140" height="40" rx="6" fill="var(--brand-500)" />
+  <text x="450" y="576" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-en">Cascading Rollback</text>
+  <text x="450" y="576" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="15" font-weight="bold" fill="var(--on-brand-lo)" class="gsvg-ar">تراجع متتالي</text>
+
+  <!-- Dependency Arrow 1: T3 W(B) to T2 R(B) -->
+  <path d="M 650 270 L 585 270 L 585 315" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 585 345 L 585 390 L 525 390" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-head)" />
+  <text x="585" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Reads uncommitted B</text>
+  <text x="585" y="335" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">يقرأ B غير المعتمدة</text>
+
+  <!-- Dependency Arrow 2: T3 Failure to T2 Rollback -->
+  <path d="M 650 510 L 585 510 L 585 525" fill="none" stroke="var(--brand-500)" stroke-width="2" />
+  <path d="M 585 555 L 585 570 L 525 570" fill="none" stroke="var(--brand-500)" stroke-width="2" marker-end="url(#arrow-head)" />
+  <text x="585" y="545" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-en">Forces rollback</text>
+  <text x="585" y="545" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="bold" fill="var(--brand-ink)" class="gsvg-ar">يجبر على التراجع</text>
+
+</svg>
+</div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">كيف يمكن لبروتوكول التحديث المؤجل (Deferred Update) أن يمنع التراجع المتتالي؟</template>

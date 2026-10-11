@@ -1100,6 +1100,132 @@ include $path . 'data/prefs.php';
     <div class="content-target"></div>
   </div>
 
+  <!-- DIAGRAM[4]: A vertical block diagram showing process memory layout. Top to bottom: 'Kernel Code and Data', 'Stack' (with a small arrow pointing down), 'Spare Memory', 'Heap' (with a small arrow pointing up), 'Global Data', 'Program Machine Code', and 'Process Control Block' at the very bottom. Label the top as 'Top of Memory' and the bottom as 'Bottom of Memory'. -->
+<div class="svg-diagram" data-diagram-id="4">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 760" width="100%" height="auto" preserveAspectRatio="xMidYMid meet">
+    <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)" />
+        </marker>
+        <marker id="arrow-axis" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--border-color)" />
+        </marker>
+        <linearGradient id="brand-grad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="var(--brand-800)"/>
+            <stop offset="100%" stop-color="var(--brand-600)"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="100%" height="100%" fill="var(--bg-surface)" />
+
+    <!-- Top Label -->
+    <text x="330" y="50" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Top of Memory</text>
+    <text x="330" y="50" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أعلى الذاكرة</text>
+
+    <!-- Left Axis (Address Space) -->
+    <path d="M 150 80 L 150 650" stroke="var(--border-color)" stroke-width="2" fill="none" marker-end="url(#arrow-axis)" />
+    
+    <text x="75" y="100" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">High Addresses</text>
+    <text x="75" y="100" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">عناوين عالية</text>
+    <text x="75" y="120" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">(0xFFFFFFFF)</text>
+    
+    <text x="75" y="620" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-en">Low Addresses</text>
+    <text x="75" y="620" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" font-weight="600" fill="var(--text-secondary)" class="gsvg-ar">عناوين منخفضة</text>
+    <text x="75" y="640" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" fill="var(--text-muted)">(0x00000000)</text>
+
+    <!-- Memory Blocks -->
+    <g>
+        <!-- Kernel Code and Data -->
+        <rect x="200" y="80" width="260" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+        <text x="330" y="120" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Kernel Code and Data</text>
+        <text x="330" y="120" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">كود وبيانات النواة</text>
+        
+        <line x1="460" y1="115" x2="510" y2="115" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4,4" />
+        <text x="640" y="120" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Reserved for the OS</text>
+        <text x="640" y="120" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">مخصص لنظام التشغيل</text>
+    </g>
+
+    <g>
+        <!-- Stack -->
+        <rect x="200" y="150" width="260" height="80" fill="url(#brand-grad)" stroke="var(--brand-500)" stroke-width="2" rx="6" />
+        <text x="330" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">Stack</text>
+        <text x="330" y="195" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">المكدس</text>
+        
+        <line x1="460" y1="190" x2="510" y2="190" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4,4" />
+        <text x="640" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Local variables &amp; call frames</text>
+        <text x="640" y="185" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">المتغيرات المحلية وإطارات الاستدعاء</text>
+        <text x="640" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Grows downwards ↓</text>
+        <text x="640" y="205" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">ينمو لأسفل ↓</text>
+    </g>
+
+    <g>
+        <!-- Spare Memory -->
+        <rect x="200" y="230" width="260" height="140" fill="var(--bg-surface)" stroke="var(--brand-400)" stroke-width="2" stroke-dasharray="6,6" rx="6" />
+        <text x="330" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-muted)" class="gsvg-en">Spare Memory</text>
+        <text x="330" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-muted)" class="gsvg-ar">ذاكرة فارغة</text>
+        
+        <line x1="460" y1="300" x2="510" y2="300" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4,4" />
+        <text x="640" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" class="gsvg-en">Empty space for growth</text>
+        <text x="640" y="305" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-muted)" class="gsvg-ar">مساحة فارغة للنمو</text>
+
+        <!-- Growth Arrows -->
+        <path d="M 330 230 L 330 270" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+        <path d="M 330 370 L 330 330" stroke="var(--brand-500)" stroke-width="3" fill="none" marker-end="url(#arrow)" />
+    </g>
+
+    <g>
+        <!-- Heap -->
+        <rect x="200" y="370" width="260" height="80" fill="url(#brand-grad)" stroke="var(--brand-500)" stroke-width="2" rx="6" />
+        <text x="330" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-en">Heap</text>
+        <text x="330" y="415" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--on-brand-hi)" class="gsvg-ar">الكومة</text>
+        
+        <line x1="460" y1="410" x2="510" y2="410" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4,4" />
+        <text x="640" y="405" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Dynamic memory (malloc)</text>
+        <text x="640" y="405" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">الذاكرة الديناميكية (malloc)</text>
+        <text x="640" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-en">Grows upwards ↑</text>
+        <text x="640" y="425" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="13" font-weight="600" fill="var(--brand-ink)" class="gsvg-ar">ينمو لأعلى ↑</text>
+    </g>
+
+    <g>
+        <!-- Global Data -->
+        <rect x="200" y="450" width="260" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+        <text x="330" y="490" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Global Data</text>
+        <text x="330" y="490" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">البيانات العامة</text>
+        
+        <line x1="460" y1="485" x2="510" y2="485" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4,4" />
+        <text x="640" y="490" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Static and global variables</text>
+        <text x="640" y="490" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">المتغيرات الثابتة والعامة</text>
+    </g>
+
+    <g>
+        <!-- Program Machine Code -->
+        <rect x="200" y="520" width="260" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+        <text x="330" y="560" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Program Machine Code</text>
+        <text x="330" y="560" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">كود الآلة للبرنامج</text>
+        
+        <line x1="460" y1="555" x2="510" y2="555" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4,4" />
+        <text x="640" y="560" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Read-only executable instructions</text>
+        <text x="640" y="560" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">تعليمات تنفيذية للقراءة فقط</text>
+    </g>
+
+    <g>
+        <!-- Process Control Block -->
+        <rect x="200" y="590" width="260" height="70" fill="var(--bg-elevated)" stroke="var(--border-color)" stroke-width="2" rx="6" />
+        <text x="330" y="630" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-en">Process Control Block (PCB)</text>
+        <text x="330" y="630" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="16" font-weight="600" fill="var(--text-primary)" class="gsvg-ar">كتلة التحكم في العملية (PCB)</text>
+        
+        <line x1="460" y1="625" x2="510" y2="625" stroke="var(--border-color)" stroke-width="1.5" stroke-dasharray="4,4" />
+        <text x="640" y="630" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-en">Process metadata</text>
+        <text x="640" y="630" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="14" fill="var(--text-secondary)" class="gsvg-ar">البيانات الوصفية للعملية</text>
+    </g>
+
+    <!-- Bottom Label -->
+    <text x="330" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-en">Bottom of Memory</text>
+    <text x="330" y="710" text-anchor="middle" font-family="system-ui, 'Cairo', 'Inter', sans-serif" font-size="18" font-weight="bold" fill="var(--text-primary)" class="gsvg-ar">أسفل الذاكرة</text>
+</svg>
+</div>
+
   <details class="thinking-question">
     <summary data-bilingual>
       <template class="content-ar">لماذا تم تصميم المكدس والكومة لينموا باتجاه بعضهما البعض بدلاً من النمو في نفس الاتجاه؟</template>
