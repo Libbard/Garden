@@ -666,6 +666,8 @@
     this.onTap = o.onTap || function () {};
     this.onPass = o.onPass || null;
     this.onScratch = o.onScratch || null;
+    this.onUndo = o.onUndo || null;
+    this.onErased = o.onErased || null;
     this.unview = o.unview || null;
     /*@3.NOCJ.116*/
     this.onTextAt = o.onTextAt || null;
@@ -1599,21 +1601,43 @@
     this.redoS.length = 0;
   };
 
+  /*@3.NOCJ.140*/
+  function changedBox(a, b) {
+    var key = function (e) { return JSON.stringify(e, function (k, v) { return k === '_bb' ? undefined : v; }); };
+    var ka0 = a.map(key), kb0 = b.map(key), seen = {}, left = {}, i, box = null;
+    for (i = 0; i < ka0.length; i++) seen[ka0[i]] = (seen[ka0[i]] || 0) + 1;
+    for (i = 0; i < kb0.length; i++) left[kb0[i]] = (left[kb0[i]] || 0) + 1;
+    var grow = function (e) {
+      var r = bboxOf(e);
+      if (!r) return;
+      if (!box) { box = { x: r.x, y: r.y, x2: r.x + r.w, y2: r.y + r.h }; return; }
+      box.x = Math.min(box.x, r.x); box.y = Math.min(box.y, r.y);
+      box.x2 = Math.max(box.x2, r.x + r.w); box.y2 = Math.max(box.y2, r.y + r.h);
+    };
+    for (i = 0; i < b.length; i++) { if (seen[kb0[i]]) seen[kb0[i]]--; else grow(b[i]); }
+    for (i = 0; i < a.length; i++) { if (left[ka0[i]]) left[ka0[i]]--; else grow(a[i]); }
+    return box ? { x: box.x, y: box.y, w: box.x2 - box.x, h: box.y2 - box.y } : null;
+  }
+
   Canvas.prototype.undo = function () {
     if (!this.undoS.length) return false;
+    var was = this.els;
     this.redoS.push(this.snapshot());
     this.els = JSON.parse(this.undoS.pop());
     this.sel = {};
     this.paint(); this.commit(); this.emit();
+    if (this.onUndo) this.onUndo(changedBox(was, this.els), 'undo');
     return true;
   };
 
   Canvas.prototype.redo = function () {
     if (!this.redoS.length) return false;
+    var was = this.els;
     this.undoS.push(this.snapshot());
     this.els = JSON.parse(this.redoS.pop());
     this.sel = {};
     this.paint(); this.commit(); this.emit();
+    if (this.onUndo) this.onUndo(changedBox(was, this.els), 'redo');
     return true;
   };
 
@@ -1795,6 +1819,7 @@
     var el = this.hit(wp);
     if (!el) return false;
     if (!this._eraseBefore) this._eraseBefore = this.snapshot();
+    this._eraseN = (this._eraseN || 0) + 1;
     this.els = this.els.filter(function (e) { return e !== el; });
     delete this.sel[el.id];
     this.paint();
@@ -1841,6 +1866,7 @@
     }
     if (!hitAny) return false;
     if (!this._eraseBefore) this._eraseBefore = this.snapshot();
+    this._erasePart = 1;
     this.els = out;
     this.sel = {};
     this.paint();
@@ -2617,7 +2643,11 @@
         if (self.tool === 'text') return;
         if (self._erasing && self._erasing[id]) {
           delete self._erasing[id];
-          if (self._eraseBefore) { self.push(self._eraseBefore); self._eraseBefore = null; self.commit(); self.emit(); }
+          if (self._eraseBefore) {
+            self.push(self._eraseBefore); self._eraseBefore = null; self.commit(); self.emit();
+            if (self.onErased && !Object.keys(self._erasing).length) self.onErased(self._eraseN || 0, !!self._erasePart);
+          }
+          if (!Object.keys(self._erasing).length) { self._eraseN = 0; self._erasePart = 0; }
           return;
         }
         if (self.tool === 'lasso' && self.lasso) {

@@ -237,6 +237,16 @@
     return out;
   }
 
+  /*@3.NOIJ2.36*/
+  var BIND_ADD = [{ t: 'touch:2tap', a: 'undo' }, { t: 'touch:3tap', a: 'redo' }, { t: 'key:KeyE', a: 'era' }], BIND_DV = 1;
+  function addDefaults(binds) {
+    BIND_ADD.forEach(function (d) {
+      var taken = binds.some(function (b) { return b.t === d.t || (d.t.indexOf('key:') === 0 && b.a === d.a && b.t.indexOf('key:') === 0); });
+      if (!taken) binds.push({ t: d.t, a: d.a });
+    });
+    return binds;
+  }
+
   function devProfile() {
     var k = devKey();
     if (_prof && _profKey === k) return _prof;
@@ -247,6 +257,11 @@
       p = { v: 1, name: '', os: g.os, kind: g.kind, src: { mouse: 'draw', touch: 'auto' }, touchSet: 0, binds: legacyBinds(), at: 0 };
     }
     if (!p.src) p.src = { mouse: 'draw', touch: 'auto' };
+    if ((p.dv || 0) < BIND_DV) {
+      addDefaults(p.binds);
+      p.dv = BIND_DV;
+      if (p.at) { try { localStorage.setItem(k, JSON.stringify(p)); } catch (e2) {} }
+    }
     _prof = p; _profKey = k;
     return p;
   }
@@ -1185,6 +1200,7 @@
     devId: devId,
     devGuess: devGuess,
     devProfile: devProfile,
+    addDefaults: addDefaults,
     saveProfile: saveProfile,
     devName: devName,
     otherDevices: otherDevices,

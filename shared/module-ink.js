@@ -306,23 +306,26 @@
     return (h >>> 0).toString(36) + ':' + s.length;
   }
 
+  function partOf(lay, el) {
+    var G = window.GardenCanvas, a = regionOf(lay, anchorY(el)), lo = a, hi = a;
+    var bb = G.bboxOf ? G.bboxOf(el) : null;
+    if (bb) {
+      lo = regionOf(lay, bb.y); hi = regionOf(lay, bb.y + bb.h);
+      while (hi > lo && bb.y + bb.h < lay[hi].top + 8) hi--;
+      while (lo < hi && bb.y > lay[lo].bot - 8) lo++;
+      if (lo === hi) lo = hi = Math.max(lo, Math.min(hi, a));
+    }
+    return { key: lo === hi ? lay[lo].key : bridgeKey(lay, lo, hi), top: lay[lo].top };
+  }
+
   function split() {
     if (!S.ov || !S.ov.cv || !S.lay) return;
-    var els = S.ov.cv.els || [], by = {}, i, lay = S.lay, G = window.GardenCanvas;
+    var els = S.ov.cv.els || [], by = {}, i, lay = S.lay;
     for (i = 0; i < lay.length; i++) by[lay[i].key] = [];
     (S.vis || []).forEach(function (b) { by[b.key] = []; });
     for (i = 0; i < els.length; i++) {
-      var a = regionOf(lay, anchorY(els[i])), lo = a, hi = a;
-      var bb = G.bboxOf ? G.bboxOf(els[i]) : null;
-      if (bb) {
-        lo = regionOf(lay, bb.y); hi = regionOf(lay, bb.y + bb.h);
-        while (hi > lo && bb.y + bb.h < lay[hi].top + 8) hi--;
-        while (lo < hi && bb.y > lay[lo].bot - 8) lo++;
-        if (lo === hi) lo = hi = Math.max(lo, Math.min(hi, a));
-      }
-      if (lo === hi) { by[lay[lo].key].push(shifted(els[i], -lay[lo].top)); continue; }
-      var bk = bridgeKey(lay, lo, hi);
-      (by[bk] = by[bk] || []).push(shifted(els[i], -lay[lo].top));
+      var pt = partOf(lay, els[i]);
+      (by[pt.key] = by[pt.key] || []).push(shifted(els[i], -pt.top));
     }
     for (var key in by) {
       if (!Object.prototype.hasOwnProperty.call(by, key)) continue;
@@ -398,23 +401,60 @@
     });
   }
 
-  function compose() {
+  function topIn(lay, vis, key) {
+    var i;
+    for (i = 0; i < lay.length; i++) if (lay[i].key === key) return lay[i].top;
+    for (i = 0; i < vis.length; i++) if (vis[i].key === key) return vis[i].top;
+    if (key.indexOf('x-') === 0) { i = bridgeAt(lay, key); if (i >= 0) return lay[i].top; }
+    return null;
+  }
+
+  /*@3.MOIJ.3*/
+  function carryHist(cv, was, lay, vis, fresh) {
+    var olds = {}, common = 0, add = [], k;
+    was.lay.forEach(function (g) { olds[g.key] = 1; });
+    (was.vis || []).forEach(function (b) { olds[b.key] = 1; });
+    for (k in fresh) {
+      if (!Object.prototype.hasOwnProperty.call(fresh, k)) continue;
+      if (olds[k]) common++; else add = add.concat(fresh[k]);
+    }
+    if (!common) return false;
+    var move = function (js) {
+      var out = [];
+      JSON.parse(js).forEach(function (el) {
+        var p = partOf(was.lay, el), t = topIn(lay, vis, p.key);
+        if (t == null) return;
+        var c = t === p.top ? el : shifted(el, t - p.top);
+        c.id = el.id;
+        out.push(c);
+      });
+      return JSON.stringify(out.concat(add));
+    };
+    cv.undoS = cv.undoS.map(move);
+    cv.redoS = cv.redoS.map(move);
+    return true;
+  }
+
+  function compose(keep) {
     if (!S.ov) return Promise.resolve();
+    var was = (keep && S.lay) ? { lay: S.lay, vis: S.vis || [] } : null;
     S.lay = layout();
     var lay = S.lay, vis = liveBridges(lay);
     var parts = lay.map(function (g) { return { key: g.key, top: g.top }; }).concat(vis);
     return Promise.all(parts.map(function (g) { return unpackLayer(g.key); })).then(function (lists) {
       if (lay !== S.lay || !S.ov) return;
       S.vis = vis;
-      var all = [];
+      var all = [], fresh = {};
       lists.forEach(function (list, i) {
-        list.forEach(function (e) { var c = shifted(e, parts[i].top); c.id = nid(); all.push(c); });
+        var mine = fresh[parts[i].key] = [];
+        list.forEach(function (e) { var c = shifted(e, parts[i].top); c.id = nid(); all.push(c); mine.push(c); });
       });
       S.ov.fit();
       var cv = S.ov.cv;
       if (!cv) return;
       cv.els = all;
-      cv.undoS = []; cv.redoS = [];
+      var held = was && (cv.undoS.length || cv.redoS.length) && carryHist(cv, was, lay, vis, fresh);
+      if (!held) { cv.undoS = []; cv.redoS = []; }
       if (cv.deselect) cv.deselect();
       cv.w = 0; cv.resize(); cv.paint();
       if (cv.emit) cv.emit();
@@ -431,7 +471,7 @@
       }
       if (same) return;
       split();
-      compose();
+      compose(true);
     }, 120);
   }
 
@@ -440,7 +480,7 @@
     var t = e.target && e.target.closest ? e.target.closest('.depth-tab') : null;
     if (!t || !S.main.contains(t)) return;
     split();
-    setTimeout(function () { compose(); }, 0);
+    setTimeout(function () { compose(true); }, 0);
   }
 
   function inInk(el) {
@@ -630,18 +670,75 @@
     });
   }
 
-  function undoBar(n) {
+  function bar(text, onUndo, ms) {
     var old = document.querySelector('.mi-undo');
     if (old) old.remove();
-    var bar = document.createElement('div');
-    bar.className = 'mi-undo';
-    bar.setAttribute('role', 'status');
-    bar.innerHTML = '<span></span><button type="button" class="gsf-btn gsf-btn--sm"></button>';
-    bar.firstChild.textContent = L('مُسح الرسم', 'Drawings cleared') + ' · ' + n + ' ' + L(n === 1 ? 'طبقة' : 'طبقات', n === 1 ? 'layer' : 'layers');
-    bar.lastChild.textContent = L('تراجع', 'Undo');
-    bar.lastChild.addEventListener('click', function () { bar.remove(); restore(); });
-    document.body.appendChild(bar);
-    setTimeout(function () { if (bar.isConnected) bar.remove(); }, 9000);
+    var b = document.createElement('div');
+    b.className = 'mi-undo';
+    b.setAttribute('role', 'status');
+    b.innerHTML = '<span></span><button type="button" class="gsf-btn gsf-btn--sm"></button>';
+    b.firstChild.textContent = text;
+    b.lastChild.textContent = L('تراجع', 'Undo');
+    b.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+    b.lastChild.addEventListener('click', function () { b.remove(); onUndo(); });
+    document.body.appendChild(b);
+    setTimeout(function () { if (b.isConnected) b.remove(); }, ms);
+  }
+  function undoBar(n) {
+    bar(L('مُسح الرسم', 'Drawings cleared') + ' · ' + n + ' ' + L(n === 1 ? 'طبقة' : 'طبقات', n === 1 ? 'layer' : 'layers'), restore, 9000);
+  }
+
+  function strokesAr(n) {
+    if (n === 1) return 'مُحي خطٌّ واحد';
+    if (n === 2) return 'مُحي خطّان';
+    if (n <= 10) return 'مُحيت ' + n + ' خطوط';
+    return 'مُحي ' + n + ' خطّاً';
+  }
+  /*@3.MOIJ.6*/
+  function onErased(n, part) {
+    if (!S.on || (!n && !part)) return;
+    var t = n ? L(strokesAr(n), 'Erased ' + n + (n === 1 ? ' stroke' : ' strokes')) : L('مُسح جزءٌ من الرسم', 'Part of a drawing erased');
+    bar(t, function () { if (S.ov && S.ov.dial) S.ov.dial.pick('undo'); }, 4000);
+  }
+
+  /*@3.MOIJ.4*/
+  function reveal(box) {
+    var cv = S.ov && S.ov.cv;
+    if (!box || !cv || !cv.wet || !cv.toScreen) return;
+    var wr = cv.wet.getBoundingClientRect(), z = (cv.wet.offsetWidth && wr.width / cv.wet.offsetWidth) || 1;
+    var a = cv.toScreen({ x: box.x, y: box.y }), b = cv.toScreen({ x: box.x + box.w, y: box.y + box.h });
+    var r = { l: wr.left + a.x * z, t: wr.top + a.y * z, r: wr.left + b.x * z, b: wr.top + b.y * z };
+    var vh = window.innerHeight, edge = 48;
+    if (r.b < edge || r.t > vh - edge) {
+      var dy = Math.round((r.t + r.b) / 2 - vh / 2);
+      var y0 = window.scrollY;
+      window.scrollBy({ top: dy, behavior: 'instant' });
+      dy = window.scrollY - y0;
+      r.t -= dy; r.b -= dy;
+    }
+    var f = document.createElement('div'), pad = 6;
+    f.className = 'mi-flash';
+    f.setAttribute('aria-hidden', 'true');
+    f.style.left = Math.round(r.l - pad) + 'px';
+    f.style.top = Math.round(r.t - pad) + 'px';
+    f.style.width = Math.max(12, Math.round(r.r - r.l + pad * 2)) + 'px';
+    f.style.height = Math.max(12, Math.round(r.b - r.t + pad * 2)) + 'px';
+    document.body.appendChild(f);
+    setTimeout(function () { f.remove(); }, 900);
+  }
+
+  function typingIn(t) {
+    return !!(t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)));
+  }
+  /*@3.MOIJ.5*/
+  function onUndoKey(e) {
+    if (!S.on || !S.drawing || !S.ov || !S.ov.dial || e.defaultPrevented || e.altKey) return;
+    if (!(e.ctrlKey || e.metaKey) || typingIn(e.target) || (e.target.closest && e.target.closest('dialog[open]'))) return;
+    var I = window.GardenInkInput, k = (I && I.keyOf) ? I.keyOf(e) : String(e.key || '').toLowerCase();
+    var act = (k === 'z' && !e.shiftKey) ? 'undo' : ((k === 'y' || (k === 'z' && e.shiftKey)) ? 'redo' : '');
+    if (!act) return;
+    e.preventDefault();
+    S.ov.dial.pick(act);
   }
 
   var POS = 'garden_mi_dock';
@@ -673,7 +770,7 @@
       M.sep() +
       M.head(L('اختصارُ القلم', 'Pen shortcut') + ': ' + keyLabel()) +
       M.item('keys', 'fa-keyboard', L('غيِّرِ الاختصارَ أو اربطْه بزرٍّ', 'Change the shortcut or bind a button')) +
-      M.item('home', 'fa-arrows-to-dot', L('أعِدِ الزرَّ إلى مكانه', 'Put the button back'), { off: !readPos() });
+      M.item('home', 'fa-location-crosshairs', L('أعِدِ الزرَّ إلى مكانه', 'Put the button back'), { off: !readPos() });
     var r = S.more.getBoundingClientRect();
     var el = M.open(r.left, r.top, h, function (act) {
       if (act === 'wipe-vis') wipe(false);
@@ -776,6 +873,8 @@
         lineSel: LINE_SEL, surface: 'module',
         heightOf: sheetH,
         onPass: pass,
+        onUndo: reveal,
+        onErased: onErased,
         onChange: function () { split(); }
       });
       if (S.ov.dial) S.ov.dial.onExit = function () { setDrawing(false); };
@@ -786,6 +885,7 @@
       document.addEventListener('click', blockFold, true);
       document.addEventListener('garden:languageChanged', relayout);
       window.addEventListener('pointerdown', onPenWake, true);
+      window.addEventListener('keydown', onUndoKey, true);
       window.addEventListener('resize', onResize);
       if (window.ResizeObserver) {
         S.ro = new ResizeObserver(relayout);
@@ -819,6 +919,7 @@
     document.removeEventListener('click', blockFold, true);
     document.removeEventListener('garden:languageChanged', relayout);
     window.removeEventListener('pointerdown', onPenWake, true);
+    window.removeEventListener('keydown', onUndoKey, true);
     window.removeEventListener('resize', onResize);
     if (S.ro) { S.ro.disconnect(); S.ro = null; }
     if (S.ov) { try { S.ov.destroy(); } catch (e) {} S.ov = null; }

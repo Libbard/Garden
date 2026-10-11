@@ -351,6 +351,26 @@
     try { localStorage.setItem(HALO_KEY, JSON.stringify({ on: p.on ? 1 : 0, swap: p.swap ? 1 : 0 })); } catch (e) {}
   }
 
+  /*@3.NODJ.137*/
+  var CHIN_HOLD_MS = 380, REP_WAIT_MS = 420, REP_MS = 150, REP_MIN_MS = 60;
+  function chinTop() { return haloPrefs().on ? HALO_R + 38 : 50; }
+  function chinBtn(k, inner, ar, en) {
+    return '<button type="button" class="ndl-cb" data-ck="' + k + '"' +
+      ' data-ar-title="' + esc(ar) + '" data-en-title="' + esc(en) + '" aria-label="' + esc(L(ar, en)) + '">' + inner + '</button>';
+  }
+  function chinHtml() {
+    return '<div class="ndl-chin" data-role="chin" role="group" aria-label="' + esc(L('تصحيحُ الرسم', 'Fix the drawing')) + '">' +
+      chinBtn('undo', '<i class="fa-solid fa-rotate-left" aria-hidden="true"></i>',
+        'تراجع — اضغطْ مطوّلاً للمزيد', 'Undo — hold for more') +
+      '<span class="ndl-cs" aria-hidden="true"></span>' +
+      chinBtn('era', ICONS.eraser || '<i class="fa-solid fa-eraser" aria-hidden="true"></i>',
+        'ممحاة — المسْها ثانيةً للقلم، واضغطْ مطوّلاً لمسحٍ مؤقّت', 'Eraser — tap again for the pen, hold to erase for a moment') +
+      '<span class="ndl-cs" aria-hidden="true"></span>' +
+      chinBtn('redo', '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i>',
+        'إعادة — اضغطْ مطوّلاً للمزيد', 'Redo — hold for more') +
+      '</div>';
+  }
+
   var R1 = 78, R2 = 128, POS_KEY = 'garden_ink_dial', FAV_KEY = 'garden_ink_favs2';
   /*@3.NODJ.59*/
   var FAV_KEY3 = 'garden_ink_favs3', FAV_MAX = 14;
@@ -2475,11 +2495,13 @@
       '<button type="button" class="ndl-z" data-role="zoom" aria-live="polite"' +
       ' aria-label="' + esc(L('التكبير', 'Zoom')) + '"' +
       ' data-ar-title="التكبير" data-en-title="Zoom">100%</button>' +
+      (this.hasChin() ? chinHtml() : '') +
       '<div class="ndl-ring ndl-ring--1" data-role="r1" hidden></div>' +
       '<div class="ndl-ring ndl-ring--2" data-role="r2" hidden></div>' +
       '<span class="ndl-tip" data-role="tip"></span>';
     document.body.appendChild(d);
     this.el = d;
+    this.chin = d.querySelector('[data-role="chin"]');
     this.hub = d.querySelector('.ndl-hub');
     this.zoomBtn = d.querySelector('[data-role="zoom"]');
     this.r1 = d.querySelector('[data-role="r1"]');
@@ -2729,12 +2751,116 @@
   };
 
   Dial.prototype.haloPrefs = function () { return haloPrefs(); };
-  Dial.prototype.setHalo = function (p) { haloSet(p); this.paintHalo(); this.paintRing1(); this.clamp(); };
+  Dial.prototype.setHalo = function (p) { haloSet(p); this.paintHalo(); this.paintRing1(); this.paintChin(); this.clamp(); };
 
   Dial.prototype.closeSub = function () {
     this.r2.hidden = true;
     this.r2.innerHTML = '';
     this.sub = null;
+  };
+
+  /*@3.NODJ.138*/
+  Dial.prototype.hasChin = function () {
+    var o = this.o || {};
+    return o.chin != null ? !!o.chin : !o.favHost;
+  };
+
+  Dial.prototype.paintChin = function () {
+    var c = this.chin;
+    if (!c) return;
+    c.hidden = !!this.open || !!this.panelOpen;
+    c.style.top = chinTop() + 'px';
+  };
+
+  Dial.prototype.chinAct = function (k) {
+    var cv = this.getCv();
+    if (!cv) return false;
+    if (k === 'undo' || k === 'redo') {
+      var h = cv.hist, ok = h ? (k === 'undo' ? h.canUndo() : h.canRedo())
+                              : !!((k === 'undo' ? cv.undoS : cv.redoS) || []).length;
+      if (!ok) return false;
+      this.pick(k);
+      return true;
+    }
+    if (k === 'era') {
+      if (cv.tool !== 'era') { if (cv.toggleAct) cv.toggleAct('era'); else cv.setTool('era'); }
+      else if (!(cv.toggleAct && cv.toggleAct('era'))) cv.setTool(this._preEra || 'pen');
+      this.sync();
+      return true;
+    }
+    return false;
+  };
+
+  /*@3.NODJ.139*/
+  Dial.prototype.bindChin = function () {
+    var self = this, c = this.chin;
+    if (!c) return;
+    var run = null;
+    var stop = function () {
+      if (!run) return;
+      clearTimeout(run.t);
+      var r = run;
+      run = null;
+      try { r.b.releasePointerCapture(r.id); } catch (e) {}
+      r.b.removeAttribute('data-hold');
+      return r;
+    };
+    var step = function () {
+      if (!run) return;
+      if (!self.chinAct(run.k)) { stop(); return; }
+      run.gap = Math.max(REP_MIN_MS, run.gap * 0.82);
+      run.t = setTimeout(step, run.gap);
+    };
+    c.addEventListener('pointerdown', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-ck]') : null;
+      e.stopPropagation();
+      if (!b || b.disabled || (e.pointerType === 'mouse' && e.button !== 0)) return;
+      e.preventDefault();
+      stop();
+      var k = b.getAttribute('data-ck');
+      run = { k: k, b: b, id: e.pointerId, t: 0, gap: REP_MS, held: false };
+      try { b.setPointerCapture(e.pointerId); } catch (e2) {}
+      if (k === 'era') {
+        run.t = setTimeout(function () {
+          var cv = self.getCv();
+          if (!run || !cv || !cv.beginMod) return;
+          run.held = true;
+          b.setAttribute('data-hold', '1');
+          cv.beginMod('era');
+          self.sync();
+        }, CHIN_HOLD_MS);
+        return;
+      }
+      if (!self.chinAct(k)) { stop(); return; }
+      run.t = setTimeout(step, REP_WAIT_MS);
+    });
+    var end = function (e) {
+      if (!run || e.pointerId !== run.id) return;
+      var r = stop();
+      if (r.k !== 'era') return;
+      var cv = self.getCv();
+      if (r.held) { if (cv && cv.endMod) cv.endMod({ act: 'era', tap: false, moved: 0, held: 1 }); self.sync(); }
+      else if (e.type === 'pointerup') self.chinAct('era');
+    };
+    c.addEventListener('pointerup', end);
+    c.addEventListener('pointercancel', end);
+    c.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-ck]') : null;
+      if (b && e.detail === 0 && !b.disabled) self.chinAct(b.getAttribute('data-ck'));
+    });
+  };
+
+  Dial.prototype.syncChin = function (s) {
+    var c = this.chin;
+    if (!c || !s) return;
+    if (s.tool && s.tool !== 'era') this._preEra = s.tool;
+    var q = c.querySelectorAll('[data-ck]');
+    for (var i = 0; i < q.length; i++) {
+      var k = q[i].getAttribute('data-ck');
+      if (k === 'undo') q[i].disabled = !s.canUndo;
+      else if (k === 'redo') q[i].disabled = !s.canRedo;
+      else q[i].setAttribute('aria-pressed', s.tool === 'era' ? 'true' : 'false');
+    }
   };
 
   Dial.prototype.setOpen = function (on) {
@@ -2744,6 +2870,7 @@
     this.r1.hidden = !this.open;
     if (!this.open) this.closeSub();
     this.hubFace();
+    this.paintChin();
     this.clamp();
   };
 
@@ -2776,6 +2903,7 @@
   Dial.prototype.onPanel = function (on) {
     this.panelOpen = !!on;
     this.hubFace();
+    this.paintChin();
   };
 
   Dial.prototype.home = function () {
@@ -2826,15 +2954,16 @@
   Dial.prototype.place = function (p) {
     var pad = 10;
     var reach = (this.open ? (this.sub ? rad2() : rad1()) : (haloPrefs().on ? HALO_R + 18 : 0)) + 26;
+    var low = (!this.open && this.chin && !this.chin.hidden) ? chinTop() + 20 + 10 : reach;
     var z = this.uiZ();
     var vw = window.innerWidth / z, vh = window.innerHeight / z;
     var x, y;
     if (p) { x = p.x; y = p.y; }
     else { x = isAr() ? (vw - 76) : 76; y = vh - 110; }
     x = Math.max(pad + reach, Math.min(x, vw - pad - reach));
-    y = Math.max(pad + reach, Math.min(y, vh - pad - reach));
+    y = Math.max(pad + reach, Math.min(y, vh - pad - Math.max(reach, low)));
     if (vw < 2 * (pad + reach)) x = vw / 2;
-    if (vh < 2 * (pad + reach)) y = vh / 2;
+    if (vh < reach + Math.max(reach, low) + 2 * pad) y = vh / 2;
     this.pos = { x: x, y: y };
     this.el.style.left = Math.round(x) + 'px';
     this.el.style.top = Math.round(y) + 'px';
@@ -2893,6 +3022,7 @@
     this.hub.addEventListener('pointercancel', function (e) { if (st && e.pointerId === st.id) st = null; });
 
     this.halo.addEventListener('click', function (e) { self.haloPick(e); });
+    this.bindChin();
     this.halo.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
 
     this.zoomBtn.addEventListener('click', function () {
@@ -2912,9 +3042,10 @@
     });
 
     var hov = function (e) {
-      var b = e.target.closest('[data-k], [data-hc], [data-hp], [data-hs]');
+      var b = e.target.closest('[data-k], [data-hc], [data-hp], [data-hs], [data-ck]');
       if (!b) { self.tip.setAttribute('data-on', '0'); return; }
-      self.tip.textContent = L(b.getAttribute('data-ar') || '', b.getAttribute('data-en') || '');
+      self.tip.textContent = L(b.getAttribute('data-ar') || b.getAttribute('data-ar-title') || '',
+                               b.getAttribute('data-en') || b.getAttribute('data-en-title') || '');
       self.tip.setAttribute('data-on', '1');
     };
     this.el.addEventListener('pointerover', hov);
@@ -2936,6 +3067,7 @@
 
     this._onLang = function () {
       i18n(self.el);
+      if (self.chin) self.chin.setAttribute('aria-label', L('تصحيحُ الرسم', 'Fix the drawing'));
       self.paintRing1();
       self.paintFavs();
       self.paintColors();
@@ -3115,6 +3247,7 @@
     }
 
     this.syncFavs(s);
+    this.syncChin(s);
 
     if (this.sub) {
       var items = this.subItems(this.sub);
@@ -3139,7 +3272,7 @@
     if (this.colorBar) this.colorBar.hidden = !live || !barOf(st, 'colors').on;
     if (this.toolBar) this.toolBar.hidden = !live || !barOf(st, 'tools').on;
     if (this.mineBar) this.mineBar.hidden = !live || !barOf(st, 'mine').on;
-    if (on) { this.paintRing1(); this.paintColors(); this.paintTools(); this.paintMine(); this.clamp(); this.sync(); }
+    if (on) { this.paintRing1(); this.paintColors(); this.paintTools(); this.paintMine(); this.paintChin(); this.clamp(); this.sync(); }
     else { this.setOpen(false); if (this.panel && this.panel.open) this.panel.toggle(false); }
   };
 

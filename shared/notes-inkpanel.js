@@ -373,6 +373,7 @@
     if (act === 'binds-reset' && X) {
       var pr = X.devProfile();
       pr.binds = [{ t: 'pen:barrel', a: 'era' }, { t: 'pen:tip', a: 'era' }, { t: 'pen:second', a: 'sel' }];
+      if (X.addDefaults) X.addDefaults(pr.binds);
       X.saveProfile(pr); this.render(); return;
     }
     if (act === 'tilt' && X) { X.setTiltMode(X.tiltMode() === 'off' ? 'auto' : 'off'); this.render(); return; }
