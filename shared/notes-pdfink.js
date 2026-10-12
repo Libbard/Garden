@@ -453,6 +453,7 @@
     var t = this.o.tool ? this.o.tool() : this.kit();
     return {
       act: (t && t.act) || 'pen',
+      geo: (t && t.geo) || null,
       c: (t && t.c) || 'ink',
       w: (t && t.w > 0) ? t.w : ((t && t.hi) ? 0 : 2),
       nib: (t && t.nib) || 'round',
@@ -733,6 +734,13 @@
                     a: { x: s.x, y: s.y }, b: { x: s.x, y: s.y }, rects: null };
       return true;
     }
+    if (t.geo && !t.hi) {
+      this.live = { n: s.n, geo: t.geo, a: { x: s.x, y: s.y },
+                    el: { ty: 'st', pts: geoPts(t.geo, s, s), c: t.c, w: t.w, nib: 'round', o: t.o,
+                          hi: 0, u: 0, ts: Date.now() } };
+      this.drawWet(s.p, this.live.el);
+      return true;
+    }
     var pt = { x: s.x, y: s.y, p: pressure == null ? 0.55 : pressure };
     if (tilt) { pt.tz = tilt.tz; pt.az = tilt.az; }
     var w0 = t.hi ? this.hiWidth(s.n, t.w) : t.w;
@@ -981,6 +989,11 @@
       return;
     }
     if (s.n !== L.n) return;
+    if (L.geo) {
+      L.el.pts = geoPts(L.geo, L.a, s, L.el.w);
+      this.drawWet(s.p, L.el);
+      return;
+    }
     var pt = { x: s.x, y: s.y, p: pressure == null ? 0.55 : pressure };
     if (tilt) { pt.tz = tilt.tz; pt.az = tilt.az; }
     L.el.pts.push(pt);
@@ -1055,6 +1068,16 @@
     }
     if (p) this.clearWet(p);
     if (!keep || !p || L.el.pts.length < 1) return false;
+    if (L.geo) {
+      var gb = bboxOf(L.el);
+      if (!gb || (gb.x1 - gb.x0 < 2 && gb.y1 - gb.y0 < 2)) { this.beat(); return false; }
+      if (this.face) this.face.used = { tool: L.geo, color: this.face.color, width: this.face.width, nib: 'round', straight: 0 };
+      this.push({ act: 'add', n: L.n, el: L.el });
+      p.els.push(L.el);
+      this.paint(L.n);
+      this.touch(L.n);
+      return true;
+    }
     /*@3.NOPJ8.170*/
     if (L.el.pts.length <= 3 && p.fhost) {
       var q0 = L.el.pts[0], qn = L.el.pts[L.el.pts.length - 1];
@@ -1087,6 +1110,31 @@
     this.touch(L.n);
     return true;
   };
+
+  /*@3.NOPJ8.195*/
+  function geoPts(geo, a, b, w) {
+    var out = [], i, P = function (x, y) { out.push({ x: x, y: y, p: 0.55 }); };
+    var seg = function (x0, y0, x1, y1, n) { for (var j = 0; j <= n; j++) P(x0 + (x1 - x0) * j / n, y0 + (y1 - y0) * j / n); };
+    if (geo === 'rect') {
+      var l = Math.min(a.x, b.x), r = Math.max(a.x, b.x), t = Math.min(a.y, b.y), d = Math.max(a.y, b.y);
+      seg(l, t, r, t, 8); seg(r, t, r, d, 8); seg(r, d, l, d, 8); seg(l, d, l, t, 8);
+    } else if (geo === 'ell') {
+      var cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2, rx = Math.abs(b.x - a.x) / 2, ry = Math.abs(b.y - a.y) / 2;
+      for (i = 0; i <= 64; i++) P(cx + rx * Math.cos(i / 64 * 2 * Math.PI), cy + ry * Math.sin(i / 64 * 2 * Math.PI));
+    } else {
+      seg(a.x, a.y, b.x, b.y, 12);
+      if (geo === 'arr') {
+        var dx = b.x - a.x, dy = b.y - a.y, len = Math.sqrt(dx * dx + dy * dy);
+        if (len > 1) {
+          var hl = Math.min(len * 0.4, Math.max(10, (w || 2) * 4)), ang = Math.atan2(dy, dx), sp = Math.PI / 7;
+          var h1x = b.x - hl * Math.cos(ang - sp), h1y = b.y - hl * Math.sin(ang - sp);
+          var h2x = b.x - hl * Math.cos(ang + sp), h2y = b.y - hl * Math.sin(ang + sp);
+          seg(b.x, b.y, h1x, h1y, 4); seg(h1x, h1y, b.x, b.y, 4); seg(b.x, b.y, h2x, h2y, 4);
+        }
+      }
+    }
+    return out;
+  }
 
   /*@3.NOPJ8.37*/
   function deep(list) {
@@ -2203,7 +2251,8 @@
       : (t === 'text') ? 'text'
       : (t === 'shp') ? 'shp'
       : (t === 'hi') ? 'hi' : 'pen';
-    return { act: act === 'hi' ? 'pen' : act, c: f.color, w: f.width,
+    var geo = (t === 'rect' || t === 'ell' || t === 'line' || t === 'arr') ? t : null;
+    return { act: act === 'hi' ? 'pen' : act, geo: geo, c: f.color, w: f.width,
              nib: f.nib, hi: act === 'hi', o: 1,
              hiMode: f.hiMode, hiStyle: f.hiStyle, straight: f.hiStraight,
              eraseMode: f.eraseMode };

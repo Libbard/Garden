@@ -698,6 +698,7 @@
     this.hiStyle = 'fill';
     this.snapText = (opts && opts.snapText) || null;
     this.snapLines = (opts && opts.snapLines) || null;
+    this.snapWord = (opts && opts.snapWord) || null;
     /*@3.NOCJ.124*/
     this.onShapeBox = (opts && opts.onShapeBox) || null;
 
@@ -2075,6 +2076,23 @@
     return (lines && lines.length) ? lines : null;
   }
 
+  /*@3.NOCJ.141*/
+  var TAP_MS = 300, TAP_PX = 6;
+  function tapWord(cv, st) {
+    if (!cv.snapWord || !st || !st.pts || !st.pts.length || !(st.ts > 0)) return false;
+    if (Date.now() - st.ts > TAP_MS) return false;
+    var z = (cv.cam && cv.cam.z) || 1, p0 = st.pts[0], i;
+    for (i = 1; i < st.pts.length; i++) {
+      if (Math.abs(st.pts[i].x - p0.x) * z > TAP_PX || Math.abs(st.pts[i].y - p0.y) * z > TAP_PX) return false;
+    }
+    return true;
+  }
+  function wordMark(cv, st) {
+    var lines = null;
+    try { lines = cv.snapWord(st.pts[0]); } catch (eW) { lines = null; }
+    return (lines && lines.length) ? lines : null;
+  }
+
   function snapHi(cv, st) {
     var pts = st.pts;
     if (!pts || pts.length < 2) return false;
@@ -2709,8 +2727,8 @@
         if (st.ty === 'st' && st.hi) {
           var snapped = false;
           /*@3.NOCJ.131*/
-          if (self.hiMode === 'text' && self.snapLines && st.pts.length > 1) {
-            var lines = textMark(self, st);
+          if (self.hiMode === 'text' && self.snapLines && (tapWord(self, st) || st.pts.length > 1)) {
+            var lines = tapWord(self, st) ? wordMark(self, st) : textMark(self, st);
             delete st._lines;
             if (lines) {
               var bands = bandsOf(self, st, lines), li;

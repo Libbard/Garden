@@ -291,6 +291,45 @@
     return out.length ? out : null;
   };
 
+  /*@3.NOOJ.37*/
+  Overlay.prototype.wordUnder = function (pt) {
+    if (!this.cv || !this.sheet || !pt) return null;
+    var c = this.worldToClient(pt);
+    var was = this.host.style.pointerEvents, wasS = this.sheet.style.pointerEvents;
+    this.host.style.pointerEvents = 'none';
+    this.sheet.style.pointerEvents = 'auto';
+    var rg = null;
+    try { rg = caretAt(c.x, c.y); } catch (e) { rg = null; }
+    this.host.style.pointerEvents = was || '';
+    this.sheet.style.pointerEvents = wasS || '';
+    var n = rg && rg.startContainer;
+    if (!n || n.nodeType !== 3 || !n.parentNode || !this.sheet.contains(n) ||
+        !n.parentNode.closest || !n.parentNode.closest(this.lineSel)) return null;
+    var t = n.nodeValue || '';
+    var i = Math.max(0, Math.min(t.length, rg.startOffset));
+    var word = function (ch) { return ch && !/[\s\u00a0.,;:!?\u060c\u061b\u061f()\[\]{}"'\u00ab\u00bb]/.test(ch); };
+    var a = i, b = i;
+    while (a > 0 && word(t.charAt(a - 1))) a--;
+    while (b < t.length && word(t.charAt(b))) b++;
+    if (b <= a) return null;
+    var wr = document.createRange();
+    try { wr.setStart(n, a); wr.setEnd(n, b); } catch (e2) { return null; }
+    var hit = false, rs = wr.getClientRects(), k;
+    for (k = 0; k < rs.length; k++) {
+      if (c.x >= rs[k].left - 4 && c.x <= rs[k].right + 4 && c.y >= rs[k].top - 4 && c.y <= rs[k].bottom + 4) { hit = true; break; }
+    }
+    if (!hit) return null;
+    var lines = [], out = [];
+    mergeLines(textRects(wr), lines);
+    for (k = 0; k < lines.length; k++) {
+      var L0 = lines[k];
+      if (!(L0.h > 3) || !(L0.right - L0.left > 2)) continue;
+      var p0 = this.clientToWorld(L0.left, L0.top), p1 = this.clientToWorld(L0.right, L0.bot);
+      out.push({ x0: Math.min(p0.x, p1.x), x1: Math.max(p0.x, p1.x), y: Math.min(p0.y, p1.y), h: Math.abs(p1.y - p0.y) });
+    }
+    return out.length ? out : null;
+  };
+
   /*@3.NOOJ.35*/
   Overlay.prototype.caretNear = function (x, y) {
     var sr = this.sheet.getBoundingClientRect();
@@ -346,6 +385,7 @@
       unview: function (el) { return self.unview ? self.unview(el) : 0; },
       hist: this.hist,
       snapText: function (bx) { return self.lineUnder(bx); },
+      snapWord: function (pt) { return self.wordUnder(pt); },
       snapLines: function (st) { var pts = st && st.pts; return (pts && pts.length > 1) ? self.linesUnder(pts[0], pts[pts.length - 1]) : null; },
       /*@3.NOOJ.8*/
       bound: this.bound,

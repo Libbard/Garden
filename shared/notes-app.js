@@ -1837,6 +1837,7 @@
       el.className = 'na-bx';
       el.setAttribute('role', 'toolbar');
       el.innerHTML =
+        '<span class="na-bx-grip" data-bx-grip="1" aria-hidden="true"><i class="fa-solid fa-grip-vertical"></i></span>' +
         '<button type="button" class="na-bx-b" data-bx="side" aria-pressed="false"><i class="fa-solid fa-table-columns" aria-hidden="true"></i></button>' +
         '<span class="na-bx-t" id="na-bx-t"></span>' +
         '<button type="button" class="na-bx-b na-bx-x" data-bx="exit"><i class="fa-solid fa-xmark" aria-hidden="true"></i><span></span><kbd>Esc</kbd></button>';
@@ -1846,6 +1847,7 @@
         if (x.getAttribute('data-bx') === 'side') sideOpen(); else browseSet(false);
       });
       host.appendChild(el);
+      bxDrag(el);
     }
     var sb = el.querySelector('[data-bx="side"]'), xb = el.querySelector('[data-bx="exit"]');
     var st = ['لوحُ الصفحات', 'Pages panel'], xt = ['أنهِ التصفّح', 'Exit browsing'];
@@ -1855,8 +1857,63 @@
     xb.setAttribute('title', L(xt[0], xt[1]) + ' (Esc)');
     xb.querySelector('span').textContent = L(xt[0], xt[1]);
     el.setAttribute('aria-label', L('وضعُ التصفّح', 'Browse mode'));
+    var gp = el.querySelector('[data-bx-grip]');
+    if (gp) gp.setAttribute('title', L('اسحبْني إلى حيث تشاء', 'Drag me anywhere'));
     el.hidden = false;
+    bxPlace(el);
     paintPsideBtn();
+  }
+
+  /*@3.NOAJ.512*/
+  var BX_KEY = 'garden_notes_bx_pos';
+  function bxRead() {
+    try { var v = JSON.parse(localStorage.getItem(BX_KEY) || 'null'); return (v && v.x >= 0 && v.y >= 0) ? v : null; } catch (e) { return null; }
+  }
+  function bxPlace(el, pos) {
+    var v = pos || bxRead();
+    if (!v) { el.classList.remove('na-bx--free'); el.style.left = el.style.top = ''; return; }
+    el.classList.add('na-bx--free');
+    var w = el.offsetWidth || 160, h = el.offsetHeight || 40;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    el.style.left = Math.round(Math.max(4, Math.min(vw - w - 4, v.x * vw))) + 'px';
+    el.style.top = Math.round(Math.max(4, Math.min(vh - h - 4, v.y * vh))) + 'px';
+  }
+  function bxDrag(el) {
+    var st = null;
+    el.addEventListener('pointerdown', function (e) {
+      if (e.button > 0 || (e.target.closest && e.target.closest('[data-bx]'))) return;
+      var r = el.getBoundingClientRect();
+      st = { id: e.pointerId, dx: e.clientX - r.left, dy: e.clientY - r.top, x: e.clientX, y: e.clientY, on: 0 };
+      try { el.setPointerCapture(e.pointerId); } catch (e1) {}
+      e.preventDefault();
+    });
+    el.addEventListener('pointermove', function (e) {
+      if (!st || e.pointerId !== st.id) return;
+      if (!st.on && Math.abs(e.clientX - st.x) + Math.abs(e.clientY - st.y) < 4) return;
+      st.on = 1;
+      el.classList.add('na-bx--free', 'is-moving');
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var x = Math.max(4, Math.min(vw - el.offsetWidth - 4, e.clientX - st.dx));
+      var y = Math.max(4, Math.min(vh - el.offsetHeight - 4, e.clientY - st.dy));
+      el.style.left = x + 'px'; el.style.top = y + 'px';
+    });
+    function end(e) {
+      if (!st || (e && e.pointerId !== st.id)) return;
+      var was = st; st = null;
+      el.classList.remove('is-moving');
+      try { el.releasePointerCapture(was.id); } catch (e2) {}
+      if (!was.on) return;
+      var r = el.getBoundingClientRect();
+      try { localStorage.setItem(BX_KEY, JSON.stringify({ x: r.left / window.innerWidth, y: r.top / window.innerHeight })); } catch (e3) {}
+    }
+    el.addEventListener('pointerup', end);
+    el.addEventListener('pointercancel', end);
+    el.addEventListener('dblclick', function (e) {
+      if (e.target.closest && e.target.closest('[data-bx]')) return;
+      try { localStorage.removeItem(BX_KEY); } catch (e4) {}
+      bxPlace(el);
+    });
+    window.addEventListener('resize', function () { if (!el.hidden) bxPlace(el); });
   }
 
   function setDocActions(on) {

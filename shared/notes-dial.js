@@ -147,6 +147,7 @@
       out.scope = raw.scope === 'per' ? 'per' : 'all';
       /*@3.NODJ.131*/
       if (raw.mineBy && typeof raw.mineBy === 'object') out.mineBy = raw.mineBy;
+      if (raw.was instanceof Array) out.was = raw.was.filter(function (k) { return BAR_KEYS.indexOf(k) >= 0; });
       if (out.scope === 'per' && SURFACE && out.mineBy && out.mineBy[SURFACE] instanceof Array) {
         barOf(out, 'mine').items = out.mineBy[SURFACE].filter(function (x) {
           return typeof x === 'string' && (x === 'sep' || x === 'spring' || !!atomMeta(x));
@@ -587,6 +588,40 @@
     try { localStorage.setItem(POS_KEY, JSON.stringify(p)); } catch (e) {}
   }
 
+  /*@3.NODJ.140*/
+  var DIALS = [];
+  function barsSync() {
+    var on = barRead().bars.some(function (b) { return b.on; });
+    var ar = on ? 'أخفِ أشرطةَ القلم' : 'أظهِرْ أشرطةَ القلم';
+    var en = on ? 'Hide the pen bars' : 'Show the pen bars';
+    DIALS.forEach(function (d) {
+      var btn = d.barTab;
+      if (!btn) return;
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+      btn.setAttribute('data-ar-title', ar);
+      btn.setAttribute('data-en-title', en);
+      btn.setAttribute('title', L(ar, en));
+      btn.setAttribute('aria-label', L(ar, en));
+      var ic = btn.querySelector('i');
+      if (ic) ic.className = 'fa-solid ' + (on ? 'fa-chevron-up' : 'fa-chevron-down');
+    });
+  }
+  function barsToggle() {
+    var d = barRead();
+    var on = d.bars.filter(function (b) { return b.on; }).map(function (b) { return b.k; });
+    if (on.length) {
+      d.was = on;
+      d.bars.forEach(function (b) { b.on = 0; });
+    } else {
+      var back = (d.was && d.was.length) ? d.was : BAR_KEYS.filter(function (k) { return BAR_ON_DEF[k]; });
+      d.bars.forEach(function (b) { b.on = back.indexOf(b.k) >= 0 ? 1 : 0; });
+    }
+    barWrite(d);
+    try { localStorage.setItem(PIN_KEY, barOf(d, 'colors').on ? '1' : '0'); } catch (eP) {}
+    DIALS.forEach(function (x) { if (x.dock && !x.dock.hidden) x.applyBar(); });
+    barsSync();
+  }
+
   function Dial(opts) {
     var o = opts || {};
     /*@3.NODJ.134*/
@@ -600,6 +635,7 @@
     this.sub = null;
     this.build();
     this.buildFavs();
+    if (this.favHost) { DIALS.push(this); barsSync(); }
     this.place(readPos());
     this.sync();
   }
@@ -674,6 +710,13 @@
       if (e.target.closest('[data-penbtn]')) { selfM.penBtnDialog(); return; }
       if (e.target.closest('[data-pincol]')) { selfM.togglePin(); selfM.applyBar(); return; }
     });
+    var tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = 'ndl-bartab';
+    tab.innerHTML = '<i class="fa-solid fa-chevron-up" aria-hidden="true"></i>';
+    tab.addEventListener('click', function (e) { e.stopPropagation(); barsToggle(); });
+    dock.appendChild(tab);
+    this.barTab = tab;
     this.favHost.appendChild(dock);
     this.dock = dock;
     this.favBar = bar;
@@ -2199,6 +2242,7 @@
     this.paintTools();
     this.paintMine();
     this.syncFavs();
+    barsSync();
   };
 
   Dial.prototype.penBtnDialog = function () {
@@ -2762,7 +2806,7 @@
   /*@3.NODJ.138*/
   Dial.prototype.hasChin = function () {
     var o = this.o || {};
-    return o.chin != null ? !!o.chin : !o.favHost;
+    return o.chin != null ? !!o.chin : true;
   };
 
   Dial.prototype.paintChin = function () {
@@ -3272,6 +3316,7 @@
     if (this.colorBar) this.colorBar.hidden = !live || !barOf(st, 'colors').on;
     if (this.toolBar) this.toolBar.hidden = !live || !barOf(st, 'tools').on;
     if (this.mineBar) this.mineBar.hidden = !live || !barOf(st, 'mine').on;
+    barsSync();
     if (on) { this.paintRing1(); this.paintColors(); this.paintTools(); this.paintMine(); this.paintChin(); this.clamp(); this.sync(); }
     else { this.setOpen(false); if (this.panel && this.panel.open) this.panel.toggle(false); }
   };
@@ -3305,10 +3350,14 @@
     if (this.el && this.el.parentNode) this.el.remove();
     if (this.dock && this.dock.parentNode) this.dock.remove();
     else if (this.favBar && this.favBar.parentNode) this.favBar.remove();
+    var ix = DIALS.indexOf(this);
+    if (ix >= 0) DIALS.splice(ix, 1);
+    barsSync();
   };
 
   window.GardenNotesDial = {
     mount: function (opts) { return new Dial(opts); },
+    toggleBars: barsToggle,
     penButtons: function () { var o = { penBtnDialog: Dial.prototype.penBtnDialog }; return o.penBtnDialog(); },
     RING1: RING1,
     TONES: TONES
