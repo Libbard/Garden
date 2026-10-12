@@ -47,7 +47,8 @@
     memory: { ar: 'ذاكرة', en: 'Memory', icon: 'fa-brain' },
     logic: { ar: 'منطق', en: 'Logic', icon: 'fa-puzzle-piece' },
     focus: { ar: 'انتباه', en: 'Focus', icon: 'fa-bullseye' },
-    speed: { ar: 'سرعة', en: 'Speed', icon: 'fa-bolt' }
+    speed: { ar: 'سرعة', en: 'Speed', icon: 'fa-bolt' },
+    calm: { ar: 'استرخاء', en: 'Relax', icon: 'fa-spa' }
   };
 
   var GAMES = [
@@ -55,37 +56,37 @@
       name: { ar: 'سودوكو', en: 'Sudoku' },
       desc: { ar: 'املأ الشبكةَ بالأرقام من 1 إلى 9 بلا تكرارٍ في صفٍّ أو عمودٍ أو مربّع.', en: 'Fill the grid with 1–9, no repeats in any row, column or box.' },
       levels: [{ id: 'easy', ar: 'سهل', en: 'Easy' }, { id: 'medium', ar: 'متوسّط', en: 'Medium' }, { id: 'hard', ar: 'صعب', en: 'Hard' }, { id: 'expert', ar: 'خبير', en: 'Expert' }],
-      daily: 'easy' },
-    { id: 'g2048', skill: 'logic', icon: 'fa-table-cells-large', kind: 'points', better: 'high',
+      daily: 'easy', zen: true },
+    { id: 'g2048', skill: 'calm', icon: 'fa-table-cells-large', kind: 'points', better: 'high',
       name: { ar: '2048', en: '2048' },
       desc: { ar: 'اسحبْ لتدمج المربّعاتِ المتشابهة حتى تصل إلى 2048 وما بعدها.', en: 'Swipe to merge matching tiles and reach 2048 and beyond.' },
       levels: [{ id: '4', ar: '4×4', en: '4×4' }, { id: '5', ar: '5×5', en: '5×5' }],
-      daily: null },
+      daily: null, zen: true, auto: false },
     { id: 'memory', skill: 'memory', icon: 'fa-clone', kind: 'moves', better: 'low',
       name: { ar: 'أزواجُ الذاكرة', en: 'Memory Pairs' },
       desc: { ar: 'اقلبْ البطاقاتِ واعثرْ على الأزواج — رموزاً، أو مصطلحاً وتعريفَه من موادّك.', en: 'Flip cards to find pairs — symbols, or a term and its definition from your courses.' },
       levels: [{ id: '12', ar: '12 بطاقة', en: '12 cards' }, { id: '16', ar: '16 بطاقة', en: '16 cards' }, { id: '24', ar: '24 بطاقة', en: '24 cards' }],
-      daily: '12' },
+      daily: '12', zen: true },
     { id: 'schulte', skill: 'focus', icon: 'fa-border-all', kind: 'time', better: 'low',
       name: { ar: 'جدولُ شولت', en: 'Schulte Table' },
       desc: { ar: 'المسْ الأرقامَ بالترتيب بأسرع ما تستطيع، وعيناك على مركز الجدول.', en: 'Tap the numbers in order as fast as you can, eyes on the centre.' },
       levels: [{ id: '4', ar: '4×4', en: '4×4' }, { id: '5', ar: '5×5', en: '5×5' }, { id: '6', ar: '6×6', en: '6×6' }, { id: '5c', ar: '5×5 ملوّن', en: '5×5 colour' }],
-      daily: '5' },
+      daily: '5', auto: ['4', '5', '6'] },
     { id: 'math', skill: 'speed', icon: 'fa-calculator', kind: 'points', better: 'high',
       name: { ar: 'الحسابُ الخاطف', en: 'Quick Math' },
       desc: { ar: 'ستّون ثانية: حلَّ أكبرَ عددٍ من المسائل. كلُّ إصابةٍ متتالية ترفع النقاط والصعوبة.', en: 'Sixty seconds: solve as many as you can. Streaks raise points and difficulty.' },
       levels: [{ id: 'mix', ar: 'منوّع', en: 'Mixed' }, { id: 'add', ar: 'جمعٌ وطرح', en: '+ and −' }, { id: 'mul', ar: 'ضربٌ وقسمة', en: '× and ÷' }],
-      daily: 'mix' },
+      daily: 'mix', auto: false },
     { id: 'mines', skill: 'logic', icon: 'fa-bomb', kind: 'time', better: 'low',
       name: { ar: 'كاسحةُ الألغام', en: 'Minesweeper' },
       desc: { ar: 'اكشفْ كلَّ الخانات الآمنة. الرقمُ يخبرك كم لغماً حوله، وضعْ علماً حيث تشكّ.', en: 'Reveal every safe square. Each number tells how many mines touch it — flag the ones you suspect.' },
       levels: [{ id: 'easy', ar: 'مبتدئ', en: 'Beginner' }, { id: 'medium', ar: 'متوسّط', en: 'Intermediate' }, { id: 'hard', ar: 'خبير', en: 'Expert' }],
       daily: 'easy' },
-    { id: 'solitaire', skill: 'logic', icon: 'fa-diamond', kind: 'time', better: 'low',
+    { id: 'solitaire', skill: 'calm', icon: 'fa-diamond', kind: 'time', better: 'low',
       name: { ar: 'سوليتير', en: 'Solitaire' },
       desc: { ar: 'كلوندايك الكلاسيكيّة: رتّبِ الورقَ تنازليّاً بألوانٍ متبادلة، وابنِ الأكوامَ الأربعة من الآص إلى الملك.', en: 'Classic Klondike: stack down in alternating colours and build the four foundations from Ace to King.' },
       levels: [{ id: 'draw1', ar: 'سحبُ ورقة', en: 'Draw 1' }, { id: 'draw3', ar: 'سحبُ ثلاث', en: 'Draw 3' }],
-      daily: null },
+      daily: null, zen: true },
     { id: 'connect4', skill: 'logic', icon: 'fa-braille', kind: 'moves', better: 'low',
       name: { ar: 'أربعةٌ في صفّ', en: 'Connect Four' },
       desc: { ar: 'أسقِطْ أقراصَك في الأعمدة وصِلْ أربعةً أفقيّاً أو عموديّاً أو قطريّاً قبل الحاسوب.', en: 'Drop your discs into the columns and line up four — across, down or diagonally — before the computer.' },
@@ -95,12 +96,12 @@
       name: { ar: 'اللغزُ المنزلق', en: 'Sliding Puzzle' },
       desc: { ar: 'حرّكِ المربّعاتِ في الخانة الفارغة حتى تعود الأرقامُ إلى ترتيبها.', en: 'Slide tiles into the empty space until the numbers are back in order.' },
       levels: [{ id: '3', ar: '3×3', en: '3×3' }, { id: '4', ar: '4×4', en: '4×4' }, { id: '5', ar: '5×5', en: '5×5' }],
-      daily: '3' },
+      daily: '3', zen: true },
     { id: 'hanoi', skill: 'logic', icon: 'fa-layer-group', kind: 'moves', better: 'low',
       name: { ar: 'برجُ هانوي', en: 'Tower of Hanoi' },
       desc: { ar: 'انقلِ البرجَ كلَّه إلى العمود الأخير، قرصاً قرصاً، ولا تضعْ قرصاً على أصغرَ منه.', en: 'Move the whole tower to the last peg, one disc at a time, never a larger disc on a smaller one.' },
       levels: [{ id: '3', ar: '3 أقراص', en: '3 discs' }, { id: '4', ar: '4 أقراص', en: '4 discs' }, { id: '5', ar: '5 أقراص', en: '5 discs' }, { id: '6', ar: '6 أقراص', en: '6 discs' }, { id: '7', ar: '7 أقراص', en: '7 discs' }],
-      daily: null },
+      daily: null, zen: true },
     { id: 'simon', skill: 'memory', icon: 'fa-circle-dot', kind: 'points', better: 'high',
       name: { ar: 'سايمون', en: 'Simon' },
       desc: { ar: 'شاهدِ الألوانَ تضيء ثمّ أعِدْها بالترتيب. كلُّ جولةٍ تضيف لوناً.', en: 'Watch the colours light up, then repeat them in order. Each round adds one more.' },
@@ -115,7 +116,37 @@
       name: { ar: 'الثعبان', en: 'Snake' },
       desc: { ar: 'وجّهِ الثعبانَ إلى الطعام فيطول، ولا تصطدمْ بالجدار ولا بذيلك.', en: 'Steer the snake to the food so it grows — don’t hit the wall or your own tail.' },
       levels: [{ id: 'slow', ar: 'بطيء', en: 'Slow' }, { id: 'normal', ar: 'عادي', en: 'Normal' }, { id: 'fast', ar: 'سريع', en: 'Fast' }],
-      daily: null }
+      daily: null },
+    { id: 'switch', skill: 'focus', icon: 'fa-shapes', kind: 'points', better: 'high',
+      name: { ar: 'تبديلُ القاعدة', en: 'Rule Switch' },
+      desc: { ar: 'شكلٌ ملوّنٌ وقاعدةٌ تتبدّل: أجبْ باللون مرّةً وبالشكل مرّة. ستّون ثانيةً تدرّب مرونةَ الذهن.', en: 'A coloured shape and a rule that keeps changing: answer by colour, then by shape. Sixty seconds of mental flexibility.' },
+      levels: [{ id: 'easy', ar: 'سهل', en: 'Easy' }, { id: 'medium', ar: 'متوسّط', en: 'Medium' }, { id: 'hard', ar: 'صعب', en: 'Hard' }],
+      daily: 'medium' },
+    { id: 'rotate', skill: 'logic', icon: 'fa-cubes', kind: 'points', better: 'high',
+      name: { ar: 'التدويرُ الذهنيّ', en: 'Mental Rotation' },
+      desc: { ar: 'هل الشكلُ الثاني هو الأوّلُ بعد تدويره، أم صورتُه في المرآة؟ ستّون ثانيةً تشحذ التخيّلَ المكانيّ.', en: 'Is the second shape the first one rotated, or its mirror image? Sixty seconds of spatial thinking.' },
+      levels: [{ id: 'easy', ar: 'سهل', en: 'Easy' }, { id: 'medium', ar: 'متوسّط', en: 'Medium' }, { id: 'hard', ar: 'صعب', en: 'Hard' }],
+      daily: 'medium' },
+    { id: 'nback', skill: 'memory', icon: 'fa-clock-rotate-left', kind: 'points', better: 'high',
+      name: { ar: 'الرجوعُ بـN', en: 'N-Back' },
+      desc: { ar: 'تضيء خانةٌ في شبكةٍ من تسع. اضغطْ «تطابق» حين تعود إلى مكانها قبل N خطوة — أشهرُ تمرينٍ للذاكرة العاملة.', en: 'A square lights up in a 3×3 grid. Press Match when it is where it was N steps back — the classic working-memory drill.' },
+      levels: [{ id: '1', ar: 'N = 1', en: 'N = 1' }, { id: '2', ar: 'N = 2', en: 'N = 2' }, { id: '3', ar: 'N = 3', en: 'N = 3' }, { id: '4', ar: 'N = 4', en: 'N = 4' }],
+      daily: '1' },
+    { id: 'queens', skill: 'logic', icon: 'fa-crown', kind: 'time', better: 'low',
+      name: { ar: 'التيجان', en: 'Queens' },
+      desc: { ar: 'تاجٌ واحدٌ في كلِّ صفٍّ وعمودٍ ومنطقةٍ ملوّنة، ولا يتلامس تاجان ولو قطريّاً.', en: 'One queen in every row, column and colour region — and no two queens may touch, not even diagonally.' },
+      levels: [{ id: '6', ar: '6×6', en: '6×6' }, { id: '7', ar: '7×7', en: '7×7' }, { id: '8', ar: '8×8', en: '8×8' }, { id: '9', ar: '9×9', en: '9×9' }],
+      daily: '7', zen: true },
+    { id: 'tango', skill: 'logic', icon: 'fa-sun', kind: 'time', better: 'low',
+      name: { ar: 'الشمسُ والقمر', en: 'Sun & Moon' },
+      desc: { ar: 'املأ الشبكةَ بالشموس والأقمار: ثلاثٌ من كلٍّ في كلِّ صفٍّ وعمود، بلا ثلاثةٍ متجاورة، واحترمْ علامتَي = و×.', en: 'Fill the grid with suns and moons: three of each per row and column, never three in a line, and obey the = and × signs.' },
+      levels: [{ id: 'intro', ar: 'تمهيدي', en: 'Starter' }, { id: 'easy', ar: 'سهل', en: 'Easy' }, { id: 'medium', ar: 'متوسّط', en: 'Medium' }, { id: 'hard', ar: 'صعب', en: 'Hard' }],
+      daily: 'medium', zen: true },
+    { id: 'breathe', skill: 'calm', icon: 'fa-wind', kind: 'time', better: 'high',
+      name: { ar: 'تنفّسْ بهدوء', en: 'Calm Breathing' },
+      desc: { ar: 'تنفّسٌ بطيءٌ موجَّه يهدّئ الجسمَ ويصفّي الذهن — اتبعِ الدائرة دقيقةً أو ثلاثاً أو خمساً.', en: 'Guided slow breathing that calms your body and clears your mind — follow the circle for 1, 3 or 5 minutes.' },
+      levels: [{ id: 'coherent', ar: 'الإيقاعُ الهادئ', en: 'Coherent' }, { id: 'box', ar: 'التنفّسُ الصندوقيّ', en: 'Box' }, { id: '478', ar: '\u20664-7-8\u2069', en: '4-7-8' }],
+      daily: null, auto: false, noBoard: true }
   ];
   var BY = {}; GAMES.forEach(function (g) { BY[g.id] = g; });
   var IMPL = {};
@@ -135,18 +166,35 @@
 
   function dailyPlan(day) {
     var r = rng(hash('garden-daily-' + day));
-    var pool = GAMES.filter(function (g) { return g.daily; }).map(function (g) { return g.id; });
+    var bySkill = {};
+    GAMES.forEach(function (g) { if (g.daily && BY[g.id]) (bySkill[g.skill] = bySkill[g.skill] || []).push(g.id); });
+    var skills = Object.keys(SKILLS).filter(function (k) { return bySkill[k]; });
     var out = [];
-    while (out.length < 3 && pool.length) out.push(pool.splice(Math.floor(r() * pool.length), 1)[0]);
+    while (out.length < 3 && skills.length) {
+      var pool = bySkill[skills.splice(Math.floor(r() * skills.length), 1)[0]];
+      out.push(pool[Math.floor(r() * pool.length)]);
+    }
     return out;
   }
+  function streakStep(st, d) {
+    st = { n: st.n || 0, last: st.last || null, best: st.best || 0, frz: st.frz || 0 };
+    var gap = st.last ? Math.max(0, dayDiff(st.last, d) - 1) : 0, used = 0, earned = false;
+    if (st.last && gap <= st.frz) { st.n += 1; st.frz -= gap; used = gap; }
+    else { st.n = 1; st.frz = 0; }
+    st.last = d;
+    st.best = Math.max(st.best, st.n);
+    if (st.n % 7 === 0 && st.frz < 2) { st.frz += 1; earned = true; }
+    return { st: st, used: used, earned: earned };
+  }
+  function missed(m, d) { return m.streak.last ? Math.max(0, dayDiff(m.streak.last, d) - 1) : 0; }
   function dailyState() {
     var d = today(), m = meta();
     var plan = dailyPlan(d);
     var done = (m.days[d] && m.days[d].done) || [];
-    var streak = m.streak.n || 0;
-    if (m.streak.last && dayDiff(m.streak.last, d) > 1) streak = 0;
-    return { day: d, plan: plan, done: done, streak: streak, complete: plan.every(function (id) { return done.indexOf(id) >= 0; }) };
+    var streak = m.streak.n || 0, gap = missed(m, d), frz = m.streak.frz || 0;
+    if (gap > frz) streak = 0;
+    return { day: d, plan: plan, done: done, streak: streak, frz: frz, covered: gap > 0 && gap <= frz ? gap : 0, scores: (m.days[d] && m.days[d].scores) || {},
+      complete: plan.every(function (id) { return done.indexOf(id) >= 0; }) };
   }
   function markDaily(id, score) {
     var d = today(), m = meta();
@@ -155,14 +203,45 @@
     day.scores[id] = score;
     var plan = dailyPlan(d);
     if (plan.every(function (x) { return day.done.indexOf(x) >= 0; }) && m.streak.last !== d) {
-      m.streak.n = (m.streak.last && dayDiff(m.streak.last, d) === 1) ? (m.streak.n || 0) + 1 : 1;
-      m.streak.last = d;
-      m.streak.best = Math.max(m.streak.best || 0, m.streak.n);
+      var r = streakStep(m.streak, d);
+      m.streak = r.st;
+      if (r.used) day.frz = r.used;
+      if (r.earned) day.earned = 1;
     }
     var keys = Object.keys(m.days).sort();
     while (keys.length > 60) delete m.days[keys.shift()];
     saveMeta(m);
   }
+
+  function autoSteps(g) { return g.auto === false ? null : (g.auto || g.levels.map(function (l) { return l.id; })); }
+  function autoOn(g) { var a = meta().auto || {}; return !!(autoSteps(g) && autoSteps(g).length > 1 && a[g.id] && a[g.id].on); }
+  function autoLevel(g) {
+    var steps = autoSteps(g), a = (meta().auto || {})[g.id] || {};
+    return steps[Math.max(0, Math.min(steps.length - 1, a.i | 0))];
+  }
+  function setAuto(g, on) {
+    var m = meta(), a = m.auto = m.auto || {}, steps = autoSteps(g);
+    var cur = a[g.id] || { i: Math.max(0, steps.indexOf(lastLevel(g.id))), w: 0 };
+    cur.on = on; a[g.id] = cur; saveMeta(m);
+  }
+  function adapt(g, r) {
+    var m = meta(), a = (m.auto || {})[g.id], steps = autoSteps(g);
+    if (!a || !a.on || !steps) return 0;
+    var grade = r.grade != null ? r.grade : (r.won === false ? -1 : 1);
+    var i = Math.max(0, Math.min(steps.length - 1, a.i | 0)), to = i;
+    if (grade < 0) { to = Math.max(0, i - 1); a.w = 0; }
+    else if (grade > 0) { a.w = (a.w | 0) + 1; if (a.w >= 2) { to = Math.min(steps.length - 1, i + 1); a.w = 0; } }
+    a.i = to; saveMeta(m);
+    return to - i;
+  }
+  function logAct(g) {
+    var m = meta(), d = today(), act = m.act = m.act || {}, row = act[d] = act[d] || {};
+    row[g.skill] = (row[g.skill] || 0) + 1;
+    var ks = Object.keys(act).sort();
+    while (ks.length > 62) delete act[ks.shift()];
+    saveMeta(m);
+  }
+  function zenOn(g) { return !!(g && g.zen && meta().zen); }
 
   var audio = null;
   function fx() { return meta().fx; }
@@ -209,20 +288,23 @@
     var el = $('gm-hub');
     var ds = dailyState();
     var m = meta();
-    var h = '<div class="gm-head"><h1>' + t('ألعابُ الذهن', 'Brain Games') + '</h1>' +
+    var h = '<div class="gm-head"><div class="gm-head-row"><h1>' + t('ألعابُ الذهن', 'Brain Games') + '</h1>' +
+      '<button type="button" class="gsf-btn gm-skbtn" data-act="skills"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> ' + t('مهاراتي', 'My skills') + '</button></div>' +
       '<p class="gm-sub">' + t('استراحةٌ قصيرةٌ تنشّط الذاكرةَ والانتباهَ والمنطق. تُلعب بالإصبع والفأرة ولوحة المفاتيح، وتُحفظ حيث توقّفت.',
         'A short break that wakes up memory, focus and logic. Play with touch, mouse or keyboard — your game is saved where you left it.') + '</p></div>';
     h += '<section class="gm-daily" aria-labelledby="gm-daily-h">' +
       '<div class="gm-daily-top"><div><h2 id="gm-daily-h">' + t('تمرينُ اليوم', 'Today’s workout') + '</h2><p>' +
-        (ds.complete ? t('أتممتَ تمرينَ اليوم. نراك غداً.', 'You finished today’s workout. See you tomorrow.') : t('ثلاثُ ألعابٍ في نحو خمس دقائق، تتغيّر كلَّ يوم.', 'Three games in about five minutes, new every day.')) + '</p></div>' +
-        (ds.streak ? '<div class="gm-streak" title="' + t('أيّامٌ متتالية', 'Days in a row') + '"><i class="fa-solid fa-fire" aria-hidden="true"></i>' + num(ds.streak) + '<small>' + t(ds.streak === 1 ? 'يوم' : ds.streak === 2 ? 'يومان' : ds.streak <= 10 ? 'أيّام' : 'يوماً', ds.streak === 1 ? 'day' : 'days') + '</small></div>' : '') + '</div>' +
+        (ds.complete ? t('أتممتَ تمرينَ اليوم. نراك غداً.', 'You finished today’s workout. See you tomorrow.') : t('ثلاثُ مهاراتٍ مختلفة في نحو خمس دقائق، تتغيّر كلَّ يوم.', 'Three different skills in about five minutes, new every day.')) + '</p></div>' +
+        (ds.streak ? '<div class="gm-streaks"><div class="gm-streak" title="' + t('أيّامٌ متتالية', 'Days in a row') + '"><i class="fa-solid fa-fire" aria-hidden="true"></i>' + num(ds.streak) + '<small>' + t(ds.streak === 1 ? 'يوم' : ds.streak === 2 ? 'يومان' : ds.streak <= 10 ? 'أيّام' : 'يوماً', ds.streak === 1 ? 'day' : 'days') + '</small></div>' +
+          (ds.frz ? '<div class="gm-frz" title="' + t('أيّامُ راحةٍ تحمي سلسلتك', 'Rest days that protect your streak') + '" aria-label="' + t('أيّامُ الراحة: ', 'Rest days: ') + ds.frz + '"><i class="fa-solid fa-snowflake" aria-hidden="true"></i>' + num(ds.frz) + '</div>' : '') + '</div>' : '') + '</div>' +
+      (ds.covered && !ds.complete ? '<p class="gm-daily-frz"><i class="fa-solid fa-snowflake" aria-hidden="true"></i> ' + t('فاتك تمرين، ويومُ الراحة يحمي سلسلتك — أتمَّ تمرينَ اليوم لتستمرّ.', 'You missed a workout; a rest day protects your streak — finish today’s to keep it.') + '</p>' : '') +
       '<ol class="gm-daily-list">' + ds.plan.map(function (id, i) {
         var g = BY[id], done = ds.done.indexOf(id) >= 0;
         return '<li><button type="button" class="gm-dstep' + (done ? ' done' : '') + '" data-daily="' + id + '">' +
           '<span class="gm-dico"><i class="fa-solid ' + (done ? 'fa-check' : g.icon) + '" aria-hidden="true"></i></span>' +
           '<span class="gm-dtxt"><b>' + tx(g.name) + '</b><small>' + (done ? t('أُنجز', 'Done') : tx(SKILLS[g.skill])) + '</small></span></button></li>';
       }).join('') + '</ol>' +
-      (ds.complete ? '' : '<button type="button" class="gsf-btn gsf-btn--go gm-dgo" data-act="daily"><i class="fa-solid fa-play" aria-hidden="true"></i> ' +
+      (ds.complete ? '<button type="button" class="gsf-btn gm-dgo" data-act="share"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i> ' + t('شارِكْ نتيجتك', 'Share your result') + '</button>' : '<button type="button" class="gsf-btn gsf-btn--go gm-dgo" data-act="daily"><i class="fa-solid fa-play" aria-hidden="true"></i> ' +
         (ds.done.length ? t('أكمِلْ تمرينَ اليوم', 'Continue today’s workout') : t('ابدأ تمرينَ اليوم', 'Start today’s workout')) + '</button>') +
       '</section>';
     h += '<section class="gm-champs" id="gm-champs" aria-labelledby="gm-champs-h" hidden></section>';
@@ -252,13 +334,14 @@
     if (S.inst) teardown();
     S.game = g;
     S.daily = opts.daily ? { day: today() } : null;
-    S.level = opts.daily ? g.daily : (opts.level || lastLevel(id));
+    S.level = opts.daily ? g.daily : (opts.level || (autoOn(g) ? autoLevel(g) : lastLevel(id)));
     S.view = 'game';
     $('gm-hub').hidden = true;
     var st = $('gm-stage'); st.hidden = false;
     document.body.classList.add('gm-playing');
     if (location.hash !== '#' + id) { try { history.pushState({ gm: id }, '', '#' + id); } catch (e) { location.hash = id; } }
     renderFrame();
+    st.classList.toggle('gm-zen', zenOn(g));
     S.loading = true;
     $('gm-board').innerHTML = '<div class="gm-loading"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i></div>';
     loadImpl(id).then(function () { S.loading = false; if (S.game === g) start(); })
@@ -278,16 +361,20 @@
   }
   function headHTML() {
     var g = S.game;
-    var lvChips = (!S.daily && g.levels.length > 1) ? '<div class="gsf-chips gm-levels" role="group" aria-label="' + t('المستوى', 'Level') + '">' + g.levels.map(function (l) {
-      var on = l.id === S.level;
-      return '<button type="button" class="gsf-chip' + (on ? ' on' : '') + '" aria-pressed="' + on + '" data-level="' + esc(l.id) + '">' + esc(tx(l)) + '</button>';
-    }).join('') + '</div>' : '';
+    var au = autoOn(g), canAuto = !!autoSteps(g) && autoSteps(g).length > 1;
+    var lvChips = (!S.daily && g.levels.length > 1) ? '<div class="gsf-chips gm-levels' + (au ? ' gm-levels--auto' : '') + '" role="group" aria-label="' + t('المستوى', 'Level') + '">' +
+      (canAuto ? '<button type="button" class="gsf-chip gm-auto' + (au ? ' on' : '') + '" aria-pressed="' + au + '" data-act="auto" title="' + t('يختار المستوى من نتائجك: يرتفع بعد نجاحين وينزل بعد تعثّر', 'Picks the level from your results: up after two strong games, down after a struggle') + '"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ' + t('تلقائي', 'Auto') + '</button>' : '') +
+      g.levels.map(function (l) {
+        var on = l.id === S.level;
+        return '<button type="button" class="gsf-chip' + (on ? (au ? ' gm-cur' : ' on') : '') + '" aria-pressed="' + (on && !au) + '"' + (on && au ? ' aria-current="true"' : '') + ' data-level="' + esc(l.id) + '">' + esc(tx(l)) + '</button>';
+      }).join('') + '</div>' : '';
     var ds = S.daily ? dailyState() : null;
     return '<div class="gm-bar">' +
         '<button type="button" class="gm-ib" data-act="back" aria-label="' + t('عودةٌ إلى الألعاب', 'Back to games') + '" data-ar-title="عودةٌ إلى الألعاب" data-en-title="Back to games"><i class="fa-solid fa-arrow-right gm-flip" aria-hidden="true"></i></button>' +
         '<div class="gm-title"><b>' + tx(g.name) + '</b>' + (S.daily ? '<small>' + t('تمرينُ اليوم', 'Today’s workout') + ' · ' + num((ds.plan.indexOf(g.id) + 1) + '/3') + '</small>' : '<small>' + tx(SKILLS[g.skill]) + '</small>') + '</div>' +
         '<div class="gm-tools">' +
-          '<button type="button" class="gm-ib" data-act="board" aria-label="' + t('لوحةُ الصدارة', 'Leaderboard') + '" data-ar-title="لوحةُ الصدارة" data-en-title="Leaderboard"><i class="fa-solid fa-trophy" aria-hidden="true"></i></button>' +
+          (g.noBoard ? '' : '<button type="button" class="gm-ib" data-act="board" aria-label="' + t('لوحةُ الصدارة', 'Leaderboard') + '" data-ar-title="لوحةُ الصدارة" data-en-title="Leaderboard"><i class="fa-solid fa-trophy" aria-hidden="true"></i></button>') +
+          (g.zen ? '<button type="button" class="gm-ib' + (zenOn(g) ? ' on' : '') + '" data-act="zen" aria-pressed="' + zenOn(g) + '" aria-label="' + t('وضعُ الهدوء: بلا عدّاد', 'Calm mode: no clock') + '" data-ar-title="وضعُ الهدوء: بلا عدّاد" data-en-title="Calm mode: no clock"><i class="fa-solid fa-spa" aria-hidden="true"></i></button>' : '') +
           '<button type="button" class="gm-ib" data-act="help" aria-label="' + t('كيف تُلعب', 'How to play') + '" data-ar-title="كيف تُلعب" data-en-title="How to play"><i class="fa-solid fa-circle-question" aria-hidden="true"></i></button>' +
           '<button type="button" class="gm-ib' + (fx() ? ' on' : '') + '" data-act="fx" aria-pressed="' + fx() + '" aria-label="' + t('الأصواتُ والاهتزاز', 'Sound and vibration') + '" data-ar-title="الأصواتُ والاهتزاز" data-en-title="Sound and vibration"><i class="fa-solid ' + (fx() ? 'fa-volume-high' : 'fa-volume-xmark') + '" aria-hidden="true"></i></button>' +
           '<button type="button" class="gm-ib" data-act="restart" aria-label="' + t('ابدأ من جديد', 'Restart') + '" data-ar-title="ابدأ من جديد" data-en-title="Restart"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i></button>' +
@@ -344,6 +431,9 @@
     m.plays[g.id] = (m.plays[g.id] || 0) + 1;
     saveMeta(m);
     if (S.daily && r.won !== false) markDaily(g.id, r.score);
+    logAct(g);
+    var moved = S.daily ? 0 : adapt(g, r), zen = zenOn(g);
+    var nextLv = moved ? autoLevel(g) : null;
     try { if (window.GardenEv) GardenEv('brain_game', { g: g.id, lv: S.level, s: r.score, w: r.won !== false ? 1 : 0, d: S.daily ? 1 : 0 }); } catch (e) {}
     sound(r.won === false ? 'bad' : 'win');
     var o = $('gm-over'); if (!o) return;
@@ -353,21 +443,26 @@
     o.innerHTML = '<div class="gm-res" role="dialog" aria-modal="true" aria-labelledby="gm-res-h">' +
       '<span class="gm-res-ico ' + (won ? 'ok' : 'no') + '"><i class="fa-solid ' + (won ? (isBest ? 'fa-trophy' : 'fa-star') : 'fa-hourglass-end') + '" aria-hidden="true"></i></span>' +
       '<h2 id="gm-res-h">' + esc(r.title || (won ? t('أحسنت!', 'Well done!') : t('انتهت اللعبة', 'Game over'))) + '</h2>' +
-      (r.score != null ? '<p class="gm-res-score">' + num(fmt(g.kind, r.score)) + (r.unit ? ' <small>' + esc(r.unit) + '</small>' : '') + '</p>' : '') +
-      (isBest && prev != null ? '<p class="gm-res-best"><i class="fa-solid fa-trophy" aria-hidden="true"></i> ' + t('رقمٌ قياسيٌّ جديد!', 'New personal best!') + '</p>'
+      (r.score != null && !zen ? '<p class="gm-res-score">' + num(fmt(g.kind, r.score)) + (r.unit ? ' <small>' + esc(r.unit) + '</small>' : '') + '</p>' : '') +
+      (zen ? '' : isBest && prev != null ? '<p class="gm-res-best"><i class="fa-solid fa-trophy" aria-hidden="true"></i> ' + t('رقمٌ قياسيٌّ جديد!', 'New personal best!') + '</p>'
         : (prev != null || isBest) ? '<p class="gm-res-prev">' + t('أفضلُ نتيجةٍ لك: ', 'Your best: ') + num(fmt(g.kind, isBest ? r.score : prev)) + '</p>' : '') +
-      (r.detail ? '<p class="gm-res-detail">' + r.detail + '</p>' : '') +
+      (r.detail && !zen ? '<p class="gm-res-detail">' + r.detail + '</p>' : '') +
+      (moved ? '<p class="gm-res-auto"><i class="fa-solid ' + (moved > 0 ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down') + '" aria-hidden="true"></i> ' +
+        (moved > 0 ? t('أداءٌ ثابت — ننتقل إلى: ', 'Steady play — moving up to: ') : t('نخفّف قليلاً — المستوى التالي: ', 'Easing off a little — next level: ')) + '<b>' + esc(tx(g.levels.filter(function (l) { return l.id === nextLv; })[0])) + '</b></p>' : '') +
       '<div class="gm-res-lb" id="gm-res-lb"></div>' +
-      (ds && ds.complete ? '<p class="gm-res-daily"><i class="fa-solid fa-fire" aria-hidden="true"></i> ' + t('أتممتَ تمرينَ اليوم! سلسلتُك: ', 'Workout complete! Streak: ') + num(ds.streak) + '</p>' : '') +
+      (ds && ds.complete ? '<p class="gm-res-daily"><i class="fa-solid fa-fire" aria-hidden="true"></i> ' + t('أتممتَ تمرينَ اليوم! سلسلتُك: ', 'Workout complete! Streak: ') + num(ds.streak) + '</p>' +
+        (earnedToday() ? '<p class="gm-res-frz"><i class="fa-solid fa-snowflake" aria-hidden="true"></i> ' + t('كسبتَ يومَ راحة: لو فاتك يومٌ لن تنكسر سلسلتُك.', 'You earned a rest day: miss one day and your streak survives.') + '</p>' : '') : '') +
       '<div class="gm-res-acts">' +
         (next ? '<button type="button" class="gsf-btn gsf-btn--go" data-act="daily-next" data-next="' + next + '"><i class="fa-solid fa-forward" aria-hidden="true"></i> ' + t('اللعبةُ التالية: ', 'Next: ') + tx(BY[next].name) + '</button>'
-          : '<button type="button" class="gsf-btn gsf-btn--go" data-act="again"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> ' + t('العبْ مرّةً أخرى', 'Play again') + '</button>') +
+          : '<button type="button" class="gsf-btn gsf-btn--go" data-act="again"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> ' + (moved ? t('العبِ المستوى التالي', 'Play the next level') : t('العبْ مرّةً أخرى', 'Play again')) + '</button>') +
+        (ds && ds.complete ? '<button type="button" class="gsf-btn" data-act="share"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i> ' + t('شارِكْ نتيجتك', 'Share your result') + '</button>' : '') +
         '<button type="button" class="gsf-btn gsf-btn--ghost" data-act="back">' + t('كلُّ الألعاب', 'All games') + '</button>' +
       '</div></div>';
     o.hidden = false;
-    boardCall('finished', { g: g.id, lv: S.level, score: r.score, won: won, el: $('gm-res-lb') });
+    if (!g.noBoard && !zen) boardCall('finished', { g: g.id, lv: S.level, score: r.score, won: won, el: $('gm-res-lb') });
+    if (moved) { S.level = nextLv; var hd = $('gm-head'); if (hd) hd.innerHTML = headHTML(); }
     var b = o.querySelector('.gsf-btn--go'); if (b) setTimeout(function () { b.focus({ preventScroll: true }); }, 60);
-    if (won && isBest && !reduced()) { try { if (window.Garden && Garden.launchConfetti && prev != null) Garden.launchConfetti(); } catch (e) {} }
+    if (won && isBest && !zen && !reduced()) { try { if (window.Garden && Garden.launchConfetti && prev != null) Garden.launchConfetti(); } catch (e) {} }
   }
 
   function showHelp() {
@@ -415,7 +510,7 @@
     if (d.filter) { S.filter = d.filter; renderHub(); return; }
     if (d.play) return open(d.play);
     if (d.daily) return open(d.daily, { daily: true });
-    if (d.level) { S.level = d.level; $('gm-head').innerHTML = headHTML(); start(); return; }
+    if (d.level) { if (autoOn(S.game)) setAuto(S.game, false); S.level = d.level; $('gm-head').innerHTML = headHTML(); start(); return; }
     switch (d.act) {
       case 'daily': var ds = dailyState(); var nx = ds.plan.filter(function (id) { return ds.done.indexOf(id) < 0; })[0]; if (nx) open(nx, { daily: true }); return;
       case 'daily-next': return open(d.next, { daily: true });
@@ -431,6 +526,21 @@
         b.innerHTML = '<i class="fa-solid ' + (m.fx ? 'fa-volume-high' : 'fa-volume-xmark') + '" aria-hidden="true"></i>';
         if (m.fx) sound('good');
         return;
+      case 'auto':
+        var ag = S.game, on = !autoOn(ag);
+        if (on) { var st = autoSteps(ag), mm = meta(); mm.auto = mm.auto || {}; mm.auto[ag.id] = { on: true, w: 0, i: Math.max(0, st.indexOf(S.level)) }; saveMeta(mm); }
+        else setAuto(ag, false);
+        var nl = on ? autoLevel(ag) : S.level;
+        $('gm-head').innerHTML = headHTML();
+        if (nl !== S.level) { S.level = nl; $('gm-head').innerHTML = headHTML(); start(); }
+        return;
+      case 'zen':
+        var zm = meta(); zm.zen = !zm.zen; saveMeta(zm);
+        $('gm-stage').classList.toggle('gm-zen', zenOn(S.game));
+        b.classList.toggle('on', zm.zen); b.setAttribute('aria-pressed', zm.zen);
+        return;
+      case 'share': return shareDaily(b);
+      case 'skills': return showSkills();
       case 'reload-game': return open(S.game.id, { daily: !!S.daily, level: S.level });
     }
   }
@@ -454,6 +564,96 @@
     if (handled || k === 't' || k === 'l' || k === '+' || k === '-' || k === '=' || k === '_' || k === ' ' || /^Arrow/.test(k)) {
       e.preventDefault(); e.stopPropagation();
     }
+  }
+
+  function earnedToday() { var d = meta().days[today()]; return !!(d && d.earned); }
+  var SKILL_MARK = { memory: '🧠', logic: '🧩', focus: '🎯', speed: '⚡', calm: '🌿' };
+  function shareText() {
+    var ds = dailyState();
+    var lines = [t('ألعابُ الذهن · تمرينُ ', 'Brain Games · workout ') + ds.day];
+    ds.plan.forEach(function (id) {
+      var g = BY[id], v = ds.scores[id];
+      lines.push(SKILL_MARK[g.skill] + ' ' + tx(g.name) + (v != null ? ' · ' + fmt(g.kind, v) : '') + (ds.done.indexOf(id) >= 0 ? ' ✅' : ' ⬜'));
+    });
+    if (ds.streak) lines.push('🔥 ' + ds.streak + ' ' + t('أيّامٍ متتالية', 'days in a row'));
+    lines.push(location.origin + location.pathname);
+    return lines.join('\n');
+  }
+  function shareDaily(btn) {
+    var txt = shareText();
+    function copied() {
+      if (!btn) return;
+      var was = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-check" aria-hidden="true"></i> ' + t('نُسخت النتيجة', 'Result copied');
+      setTimeout(function () { if (btn.isConnected) btn.innerHTML = was; }, 1800);
+    }
+    function copy() {
+      try { navigator.clipboard.writeText(txt).then(copied, function () {}); } catch (e) {}
+    }
+    if (navigator.share && coarse()) { navigator.share({ text: txt }).catch(function (e) { if (e && e.name !== 'AbortError') copy(); }); return; }
+    copy();
+  }
+
+  function skillReport(k, m, days) {
+    var games = GAMES.filter(function (g) { return g.skill === k; });
+    var act = m.act || {}, log = m.log || {};
+    var cells = days.map(function (d) {
+      var n = (act[d] && act[d][k]) || 0;
+      if (!n && log[d]) games.forEach(function (g) { Object.keys(log[d]).forEach(function (key) { if (key.indexOf(g.id + ':') === 0) n++; }); });
+      return n;
+    });
+    var best = null;
+    games.forEach(function (g) {
+      g.levels.forEach(function (l) {
+        var key = bestKey(g.id, l.id), pts = days.filter(function (d) { return log[d] && log[d][key]; }).map(function (d) { return log[d][key].v; });
+        if (pts.length < 2 || !pts[0]) return;
+        var a = pts[0], z = pts[pts.length - 1];
+        var pct = g.better === 'low' ? (a - z) / a : (z - a) / a;
+        if (!best || pct > best.pct) best = { g: g, l: l, pct: pct, n: pts.length };
+      });
+    });
+    return { games: games, cells: cells, active: cells.filter(Boolean).length, best: best };
+  }
+  function showSkills() {
+    var m = meta(), d0 = today(), days = [];
+    for (var i = 27; i >= 0; i--) { var dt = new Date(d0 + 'T12:00:00'); dt.setDate(dt.getDate() - i); days.push(today(dt)); }
+    var ds = dailyState(), anyPlay = false;
+    var cards = Object.keys(SKILLS).map(function (k) {
+      var r = skillReport(k, m, days), sk = SKILLS[k];
+      if (r.active) anyPlay = true;
+      var line;
+      if (r.best && r.best.pct >= 0.02) line = '<i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> ' + esc(tx(r.best.g.name)) + (r.best.g.levels.length > 1 ? ' · ' + esc(tx(r.best.l)) : '') + ': ' +
+        t('تحسّنتَ ', 'improved by ') + num(Math.round(r.best.pct * 100) + '%') + t(' منذ أوّل محاولة', ' since your first try');
+      else if (r.best) line = '<i class="fa-solid fa-equals" aria-hidden="true"></i> ' + t('مستواك ثابت — جرّبْ مستوًى أعلى أو «تلقائي».', 'Holding steady — try a harder level or Auto.');
+      else if (r.active) line = t('العبْ يوماً آخر لنقيس تقدّمك.', 'Play on another day to measure your progress.');
+      else line = t('لم تلعبْ بعدُ ألعابَ هذه المهارة: ', 'Not played yet: ') + r.games.map(function (g) { return esc(tx(g.name)); }).join(t('، ', ', '));
+      return '<section class="gm-sk-card" style="--gm-c:var(--gm-' + k + ')">' +
+        '<div class="gm-sk-top"><span class="gm-ico"><i class="fa-solid ' + sk.icon + '" aria-hidden="true"></i></span><b>' + tx(sk) + '</b>' +
+        '<small>' + num(r.active) + t(' يوماً من 28', ' of 28 days') + '</small></div>' +
+        '<div class="gm-sk-heat" role="img" aria-label="' + t('أيّامُ اللعب في آخر 28 يوماً: ', 'Days played in the last 28: ') + r.active + '">' +
+        r.cells.map(function (n, i) { return '<span data-n="' + Math.min(3, n) + '" title="' + days[i] + '"></span>'; }).join('') + '</div>' +
+        '<p class="gm-sk-line">' + line + '</p></section>';
+    }).join('');
+    var dlg = document.getElementById('gm-skills');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'gm-skills'; dlg.className = 'gsf gm-sk';
+      dlg.setAttribute('aria-labelledby', 'gm-sk-h');
+      ($('gm-root') || document.body).appendChild(dlg);
+    }
+    dlg.innerHTML = '<div class="gsf-grip" aria-hidden="true"></div>' +
+      '<form method="dialog" class="gsf-x"><button class="gsf-close" aria-label="' + t('إغلاق', 'Close') + '"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></form>' +
+      '<div class="gsf-body"><h2 id="gm-sk-h"><i class="fa-solid fa-chart-simple" aria-hidden="true"></i> ' + t('مهاراتي', 'My skills') + '</h2>' +
+      '<p class="gm-sk-sub">' + t('آخرُ أربعة أسابيع على هذا الجهاز. التقدّمُ يقارن أوّلَ نتيجةٍ لك بآخرها في المستوى نفسِه.', 'The last four weeks on this device. Progress compares your first and latest result on the same level.') + '</p>' +
+      '<div class="gm-sk-sum">' +
+        '<span class="gm-stat"><small>' + t('السلسلة', 'Streak') + '</small><b>' + ds.streak + '</b></span>' +
+        '<span class="gm-stat"><small>' + t('أطولُ سلسلة', 'Best streak') + '</small><b>' + Math.max(m.streak.best || 0, ds.streak) + '</b></span>' +
+        '<span class="gm-stat"><small><i class="fa-solid fa-snowflake" aria-hidden="true"></i> ' + t('أيّامُ راحة', 'Rest days') + '</small><b>' + ds.frz + '</b></span>' +
+      '</div>' +
+      (anyPlay ? '' : '<p class="gm-sk-empty">' + t('العبْ أيَّ لعبةٍ وستظهر مهاراتُك هنا.', 'Play any game and your skills will show up here.') + '</p>') +
+      '<div class="gm-sk-grid">' + cards + '</div>' +
+      '<p class="gm-sk-note">' + t('يومُ الراحة: كلُّ سبعة أيّامٍ متتالية تكسبك يوماً (حتى يومين) يحمي سلسلتَك إن فاتك تمرين.', 'Rest days: every 7 days in a row earns one (up to two) that protects your streak if you miss a workout.') + '</p></div>';
+    try { dlg.showModal(); } catch (e) { dlg.setAttribute('open', ''); }
   }
 
   function boardCall(name, arg) {
@@ -494,7 +694,8 @@
   window.GardenGames = {
     register: function (id, impl) { IMPL[id] = impl; },
     list: GAMES, _state: S,
-    _host: { list: GAMES, by: BY, fmt: fmt, t: t, tx: tx, esc: esc, num: num, today: today, meta: meta, lastLevel: lastLevel },
+    _host: { list: GAMES.filter(function (g) { return !g.noBoard; }), by: BY, fmt: fmt, t: t, tx: tx, esc: esc, num: num, today: today, meta: meta, lastLevel: lastLevel },
+    _logic: { dailyPlan: dailyPlan, streakStep: streakStep, adapt: adapt, setAuto: setAuto, autoLevel: autoLevel, autoSteps: autoSteps, meta: meta },
     _boardReady: function () { if (S.view === 'hub') boardCall('hub', $('gm-champs')); }
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

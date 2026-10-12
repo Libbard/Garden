@@ -58,7 +58,8 @@
           cancelAnimationFrame(raf);
           paint();
           var secs = acc / 1000;
-          ctx.finish({ won: true, score: Math.round(acc), detail: t('أخطاء: ', 'Misses: ') + errors + ' · ' + t('السرعة: ', 'Pace: ') + (secs / total).toFixed(2) + t('ث لكلِّ رقم', 's per number') });
+          var par = n === 4 ? .9 : n === 6 ? 1.4 : 1.1, pace = secs / total;
+          ctx.finish({ won: true, score: Math.round(acc), grade: pace <= par && errors <= 2 ? 1 : pace > par * 2 ? -1 : 0, detail: t('أخطاء: ', 'Misses: ') + errors + ' · ' + t('السرعة: ', 'Pace: ') + (secs / total).toFixed(2) + t('ث لكلِّ رقم', 's per number') });
           return;
         }
         paint();

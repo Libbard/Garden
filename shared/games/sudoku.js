@@ -379,7 +379,7 @@
       ctx.sound('good');
       timers.push(setTimeout(function () {
         ctx.clearSave();
-        ctx.finish({ won: true, score: ms,
+        ctx.finish({ won: true, score: ms, grade: !hints && mis <= 1 ? 1 : hints >= 3 ? -1 : 0,
           detail: t('الأخطاء: ', 'Mistakes: ') + mis + ' · ' + t('التلميحات: ', 'Hints: ') + hints + ' · ' + t(LV[level][0], LV[level][1]) });
       }, wait));
       return true;

@@ -315,7 +315,7 @@
       var title = st === 3 ? t('ذاكرةٌ لامعة!', 'Brilliant memory!') : st === 2 ? t('أحسنت!', 'Well done!') : t('وجدتَ كلَّ الأزواج!', 'All pairs found!');
       finT = setTimeout(function () {
         if (dead) return;
-        ctx.finish({ won: true, score: S.moves, unit: t('حركة', 'moves'), detail: detail, title: title });
+        ctx.finish({ won: true, score: S.moves, unit: t('حركة', 'moves'), detail: detail, title: title, grade: st === 3 ? 1 : st === 1 ? -1 : 0 });
       }, ctx.reduced ? 120 : 520);
     }
 

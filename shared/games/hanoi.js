@@ -211,7 +211,7 @@
       root.classList.add('ghn--won');
       render(); paint(); say(hint());
       var optimal = hist.length === MIN;
-      ctx.finish({ won: true, score: hist.length, detail: optimal ? t('حلٌّ مثاليّ!', 'Perfect solution!') : t('الحدُّ الأدنى: ', 'Minimum: ') + MIN });
+      ctx.finish({ won: true, score: hist.length, grade: hist.length <= Math.ceil(MIN * 1.15) ? 1 : hist.length > MIN * 2 ? -1 : 0, detail: optimal ? t('حلٌّ مثاليّ!', 'Perfect solution!') : t('الحدُّ الأدنى: ', 'Minimum: ') + MIN });
     }
     function tryMove(from, to, dragged) {
       var next = applyMove(pegs, from, to);

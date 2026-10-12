@@ -5225,8 +5225,7 @@
   }
 
   function applyPdfInkOff() {
-    var wrap = document.querySelector('.gpv');
-    if (wrap) wrap.setAttribute('data-inkoff', inkHidden() ? '1' : '0');
+    applyInkHidden();
   }
 
   /*@3.NOAJ.488*/
@@ -9952,6 +9951,8 @@
   function pdfDraw(on) {
     if (!pdfOn() || !pdfUi.ink()) return false;
     var arm = pdfUi.draw(on);
+    /*@3.NOAJ.513*/
+    if (arm && inkHidden()) { uiSet('inkOff', 0); applyInkHidden(); }
     if (arm && !pdfDial && window.GardenNotesDial) {
       pdfDial = GardenNotesDial.mount({
         canvas: function () {

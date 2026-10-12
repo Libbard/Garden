@@ -213,7 +213,7 @@
         ended = true;
         var n = E.score, ar = ctx.isAr();
         ctx.finish({
-          won: n > 0, score: n, title: t('انتهت اللعبة', 'Game over'),
+          won: n > 0, score: n, grade: n >= 10 ? 1 : n < 5 ? -1 : 0, title: t('انتهت اللعبة', 'Game over'),
           unit: roundsWord(n, ar),
           detail: t('أخطأتَ في الخطوة ', 'Missed at step ') + (E.idx + 1) + '/' + E.seq.length + ' · ' +
             t('اللونُ الصحيح: ', 'Right colour: ') + t(PADS[want].ar, PADS[want].en)
