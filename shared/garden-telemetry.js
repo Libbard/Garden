@@ -41,7 +41,8 @@
     lab_open: 1, lab_run: 1, lab_error: 1,
     js_error: 1, perf: 1, api_fail: 1, rage_click: 1,
     dropped: 1, queue_replay: 1,
-    p_hb: 1, brain_game: 1, custom_quiz: 1, feat: 1
+    p_hb: 1, brain_game: 1, custom_quiz: 1, feat: 1,
+    appear: 1, appear_mod: 1
   };
 
   /*@3.GATJ.3*/
@@ -536,6 +537,28 @@
     flush(true);
   }
 
+  function appear() {
+    var p = {}, h = document.documentElement;
+    function ls(k) { try { return localStorage.getItem(k) || ''; } catch (e) { return ''; } }
+    function id(v) { return typeof v === 'string' ? v.slice(0, 24) : ''; }
+    try { p = JSON.parse(ls('dashboard_prefs') || 'null') || {}; } catch (e) { p = {}; }
+    var bg = p.siteBg && typeof p.siteBg === 'object' ? p.siteBg : null;
+    var cs = p.courseStyle && typeof p.courseStyle === 'object' ? Object.keys(p.courseStyle).length : 0;
+    var site = {
+      th: ls('garden_theme') || h.getAttribute('data-theme') || 'dark',
+      lk: ls('garden_look'), fs: ls('garden_font_size'),
+      sk: id(p.siteSkin), st: id(p.siteTheme), bg: bg ? id(bg.type) : '',
+      bp: bg && bg.p ? id(bg.p) : '', sf: id(p.siteFont)
+    };
+    var mod = { mt: id(p.moduleTheme), md: id(p.moduleDesign), mf: id(p.moduleFont),
+      ml: id(p.moduleFontLat), lf: id(p.siteFontLat), cs: cs };
+    var sig = new Date().toISOString().slice(0, 10) + JSON.stringify(site) + JSON.stringify(mod);
+    if (ls('garden_tel_ap') === sig) return;
+    ev('appear', site);
+    ev('appear_mod', mod);
+    try { localStorage.setItem('garden_tel_ap', sig); } catch (e) { }
+  }
+
   function boot() {
     if (!enabled()) return;
 
@@ -552,6 +575,7 @@
     watchNav();
 
     if (fresh) ev('s_start', Object.assign({ r: refHost() }, utm()));
+    try { appear(); } catch (e) { }
     ev('p_view', {
       pg: pg,
       u: cleanPath(),
