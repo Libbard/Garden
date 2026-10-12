@@ -1302,7 +1302,10 @@ window.AlgoWidgets[5] = function(container) {
         cell2.style.textAlign = 'end';
       });
       if (s.currentTour.length > 0) {
-        var currentTourRow = toursTableBody.querySelector('tr:has(td:first-child:contains("' + s.currentTour.join(' → ') + '"))');
+        var curPath = s.currentTour.join(' → ');
+        var currentTourRow = Array.prototype.find.call(toursTableBody.rows, function (r) {
+          return r.cells[0] && r.cells[0].textContent.indexOf(curPath) >= 0;
+        });
         if (currentTourRow) currentTourRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
     }
