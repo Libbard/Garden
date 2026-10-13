@@ -4966,13 +4966,14 @@
   /*@3.GARJ.595*/
   const AI_CADENCE_REPLAY = true;
   /*@3.GARJ.594*/
+  /*@3.GARJ.675*/
   const AI_CADENCE = {
     thinkMs: [700, 1500, 3200],
-    ttfbMs:  [900, 1800, 4200],
+    ttfbMs:  [790, 1060, 1630],
     /*@3.GARJ.617*/
-    cps:     [77, 95, 117],
-    thinkShare: 1,
-    measured: 'cps+share',
+    cps:     [285, 325, 360],
+    thinkShare: 0,
+    measured: 'live-site-2026-10-13',
   };
   function cadPick(tri) {
     const r = Math.random();
