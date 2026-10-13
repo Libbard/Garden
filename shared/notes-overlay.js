@@ -179,6 +179,20 @@
     return null;
   }
 
+  /*@3.NOOJ.38*/
+  function hitChar(rg, x, y) {
+    var n = rg && rg.startContainer;
+    if (!n || n.nodeType !== 3) return null;
+    var t = n.nodeValue || '', i = rg.startOffset, r = document.createRange(), k, bx;
+    for (k = i - 1; k <= i; k++) {
+      if (k < 0 || k >= t.length || /\s/.test(t.charAt(k))) continue;
+      try { r.setStart(n, k); r.setEnd(n, k + 1); } catch (e) { continue; }
+      bx = r.getBoundingClientRect();
+      if (bx.width > 0 && x >= bx.left - 0.5 && x <= bx.right + 0.5 && y >= bx.top - bx.height && y <= bx.bottom + bx.height) return { node: n, a: k, b: k + 1 };
+    }
+    return null;
+  }
+
   function wordRect(x, y) {
     var rg = caretAt(x, y);
     if (!rg) return null;
@@ -272,9 +286,12 @@
     if (!inSheet(ra) || !inSheet(rb)) return null;
     var rg = document.createRange();
     try {
-      rg.setStart(ra.startContainer, ra.startOffset);
-      rg.setEnd(rb.startContainer, rb.startOffset);
-      if (rg.collapsed) { rg.setStart(rb.startContainer, rb.startOffset); rg.setEnd(ra.startContainer, ra.startOffset); }
+      var cmp = ra.compareBoundaryPoints(Range.START_TO_START, rb), back = cmp > 0;
+      if (!cmp) return null;
+      var r0 = back ? rb : ra, r1 = back ? ra : rb, c0 = back ? b : a, c1 = back ? a : b;
+      var h0 = hitChar(r0, c0.x, c0.y), h1 = hitChar(r1, c1.x, c1.y);
+      if (h0) rg.setStart(h0.node, h0.a); else rg.setStart(r0.startContainer, r0.startOffset);
+      if (h1) rg.setEnd(h1.node, h1.b); else rg.setEnd(r1.startContainer, r1.startOffset);
     } catch (e2) { return null; }
     if (rg.collapsed) return null;
     var rects = textRects(rg), lines = [], i;
@@ -468,7 +485,7 @@
       var was = this.data.rw || this.data.w || 0;
       this.refW = this.bound ? this.refBase : pageW(this.sheet, zoomOf(this.stage));
       var self2 = this;
-      var done = this.cv.load(this.data.ink, null, this.data.shapes, this.data.ts);
+      var done = this.cv.load(this.data.ink, null, this.data.shapes, this.data.ts, this.data);
       if (done && done.then) done.then(function () { self2.migrateRef(was); if (self2.onLoad) self2.onLoad(); });
       else { this.migrateRef(was); if (this.onLoad) this.onLoad(); }
     }

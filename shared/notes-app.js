@@ -12916,6 +12916,14 @@
     window.addEventListener('garden:notesPulled', function (e) {
       /*@3.NOAJ.120*/
       if (!e.detail || e.detail.id !== edId) return;
+      if (inkOnly(e.detail.keys) && !conflictOpen[edId]) {
+        var idL = edId, clean = true;
+        if (ed) { try { ed.readAll(); clean = lastSaved[idL] == null || JSON.stringify(ed.doc) === lastSaved[idL]; } catch (eL) { clean = false; } }
+        if (clean) {
+          liveInk(idL).then(function (done) { if (!done && edId === idL) openNote(idL, { remount: true }); });
+          return;
+        }
+      }
       if (!ed) { openNote(edId, { remount: true }); return; }
       var id = edId, cur = null;
       try { ed.readAll(); cur = JSON.stringify(ed.doc); } catch (eR) { cur = null; }
@@ -12924,6 +12932,33 @@
       if (edited && cur && docHasContent(ed.doc)) sideCopy(id, cur);
       openNote(id, { remount: true });
     });
+    /*@3.NOAJ.515*/
+    function inkOnly(keys) {
+      return !!(keys && keys.length) && keys.every(function (k) { return k.indexOf('m:') === 0 || k === 'k:marks' || k === 'k:ov'; });
+    }
+    function liveInk(id) {
+      var St = window.GardenNotesStore;
+      if (!St || !St.getDoc) return Promise.resolve(false);
+      return St.getDoc(id).then(function (r) {
+        var doc = r && r.doc;
+        if (!doc || edId !== id) return false;
+        var jobs = [];
+        var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null;
+        if (doc.marks && ik && ik.refresh) jobs.push(ik.refresh(doc.marks));
+        if (overlay && overlay.cv && doc.ov) {
+          overlay.data = doc.ov;
+          jobs.push(Promise.resolve(overlay.cv.load(doc.ov.ink, null, doc.ov.shapes, doc.ov.ts, doc.ov)).then(function () { return true; }));
+        }
+        return Promise.all(jobs).then(function (all) {
+          if (!all.every(Boolean)) return false;
+          if (!ed || !ed.doc) return true;
+          if (doc.marks) ed.doc.marks = doc.marks; else delete ed.doc.marks;
+          if (doc.ov) ed.doc.ov = doc.ov; else delete ed.doc.ov;
+          try { lastSaved[id] = JSON.stringify(ed.doc); } catch (eJ) {}
+          return true;
+        });
+      })['catch'](function () { return false; });
+    }
     /*@3.NOAJ.428*/
     function flushHidden() {
       if (marksFor) { try { flushMarks(); } catch (eM) {} }
@@ -12939,6 +12974,17 @@
       if (document.visibilityState !== 'visible') return;
       if (Date.now() - lastRecon > 30000) runReconcile(idxSynced);
     });
+    /*@3.NOAJ.514*/
+    var liveIn = Date.now();
+    ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(function (t) {
+      document.addEventListener(t, function () { liveIn = Date.now(); }, { passive: true, capture: true });
+    });
+    setInterval(function () {
+      var Sy = window.GardenNotesSync, St = window.GardenNotesStore, id = edId;
+      if (!id || document.visibilityState !== 'visible' || !Sy || !Sy.pull || !Sy.partsMode || !Sy.partsMode()) return;
+      if (!St || !St.getRaw || Date.now() - liveIn < 8000) return;
+      St.getRaw(id).then(function (r) { if (r && !r.dirty && id === edId) return Sy.pull(id); }).catch(function () {});
+    }, 30000);
     window.addEventListener('garden:notesPushed', function (e) {
       if (!e.detail || e.detail.id !== edId) return;
       saveState('saved', L('مُزامَنة', 'Synced'));

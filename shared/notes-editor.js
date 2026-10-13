@@ -2481,6 +2481,7 @@
         onChange: function (d) {
           b.ink = d.ink; b.w = d.w; b.h = d.h;
           if (d.ts) b.ts = d.ts; else delete b.ts;
+          ['ei', 'em', 'gn'].forEach(function (f) { if (d[f]) b[f] = d[f]; else delete b[f]; });
           b.shapes = d.shapes && d.shapes.length ? d.shapes : null;
           self.touch();
         },
@@ -2490,7 +2491,7 @@
       self.canvases = self.canvases || {};
       self.canvases[b.id] = cv;
       cv.setTool(GardenCanvas.lastTool ? GardenCanvas.lastTool() : 'pen');
-      if (b.ink || (b.shapes && b.shapes.length)) cv.load(b.ink, b.h, b.shapes, b.ts);
+      if (b.ink || (b.shapes && b.shapes.length)) cv.load(b.ink, b.h, b.shapes, b.ts, b);
       cv.emit();
     }, 0);
 

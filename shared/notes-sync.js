@@ -34,7 +34,20 @@
     if (!P()) return null;
     var d = doc;
     if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { return null; } }
-    return { t: Number(t) || 0, h: P().hashes(P().split(d)) };
+    var parts = P().split(d);
+    return { t: Number(t) || 0, h: P().hashes(parts), x: texts(parts, {}) };
+  }
+
+  /*@3.NOSJ2.24*/
+  var TEXT_CAP = 16384;
+  function texts(parts, into) {
+    Object.keys(parts || {}).forEach(function (k) {
+      if (!(k === 'o' || k === 'kk' || k.indexOf('b:') === 0)) return;
+      var v = parts[k];
+      if (v == null || typeof v !== 'string' || v.length > TEXT_CAP || v.indexOf('"ink"') >= 0) delete into[k];
+      else into[k] = v;
+    });
+    return into;
   }
 
   function endpoint() {
@@ -215,14 +228,37 @@
         var nh = P().hashes(parts);
         acc.rejected.forEach(function (k) { if (b && b.h && b.h[k]) nh[k] = b.h[k]; else delete nh[k]; });
         var mixed = acc.rejected.length > 0 || acc.others;
-        var nb = { t: mixed ? (b ? b.t : 0) : Math.max(acc.t, b ? b.t : 0), h: nh };
+        var took = {};
+        Object.keys(d.set).concat(d.del).forEach(function (k) { if (acc.rejected.indexOf(k) < 0) took[k] = parts[k] == null ? null : parts[k]; });
+        var nx = texts(took, Object.assign({}, (b && b.x) || {}));
+        var nb = { t: mixed ? (b ? b.t : 0) : Math.max(acc.t, b ? b.t : 0), h: nh, x: nx };
+        var buried = acc.t > row.t ? Object.keys(d.set).concat(d.del).filter(function (k) { return acc.rejected.indexOf(k) < 0; }) : [];
         return baseSet(noteId, nb).then(function () {
           emit('garden:notesPushed', { id: noteId, t: row.t, parts: acc.sent });
-          if (!mixed) return S().markClean(noteId, row.t).then(function () { return { ok: true, applied: 1, t: row.t, parts: acc.sent }; });
-          return pull(noteId).then(function (pr) { return { ok: true, applied: 1, t: row.t, merged: !!(pr && pr.ok), parts: acc.sent }; });
+          if (!mixed && !buried.length) return S().markClean(noteId, row.t).then(function () { return { ok: true, applied: 1, t: row.t, parts: acc.sent }; });
+          var then = mixed ? pull(noteId) : Promise.resolve(null);
+          return then.then(function (pr) {
+            return (buried.length ? lift(noteId, buried, acc.t) : Promise.resolve()).then(function () {
+              return { ok: true, applied: 1, t: row.t, merged: !!(pr && pr.ok), parts: acc.sent };
+            });
+          });
         });
       });
     });
+  }
+
+  /*@3.NOSJ2.23*/
+  function lift(noteId, keys, head) {
+    return S().getRaw(noteId).then(function (row) {
+      if (!row || !row.raw) return null;
+      return baseGet(noteId).then(function (b) {
+        var h = Object.assign({}, (b && b.h) || {});
+        keys.forEach(function (k) { h[k] = '!'; });
+        return baseSet(noteId, { t: b ? b.t : 0, h: h, x: (b && b.x) || {} });
+      }).then(function () {
+        return S().putDoc(noteId, row.raw, Math.max(Number(row.t) || 0, head) + 1, { clean: false });
+      }).then(function () { again[noteId] = 1; });
+    }).catch(function () { return null; });
   }
 
   function pushWhole(vid, noteId, row, raw) {
@@ -296,40 +332,92 @@
             Object.keys(dl.set).forEach(function (k) { mine[k] = 1; });
             dl.del.forEach(function (k) { mine[k] = 1; });
           }
-          var merged = Object.assign({}, local), lost = false, moved = false, lt = row ? row.t : 0;
+          var lt = row ? row.t : 0;
           var same = function (k) { return (rp[k] == null ? null : rp[k]) === (local[k] == null ? null : local[k]); };
-          Object.keys(rp).forEach(function (k) {
-            if (same(k)) return;
-            if (mine[k]) {
-              if ((ts[k] || rt) > lt) lost = true;
-              else return;
+          return mergeInk(rp, local, mine, same, b.x || {}).then(function (mm) {
+            var merged = Object.assign({}, local), lost = false, moved = false, extra = false;
+            Object.keys(rp).forEach(function (k) {
+              if (same(k)) return;
+              if (mm[k] != null) {
+                if (mm[k] !== rp[k]) extra = true;
+                if (mm[k] !== local[k]) { moved = true; merged[k] = mm[k]; }
+                return;
+              }
+              if (mine[k]) {
+                if ((ts[k] || rt) > lt) lost = true;
+                else return;
+              }
+              moved = true;
+              if (rp[k] == null) delete merged[k]; else merged[k] = rp[k];
+            });
+            var still = extra || Object.keys(mine).some(function (k) { return mm[k] == null && (!(k in rp) || (!same(k) && !((ts[k] || rt) > lt))); });
+            var nb = { t: rt, h: Object.assign({}, b.h), x: texts(rp, Object.assign({}, b.x || {})) };
+            Object.keys(rp).forEach(function (k) { if (rp[k] == null) delete nb.h[k]; else nb.h[k] = P().hash(rp[k]); });
+            if (lost) emit('garden:notesConflict', { id: noteId, raw: row.raw, t: row.t, remoteT: rt });
+            if (!moved && row && !extra) {
+              return baseSet(noteId, nb).then(function () {
+                return still ? null : S().markClean(noteId, row.t);
+              }).then(function () { return { ok: true, t: row.t, none: true }; });
             }
-            moved = true;
-            if (rp[k] == null) delete merged[k]; else merged[k] = rp[k];
-          });
-          var still = Object.keys(mine).some(function (k) { return !(k in rp) || (!same(k) && !((ts[k] || rt) > lt)); });
-          var nb = { t: rt, h: Object.assign({}, b.h) };
-          Object.keys(rp).forEach(function (k) { if (rp[k] == null) delete nb.h[k]; else nb.h[k] = P().hash(rp[k]); });
-          if (lost) emit('garden:notesConflict', { id: noteId, raw: row.raw, t: row.t, remoteT: rt });
-          if (!moved && row) {
-            return baseSet(noteId, nb).then(function () {
-              return still ? null : S().markClean(noteId, row.t);
-            }).then(function () { return { ok: true, t: row.t, none: true }; });
-          }
-          var doc = P().assemble(merged);
-          var t = still ? row.t : Math.max(rt, row ? row.t : 0);
-          var again2 = S().getRaw ? S().getRaw(noteId) : Promise.resolve(row);
-          return again2.then(function (now) {
-            if (row && now && Number(now.t) !== Number(row.t)) return { ok: false, reason: 'busy' };
-            return S().putDoc(noteId, doc, t, { clean: !still }).then(function () {
-              return baseSet(noteId, nb);
-            }).then(function () {
-              emit('garden:notesPulled', { id: noteId, t: t, parts: Object.keys(rp).length });
-              return { ok: true, t: t, merged: true };
+            var doc = P().assemble(merged);
+            var t = extra ? Math.max(rt, lt) + 1 : (still ? row.t : Math.max(rt, row ? row.t : 0));
+            var again2 = S().getRaw ? S().getRaw(noteId) : Promise.resolve(row);
+            return again2.then(function (now) {
+              if (row && now && Number(now.t) !== Number(row.t)) return { ok: false, reason: 'busy' };
+              return S().putDoc(noteId, doc, t, { clean: !still }).then(function () {
+                return baseSet(noteId, nb);
+              }).then(function () {
+                var keys = Object.keys(merged).concat(Object.keys(local)).filter(function (k, i, all) {
+                return all.indexOf(k) === i && (merged[k] == null ? null : merged[k]) !== (local[k] == null ? null : local[k]);
+              });
+              emit('garden:notesPulled', { id: noteId, t: t, parts: Object.keys(rp).length, keys: keys });
+                return { ok: true, t: t, merged: true };
+              });
             });
           });
         });
       });
+  }
+
+  /*@3.NOSJ2.22*/
+  function mergeInk(rp, local, mine, same, base3) {
+    var C = window.GardenInkCodec, out = {};
+    var keys = Object.keys(rp).filter(function (k) {
+      return mine[k] && !same(k) && rp[k] != null && local[k] != null &&
+        (k.indexOf('m:') === 0 || k === 'k:marks' || k === 'k:ov' || k.indexOf('b:') === 0 || k === 'o' || k === 'kk');
+    });
+    if (!keys.length) return Promise.resolve(out);
+    return keys.reduce(function (chain, k) {
+      return chain.then(function () {
+        var a, b;
+        try { a = JSON.parse(local[k]); b = JSON.parse(rp[k]); } catch (e) { return null; }
+        if (k === 'k:marks') {
+          if (!a || !b || !Array.isArray(a.pages) || !Array.isArray(b.pages)) return null;
+          var pg = b.pages.slice();
+          a.pages.forEach(function (n) { if (pg.indexOf(n) < 0) pg.push(n); });
+          pg.sort(function (x, y) { return (+x) - (+y); });
+          out[k] = JSON.stringify(Object.assign({}, b, { pages: pg }));
+          return null;
+        }
+        if (k.indexOf('b:') === 0) {
+          if (a && b && (a.ink != null || a.shapes) && (b.ink != null || b.shapes) && C && C.mergeOv) {
+            return C.mergeOv(a, b).then(function (blk) { out[k] = JSON.stringify(blk); }, function () { return null; });
+          }
+          if (!base3 || base3[k] == null) return null;
+          var mt = P().mergeBlock(JSON.parse(base3[k]), a, b);
+          if (mt) out[k] = JSON.stringify(mt);
+          return null;
+        }
+        if (k === 'o' || k === 'kk') {
+          if (!base3 || base3[k] == null) return null;
+          var ml = P().mergeList(JSON.parse(base3[k]), a, b);
+          if (ml) out[k] = JSON.stringify(ml);
+          return null;
+        }
+        if (!C || !C.mergePages) return null;
+        return (k === 'k:ov' ? C.mergeOv(a, b) : C.mergePages(a, b)).then(function (pgM) { out[k] = JSON.stringify(pgM); }, function () { return null; });
+      });
+    }, Promise.resolve()).then(function () { return out; });
   }
 
   function pullWhole(vid, noteId) {

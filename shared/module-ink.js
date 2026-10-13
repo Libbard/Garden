@@ -104,7 +104,7 @@
       var set = {}, del = {};
       keys.forEach(function (k) {
         if (pend[k] === 'del') del[k] = (st.dt && st.dt[k]) || Date.now();
-        else if (st.L[k]) set[k] = { v: JSON.stringify({ ink: st.L[k].ink || '', shapes: st.L[k].shapes || [], ts: st.L[k].ts || null, lg: st.L[k].lg ? 1 : 0 }), t: st.L[k].t || Date.now() };
+        else if (st.L[k]) set[k] = { v: JSON.stringify(wire(st.L[k])), t: st.L[k].t || Date.now() };
       });
       return fetch(inkUrl(id), { method: 'POST', cache: 'no-store',
         headers: hdrs(id, { 'Content-Type': 'application/json' }),
@@ -127,6 +127,22 @@
     return pushing;
   }
 
+  function wire(L) {
+    var o = { ink: L.ink || '', shapes: L.shapes || [], ts: L.ts || null, lg: L.lg ? 1 : 0 };
+    if (L.ei) { o.ei = L.ei; o.em = L.em; }
+    if (L.gn) o.gn = L.gn;
+    return o;
+  }
+
+  function layerOf(d, t) {
+    var o = { ink: d.ink || '', shapes: d.shapes || [], t: t };
+    if (d.ts) o.ts = d.ts;
+    if (d.lg) o.lg = 1;
+    if (d.ei) { o.ei = d.ei; o.em = d.em; }
+    if (d.gn) o.gn = d.gn;
+    return o;
+  }
+
   function pull(full) {
     return vault().then(function (id) {
       if (!id) return false;
@@ -134,27 +150,33 @@
       return fetch(inkUrl(id) + '?since=' + (full ? 0 : (st0.syncT || 0)), { cache: 'no-store', headers: hdrs(id) }).then(function (r) {
         if (!r.ok) return false;
         return r.json().then(function (j) {
-          var st = readStore(), got = j.layers || {}, changed = [];
+          var st = readStore(), got = j.layers || {}, changed = [], K = window.GardenInkCodec, jobs = [];
           st.pend = st.pend || {};
           Object.keys(got).forEach(function (k) {
             var it = got[k], local = st.L[k], lt = local ? (local.t || 0) : ((st.dt && st.dt[k]) || 0);
             if (!(it.t > lt)) return;
             if (st.pend[k] && lt >= it.t) return;
-            if (it.v == null) { delete st.L[k]; st.dt = st.dt || {}; st.dt[k] = it.t; }
-            else {
-              var d = null;
-              try { d = JSON.parse(it.v); } catch (e) { d = null; }
-              if (!d) return;
-              st.L[k] = { ink: d.ink || '', shapes: d.shapes || [], ts: d.ts || undefined, t: it.t };
-              if (!st.L[k].ts) delete st.L[k].ts;
-              if (d.lg) st.L[k].lg = 1;
+            var d = null;
+            if (it.v != null) { try { d = JSON.parse(it.v); } catch (e) { d = null; } if (!d) return; }
+            /*@3.MOIJ.7*/
+            if (st.pend[k] === 'set' && local && d && K && K.mergeOv) {
+              jobs.push(K.mergeOv(local, d).then(function (m) {
+                st.L[k] = layerOf(m, Math.max(it.t, lt) + 1);
+                changed.push(k);
+              }, function () { return null; }));
+              return;
             }
+            if (!d) { delete st.L[k]; st.dt = st.dt || {}; st.dt[k] = it.t; }
+            else st.L[k] = layerOf(d, it.t);
             delete st.pend[k];
             changed.push(k);
           });
-          if (j.t > (st.syncT || 0)) st.syncT = j.t;
-          writeStore(st);
-          return changed;
+          return Promise.all(jobs).then(function () {
+            if (j.t > (st.syncT || 0)) st.syncT = j.t;
+            writeStore(st);
+            if (jobs.length) schedulePush();
+            return changed;
+          });
         });
       });
     }).catch(function () { return false; });
@@ -177,7 +199,7 @@
 
   var S = {
     on: false, drawing: false, ov: null, main: null, lay: null, mem: {}, sig: {},
-    store: null, dirty: {}, saveT: 0, busy: false, vp: null, opened: [], ro: null,
+    store: null, base: {}, dirty: {}, saveT: 0, busy: false, vp: null, opened: [], ro: null,
     reT: 0, btn: null, fab: null, seq: 0
   };
 
@@ -298,7 +320,7 @@
   function sigOf(list) {
     var s = JSON.stringify(list.map(function (e) {
       var c = {}, k;
-      for (k in e) if (k !== 'id' && k !== '_bb' && Object.prototype.hasOwnProperty.call(e, k)) c[k] = e[k];
+      for (k in e) if (k !== 'id' && k !== '_bb' && k !== 'eid' && k !== 'mt' && Object.prototype.hasOwnProperty.call(e, k)) c[k] = e[k];
       return c;
     }));
     var h = 2166136261, i;
@@ -339,8 +361,13 @@
     S.saveT = setTimeout(persist, SAVE_MS);
   }
 
-  function packLayer(list) {
-    var K = window.GardenInkCodec, G = window.GardenCanvas;
+  function packLayer(list, key) {
+    var K = window.GardenInkCodec, G = window.GardenCanvas, gn = null;
+    if (K.stamp && key) {
+      var b0 = S.base[key] || null, row = { els: list, gn: b0 && b0.gn };
+      S.base[key] = { map: K.stamp(b0, row), gn: row.gn || null };
+      gn = row.gn || null;
+    }
     var strokes = list.filter(function (e) { return e.ty === 'st'; });
     var shapes = list.filter(function (e) { return e.ty !== 'st'; }).map(function (e) {
       var c = {}, k;
@@ -354,6 +381,11 @@
     })).then(function (ink) {
       var d = { ink: strokes.length ? ink : '', shapes: shapes, t: Date.now(), lg: 1 };
       if (ts.some(function (t) { return t > 0; })) d.ts = ts;
+      if (strokes.some(function (e) { return !!e.eid; })) {
+        d.ei = strokes.map(function (e) { return e.eid || ''; });
+        d.em = strokes.map(function (e) { return +e.mt || 0; });
+      }
+      if (gn && Object.keys(gn).length) d.gn = gn;
       return d;
     });
   }
@@ -371,7 +403,7 @@
         if (st.L[k]) { delete st.L[k]; st.pend[k] = 'del'; st.dt[k] = Date.now(); }
         return null;
       }
-      return packLayer(list).then(function (d) { st.L[k] = d; st.pend[k] = 'set'; delete st.dt[k]; });
+      return packLayer(list, k).then(function (d) { st.L[k] = d; st.pend[k] = 'set'; delete st.dt[k]; });
     })).then(function () {
       st.rw = SHEET;
       writeStore(st);
@@ -384,7 +416,7 @@
   function unpackLayer(key) {
     if (S.mem[key]) return Promise.resolve(S.mem[key]);
     var d = (S.store && S.store.L[key]) || null;
-    if (!d) { S.mem[key] = []; S.sig[key] = sigOf([]); return Promise.resolve(S.mem[key]); }
+    if (!d) { S.mem[key] = []; S.sig[key] = sigOf([]); S.base[key] = null; return Promise.resolve(S.mem[key]); }
     var shapes = (d.shapes || []).map(function (s) { s.id = nid(); return s; });
     var done = d.ink ? window.GardenInkCodec.unpack(d.ink) : Promise.resolve([]);
     return done.then(function (strokes) {
@@ -393,8 +425,10 @@
         var e = { id: nid(), ty: 'st', c: st.color || 'ink', w: st.w || 2.4, nib: st.nib || 'round',
                   o: st.tool === 'hi' ? 0.32 : (st.o == null ? 1 : st.o), hi: st.tool === 'hi' ? 1 : 0, pts: st.pts };
         if (tsOk && d.ts[k] > 0) e.ts = d.ts[k];
+        if (d.ei && d.ei[k]) { e.eid = d.ei[k]; e.mt = (d.em && d.em[k]) || 0; }
         return e;
       }).concat(shapes);
+      S.base[key] = { els: JSON.parse(JSON.stringify(list)), gn: d.gn || null };
       S.mem[key] = list;
       S.sig[key] = sigOf(list);
       return list;
@@ -453,6 +487,7 @@
       var cv = S.ov.cv;
       if (!cv) return;
       cv.els = all;
+      cv.noStamp = 1;
       var held = was && (cv.undoS.length || cv.redoS.length) && carryHist(cv, was, lay, vis, fresh);
       if (!held) { cv.undoS = []; cv.redoS = []; }
       if (cv.deselect) cv.deselect();
@@ -866,7 +901,7 @@
     }).then(function () {
       twinLegacy();
       S.store = readStore();
-      S.mem = {}; S.sig = {}; S.dirty = {};
+      S.mem = {}; S.sig = {}; S.dirty = {}; S.base = {};
       S.lay = layout();
       S.ov = window.GardenNotesOverlay.mount({
         scroller: scroller, stage: S.main, sheet: S.main, bound: true, refW: SHEET,

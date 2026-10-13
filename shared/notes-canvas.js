@@ -1960,6 +1960,13 @@
   /*@3.NOCJ.88*/
   Canvas.prototype.commit = function (quiet) {
     var self = this;
+    /*@3.NOCJ.142*/
+    var K = C();
+    if (K.stamp && !this.noStamp) {
+      var row = { els: this.els, gn: this.gn };
+      this._sb = { map: K.stamp(this._sb || null, row) };
+      this.gn = row.gn || {};
+    }
     var strokes = this.els.filter(function (e) { return e.ty === 'st'; });
     var shapes = this.els.filter(function (e) { return e.ty !== 'st'; });
     /*@3.NOCJ.136*/
@@ -1983,6 +1990,11 @@
       var d = { ink: packed, shapes: shapes, w: self.w, h: self.pageH,
                 ch: Math.round(self.contentH()) };
       if (ts.some(function (t) { return t > 0; })) d.ts = ts;
+      if (strokes.some(function (e) { return !!e.eid; })) {
+        d.ei = strokes.map(function (e) { return e.eid || ''; });
+        d.em = strokes.map(function (e) { return +e.mt || 0; });
+      }
+      if (self.gn && Object.keys(self.gn).length) d.gn = self.gn;
       self.onChange(d, quiet);
       return packed;
     });
@@ -2017,18 +2029,24 @@
     if (s !== 1 && typeof el.w === 'number') el.w = Math.max(0.4, el.w * s);
   };
 
-  Canvas.prototype.load = function (packed, h, shapes, ts) {
+  Canvas.prototype.snapBase = function () {
+    try { this._sb = { els: JSON.parse(JSON.stringify(this.els)) }; } catch (e) { this._sb = null; }
+  };
+
+  Canvas.prototype.load = function (packed, h, shapes, ts, meta) {
     var self = this;
     if (h) this.pageH = h;
-    this.els = [];
+    var next = [];
+    this.gn = (meta && meta.gn) ? JSON.parse(JSON.stringify(meta.gn)) : {};
+    var ei = meta && Array.isArray(meta.ei) ? meta.ei : null, em = meta && Array.isArray(meta.em) ? meta.em : null;
     if (Array.isArray(shapes)) {
       for (var i = 0; i < shapes.length; i++) {
         var s = shapes[i];
         if (!s.id) s.id = uid();
-        this.els.push(s);
+        next.push(s);
       }
     }
-    if (!packed) { this.w = 0; this.resize(); this.paint(); return Promise.resolve(); }
+    if (!packed) { this.els = next; this.w = 0; this.resize(); this.paint(); this.snapBase(); return Promise.resolve(); }
     return C().unpack(packed).then(function (strokes) {
       var tsOk = Array.isArray(ts) && ts.length === strokes.length;
       for (var k = 0; k < strokes.length; k++) {
@@ -2039,11 +2057,14 @@
           hi: st.tool === 'hi' ? 1 : 0, pts: st.pts
         };
         if (tsOk && ts[k] > 0) e.ts = ts[k];
-        self.els.push(e);
+        if (ei && ei.length === strokes.length && ei[k]) { e.eid = ei[k]; e.mt = em && em[k] != null ? em[k] : 0; }
+        next.push(e);
       }
+      self.els = next;
       self.w = 0;
       self.resize();
       self.paint();
+      self.snapBase();
     });
   };
 

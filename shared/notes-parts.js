@@ -175,5 +175,111 @@
     return out;
   }
 
-  return { split: split, assemble: assemble, hash: hash, hashes: hashes, diff: diff, chunks: chunks, byteLen: byteLen, MAX_PART: MAX_PART };
+  /*@3.NOPJ15.7*/
+  var DIFF_CAP = 4000000;
+  function J(v) { return JSON.stringify(v === undefined ? null : v); }
+
+  function pairs(o, a, eq) {
+    var n = o.length, m = a.length, i, j;
+    if (n * m > DIFF_CAP) return null;
+    var w = m + 1, L = new Uint32Array((n + 1) * w);
+    for (i = n - 1; i >= 0; i--) {
+      for (j = m - 1; j >= 0; j--) {
+        L[i * w + j] = eq(o[i], a[j]) ? L[(i + 1) * w + j + 1] + 1 : Math.max(L[(i + 1) * w + j], L[i * w + j + 1]);
+      }
+    }
+    var map = {};
+    i = 0; j = 0;
+    while (i < n && j < m) {
+      if (eq(o[i], a[j])) { map[i] = j; i++; j++; }
+      else if (L[(i + 1) * w + j] >= L[i * w + j + 1]) i++;
+      else j++;
+    }
+    return map;
+  }
+
+  function same(x, y, eq) {
+    if (x.length !== y.length) return false;
+    for (var i = 0; i < x.length; i++) if (!eq(x[i], y[i])) return false;
+    return true;
+  }
+
+  function diff3(o, a, b, eq, union) {
+    var ma = pairs(o, a, eq), mb = pairs(o, b, eq);
+    if (!ma || !mb) return null;
+    var out = [], io = 0, ia = 0, ib = 0;
+    for (;;) {
+      var k = io, ak = a.length, bk = b.length;
+      while (k < o.length && !(ma[k] != null && mb[k] != null)) k++;
+      if (k < o.length) { ak = ma[k]; bk = mb[k]; }
+      var O = o.slice(io, k), A = a.slice(ia, ak), Bc = b.slice(ib, bk);
+      if (same(A, O, eq)) out = out.concat(Bc);
+      else if (same(Bc, O, eq) || same(A, Bc, eq)) out = out.concat(A);
+      else if (union) {
+        out = out.concat(A);
+        Bc.forEach(function (x) { if (!A.some(function (y) { return eq(x, y); })) out.push(x); });
+      } else return null;
+      if (k >= o.length) break;
+      out.push(a[ak]);
+      io = k + 1; ia = ak + 1; ib = bk + 1;
+    }
+    return out;
+  }
+
+  function toks(rt) {
+    var out = [];
+    (rt || []).forEach(function (r) {
+      var m = {}, k;
+      for (k in r) if (own(r, k) && k !== 's') m[k] = r[k];
+      var mk = JSON.stringify(m), s = r.s == null ? '' : String(r.s);
+      for (var i = 0; i < s.length; i++) out.push({ c: s.charAt(i), m: mk });
+    });
+    return out;
+  }
+
+  function runs(ts) {
+    var out = [], cur = null;
+    ts.forEach(function (t) {
+      if (cur && cur.m === t.m) { cur.s += t.c; return; }
+      cur = { m: t.m, s: t.c };
+      out.push(cur);
+    });
+    return out.map(function (r) { var o = JSON.parse(r.m); o.s = r.s; return o; });
+  }
+
+  function eqTok(x, y) { return x.c === y.c && x.m === y.m; }
+  function eqVal(x, y) { return J(x) === J(y); }
+
+  /*@3.NOPJ15.8*/
+  function mergeBlock(base, a, b) {
+    if (!isObj(base) || !isObj(a) || !isObj(b)) return null;
+    var out = {}, keys = {}, ok = true;
+    [base, a, b].forEach(function (x) { Object.keys(x).forEach(function (k) { keys[k] = 1; }); });
+    Object.keys(keys).forEach(function (k) {
+      if (!ok) return;
+      var vo = base[k], va = a[k], vb = b[k], v;
+      if (J(va) === J(vb)) v = va;
+      else if (J(va) === J(vo)) v = vb;
+      else if (J(vb) === J(vo)) v = va;
+      else if (Array.isArray(va) && Array.isArray(vb) && Array.isArray(vo) && va.concat(vb, vo).every(function (r) { return isObj(r) && (r.s == null || typeof r.s === 'string'); }) && k === 'rt') {
+        var m = diff3(toks(vo), toks(va), toks(vb), eqTok, false);
+        if (!m) { ok = false; return; }
+        v = runs(m);
+      } else if (typeof va === 'string' && typeof vb === 'string' && typeof vo === 'string') {
+        var c = diff3(vo.split(''), va.split(''), vb.split(''), function (x, y) { return x === y; }, false);
+        if (!c) { ok = false; return; }
+        v = c.join('');
+      } else { ok = false; return; }
+      if (v !== undefined) out[k] = v;
+    });
+    return ok ? out : null;
+  }
+
+  function mergeList(base, a, b) {
+    if (!Array.isArray(base) || !Array.isArray(a) || !Array.isArray(b)) return null;
+    return diff3(base, a, b, eqVal, true);
+  }
+
+  return { split: split, assemble: assemble, hash: hash, hashes: hashes, diff: diff, chunks: chunks, byteLen: byteLen, MAX_PART: MAX_PART,
+           mergeBlock: mergeBlock, mergeList: mergeList, diff3: diff3 };
 });

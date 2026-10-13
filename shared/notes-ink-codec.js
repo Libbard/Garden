@@ -312,7 +312,253 @@
     return { strokes: (strokes || []).length, points: pts, afterRdp: kept };
   }
 
+  var GONE_MAX = 3000;
+
+  function fnv(s) {
+    var h = 0x811c9dc5;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+    }
+    return h.toString(36) + s.length.toString(36);
+  }
+
+  function body(e) {
+    return JSON.stringify(e, function (k, v) {
+      return (this === e && (k === 'eid' || k === 'mt' || k === 'id' || k.charAt(0) === '_')) ? undefined : v;
+    });
+  }
+
+  function idOf(e) {
+    if (e.ty === 'st' && e.ts > 0) return 's' + Math.round(e.ts).toString(36);
+    if (e.ty === 'st') {
+      var p = e.pts || [], a = p[0] || {}, b = p[p.length - 1] || {};
+      return 'z' + fnv([e.c, e.w, e.nib, e.hi ? 1 : 0, Math.floor((a.x || 0) / 8), Math.floor((a.y || 0) / 8),
+                        Math.floor((b.x || 0) / 8), Math.floor((b.y || 0) / 8)].join('|'));
+    }
+    return 'h' + fnv(body(e));
+  }
+
+  function rnd() { return Math.random().toString(36).slice(2, 8); }
+
+  function ids(els) {
+    var seen = {};
+    (els || []).forEach(function (e) {
+      if (!e) return;
+      var had = !!e.eid;
+      if (!had) e.eid = idOf(e);
+      if (seen[e.eid]) e.eid = e.eid + '.' + (had ? rnd() : seen[e.eid]);
+      seen[e.eid] = (seen[e.eid] || 0) + 1;
+    });
+    return els;
+  }
+
+  function goneOf(a, b) {
+    var out = {}, k;
+    for (k in (a || {})) if (Object.prototype.hasOwnProperty.call(a, k)) out[k] = +a[k] || 0;
+    for (k in (b || {})) if (Object.prototype.hasOwnProperty.call(b, k) && !((out[k] || 0) >= (+b[k] || 0))) out[k] = +b[k] || 0;
+    return out;
+  }
+
+  function trim(g) {
+    var ks = Object.keys(g);
+    if (ks.length <= GONE_MAX) return g;
+    ks.sort(function (x, y) { return g[y] - g[x]; });
+    var out = {};
+    for (var i = 0; i < GONE_MAX; i++) out[ks[i]] = g[ks[i]];
+    return out;
+  }
+
+  /*@3.NOICJ.17*/
+  function stamp(prev, row, now) {
+    var N = ids((row && row.els) || []), pm = prev && prev.map, nm = {};
+    var gone = goneOf(prev && prev.gn, row && row.gn), here = {};
+    now = now || Date.now();
+    if (!pm) {
+      pm = {};
+      ids((prev && prev.els) || []).forEach(function (e) { if (e) pm[e.eid] = { h: body(e), mt: +e.mt || 0 }; });
+    }
+    N.forEach(function (e) {
+      if (!e) return;
+      here[e.eid] = 1;
+      var pv = pm[e.eid], h = body(e);
+      nm[e.eid] = { h: h };
+      if (pv) {
+        if (pv.h !== h && !((+e.mt || 0) > pv.mt)) e.mt = now;
+        else if (e.mt == null) e.mt = pv.mt;
+      } else if (gone[e.eid] != null) {
+        if ((+e.mt || 0) <= gone[e.eid]) e.mt = now;
+      } else if (e.mt == null) e.mt = now;
+      if (gone[e.eid] != null && (+e.mt || 0) > gone[e.eid]) delete gone[e.eid];
+      nm[e.eid].mt = +e.mt || 0;
+    });
+    Object.keys(pm).forEach(function (k) { if (!here[k] && gone[k] == null) gone[k] = now; });
+    gone = trim(gone);
+    if (Object.keys(gone).length) row.gn = gone; else delete row.gn;
+    return nm;
+  }
+
+  function fids(bs) {
+    (bs || []).forEach(function (b) { if (b && !b.eid && b.id != null) b.eid = 'f' + b.id; });
+    return bs || [];
+  }
+
+  /*@3.NOICJ.22*/
+  function stampFd(prev, row) {
+    var pb = fids(prev && prev.fdoc && prev.fdoc.blocks), nb = fids(row && row.fdoc && row.fdoc.blocks);
+    if (!pb.length && !nb.length && !(prev && prev.fgn) && !(row && row.fgn)) return row;
+    var r = { els: nb, gn: goneOf(prev && prev.fgn, row && row.fgn) };
+    stamp({ els: pb }, r);
+    if (r.gn) row.fgn = r.gn; else delete row.fgn;
+    return row;
+  }
+
+  function mergeFd(lf, lg, rf, rg) {
+    var L = fids(lf && lf.blocks ? lf.blocks.slice() : []), R = fids(rf && rf.blocks ? rf.blocks.slice() : []);
+    var m = mergeEls(L, lg, R, rg), base = rf || lf || { v: 1, fpv: 2 }, out = {}, k;
+    for (k in base) if (Object.prototype.hasOwnProperty.call(base, k)) out[k] = base[k];
+    out.blocks = m.els;
+    return { fdoc: m.els.length ? out : null, fgn: m.gn, changed: m.changed, push: m.push };
+  }
+
+  function twinSt(a, b) {
+    if (!a || !b || a.ty !== 'st' || b.ty !== 'st' || a.c !== b.c) return false;
+    var pa = a.pts || [], pb = b.pts || [];
+    if (!pa.length || !pb.length) return false;
+    var x = pa[0], y = pb[0], u = pa[pa.length - 1], v = pb[pb.length - 1];
+    return Math.abs(x.x - y.x) < 0.5 && Math.abs(x.y - y.y) < 0.5 && Math.abs(u.x - v.x) < 0.5 && Math.abs(u.y - v.y) < 0.5;
+  }
+
+  function keyOf(els, gn) {
+    var a = (els || []).map(function (e) { return e.eid + ':' + (+e.mt || 0); }).sort();
+    var g = Object.keys(gn || {}).sort().map(function (k) { return k + ':' + gn[k]; });
+    return a.join(',') + '|' + g.join(',');
+  }
+
+  /*@3.NOICJ.18*/
+  function mergeEls(L, Lg, R, Rg) {
+    L = ids((L || []).slice()); R = ids((R || []).slice());
+    var gone = goneOf(Lg, Rg), out = [], at = {}, add = 0, seenR = {}, kL = keyOf(L, goneOf(Lg));
+    L.forEach(function (e) { at[e.eid] = out.length; out.push(e); });
+    R.forEach(function (r) {
+      seenR[r.eid] = 1;
+      var i = at[r.eid];
+      if (i != null) {
+        if ((+r.mt || 0) > (+out[i].mt || 0)) { out[i] = r; add++; }
+        return;
+      }
+      if (r.eid.charAt(0) === 'z') {
+        for (var k = 0; k < out.length; k++) {
+          var o = out[k];
+          if (o.eid.charAt(0) !== 'z' || seenR[o.eid] || !twinSt(o, r)) continue;
+          if (r.eid < o.eid) { delete at[o.eid]; o.eid = r.eid; at[r.eid] = k; }
+          return;
+        }
+      }
+      at[r.eid] = out.length; out.push(r); add++;
+    });
+    out = out.filter(function (e) { return !(gone[e.eid] != null && gone[e.eid] >= (+e.mt || 0)); });
+    gone = trim(gone);
+    var k1 = keyOf(out, gone);
+    return { els: out, gn: gone, add: add, changed: k1 !== kL, push: k1 !== keyOf(R, goneOf(Rg)) };
+  }
+
+  /*@3.NOICJ.19*/
+  var PDF = { sk: 'st', kk: 'els' }, OV = { sk: 'ink', kk: 'shapes' };
+
+  function pageEls(d, A) {
+    A = A || PDF;
+    if (!d) return Promise.resolve([]);
+    var un = d[A.sk] ? unpack(d[A.sk]) : Promise.resolve(d.raw || []);
+    return un.then(function (strokes) {
+      var out = [], i;
+      for (i = 0; i < (strokes || []).length; i++) {
+        var s = strokes[i];
+        var e = { ty: 'st', pts: s.pts, c: s.color || 'ink', w: s.w || 2, nib: s.nib || 'round',
+                  o: 1, hi: s.tool === 'hi' ? 1 : 0 };
+        if (d.ts && d.ts[i] != null && d.ts[i] >= 0) e.ts = d.ts[i];
+        if (d.ei && d.ei[i]) e.eid = d.ei[i];
+        if (d.em && d.em[i] != null) e.mt = d.em[i];
+        out.push(e);
+      }
+      return out.concat(JSON.parse(JSON.stringify(d[A.kk] || [])));
+    });
+  }
+
+  function splitEls(els) {
+    var st = [], ts = [], ei = [], em = [], keep = [], i;
+    for (i = 0; i < (els || []).length; i++) {
+      var e = els[i];
+      if (!e) continue;
+      if (e.ty === 'st' && e.pts && e.pts.length) {
+        st.push({ tool: e.hi ? 'hi' : 'pen', color: e.c, w: e.w, nib: e.nib, pts: e.pts });
+        ts.push(e.ts == null ? -1 : e.ts);
+        ei.push(e.eid || '');
+        em.push(+e.mt || 0);
+      } else keep.push(e);
+    }
+    return { st: st, ts: ts, ei: ei, em: em, keep: keep };
+  }
+
+  function pagePack(els, extra, A) {
+    A = A || PDF;
+    var parts = splitEls(els), page = {}, k;
+    for (k in (extra || {})) if (Object.prototype.hasOwnProperty.call(extra, k)) page[k] = extra[k];
+    page[A.kk] = parts.keep;
+    if (parts.ts.some(function (t) { return t >= 0; })) page.ts = parts.ts;
+    if (parts.ei.some(function (x) { return !!x; })) { page.ei = parts.ei; page.em = parts.em; }
+    if (!parts.st.length && A === PDF) return Promise.resolve(page);
+    return pack(parts.st).then(function (packed) { page[A.sk] = packed; return page; });
+  }
+
+  /*@3.NOICJ.20*/
+  function mergePages(lp, rp) {
+    if (!lp || typeof lp !== 'object') return Promise.resolve(rp);
+    if (!rp || typeof rp !== 'object') return Promise.resolve(lp);
+    return Promise.all([pageEls(lp), pageEls(rp)]).then(function (two) {
+      var L = ids(two[0]), R = ids(two[1]);
+      var Lg = goneOf(lp.gn), Rg = goneOf(rp.gn);
+      if (lp.x && !lp.gn) R.forEach(function (e) { if ((+e.mt || 0) <= (lp.t || 0)) Lg[e.eid] = lp.t || 0; });
+      if (rp.x && !rp.gn) L.forEach(function (e) { if ((+e.mt || 0) <= (rp.t || 0)) Rg[e.eid] = rp.t || 0; });
+      var m = mergeEls(L, Lg, R, Rg);
+      var fm = mergeFd(lp.fdoc, lp.fgn, rp.fdoc, rp.fgn);
+      var extra = { t: Math.max(lp.t || 0, rp.t || 0) };
+      if (fm.fdoc) extra.fdoc = fm.fdoc;
+      if (Object.keys(fm.fgn).length) extra.fgn = fm.fgn;
+      if (Object.keys(m.gn).length) extra.gn = m.gn;
+      if (!m.els.length && !extra.fdoc) extra.x = 1;
+      return pagePack(m.els, extra);
+    });
+  }
+
+  /*@3.NOICJ.21*/
+  function mergeOv(lo, ro) {
+    if (!lo || typeof lo !== 'object') return Promise.resolve(ro);
+    if (!ro || typeof ro !== 'object') return Promise.resolve(lo);
+    return Promise.all([pageEls(lo, OV), pageEls(ro, OV)]).then(function (two) {
+      var m = mergeEls(two[0], lo.gn, two[1], ro.gn), extra = {}, k;
+      for (k in ro) {
+        if (!Object.prototype.hasOwnProperty.call(ro, k) || /^(ink|shapes|ts|ei|em|gn|raw)$/.test(k)) continue;
+        extra[k] = ro[k];
+      }
+      ['h', 'ch'].forEach(function (f) { if (+lo[f] > +(extra[f] || 0)) extra[f] = lo[f]; });
+      if (Object.keys(m.gn).length) extra.gn = m.gn;
+      return pagePack(m.els, extra, OV);
+    });
+  }
+
   window.GardenInkCodec = {
+    mergeOv: mergeOv,
+    mergeFd: mergeFd,
+    stampFd: stampFd,
+    OV: OV,
+    stamp: stamp,
+    mergeEls: mergeEls,
+    mergePages: mergePages,
+    pageEls: pageEls,
+    pagePack: pagePack,
+    splitEls: splitEls,
+    ids: ids,
     pack: pack,
     unpack: unpack,
     encodeStrokes: encodeStrokes,
