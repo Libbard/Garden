@@ -295,10 +295,17 @@
     var t0 = Date.now();
     var P = typeof raw === 'string' ? parse(raw) : raw;
     var res = { q: raw, total: 0, hits: [], facets: { type: {}, level: {}, course: {} }, terms: [], suggest: null, relaxed: false };
-    var groups = [], fixes = {};
+    var groups = [], fixes = {}, also = opts.also || [];
+    function knownElse(t, pre) {
+      for (var a = 0; a < also.length; a++) {
+        if (also[a] === idx) continue;
+        if (pre ? hasPrefix(also[a], t) : also[a].dict.has(t)) return true;
+      }
+      return false;
+    }
     P.terms.forEach(function (t) {
       var alts = idx.dict.has(t) ? [t] : [];
-      if (!alts.length) {
+      if (!alts.length && !knownElse(t)) {
         var fz = fuzzy(idx, t);
         if (fz) { alts = [fz]; fixes[t] = fz; }
       }
@@ -308,14 +315,13 @@
       var pre = P.prefix, st = stem(pre);
       var alts = expand(idx, pre, 48);
       if (st !== pre && idx.dict.has(st) && alts.indexOf(st) < 0) alts.unshift(st);
-      if (!alts.length) {
+      if (!alts.length && !knownElse(pre, true) && !knownElse(st)) {
         var fp = fuzzy(idx, st);
         if (fp) { alts = [fp]; fixes[pre] = fp; }
       }
       groups.push({ t: pre, alts: alts, prefix: true });
     }
     var fx = Object.keys(fixes);
-    if (fx.length) res.suggest = fx.reduce(function (s, k) { return s.split(k).join(fixes[k]); }, P.terms.concat(P.prefix ? [P.prefix] : []).join(' '));
     res.terms = groups.map(function (g) { return { t: g.t, alts: g.alts.slice(0, 12), prefix: !!g.prefix }; });
     if (!groups.length && !P.phrases.length) { res.ms = Date.now() - t0; return res; }
 
@@ -404,6 +410,7 @@
       return (idx.docs[a.d].t[0] || '').length - (idx.docs[b.d].t[0] || '').length;
     });
     res.total = hits.length;
+    if (fx.length && hits.length && !res.relaxed && typeof raw === 'string') res.suggest = suggestion(idx, raw, fixes, hits);
     var off = Math.max(0, opts.offset | 0), lim = Math.min(Math.max(1, opts.limit || 20), 300);
     var re = matcher(groups, P.phrases);
     res.hits = hits.slice(off, off + lim).map(function (h) {
@@ -418,6 +425,41 @@
     });
     res.ms = Date.now() - t0;
     return res;
+  }
+
+  function hasPrefix(ix, pre) {
+    var t = ix.terms[lower(ix.terms, pre)];
+    return t !== undefined && t.slice(0, pre.length) === pre;
+  }
+
+  var WORD_RE = /[A-Za-z0-9]+[+#]*|[ء-يً-ٰٟـ]+/g;
+  function surface(idx, fix, hits) {
+    if (/^[a-z0-9]/.test(fix)) return fix;
+    var loose = null;
+    for (var h = 0; h < hits.length && h < 40; h++) {
+      var d = idx.docs[hits[h].d];
+      var src = [d.t && d.t[0], d.t && d.t[1]].concat(fields(d).map(function (f) { return f[2]; }));
+      for (var i = 0; i < src.length; i++) {
+        var ws = String(src[i] || '').match(WORD_RE) || [];
+        for (var j = 0; j < ws.length; j++) {
+          var f = norm(ws[j]);
+          if (f === fix) return clean(ws[j]);
+          if (!loose && stem(f) === fix) loose = clean(ws[j]);
+        }
+      }
+    }
+    return loose || fix;
+  }
+  function suggestion(idx, raw, fixes, hits) {
+    var done = false, seen = {};
+    var out = String(raw).replace(WORD_RE, function (w) {
+      var f = norm(w), k = fixes[f] !== undefined ? f : fixes[stem(f)] !== undefined ? stem(f) : null;
+      if (k === null) return w;
+      done = true;
+      if (!seen[k]) seen[k] = surface(idx, fixes[k], hits);
+      return seen[k];
+    });
+    return done && norm(out) !== norm(raw) ? out.replace(/\s+/g, ' ').trim() : null;
   }
 
   function esc(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }

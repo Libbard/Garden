@@ -155,14 +155,14 @@
       <span class="tag">الخوارزميات</span>
       <span class="tag">الترتيب</span>
       <span class="tag">التعقيدية الزمنية</span>
-      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 دقيقة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> ساعة و15 دقيقة</span>
     </template>
     <template class="content-en">
       <span class="tag">Data Structures</span>
       <span class="tag">Algorithms</span>
       <span class="tag">Sorting</span>
       <span class="tag">Time Complexity</span>
-      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 45 min</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 1 h 15 min</span>
     </template>
     <div class="content-target"></div>
   </div>
@@ -185,7 +185,7 @@
   </ul>
 </section>
 
-<section id="introduction-to-sorting" class="concept-card glass-card fade-up">
+<section id="introduction-to-sorting" class="concept-card glass-card fade-up" data-study-s="272">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">1</span> مفهوم الترتيب وأنواعه</h2></template>
     <template class="content-en"><h2><span class="concept-number">1</span> What is Sorting?</h2></template>
@@ -278,7 +278,7 @@
   </details>
 </section>
 
-<section id="insertion-sort" class="concept-card glass-card fade-up">
+<section id="insertion-sort" class="concept-card glass-card fade-up" data-study-s="750">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">2</span> ترتيب الإدراج</h2></template>
     <template class="content-en"><h2><span class="concept-number">2</span> Insertion Sort</h2></template>
@@ -484,7 +484,7 @@ void insertionSort( AnyType [ ] a )
   </details>
 </section>
 
-<section id="shellsort" class="concept-card glass-card fade-up">
+<section id="shellsort" class="concept-card glass-card fade-up" data-study-s="759">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">3</span> ترتيب شيل</h2></template>
     <template class="content-en"><h2><span class="concept-number">3</span> Shellsort</h2></template>
@@ -629,7 +629,7 @@ void shellsort( AnyType [ ] a )
   </details>
 </section>
 
-<section id="heapsort" class="concept-card glass-card fade-up">
+<section id="heapsort" class="concept-card glass-card fade-up" data-study-s="1415">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">4</span> ترتيب الكومة</h2></template>
     <template class="content-en"><h2><span class="concept-number">4</span> Heapsort</h2></template>
@@ -681,6 +681,61 @@ void shellsort( AnyType [ ] a )
 }
 private static int getRightChildIndex(int index) {
     return 2 * index + 2;
+}</code></pre>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>java</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>public static &lt;AnyType extends Comparable&lt;? super AnyType&gt;&gt;
+void heapsort( AnyType [ ] a )
+{
+    // Step 1: Build the max-heap
+    for( int i = a.length / 2 - 1; i &gt;= 0; i-- )
+        percDown( a, i, a.length );
+        
+    // Step 2: Sort by swapping root with last element and fixing heap
+    for( int i = a.length - 1; i &gt; 0; i-- )
+    {
+        swap( a, 0, i );     // Swap max to the end
+        percDown( a, 0, i ); // Fix the remaining heap
+    }
+}
+
+private static &lt;AnyType extends Comparable&lt;? super AnyType&gt;&gt;
+void percDown( AnyType [ ] a, int i, int n )
+{
+    int child;
+    AnyType tmp;
+    
+    for( tmp = a[ i ]; leftChild( i ) &lt; n; i = child )
+    {
+        child = leftChild( i );
+        // Find the larger child
+        if( child != n - 1 &amp;&amp; a[ child ].compareTo( a[ child + 1 ] ) &lt; 0 )
+            child++;
+            
+        // Percolate down if necessary
+        if( tmp.compareTo( a[ child ] ) &lt; 0 )
+            a[ i ] = a[ child ];
+        else
+            break;
+    }
+    a[ i ] = tmp;
+}
+
+private static int leftChild( int i )
+{
+    return 2 * i + 1;
+}
+
+private static &lt;AnyType&gt; void swap( AnyType [ ] a, int index1, int index2 )
+{
+    AnyType tmp = a[ index1 ];
+    a[ index1 ] = a[ index2 ];
+    a[ index2 ] = tmp;
 }</code></pre>
   </div>
 
@@ -889,8 +944,8 @@ private static int getRightChildIndex(int index) {
     <h2 data-i18n="prof.title">حديث البروفيسور</h2>
   </div>
   <div class="professor-text" data-bilingual>
-    <template class="content-ar">أهلاً بكم يا أبطال الخوارزميات. في هذه الوحدة، نغوص في عالم الترتيب (Sorting)، وهو من أهم المواضيع في علوم الحاسب. تخيل أنك ترتب أوراق اللعب في يدك؛ هذا بالضبط ما يفعله 'ترتيب الإدراج' (Insertion Sort). إنه بسيط، لكنه بطيء \(O(N^2)\) للمصفوفات الكبيرة، إلا إذا كانت مرتبة مسبقاً! ثم يأتي 'ترتيب شيل' (Shellsort) كترقية ذكية، حيث يسمح بتبادل العناصر البعيدة لتقليل الجهد، وسرعته تعتمد كلياً على 'تسلسل الزيادة' الذي تختاره. وأخيراً، نجم هذه الوحدة: 'ترتيب الكومة' (Heapsort). هذا العبقري يحول المصفوفة إلى شجرة (Max-heap)، ثم يسحب العنصر الأكبر مراراً وتكراراً ليضعه في النهاية. النتيجة؟ ترتيب مضمون بتعقيد O(N log N) دون استخدام أي ذاكرة إضافية. ركزوا جيداً على كيفية حساب فهارس الأبناء في المصفوفة (2i+1 و 2i+2)، فهذا سؤال كلاسيكي في الامتحانات! بالتوفيق.<p>في الاختبارات، لا يكفي حفظ تعقيد الخوارزميات فقط، بل يجب عليك التدرب على تتبع (Tracing) كل خوارزمية خطوة بخطوة. تأكد من قدرتك على رسم حالة المصفوفة بعد كل دورة في ترتيب شيل، وبعد كل عملية استخراج في ترتيب الكومة، فهذه هي الأسئلة التي تميز الطالب المتمكن.</p><p>الآن وبعد أن اكتملت الصورة، تذكر أن التحليل الدقيق للخوارزميات لا يقتصر على 'O الكبير' فقط. فهمك لعدد المقارنات الدقيق في ترتيب الكومة، وأفضل الحالات في ترتيب شيل، وكيفية كتابة الكود الفعلي بكفاءة، هو ما يميز المبرمج المحترف عن المبتدئ في الامتحانات والمقابلات التقنية.</p></template>
-    <template class="content-en">Welcome, algorithm champions. In this module, we dive into Sorting. Imagine sorting playing cards in your hand; that's exactly 'Insertion Sort'. It's simple but slow \(O(N^2)\) for large arrays, unless they are presorted! Then comes 'Shellsort' as a clever upgrade, allowing far elements to swap to save effort. Its speed entirely depends on the 'increment sequence' you choose. Finally, the star of the show: 'Heapsort'. This genius algorithm turns the array into a tree (Max-heap), then repeatedly extracts the largest element to place it at the end. The result? A guaranteed O(N log N) sort without extra memory. Pay close attention to how child indices are calculated in the array (2i+1 and 2i+2)—that's a classic exam question! Good luck.<p>For exams, simply memorizing algorithm complexities is not enough; you must practice tracing each algorithm step-by-step. Ensure you can draw the array's state after each pass in Shellsort, and after each extraction in Heapsort, as these questions distinguish truly proficient students.</p><p>Now that the picture is complete, remember that rigorous algorithm analysis goes beyond just 'Big O'. Understanding the exact comparison counts in Heapsort, the best-case scenarios in Shellsort, and how to write the actual code efficiently is what separates a professional programmer from a beginner in exams and technical interviews.</p></template>
+    <template class="content-ar"><p>أهلاً بكم في الليلة التي تسبق الاختبار. غداً، سنختبر مدى إتقانكم لمفهوم <b>الترتيب</b> (Sorting)، وهو العملية الأساسية لتنظيم مجموعة من العناصر في تسلسل محدد بناءً على معايير معينة. هذه الوحدة لا تقتصر على مجرد وضع الأشياء في نصابها، بل تحكي قصة تطور الكفاءة الخوارزمية. تبدأ رحلتنا مع <b>ترتيب الإدراج</b> (Insertion Sort)، وهو خوارزمية بديهية تبني المصفوفة المرتبة النهائية عنصراً تلو الآخر، تماماً كما ترتبون أوراق اللعب في أيديكم. إنها طريقة بسيطة وفعالة، لكن اعتمادها الكبير على إزاحة العناصر المتجاورة يكشف عن ضعفها الواضح عندما يزداد حجم البيانات.</p><p>للتغلب على هذا القصور، ننتقل إلى <b>ترتيب شيل</b> (Shellsort). من خلال السماح بتبادل العناصر المتباعدة باستخدام تسلسل متناقص من الفجوات، يقلل هذا الترتيب بشكل جذري من عدد الإزاحات المطلوبة، ليمثل بذلك ترقية هيكلية وذكية لترتيب الإدراج. بعد ذلك، نغير نهجنا بالكامل لنصل إلى <b>ترتيب الكومة</b> (Heapsort). بدلاً من مقارنة العناصر المتجاورة أو المتباعدة بفجوات، يحول هذا الخوارزمي المصفوفة إلى شجرة ثنائية. ثم يقوم بشكل منهجي ومتكرر باستخراج العنصر الأكبر الموجود في الجذر ووضعه في نهاية المصفوفة، مما يضمن أداءً عالياً ومستقراً دون الحاجة إلى استهلاك أي ذاكرة إضافية.</p><p>بالنسبة لاختبار الغد، لن يكفيكم مجرد حفظ التعقيد الزمني للخوارزميات. سأختبر قدرتكم الفعلية على تتبع هذه الخوارزميات خطوة بخطوة. من الأخطاء الكلاسيكية التي يقع فيها الطلاب الفشل في رسم حالة المصفوفة بشكل صحيح بعد مرور دورة فجوة معينة في ترتيب شيل، أو الخطأ في حساب فهارس الأبناء أثناء عمليات الاستخراج في ترتيب الكومة. ركزوا جيداً على آليات هذه التحولات، وافهموا بدقة ما يحدث خلف الكواليس في كل خطوة، وسيكون التميز حليفكم.</p></template>
+    <template class="content-en"><p>Welcome to the night before your exam. Tomorrow, we test your mastery of <b>Sorting</b>, the fundamental process of arranging items into a defined order based on specific criteria. This module is about the evolution of efficiency. We start with <b>Insertion Sort</b>, an intuitive algorithm that builds the sorted array one item at a time, exactly like organizing playing cards in your hands. It is simple, but relying on shifting adjacent elements exposes its weakness as data grows.</p><p>To overcome this, we explore <b>Shellsort</b>. By allowing the exchange of far-apart items using a decreasing sequence of gaps, Shellsort drastically reduces shifts, acting as a brilliant upgrade to our previous method. From there, we shift our paradigm entirely to <b>Heapsort</b>. This algorithm transforms the array into a binary tree, then systematically extracts the largest root element and places it at the end of the array, guaranteeing high performance without extra memory.</p><p>For the exam, memorizing complexities is not enough. I will test your ability to trace these algorithms step-by-step. A classic mistake is failing to correctly map the array's state after a gap pass in Shellsort, or miscalculating child indices during Heapsort extractions. Focus on the mechanics of these transformations, and you will excel.</p></template>
     <div class="content-target"></div>
   </div>
 </section>
@@ -1082,6 +1137,24 @@ private static int getRightChildIndex(int index) {
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar"><p>عندما نبدل الجذر مع العنصر الأخير ونفصله، يجب أن نزيح الجذر الجديد لأسفل (Percolate Down) لاستعادة خاصية الكومة. ارتفاع الكومة المتبقية هو $\log(N - i + 1)$. في كل مستوى من هذا الارتفاع، نحتاج إلى مقارنتين: الأولى لتحديد أي من الابنين هو الأكبر، والثانية لمقارنة الابن الأكبر مع العقدة الحالية. لذا نضرب الارتفاع في 2.</p></template>
           <template class="content-en"><p>When we swap the root with the last element and disconnect it, the new root must percolate down to restore the heap property. The height of the remaining heap is $\log(N - i + 1)$. At each level of this height, we need up to two comparisons: one to find the larger of the two children, and one to compare that larger child with the current node. Hence, we multiply the height by 2.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">في التنفيذ البرمجي لترتيب الكومة، لماذا تبدأ مرحلة بناء الكومة (Build Heap) من الفهرس a.length / 2 - 1 وتتناقص حتى 0؟</template>
+          <template class="content-en">In the Heapsort implementation, why does the buildHeap phase start from index a.length / 2 - 1 and go down to 0?</template>
+          <span class="content-target">في التنفيذ البرمجي لترتيب الكومة، لماذا تبدأ مرحلة بناء الكومة (Build Heap) من الفهرس a.length / 2 - 1 وتتناقص حتى 0؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>الفهرس a.length / 2 - 1 يمثل آخر عقدة لها أبناء (عقدة غير ورقية) في الشجرة. العقد الورقية (التي تقع بعد هذا الفهرس) تحقق خاصية الكومة تلقائياً لأن ليس لها أبناء. بالبدء من آخر عقدة غير ورقية وتطبيق عملية الإزاحة لأسفل (Percolate Down) صعوداً حتى الجذر، نقوم ببناء الكومة من الأسفل للأعلى بكفاءة عالية في وقت خطي O(N).</p></template>
+          <template class="content-en"><p>The index a.length / 2 - 1 represents the last non-leaf node (a node with children) in the tree. Leaf nodes (located after this index) trivially satisfy the heap property since they have no children. By starting from the last non-leaf node and applying the percolate down operation upwards to the root, we build the heap bottom-up highly efficiently in linear O(N) time.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1388,7 +1461,7 @@ private static int getRightChildIndex(int index) {
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 11</span>
+      <span id="quiz-counter">1 / 14</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1404,7 +1477,7 @@ private static int getRightChildIndex(int index) {
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 11</div>
+    <div class="score-display" id="quiz-score-display">0 / 14</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -1761,6 +1834,102 @@ private static int getRightChildIndex(int index) {
     },
     "difficulty": "hard",
     "id": 11
+  },
+  {
+    "conceptId": "insertion-sort",
+    "question": {
+      "ar": "في التنفيذ البرمجي القياسي لترتيب الإدراج (Insertion Sort)، ما هو الشرط في الحلقة الداخلية الذي يحدد متى تتوقف إزاحة العناصر؟",
+      "en": "In the standard implementation of Insertion Sort, what is the condition in the inner loop that determines when to stop shifting elements?"
+    },
+    "options": {
+      "ar": [
+        "j > 0 && tmp.compareTo(a[j - 1]) < 0",
+        "j > 0 && tmp.compareTo(a[j + 1]) > 0",
+        "j < a.length && tmp.compareTo(a[j - 1]) == 0",
+        "j >= 0 && tmp.compareTo(a[j]) < 0"
+      ],
+      "en": [
+        "j > 0 && tmp.compareTo(a[j - 1]) < 0",
+        "j > 0 && tmp.compareTo(a[j + 1]) > 0",
+        "j < a.length && tmp.compareTo(a[j - 1]) == 0",
+        "j >= 0 && tmp.compareTo(a[j]) < 0"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "الحلقة الداخلية تستمر طالما لم نصل إلى بداية المصفوفة (j > 0) والعنصر الحالي أصغر من العنصر الذي يسبقه (tmp.compareTo(a[j - 1]) < 0).",
+      "en": "The inner loop continues as long as we haven't reached the start of the array (j > 0) and the current element is smaller than the preceding one (tmp.compareTo(a[j - 1]) < 0)."
+    },
+    "hint": {
+      "ar": "تذكر أننا نقارن العنصر المحتفظ به (tmp) مع العناصر التي تسبقه (a[j - 1]).",
+      "en": "Remember we compare the stored element (tmp) with the preceding elements (a[j - 1])."
+    },
+    "difficulty": "medium",
+    "id": 12
+  },
+  {
+    "conceptId": "shellsort",
+    "question": {
+      "ar": "في التنفيذ البرمجي لترتيب شيل (Shellsort) باستخدام زيادات شيل الأصلية، كيف يتم تحديث الفجوة (Gap) في الحلقة الخارجية؟",
+      "en": "In the implementation of Shellsort using Shell's original increments, how is the gap typically updated in the outer loop?"
+    },
+    "options": {
+      "ar": [
+        "gap /= 2",
+        "gap--",
+        "gap = gap * 3 + 1",
+        "gap = Math.sqrt(gap)"
+      ],
+      "en": [
+        "gap /= 2",
+        "gap--",
+        "gap = gap * 3 + 1",
+        "gap = Math.sqrt(gap)"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "تسلسل شيل الأصلي يبدأ بفجوة تساوي نصف طول المصفوفة، ثم يقسم الفجوة على 2 في كل دورة حتى تصل إلى 1.",
+      "en": "Shell's original sequence starts with a gap equal to half the array length, then divides the gap by 2 in each pass until it reaches 1."
+    },
+    "hint": {
+      "ar": "تسلسل شيل الأصلي يعتمد على التنصيف المستمر.",
+      "en": "Shell's original sequence relies on continuous halving."
+    },
+    "difficulty": "easy",
+    "id": 13
+  },
+  {
+    "conceptId": "heapsort",
+    "question": {
+      "ar": "في التنفيذ البرمجي لترتيب الكومة (Heapsort)، ما هو الفهرس الذي تبدأ منه حلقة بناء الكومة (Build Heap)؟",
+      "en": "In the Heapsort implementation, what is the starting index for the loop that builds the initial max-heap?"
+    },
+    "options": {
+      "ar": [
+        "a.length / 2 - 1",
+        "a.length - 1",
+        "0",
+        "a.length / 2"
+      ],
+      "en": [
+        "a.length / 2 - 1",
+        "a.length - 1",
+        "0",
+        "a.length / 2"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "الفهرس a.length / 2 - 1 يمثل آخر عقدة غير ورقية (Non-leaf node) في الكومة. نبدأ من هذه العقدة ونتجه صعوداً إلى الجذر (0) لتطبيق عملية الإزاحة لأسفل (Percolate Down) وبناء الكومة بكفاءة.",
+      "en": "The index a.length / 2 - 1 represents the last non-leaf node in the heap. We start from this node and go up to the root (0) applying the percolate down operation to build the heap efficiently."
+    },
+    "hint": {
+      "ar": "العقد الورقية (Leaf nodes) تحقق خاصية الكومة تلقائياً، لذا نبدأ من آخر أب.",
+      "en": "Leaf nodes automatically satisfy the heap property, so we start from the last parent."
+    },
+    "difficulty": "medium",
+    "id": 14
   }
 ]
 </script>

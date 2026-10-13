@@ -160,7 +160,7 @@
     </p>
   </div>
 
-  <article class="concept-card glass-card fade-up" id="sql-overview-history">
+  <article class="concept-card glass-card fade-up" id="sql-overview-history" data-study-s="68">
     <div class="concept-header">
       <h2>
         <span class="concept-number">7.1</span>
@@ -189,7 +189,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="create-schema-table">
+  <article class="concept-card glass-card fade-up" id="create-schema-table" data-study-s="74">
     <div class="concept-header">
       <h2>
         <span class="concept-number">7.2</span>
@@ -218,7 +218,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="circular-reference-problem">
+  <article class="concept-card glass-card fade-up" id="circular-reference-problem" data-study-s="73">
     <div class="concept-header">
       <h2>
         <span class="concept-number">7.3</span>
@@ -247,7 +247,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="sql-data-types">
+  <article class="concept-card glass-card fade-up" id="sql-data-types" data-study-s="70">
     <div class="concept-header">
       <h2>
         <span class="concept-number">7.4</span>
@@ -276,7 +276,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="referential-integrity-options">
+  <article class="concept-card glass-card fade-up" id="referential-integrity-options" data-study-s="107">
     <div class="concept-header">
       <h2>
         <span class="concept-number">7.5</span>
@@ -305,7 +305,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="domain-constraints-check">
+  <article class="concept-card glass-card fade-up" id="domain-constraints-check" data-study-s="98">
     <div class="concept-header">
       <h2>
         <span class="concept-number">7.6</span>
@@ -333,6 +333,35 @@
       <div class="content-target"><p>يمكن تحديد قيود إضافية على البيانات باستخدام جملة <code>CHECK</code>.</p><p>على سبيل المثال، لضمان أن رقم القسم بين 1 و 20: <code>CHECK (Dnumber > 0 AND Dnumber < 21)</code>.</p><p>بدلاً من تكرار هذا القيد في عدة جداول، يمكن إنشاء مجال مخصص باستخدام <code>CREATE DOMAIN</code>. مثال: <code>CREATE DOMAIN D_NUM AS INTEGER CHECK (Dnumber > 0 AND Dnumber < 21);</code>.</p><p>بعد ذلك، يمكن استخدام <code>D_NUM</code> كنوع بيانات لسمة <code>Dnumber</code> في جدول <code>DEPARTMENT</code>، ولسمة <code>Dnum</code> في جدول <code>PROJECT</code>، مما يسهل إعادة الاستخدام ويحافظ على اتساق البيانات.</p></div>
     </div>
   </article>
+
+  <article class="concept-card glass-card fade-up" id="company-database-ddl-example" data-study-s="132">
+    <div class="concept-header">
+      <h2>
+        <span class="concept-number">7.7</span>
+        <span data-bilingual>
+          <template class="content-ar">مثال متكامل: مخطط قاعدة بيانات COMPANY</template>
+          <template class="content-en">Integrated Example: COMPANY Database Schema</template>
+          <span class="content-target">مثال متكامل: مخطط قاعدة بيانات COMPANY</span>
+        </span>
+      </h2>
+    </div>
+
+    <div class="depth-tabs">
+      <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+      <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    </div>
+
+    <div class="depth-layer active" data-layer="flash" data-bilingual>
+      <template class="content-ar"><p>يجمع هذا المثال المتكامل جميع مفاهيم تعريف البيانات (DDL) لإنشاء الجداول، تحديد أنواع البيانات، وتطبيق قيود التكامل المرجعي لقاعدة بيانات COMPANY.</p></template>
+      <template class="content-en"><p>This integrated example combines all Data Definition Language (DDL) concepts to create tables, specify data types, and apply referential integrity constraints for the COMPANY database.</p></template>
+      <div class="content-target"><p>يجمع هذا المثال المتكامل جميع مفاهيم تعريف البيانات (DDL) لإنشاء الجداول، تحديد أنواع البيانات، وتطبيق قيود التكامل المرجعي لقاعدة بيانات COMPANY.</p></div>
+    </div>
+    <div class="depth-layer" data-layer="full" data-bilingual>
+      <template class="content-ar"><p>لبناء مخطط قاعدة بيانات COMPANY بالكامل، نقوم بتعريف الجداول الأساسية وربطها ببعضها البعض باستخدام المفاتيح الأجنبية. يوضح السكريبت التالي كيفية تكامل الجداول:</p><ol><li><b>EMPLOYEE و DEPARTMENT:</b> يمثلان الكيانات الأساسية. يحتوي كل منهما على مفتاح أجنبي يشير للآخر (مشكلة المرجع الدائري)، ويتم استخدام قيود مسماة مع خيارات <code>ON DELETE SET DEFAULT</code> و <code>ON UPDATE CASCADE</code>.</li><li><b>DEPT_LOCATIONS:</b> يمثل سمة متعددة القيم (Multivalued Attribute) للقسم، ويستخدم مفتاحاً أساسياً مركباً (Composite Primary Key) يتكون من رقم القسم والموقع.</li><li><b>PROJECT:</b> يرتبط بالقسم الذي يديره.</li><li><b>WORKS_ON:</b> جدول وسيط يربط الموظفين بالمشاريع (علاقة Many-to-Many)، ويستخدم مفتاحاً أساسياً مركباً من رقم الموظف ورقم المشروع.</li><li><b>DEPENDENT:</b> كيان ضعيف (Weak Entity) يعتمد على الموظف، ومفتاحه الأساسي مركب من رقم الموظف واسم التابع.</li></ol></template>
+      <template class="content-en"><p>To build the complete COMPANY database schema, we define the base tables and link them using foreign keys. The following script demonstrates how the tables integrate:</p><ol><li><b>EMPLOYEE and DEPARTMENT:</b> Represent the core entities. They have foreign keys pointing to each other (circular reference), using named constraints with <code>ON DELETE SET DEFAULT</code> and <code>ON UPDATE CASCADE</code> options.</li><li><b>DEPT_LOCATIONS:</b> Represents a multivalued attribute of a department, using a <span class="smart-term" data-term-en="Composite Primary Key" data-ar="المفتاح الأساسي المركب" data-en-def="A primary key that consists of two or more attributes to uniquely identify a tuple, often used in associative tables or weak entities.">composite primary key<span class="smart-term-tooltip"></span></span> consisting of the department number and location.</li><li><b>PROJECT:</b> Linked to the controlling department.</li><li><b>WORKS_ON:</b> An intermediate table linking employees to projects (Many-to-Many relationship), using a composite primary key of employee SSN and project number.</li><li><b>DEPENDENT:</b> A weak entity dependent on the employee, with a composite primary key of the employee SSN and dependent name.</li></ol></template>
+      <div class="content-target"><p>لبناء مخطط قاعدة بيانات COMPANY بالكامل، نقوم بتعريف الجداول الأساسية وربطها ببعضها البعض باستخدام المفاتيح الأجنبية. يوضح السكريبت التالي كيفية تكامل الجداول:</p><ol><li><b>EMPLOYEE و DEPARTMENT:</b> يمثلان الكيانات الأساسية. يحتوي كل منهما على مفتاح أجنبي يشير للآخر (مشكلة المرجع الدائري)، ويتم استخدام قيود مسماة مع خيارات <code>ON DELETE SET DEFAULT</code> و <code>ON UPDATE CASCADE</code>.</li><li><b>DEPT_LOCATIONS:</b> يمثل سمة متعددة القيم (Multivalued Attribute) للقسم، ويستخدم مفتاحاً أساسياً مركباً (Composite Primary Key) يتكون من رقم القسم والموقع.</li><li><b>PROJECT:</b> يرتبط بالقسم الذي يديره.</li><li><b>WORKS_ON:</b> جدول وسيط يربط الموظفين بالمشاريع (علاقة Many-to-Many)، ويستخدم مفتاحاً أساسياً مركباً من رقم الموظف ورقم المشروع.</li><li><b>DEPENDENT:</b> كيان ضعيف (Weak Entity) يعتمد على الموظف، ومفتاحه الأساسي مركب من رقم الموظف واسم التابع.</li></ol></div>
+    </div>
+  </article>
 </section>
 
 
@@ -350,7 +379,7 @@
     </p>
   </div>
 
-  <article class="concept-card glass-card fade-up" id="basic-select-statement">
+  <article class="concept-card glass-card fade-up" id="basic-select-statement" data-study-s="68">
     <div class="concept-header">
       <h2>
         <span class="concept-number">8.1</span>
@@ -379,7 +408,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="bags-vs-sets">
+  <article class="concept-card glass-card fade-up" id="bags-vs-sets" data-study-s="93">
     <div class="concept-header">
       <h2>
         <span class="concept-number">8.2</span>
@@ -408,7 +437,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="aliasing-and-qualifying">
+  <article class="concept-card glass-card fade-up" id="aliasing-and-qualifying" data-study-s="84">
     <div class="concept-header">
       <h2>
         <span class="concept-number">8.3</span>
@@ -437,7 +466,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="missing-where-clause">
+  <article class="concept-card glass-card fade-up" id="missing-where-clause" data-study-s="80">
     <div class="concept-header">
       <h2>
         <span class="concept-number">8.4</span>
@@ -466,7 +495,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="set-and-multiset-operations">
+  <article class="concept-card glass-card fade-up" id="set-and-multiset-operations" data-study-s="60">
     <div class="concept-header">
       <h2>
         <span class="concept-number">8.5</span>
@@ -495,7 +524,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="substring-comparison-like">
+  <article class="concept-card glass-card fade-up" id="substring-comparison-like" data-study-s="68">
     <div class="concept-header">
       <h2>
         <span class="concept-number">8.6</span>
@@ -524,7 +553,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="order-by-clause">
+  <article class="concept-card glass-card fade-up" id="order-by-clause" data-study-s="71">
     <div class="concept-header">
       <h2>
         <span class="concept-number">8.7</span>
@@ -553,7 +582,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="update-statements">
+  <article class="concept-card glass-card fade-up" id="update-statements" data-study-s="73">
     <div class="concept-header">
       <h2>
         <span class="concept-number">8.8</span>
@@ -598,7 +627,7 @@
     </p>
   </div>
 
-  <article class="concept-card glass-card fade-up" id="nulls-and-3-valued-logic">
+  <article class="concept-card glass-card fade-up" id="nulls-and-3-valued-logic" data-study-s="85">
     <div class="concept-header">
       <h2>
         <span class="concept-number">9.1</span>
@@ -627,7 +656,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="nested-queries">
+  <article class="concept-card glass-card fade-up" id="nested-queries" data-study-s="89">
     <div class="concept-header">
       <h2>
         <span class="concept-number">9.2</span>
@@ -656,7 +685,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="exists-function">
+  <article class="concept-card glass-card fade-up" id="exists-function" data-study-s="84">
     <div class="concept-header">
       <h2>
         <span class="concept-number">9.3</span>
@@ -685,7 +714,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="joined-tables">
+  <article class="concept-card glass-card fade-up" id="joined-tables" data-study-s="80">
     <div class="concept-header">
       <h2>
         <span class="concept-number">9.4</span>
@@ -714,7 +743,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="aggregate-functions-and-grouping">
+  <article class="concept-card glass-card fade-up" id="aggregate-functions-and-grouping" data-study-s="83">
     <div class="concept-header">
       <h2>
         <span class="concept-number">9.5</span>
@@ -743,7 +772,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="assertions">
+  <article class="concept-card glass-card fade-up" id="assertions" data-study-s="69">
     <div class="concept-header">
       <h2>
         <span class="concept-number">9.6</span>
@@ -772,7 +801,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="sql-triggers">
+  <article class="concept-card glass-card fade-up" id="sql-triggers" data-study-s="70">
     <div class="concept-header">
       <h2>
         <span class="concept-number">9.7</span>
@@ -817,7 +846,7 @@
     </p>
   </div>
 
-  <article class="concept-card glass-card fade-up" id="sql-views">
+  <article class="concept-card glass-card fade-up" id="sql-views" data-study-s="72">
     <div class="concept-header">
       <h2>
         <span class="concept-number">10.1</span>
@@ -846,7 +875,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="schema-modification">
+  <article class="concept-card glass-card fade-up" id="schema-modification" data-study-s="72">
     <div class="concept-header">
       <h2>
         <span class="concept-number">10.2</span>
@@ -875,7 +904,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="relational-algebra-unary">
+  <article class="concept-card glass-card fade-up" id="relational-algebra-unary" data-study-s="152">
     <div class="concept-header">
       <h2>
         <span class="concept-number">10.3</span>
@@ -913,7 +942,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="relational-algebra-set">
+  <article class="concept-card glass-card fade-up" id="relational-algebra-set" data-study-s="152">
     <div class="concept-header">
       <h2>
         <span class="concept-number">10.4</span>
@@ -951,7 +980,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="relational-algebra-binary">
+  <article class="concept-card glass-card fade-up" id="relational-algebra-binary" data-study-s="181">
     <div class="concept-header">
       <h2>
         <span class="concept-number">10.5</span>
@@ -989,7 +1018,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="relational-algebra-division">
+  <article class="concept-card glass-card fade-up" id="relational-algebra-division" data-study-s="176">
     <div class="concept-header">
       <h2>
         <span class="concept-number">10.6</span>
@@ -1043,7 +1072,7 @@
     </p>
   </div>
 
-  <article class="concept-card glass-card fade-up" id="informal-design-guidelines">
+  <article class="concept-card glass-card fade-up" id="informal-design-guidelines" data-study-s="73">
     <div class="concept-header">
       <h2>
         <span class="concept-number">11.1</span>
@@ -1090,7 +1119,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="functional-dependencies">
+  <article class="concept-card glass-card fade-up" id="functional-dependencies" data-study-s="168">
     <div class="concept-header">
       <h2>
         <span class="concept-number">11.2</span>
@@ -1134,7 +1163,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="inference-rules-fds">
+  <article class="concept-card glass-card fade-up" id="inference-rules-fds" data-study-s="73">
     <div class="concept-header">
       <h2>
         <span class="concept-number">11.3</span>
@@ -1184,7 +1213,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="keys-and-attributes">
+  <article class="concept-card glass-card fade-up" id="keys-and-attributes" data-study-s="76">
     <div class="concept-header">
       <h2>
         <span class="concept-number">11.4</span>
@@ -1222,7 +1251,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="first-normal-form">
+  <article class="concept-card glass-card fade-up" id="first-normal-form" data-study-s="55">
     <div class="concept-header">
       <h2>
         <span class="concept-number">11.5</span>
@@ -1260,7 +1289,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="second-normal-form">
+  <article class="concept-card glass-card fade-up" id="second-normal-form" data-study-s="79">
     <div class="concept-header">
       <h2>
         <span class="concept-number">11.6</span>
@@ -1298,7 +1327,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="third-normal-form">
+  <article class="concept-card glass-card fade-up" id="third-normal-form" data-study-s="79">
     <div class="concept-header">
       <h2>
         <span class="concept-number">11.7</span>
@@ -1335,6 +1364,94 @@
 <p>بعبارة أبسط: كل سمة يجب أن تعتمد على المفتاح، المفتاح كله، ولا شيء سوى المفتاح.</p></div>
     </div>
   </article>
+
+  <article class="concept-card glass-card fade-up" id="minimal-sets-fds" data-study-s="126">
+    <div class="concept-header">
+      <h2>
+        <span class="concept-number">11.8</span>
+        <span data-bilingual>
+          <template class="content-ar">المجموعات الصغرى للاعتمادات الوظيفية</template>
+          <template class="content-en">Minimal Sets of Functional Dependencies</template>
+          <span class="content-target">المجموعات الصغرى للاعتمادات الوظيفية</span>
+        </span>
+      </h2>
+    </div>
+
+    <div class="depth-tabs">
+      <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+      <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    </div>
+
+    <div class="depth-layer active" data-layer="flash" data-bilingual>
+      <template class="content-ar"><p>المجموعة الصغرى هي نسخة مبسطة ومكافئة من الاعتمادات حيث يكون لكل طرف أيمن سمة واحدة، ولا يمكن إزالة أي اعتماد أو سمة دون تغيير المعنى الأساسي.</p></template>
+      <template class="content-en"><p>A minimal set of FDs is a simplified, equivalent version of dependencies where every right-hand side is a single attribute, and no dependency or attribute can be removed without changing the closure.</p></template>
+      <div class="content-target"><p>المجموعة الصغرى هي نسخة مبسطة ومكافئة من الاعتمادات حيث يكون لكل طرف أيمن سمة واحدة، ولا يمكن إزالة أي اعتماد أو سمة دون تغيير المعنى الأساسي.</p></div>
+    </div>
+    <div class="depth-layer" data-layer="full" data-bilingual>
+      <template class="content-ar"><p>تُعتبر مجموعة الاعتمادات الوظيفية F <b>صغرى (Minimal)</b> إذا استوفت ثلاثة شروط صارمة:</p>
+<ol>
+<li>كل اعتماد في F يحتوي على سمة واحدة فقط في الطرف الأيمن (RHS).</li>
+<li>لا يمكننا إزالة أي اعتماد من F والحصول على مجموعة مكافئة لـ F (أي لا توجد اعتمادات زائدة).</li>
+<li>لا يمكننا استبدال أي اعتماد X -> A بـ Y -> A (حيث Y مجموعة فرعية فعلية من X) مع بقاء المجموعة مكافئة (أي لا توجد سمات زائدة في الطرف الأيسر).</li>
+</ol>
+<p>كل مجموعة من الاعتمادات لها مجموعة صغرى مكافئة واحدة على الأقل. هذه <span class="smart-term" data-term-en="Minimal Set" data-ar="المجموعة الصغرى" data-en-def="A set of functional dependencies that is as small as possible without losing any information or inferable dependencies.">المجموعة الصغرى<span class="smart-term-tooltip"></span></span> ضرورية كنقطة انطلاق لتوليف المخططات العلائقية (Synthesizing relations).</p></template>
+      <template class="content-en"><p>A set of functional dependencies F is considered <b>minimal</b> if it satisfies three strict conditions:</p>
+<ol>
+<li>Every dependency in F has a single attribute on its right-hand side (RHS).</li>
+<li>We cannot remove any dependency from F and still have a set of dependencies equivalent to F (no redundant dependencies).</li>
+<li>We cannot replace any dependency X -> A with Y -> A (where Y is a proper subset of X) and keep the set equivalent (no redundant attributes on the left-hand side).</li>
+</ol>
+<p>Every set of FDs has at least one equivalent <span class="smart-term" data-term-en="Minimal Set" data-ar="المجموعة الصغرى" data-en-def="A set of functional dependencies that is as small as possible without losing any information or inferable dependencies.">minimal set<span class="smart-term-tooltip"></span></span>. This minimal set is crucial as a starting point for synthesizing relational schemas.</p></template>
+      <div class="content-target"><p>تُعتبر مجموعة الاعتمادات الوظيفية F <b>صغرى (Minimal)</b> إذا استوفت ثلاثة شروط صارمة:</p>
+<ol>
+<li>كل اعتماد في F يحتوي على سمة واحدة فقط في الطرف الأيمن (RHS).</li>
+<li>لا يمكننا إزالة أي اعتماد من F والحصول على مجموعة مكافئة لـ F (أي لا توجد اعتمادات زائدة).</li>
+<li>لا يمكننا استبدال أي اعتماد X -> A بـ Y -> A (حيث Y مجموعة فرعية فعلية من X) مع بقاء المجموعة مكافئة (أي لا توجد سمات زائدة في الطرف الأيسر).</li>
+</ol>
+<p>كل مجموعة من الاعتمادات لها مجموعة صغرى مكافئة واحدة على الأقل. هذه <span class="smart-term" data-term-en="Minimal Set" data-ar="المجموعة الصغرى" data-en-def="A set of functional dependencies that is as small as possible without losing any information or inferable dependencies.">المجموعة الصغرى<span class="smart-term-tooltip"></span></span> ضرورية كنقطة انطلاق لتوليف المخططات العلائقية (Synthesizing relations).</p></div>
+    </div>
+  </article>
+
+  <article class="concept-card glass-card fade-up" id="properties-of-decompositions" data-study-s="87">
+    <div class="concept-header">
+      <h2>
+        <span class="concept-number">11.9</span>
+        <span data-bilingual>
+          <template class="content-ar">خصائص التفكيك</template>
+          <template class="content-en">Properties of Decompositions</template>
+          <span class="content-target">خصائص التفكيك</span>
+        </span>
+      </h2>
+    </div>
+
+    <div class="depth-tabs">
+      <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+      <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    </div>
+
+    <div class="depth-layer active" data-layer="flash" data-bilingual>
+      <template class="content-ar"><p>عند تفكيك الجداول، هناك خاصيتان مهمتان: الربط غير المفقود (Lossless Join) وهو إلزامي، والحفاظ على الاعتمادات (Dependency Preservation) وهو أقل صرامة ويمكن التضحية به.</p></template>
+      <template class="content-en"><p>When decomposing tables, there are two important properties: Lossless Join (mandatory) and Dependency Preservation (less stringent, can be sacrificed).</p></template>
+      <div class="content-target"><p>عند تفكيك الجداول، هناك خاصيتان مهمتان: الربط غير المفقود (Lossless Join) وهو إلزامي، والحفاظ على الاعتمادات (Dependency Preservation) وهو أقل صرامة ويمكن التضحية به.</p></div>
+    </div>
+    <div class="depth-layer" data-layer="full" data-bilingual>
+      <template class="content-ar"><p>عندما نقوم بتفكيك (Decomposition) مخطط علاقة إلى مخططات أصغر للوصول إلى نماذج عادية أعلى، يجب أن نأخذ في الاعتبار خاصيتين مهمتين:</p>
+<ol>
+<li><strong><span class="smart-term" data-term-en="Lossless Join" data-ar="الربط غير المفقود" data-en-def="A property of decomposition ensuring that a natural join of the decomposed relations results in exactly the original relation, with no extra (spurious) tuples.">الربط غير المفقود<span class="smart-term-tooltip"></span></span> (Lossless Join):</strong> أو الربط غير المضاف (Non-additive). تضمن هذه الخاصية عدم توليد سجلات زائفة (Spurious Tuples) عند إعادة دمج الجداول. هذه الخاصية <b>بالغة الأهمية ولا يمكن التضحية بها أبداً</b>.</li>
+<li><strong><span class="smart-term" data-term-en="Dependency Preservation" data-ar="الحفاظ على الاعتمادات" data-en-def="A property of decomposition where all functional dependencies can be enforced without joining the decomposed relations.">الحفاظ على الاعتمادات<span class="smart-term-tooltip"></span></span> الوظيفية (Preservation of FDs):</strong> تضمن هذه الخاصية أن جميع الاعتمادات الوظيفية الأصلية لا تزال قابلة للتحقق داخل الجداول الجديدة دون الحاجة إلى إجراء عمليات ربط (JOIN) بينها.</li>
+</ol></template>
+      <template class="content-en"><p>When we decompose a relation schema into smaller schemas to achieve higher normal forms, we must consider two important properties:</p>
+<ol>
+<li><strong><span class="smart-term" data-term-en="Lossless Join" data-ar="الربط غير المفقود" data-en-def="A property of decomposition ensuring that a natural join of the decomposed relations results in exactly the original relation, with no extra (spurious) tuples.">Lossless Join<span class="smart-term-tooltip"></span></span> (Non-additive join):</strong> This ensures that no spurious tuples are generated when the tables are recombined using a natural join. This property is <b>extremely important and cannot be sacrificed</b>.</li>
+<li><strong>Preservation of functional dependencies:</strong> This ensures that all original functional dependencies can still be checked within the individual new relations without needing to join them.</li>
+</ol></template>
+      <div class="content-target"><p>عندما نقوم بتفكيك (Decomposition) مخطط علاقة إلى مخططات أصغر للوصول إلى نماذج عادية أعلى، يجب أن نأخذ في الاعتبار خاصيتين مهمتين:</p>
+<ol>
+<li><strong><span class="smart-term" data-term-en="Lossless Join" data-ar="الربط غير المفقود" data-en-def="A property of decomposition ensuring that a natural join of the decomposed relations results in exactly the original relation, with no extra (spurious) tuples.">الربط غير المفقود<span class="smart-term-tooltip"></span></span> (Lossless Join):</strong> أو الربط غير المضاف (Non-additive). تضمن هذه الخاصية عدم توليد سجلات زائفة (Spurious Tuples) عند إعادة دمج الجداول. هذه الخاصية <b>بالغة الأهمية ولا يمكن التضحية بها أبداً</b>.</li>
+<li><strong><span class="smart-term" data-term-en="Dependency Preservation" data-ar="الحفاظ على الاعتمادات" data-en-def="A property of decomposition where all functional dependencies can be enforced without joining the decomposed relations.">الحفاظ على الاعتمادات<span class="smart-term-tooltip"></span></span> الوظيفية (Preservation of FDs):</strong> تضمن هذه الخاصية أن جميع الاعتمادات الوظيفية الأصلية لا تزال قابلة للتحقق داخل الجداول الجديدة دون الحاجة إلى إجراء عمليات ربط (JOIN) بينها.</li>
+</ol></div>
+    </div>
+  </article>
 </section>
 
 
@@ -1352,7 +1469,7 @@
     </p>
   </div>
 
-  <article class="concept-card glass-card fade-up" id="boyce-codd-normal-form">
+  <article class="concept-card glass-card fade-up" id="boyce-codd-normal-form" data-study-s="157">
     <div class="concept-header">
       <h2>
         <span class="concept-number">12.1</span>
@@ -1396,7 +1513,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="properties-of-decomposition">
+  <article class="concept-card glass-card fade-up" id="properties-of-decomposition" data-study-s="168">
     <div class="concept-header">
       <h2>
         <span class="concept-number">12.2</span>
@@ -1449,7 +1566,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="multivalued-dependencies-4nf">
+  <article class="concept-card glass-card fade-up" id="multivalued-dependencies-4nf" data-study-s="159">
     <div class="concept-header">
       <h2>
         <span class="concept-number">12.3</span>
@@ -1490,7 +1607,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="join-dependencies-5nf">
+  <article class="concept-card glass-card fade-up" id="join-dependencies-5nf" data-study-s="170">
     <div class="concept-header">
       <h2>
         <span class="concept-number">12.4</span>
@@ -1534,7 +1651,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="inclusion-dependencies">
+  <article class="concept-card glass-card fade-up" id="inclusion-dependencies" data-study-s="149">
     <div class="concept-header">
       <h2>
         <span class="concept-number">12.5</span>
@@ -1575,7 +1692,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="domain-key-normal-form">
+  <article class="concept-card glass-card fade-up" id="domain-key-normal-form" data-study-s="56">
     <div class="concept-header">
       <h2>
         <span class="concept-number">12.6</span>
@@ -1606,6 +1723,35 @@
 <p>الفكرة هي تحديد 'النموذج العياري النهائي' الذي يأخذ في الاعتبار جميع أنواع الاعتماديات.</p></div>
     </div>
   </article>
+
+  <article class="concept-card glass-card fade-up" id="relational-synthesis-algorithms" data-study-s="131">
+    <div class="concept-header">
+      <h2>
+        <span class="concept-number">12.7</span>
+        <span data-bilingual>
+          <template class="content-ar">خوارزميات التوليف العلائقي (11.2 و 11.4)</template>
+          <template class="content-en">Relational Synthesis Algorithms (11.2 &amp; 11.4)</template>
+          <span class="content-target">خوارزميات التوليف العلائقي (11.2 و 11.4)</span>
+        </span>
+      </h2>
+    </div>
+
+    <div class="depth-tabs">
+      <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+      <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    </div>
+
+    <div class="depth-layer active" data-layer="flash" data-bilingual>
+      <template class="content-ar"><p>خوارزميات تبني جداول قاعدة البيانات من الأسفل إلى الأعلى (Bottom-up) باستخدام الاعتماديات الدالية، لضمان الوصول إلى 3NF مع حفظ الاعتماديات.</p></template>
+      <template class="content-en"><p>Algorithms that build database tables from the bottom up using functional dependencies, ensuring 3NF and dependency preservation.</p></template>
+      <div class="content-target"><p>خوارزميات تبني جداول قاعدة البيانات من الأسفل إلى الأعلى (Bottom-up) باستخدام الاعتماديات الدالية، لضمان الوصول إلى 3NF مع حفظ الاعتماديات.</p></div>
+    </div>
+    <div class="depth-layer" data-layer="full" data-bilingual>
+      <template class="content-ar"><p><b>خوارزمية 11.2 (<span class="smart-term" data-term-en="Relational Synthesis" data-ar="التوليف العلائقي" data-en-def="A bottom-up database design approach that constructs relations directly from a set of functional dependencies.">التوليف العلائقي<span class="smart-term-tooltip"></span></span> إلى 3NF):</b></p><ol><li>أوجد <span class="smart-term" data-term-en="Minimal Cover" data-ar="الغطاء الأدنى" data-en-def="A simplified, equivalent set of functional dependencies with no redundancies, used as the starting point for synthesis algorithms.">الغطاء الأدنى<span class="smart-term-tooltip"></span></span> (Minimal Cover) $G$ للاعتماديات $F$.</li><li>لكل طرف أيسر $X$ في $G$، أنشئ مخطط علاقة يحتوي على $X$ وجميع السمات التي يحددها: $\{X \cup A_1 \cup ... \cup A_k\}$.</li><li>ضع أي سمات متبقية لم تُخصص في مخطط علاقة منفرد.</li></ol><p><b>خوارزمية 11.4 (3NF مع الربط غير الفاقد):</b></p><ol><li>طبق الخوارزمية 11.2 للحصول على مجموعة علاقات في 3NF.</li><li>إذا لم تكن أي من العلاقات الناتجة تحتوي على مفتاح مرشح للعلاقة الأصلية $R$، قم بإنشاء علاقة إضافية تحتوي على سمات مفتاح لـ $R$.</li></ol><p><b>خوارزمية 11.4a (إيجاد المفتاح):</b> ابدأ بـ $K = R$. لكل سمة $A$ في $K$، احسب الانغلاق $(K - A)^+$. إذا كان الانغلاق يحتوي على جميع سمات $R$، احذف $A$ من $K$. كرر حتى يصبح $K$ أصغرياً.</p></template>
+      <template class="content-en"><p><b>Algorithm 11.2 (<span class="smart-term" data-term-en="Relational Synthesis" data-ar="التوليف العلائقي" data-en-def="A bottom-up database design approach that constructs relations directly from a set of functional dependencies.">Relational Synthesis<span class="smart-term-tooltip"></span></span> into 3NF):</b></p><ol><li>Find a <span class="smart-term" data-term-en="Minimal Cover" data-ar="الغطاء الأدنى" data-en-def="A simplified, equivalent set of functional dependencies with no redundancies, used as the starting point for synthesis algorithms.">minimal cover<span class="smart-term-tooltip"></span></span> $G$ for the functional dependencies $F$.</li><li>For each left-hand-side $X$ in $G$, create a relation schema containing $X$ and all attributes it determines: $\{X \cup A_1 \cup ... \cup A_k\}$.</li><li>Place any remaining unassigned attributes in a single relation schema.</li></ol><p><b>Algorithm 11.4 (3NF with Lossless Join):</b></p><ol><li>Apply Algorithm 11.2 to get a set of 3NF relations.</li><li>If none of the created relations contains a candidate key of the universal relation $R$, create one additional relation containing the attributes of a key for $R$.</li></ol><p><b>Algorithm 11.4a (Finding a Key):</b> Start with $K = R$. For each attribute $A$ in $K$, compute the closure $(K - A)^+$. If the closure contains all attributes of $R$, remove $A$ from $K$. Repeat until $K$ is minimal.</p></template>
+      <div class="content-target"><p><b>خوارزمية 11.2 (<span class="smart-term" data-term-en="Relational Synthesis" data-ar="التوليف العلائقي" data-en-def="A bottom-up database design approach that constructs relations directly from a set of functional dependencies.">التوليف العلائقي<span class="smart-term-tooltip"></span></span> إلى 3NF):</b></p><ol><li>أوجد <span class="smart-term" data-term-en="Minimal Cover" data-ar="الغطاء الأدنى" data-en-def="A simplified, equivalent set of functional dependencies with no redundancies, used as the starting point for synthesis algorithms.">الغطاء الأدنى<span class="smart-term-tooltip"></span></span> (Minimal Cover) $G$ للاعتماديات $F$.</li><li>لكل طرف أيسر $X$ في $G$، أنشئ مخطط علاقة يحتوي على $X$ وجميع السمات التي يحددها: $\{X \cup A_1 \cup ... \cup A_k\}$.</li><li>ضع أي سمات متبقية لم تُخصص في مخطط علاقة منفرد.</li></ol><p><b>خوارزمية 11.4 (3NF مع الربط غير الفاقد):</b></p><ol><li>طبق الخوارزمية 11.2 للحصول على مجموعة علاقات في 3NF.</li><li>إذا لم تكن أي من العلاقات الناتجة تحتوي على مفتاح مرشح للعلاقة الأصلية $R$، قم بإنشاء علاقة إضافية تحتوي على سمات مفتاح لـ $R$.</li></ol><p><b>خوارزمية 11.4a (إيجاد المفتاح):</b> ابدأ بـ $K = R$. لكل سمة $A$ في $K$، احسب الانغلاق $(K - A)^+$. إذا كان الانغلاق يحتوي على جميع سمات $R$، احذف $A$ من $K$. كرر حتى يصبح $K$ أصغرياً.</p></div>
+    </div>
+  </article>
 </section>
 
 
@@ -1623,7 +1769,7 @@
     </p>
   </div>
 
-  <article class="concept-card glass-card fade-up" id="database-security-threats-countermeasures">
+  <article class="concept-card glass-card fade-up" id="database-security-threats-countermeasures" data-study-s="77">
     <div class="concept-header">
       <h2>
         <span class="concept-number">13.1</span>
@@ -1652,7 +1798,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="dba-and-auditing">
+  <article class="concept-card glass-card fade-up" id="dba-and-auditing" data-study-s="72">
     <div class="concept-header">
       <h2>
         <span class="concept-number">13.2</span>
@@ -1681,7 +1827,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="discretionary-access-control-dac">
+  <article class="concept-card glass-card fade-up" id="discretionary-access-control-dac" data-study-s="82">
     <div class="concept-header">
       <h2>
         <span class="concept-number">13.3</span>
@@ -1710,7 +1856,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="mandatory-access-control-mac">
+  <article class="concept-card glass-card fade-up" id="mandatory-access-control-mac" data-study-s="87">
     <div class="concept-header">
       <h2>
         <span class="concept-number">13.4</span>
@@ -1739,7 +1885,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="multilevel-relations-polyinstantiation">
+  <article class="concept-card glass-card fade-up" id="multilevel-relations-polyinstantiation" data-study-s="170">
     <div class="concept-header">
       <h2>
         <span class="concept-number">13.5</span>
@@ -1777,7 +1923,7 @@
     </div>
   </article>
 
-  <article class="concept-card glass-card fade-up" id="role-based-access-control-rbac">
+  <article class="concept-card glass-card fade-up" id="role-based-access-control-rbac" data-study-s="78">
     <div class="concept-header">
       <h2>
         <span class="concept-number">13.6</span>

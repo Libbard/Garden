@@ -695,12 +695,6 @@
   }
 
   /*@3.COUJ.35*/
-  var EV_AR = { instructor: 'تغيّر الأستاذ', room: 'تغيّرت القاعة', time: 'تغيّر وقت المحاضرة',
-                exam: 'تغيّرت مواعيد الاختبارات', seats: 'تغيّرت المقاعد', added: 'أُضيفت الشعبة',
-                removed: 'اختفت الشعبة', status: 'تغيّرت الحالة' };
-  var EV_EN = { instructor: 'Instructor changed', room: 'Room changed', time: 'Class time changed',
-                exam: 'Exam dates changed', seats: 'Seats changed', added: 'Section added',
-                removed: 'Section removed', status: 'Status changed' };
 
   function loadHistory(crn) {
     var box = el('crs-hist');
@@ -726,12 +720,10 @@
             esc(L('لا تغييراتٍ مرصودة', 'No changes recorded')) + '</span></span></div>';
         } else {
           h += '<ul class="crs-tl">' + evs.slice(0, 12).map(function (e) {
-            var lbl = (isAr() ? EV_AR : EV_EN)[e.kind] || e.kind;
+            var SE = window.GardenSecEvents;
             return '<li><span class="crs-tl-when">' + esc(fmtDate(e.at)) + '</span>' +
-              '<span class="crs-tl-what"><b>' + esc(lbl) + '</b>' +
-              (e.from != null && e.to != null
-                ? '<span class="ltr">' + esc(String(e.from)) + ' ← ' + esc(String(e.to)) + '</span>' : '') +
-              '</span></li>';
+              '<span class="crs-tl-what"><b>' + esc(SE ? SE.label(e.kind) : e.kind) + '</b>' +
+              (SE ? SE.detail(e) : '') + '</span></li>';
           }).join('') + '</ul>';
         }
         h += '<div style="margin-top:.7rem"><a class="crs-btn" href="sections.html">' +

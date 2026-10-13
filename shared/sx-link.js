@@ -424,6 +424,36 @@
       return 'update';
     }
 
+    /*@3.SXLJ.74*/
+    var ask = !!opts.ask;
+    if (!d.sx_offers || typeof d.sx_offers !== 'object') d.sx_offers = {};
+    function dropOffer(cur) {
+      if (cur && cur.id && d.sx_offers[cur.id]) { delete d.sx_offers[cur.id]; snapStamped = true; }
+    }
+    function propose(cur, fresh, snapOf, kind, crn, keys, apply) {
+      if (!cur.sx_crn || !cur.sx_snap || !cur.id) return reconcile(cur, fresh, snapOf, apply);
+      var fs = snapOf(fresh), stored = cur.sx_snap;
+      if (snapOf(cur) === fs) {
+        if (stored !== fs) { cur.sx_snap = fs; snapStamped = true; }
+        if (cur.sx_declined) { delete cur.sx_declined; snapStamped = true; }
+        dropOffer(cur);
+        return 'same';
+      }
+      if (stored === fs || cur.sx_declined === fs) { dropOffer(cur); return 'keep'; }
+      var from = {}, to = {};
+      keys.forEach(function (k) { from[k] = cur[k] == null ? '' : cur[k]; to[k] = fresh[k] == null ? '' : fresh[k]; });
+      var was = d.sx_offers[cur.id];
+      if (!was || was.snap !== fs) {
+        d.sx_offers[cur.id] = { id: cur.id, kind: kind, crn: crn, code: cur.course_code || fresh.course_code,
+                                from: from, to: to, snap: fs, at: new Date().toISOString() };
+        snapStamped = true;
+      }
+      rep.offers = (rep.offers || 0) + 1;
+      return 'offer';
+    }
+    var LEC_KEYS = ['day', 'start_time', 'end_time', 'room', 'attendance', 'kind'];
+    var EX_KEYS = ['date', 'start_time', 'end_time', 'room', 'exam_type'];
+
     /*@3.SXLJ.24*/
     function describeLec(cur, fresh) {
       var bits = [];
@@ -469,12 +499,14 @@
           if (l.start_date && cur.start_date !== l.start_date) { cur.start_date = l.start_date; snapStamped = true; }
           if (l.end_date && cur.end_date !== l.end_date) { cur.end_date = l.end_date; snapStamped = true; }
         }
-        var verdict = reconcile(cur, l, lecSnap, function (c, fresh) {
+        var applyLec = function (c, fresh) {
           c.day = fresh.day;
           c.start_time = fresh.start_time; c.end_time = fresh.end_time;
           c.room = fresh.room; c.attendance = fresh.attendance; c.kind = fresh.kind;
           /*@3.SXLJ.25*/
-        });
+        };
+        var verdict = (ask && cur) ? propose(cur, l, lecSnap, 'lec', crn, LEC_KEYS, applyLec)
+                                   : reconcile(cur, l, lecSnap, applyLec);
         if (verdict === 'add') {
           d.lectures.push(l); claimed.push(l); added++; touched++; rep.added++;
         } else if (verdict === 'update') {
@@ -500,11 +532,13 @@
           d.exams.push(x); claimed.push(x); added++; touched++; exAdded++;
           return;
         }
-        var v = reconcile(cur, x, exSnap, function (c, fresh) {
+        var applyEx = function (c, fresh) {
           c.date = fresh.date;
           c.start_time = fresh.start_time; c.end_time = fresh.end_time;
           c.room = fresh.room; c.exam_type = fresh.exam_type;
-        });
+        };
+        var v = ask ? propose(cur, x, exSnap, 'exam', crn, EX_KEYS, applyEx)
+                    : reconcile(cur, x, exSnap, applyEx);
         if (v === 'update') { rep.updated++; added++; touched++; }
         else if (v === 'adopt') { touched++; }
         else if (v === 'keep') {
@@ -874,6 +908,81 @@
     }).catch(function () { return null; });
   }
 
+  /*@3.SXLJ.75*/
+  function offers() {
+    var d = schLoad();
+    var o = (d && d.sx_offers && typeof d.sx_offers === 'object') ? d.sx_offers : {};
+    var live = {};
+    (d ? d.lectures.concat(d.exams) : []).forEach(function (r) { if (r && r.id) live[r.id] = 1; });
+    return Object.keys(o).map(function (k) { return o[k]; })
+      .filter(function (x) { return x && live[x.id]; })
+      .sort(function (a, b) { return String(a.code).localeCompare(String(b.code)) || (a.kind === 'exam' ? -1 : 1); });
+  }
+
+  /*@3.SXLJ.76*/
+  function decide(id, accept, stop) {
+    var d = schLoad();
+    var o = d && d.sx_offers && d.sx_offers[id];
+    if (!o) return false;
+    var list = o.kind === 'exam' ? d.exams : d.lectures;
+    var r = null;
+    list.forEach(function (x) { if (x && x.id === id) r = x; });
+    if (r) {
+      if (accept) {
+        Object.keys(o.to).forEach(function (k) { r[k] = o.to[k]; });
+        r.sx_snap = o.snap;
+        delete r.sx_declined;
+      } else {
+        r.sx_declined = o.snap;
+      }
+    }
+    delete d.sx_offers[id];
+    if (stop && o.crn) {
+      var what = o.kind === 'exam' ? 'exams' : 'lectures';
+      if (!d.sx_optout || typeof d.sx_optout !== 'object') d.sx_optout = {};
+      var prev = optScope(d, o.crn);
+      d.sx_optout[String(o.crn)] = { at: new Date().toISOString(),
+                                     scope: (prev && prev !== what) ? 'all' : what };
+      Object.keys(d.sx_offers).forEach(function (k) {
+        var x = d.sx_offers[k];
+        if (x && String(x.crn) === String(o.crn) && x.kind === o.kind) delete d.sx_offers[k];
+      });
+    }
+    if (!Object.keys(d.sx_offers).length) delete d.sx_offers;
+    return schSave(d);
+  }
+
+  /*@3.SXLJ.77*/
+  var _refP = null;
+  function refresh() {
+    if (_refP) return _refP;
+    var d = schLoad();
+    if (!d || !API) return Promise.resolve({ offers: offers().length });
+    var byTerm = {};
+    d.lectures.concat(d.exams).forEach(function (r) {
+      if (!r || !r.sx_crn || !r.sx_term) return;
+      if (optBlocks(d, r.sx_crn, 'lectures') && optBlocks(d, r.sx_crn, 'exams')) return;
+      var b = byTerm[r.sx_term] || (byTerm[r.sx_term] = []);
+      if (b.indexOf(String(r.sx_crn)) < 0) b.push(String(r.sx_crn));
+    });
+    if (!Object.keys(byTerm).length) return Promise.resolve({ offers: offers().length });
+    _refP = terms().then(function (ts) {
+      var jobs = ts.filter(function (x) { return isLive(x) && byTerm[x.term]; }).map(function (x) {
+        var crns = byTerm[x.term].slice(0, 16);
+        return fetch(API + '/v1/catalog/' + x.term + '/pick?crn=' + crns.join(','))
+          .then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (j) {
+            var secs = (j && Array.isArray(j.sections)) ? j.sections : [];
+            if (secs.length) register(secs, { term: x.term, live: true, pending: false, updateOnly: true, ask: true });
+          });
+      });
+      return Promise.all(jobs);
+    }).then(function () { return { offers: offers().length }; },
+            function () { return { offers: offers().length, error: true }; })
+      .then(function (r) { _refP = null; return r; });
+    return _refP;
+  }
+
   /*@3.SXLJ.38*/
   window.GardenSXLink = {
     SCH_KEY: SCH_KEY,
@@ -886,6 +995,7 @@
     hasAnywhere: hasAnywhere, linked: linked, registered: registered, crnsOfCourse: crnsOfCourse,
     forgetPick: forgetPick, conflicts: conflicts, keepOnly: keepOnly,
     register: register, unregister: unregister,
+    offers: offers, decide: decide, refresh: refresh,
     optScope: function (crn) { return optScope(schLoad() || {}, crn); },
     setOptOut: setOptOut, clearOptOut: clearOptOut,
     optOuts: function () { return optOuts(schLoad() || {}); },

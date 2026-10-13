@@ -1323,7 +1323,7 @@
     /*@3.SECJ.482*/
     crns = crns.filter(function (c) { return schLinked(c); });
     if (!crns.length) return null;
-    schRegister(crns, { pending: false, noAdopt: true, updateOnly: true });
+    schRegister(crns, { pending: false, noAdopt: true, updateOnly: true, ask: true });
     return schRegister.lastReport || null;
   }
 
@@ -1333,13 +1333,17 @@
     var parts = [];
     if (rep.updated) parts.push(t('حُدِّث ' + rep.updated + ' موعداً من بانر',
                                   rep.updated + ' entr' + (rep.updated > 1 ? 'ies' : 'y') + ' updated from Banner'));
+    if (rep.offers) parts.push(t(rep.offers === 1 ? 'موعدٌ تغيّر في بانر — راجعه في جدولك'
+                                                  : rep.offers + ' مواعيد تغيّرت في بانر — راجعها في جدولك',
+                                 rep.offers === 1 ? 'A time changed in Banner — review it in your schedule'
+                                                  : rep.offers + ' times changed in Banner — review them in your schedule'));
     if (rep.kept.length) parts.push(t(rep.kept.length + ' عدّلتَها بيدك وبانر يقول غيرَها',
                                       rep.kept.length + ' you edited — Banner differs'));
     if (rep.quarantined) parts.push(t('أُبعد ' + rep.quarantined + ' موعداً دخل جدولَك من فصلٍ آخر',
                                       rep.quarantined + ' entr' + (rep.quarantined > 1 ? 'ies' : 'y') +
                                       ' from another term moved out of your schedule'));
     if (!parts.length) return;
-    var sig = 'sxrec:' + rep.updated + ':' + (rep.quarantined || 0) + ':' + rep.kept.map(function (k) { return k.crn + k.why; }).join(',');
+    var sig = 'sxrec:' + rep.updated + ':' + (rep.offers || 0) + ':' + (rep.quarantined || 0) + ':' + rep.kept.map(function (k) { return k.crn + k.why; }).join(',');
     try {
       if (sessionStorage.getItem('sx_rec_sig') === sig) return;
       sessionStorage.setItem('sx_rec_sig', sig);
@@ -1727,20 +1731,6 @@
   function closeModal() { $('#sx-modal').classList.remove('on'); _open = null; }
   var _open = null;   /*@3.SECJ.136*/
 
-  /*@3.SECJ.137*/
-  var EV_AR = {
-    seats: 'تغيّرت المقاعد', capacity: 'تغيّر سقف الشعبة',
-    faculty: 'تغيّر الأستاذ', mode: 'تغيّرت طريقة الحضور',
-    'class': 'تغيّر وقت المحاضرة', exam: 'تغيّر موعد اختبار',
-    appeared: 'ظهرت في البانر', vanished: 'اختفت من البانر',
-    returned: 'عادت للظهور', room: 'تغيّرت القاعة'
-  };
-  var EV_EN = {
-    seats: 'Seats changed', capacity: 'Capacity changed', faculty: 'Instructor changed',
-    mode: 'Delivery mode changed', 'class': 'Class time changed', exam: 'Exam moved',
-    appeared: 'Appeared in Banner', vanished: 'Disappeared from Banner',
-    returned: 'Reappeared', room: 'Room changed'
-  };
   var VERDICT = {
     split:     { ar: 'قُسِّمت غالباً إلى شعبٍ أخرى', en: 'Likely split into other sections', cls: 'warn' },
     replaced:  { ar: 'استُبدلت بشعبةٍ أخرى غالباً',  en: 'Likely replaced by another section', cls: 'warn' },
@@ -1835,9 +1825,9 @@
            t('لا تغييرات مرصودة على هذه الشعبة', 'No changes recorded') + '</div>';
     } else {
       h += '<ul class="sx-tl">' + evs.map(function (e) {
-        var lbl = (ar ? EV_AR : EV_EN)[e.kind] || e.kind;
+        var lbl = SE().label(e.kind);
         return '<li><span class="sx-tl-when">' + esc(when(e.at)) + '</span>' +
-               '<span class="sx-tl-what"><b>' + esc(lbl) + '</b>' + detail(e) + '</span></li>';
+               '<span class="sx-tl-what"><b>' + esc(lbl) + '</b>' + SE().detail(e) + '</span></li>';
       }).join('') + '</ul>';
     }
     return h;
@@ -1863,63 +1853,7 @@
     } catch (e) { return ''; }
   }
 
-  /*@3.SECJ.493*/
-  var MEET_LBL = { MEXM: ['ميد', 'Mid'], FEXM: ['فاينل', 'Final'], CLAS: ['حضوري', 'On campus'], VRTL: ['عن بعد', 'Remote'] };
-  function meetTxt(m, exam) {
-    if (!m) return '';
-    if (exam) return dt(m.start_date) + (m.begin ? ' · ' + examWord(m.begin) : '');
-    return dayList(m.days) + ' ' + hhmm(m.begin) + '–' + hhmm(m.end);
-  }
-  function meetDiff(kind, b, a) {
-    var exam = kind === 'exam';
-    var types = [];
-    b.concat(a).forEach(function (m) { if (m && m.type && types.indexOf(m.type) < 0) types.push(m.type); });
-    var out = types.map(function (ty) {
-      var bs = b.filter(function (m) { return m && m.type === ty; }).map(function (m) { return meetTxt(m, exam); });
-      var as = a.filter(function (m) { return m && m.type === ty; }).map(function (m) { return meetTxt(m, exam); });
-      var gone = bs.filter(function (x) { return as.indexOf(x) < 0; });
-      var added = as.filter(function (x) { return bs.indexOf(x) < 0; });
-      if (!gone.length && !added.length) return '';
-      var l = MEET_LBL[ty];
-      var row = '<span class="sx-tl-diff"><em>' + esc(l ? t(l[0], l[1]) : ty) + '</em> ';
-      if (gone.length) row += '<s>' + esc(gone.join('، ')) + '</s>';
-      if (gone.length && added.length) row += ' ← ';
-      if (added.length) row += '<b>' + esc(added.join('، ')) + '</b>';
-      if (!added.length) row += ' <i>' + esc(t('أُزيل', 'removed')) + '</i>';
-      else if (!b.length) row += ' <i>' + esc(t('أوّلُ نشر', 'first published')) + '</i>';
-      else if (!gone.length) row += ' <i>' + esc(t('جديد', 'new')) + '</i>';
-      return row + '</span>';
-    }).join('');
-    return out;
-  }
-
-  function detail(e) {
-    var b = e.before, a = e.after;
-    if (e.kind === 'seats' && a) return ' — ' + t('المتاح', 'available') + ': ' + esc(a.avail);
-    if (e.kind === 'capacity' && a && b) return ' — ' + esc(b.max) + ' ← ' + esc(a.max);
-    if (e.kind === 'faculty') {
-      return ' — ' + esc(((b || []).join('، ') || t('بلا أستاذ', 'none'))) +
-             ' ← ' + esc(((a || []).join('، ') || t('بلا أستاذ', 'none')));
-    }
-    if (e.kind === 'mode' && a) {
-      return ' — ' + (a.in_person ? t('صارت حضورية', 'now on campus')
-                                  : t('صارت عن بعد', 'now remote'));
-    }
-    /*@3.SECJ.140*/
-    if (e.kind === 'room' && a) {
-      var rr = [];
-      var at = a.at || {};
-      for (var k in at) if (at[k] && at[k].room) rr.push(at[k].room);
-      var lbl = a.move === 'assigned' ? t('تعيّنت', 'assigned')
-              : a.move === 'cleared'  ? t('رُفعت', 'cleared') : t('تبدّلت', 'changed');
-      return ' — ' + lbl + (rr.length ? ': ' + esc(rr.join('، ')) : '');
-    }
-    /*@3.SECJ.494*/
-    if ((e.kind === 'exam' || e.kind === 'class') && (Array.isArray(b) || Array.isArray(a))) {
-      return meetDiff(e.kind, Array.isArray(b) ? b : [], Array.isArray(a) ? a : []);
-    }
-    return '';
-  }
+  function SE() { return window.GardenSecEvents; }
 
   /*@3.SECJ.141*/
   function GW() { return window.GardenWatch; }

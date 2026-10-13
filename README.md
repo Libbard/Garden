@@ -25,11 +25,11 @@
 
 | | |
 |---:|:---|
-| **٨٢** | مقرَّراً — ‏٢٤ في علوم الحاسب و‏٢٤ في تقنية المعلومات و‏٢٢ في علوم البيانات، ومعها ‏١٢ عامّةً وداعمة |
-| **١٬٠٢٩** | وحدةً دراسيةً مشروحة |
-| **٦٬٨٧٤** | مفهوماً بثلاثة أعماق: سريعٌ وكاملٌ وعميق |
-| **١٧٬٠١٧** | بطاقةَ مراجعةٍ بالتكرار المتباعد |
-| **٨٩٬٠٦١** | سؤالاً — ‏٥٣٬٤٥٠ اختيارٍ من متعدّد و‏٢٥٬٣١٩ مقاليّاً و‏١٠٬٢٩٢ داخل الوحدات |
+| **٩٠** | مقرَّراً — ‏٢٦ في علوم الحاسب و‏٢٦ في تقنية المعلومات و‏٢٦ في علوم البيانات، ومعها ‏١٢ عامّةً وداعمة |
+| **١٬٠٥٥** | وحدةً دراسيةً مشروحة |
+| **٧٬٦٨١** | مفهوماً بثلاثة أعماق: سريعٌ وكاملٌ وعميق |
+| **١٩٬٥٣٤** | بطاقةَ مراجعةٍ بالتكرار المتباعد |
+| **٩٨٬٥٢٨** | سؤالاً — ‏٥٩٬٤١٢ اختيارٍ من متعدّد و‏٢٥٬٩٦٩ مقاليّاً و‏١٣٬١٤٧ داخل الوحدات |
 | **٤٬٧٣٦** | مصطلحاً ذكياً يُعرَّف بلمسة، في ‏٧٬٦٣٢ موضعاً |
 | **٢٬٨٧١** | مخطَّطاً تفاعلياً (SVG) |
 | **٦٬١٩٤** | فيديو مُنتقىً عبر ٦٨٧ وحدة |
@@ -181,7 +181,7 @@ root/
 
 **Digital Garden** is a free, bilingual (Arabic / English) study platform for Computer Science,
 Information Technology and Data Science students at PMAU (جامعة الأمير مساعد بن عبدالرحمن, formerly
-the Saudi Electronic University): 82 courses and 1,029 units with explanations at three depths,
+the Saudi Electronic University): 90 courses and 1,055 units with explanations at three depths,
 spaced-repetition flashcards, quizzes, a custom test builder with midterm and final simulations, thirteen
 brain games (Sudoku, 2048, Minesweeper, Solitaire and more), a notes app with PDF annotation, pen input and a colouring
 studio, site-wide search, a schedule, GPA calculator, section finder, sixteen skins that redraw the
