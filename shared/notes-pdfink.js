@@ -1026,7 +1026,7 @@
       if (s.n !== L.n) return;
       L.b = { x: s.x, y: s.y };
       L.rects = this.markRects(L.n, L.a, L.b, L.mode);
-      if (!L.rects) L.rects = this.wordRects(L.n, L.a, L.mode);
+      if (!L.rects || !L.rects.length) { L.rects = null; this.clearPreview(L.n); return; }
       this.previewMark(L.n, L.rects, L.c, L.u);
       return;
     }
@@ -1073,7 +1073,14 @@
       this.clearPreview(L.n);
       var rr = L.rects || this.markRects(L.n, L.a, L.b, L.mode);
       /*@3.NOPJ8.86*/
-      if (!rr || !rr.length) rr = this.wordRects(L.n, L.a, L.mode);
+      if (!rr || !rr.length) {
+        /*@3.NOPJ8.200*/
+        var now = Date.now(), pv = this._tap;
+        this._tap = { n: L.n, x: L.a.x, y: L.a.y, t: now };
+        if (!(pv && pv.n === L.n && now - pv.t < 450 && Math.abs(pv.x - L.a.x) < 8 && Math.abs(pv.y - L.a.y) < 8)) { this.beat(); return false; }
+        this._tap = null;
+        rr = this.wordRects(L.n, L.a, L.mode);
+      }
       if (keep && rr && rr.length) {
         if (this.face) {
           this.face.used = { tool: 'hi', color: this.face.color,
@@ -2428,6 +2435,11 @@
     return null;
   }
 
+  function glyphHit(c, x, y) {
+    var V = window.GardenPdfView, g = V && V.glyphAt && c && c.node && c.node.nodeType === 3 ? V.glyphAt(c.node, x) : null;
+    return g || charHit(c, x, y);
+  }
+
   function spanOf(c1, x1, y1, c2, x2, y2) {
     var rg = document.createRange();
     try {
@@ -2436,7 +2448,7 @@
       if (c1.node === c2.node && c1.offset === c2.offset) return rg;
       var back = rg.collapsed;
       var e0 = back ? c2 : c1, e1 = back ? c1 : c2;
-      var h0 = charHit(e0, back ? x2 : x1, back ? y2 : y1), h1 = charHit(e1, back ? x1 : x2, back ? y1 : y2);
+      var h0 = glyphHit(e0, back ? x2 : x1, back ? y2 : y1), h1 = glyphHit(e1, back ? x1 : x2, back ? y1 : y2);
       rg.setStart(e0.node, h0 ? h0.a : e0.offset);
       rg.setEnd(e1.node, h1 ? h1.b : e1.offset);
     } catch (e) { return null; }
@@ -2595,7 +2607,7 @@
     var rg = spanOf(c1, base.left + pa.x, base.top + pa.y, c2, base.left + pb.x, base.top + pb.y);
     if (!rg) return null;
     if (rg.collapsed) return null;
-    var list = rg.getClientRects();
+    var list = inkRects(rg);
     if (!list || !list.length) return null;
     var boxes = V.merge(list, base.left, base.top);
     if (!boxes.length) return null;
@@ -2849,6 +2861,14 @@
       var sub = node.ownerDocument.createRange();
       try { sub.setStart(node, a); sub.setEnd(node, b); } catch (e) { continue; }
       var rs = sub.getClientRects();
+      var V = window.GardenPdfView, gl = V && V.glyphX ? V.glyphX(node, a) : null, gr = V && V.glyphX ? V.glyphX(node, b) : null;
+      if (gl != null && gr != null && gr > gl && rs.length) {
+        var tp = Infinity, bt = -Infinity;
+        for (i = 0; i < rs.length; i++) { if (rs[i].top < tp) tp = rs[i].top; if (rs[i].bottom > bt) bt = rs[i].bottom; }
+        out.push({ left: gl, right: gr, top: tp, bottom: bt, x: gl, y: tp, width: gr - gl, height: bt - tp });
+        any = true;
+        continue;
+      }
       for (i = 0; i < rs.length; i++) if (rs[i].width > 0 && rs[i].height > 0) { out.push(rs[i]); any = true; }
     }
     return any ? out : rg.getClientRects();
@@ -2899,12 +2919,13 @@
       var c = caretInRun(td, base, run, px, py);
       if (lift) lift.style.pointerEvents = was || '';
       if (!c || !c.node || c.node.nodeType !== 3) return null;
-      var w = wordSpan(c.node, c.offset);
+      var gw = V.glyphAt ? V.glyphAt(c.node, base.left + px) : null;
+      var w = wordSpan(c.node, gw ? gw.a : c.offset);
       if (!w) return null;
       try { rg.setStart(c.node, w.a); rg.setEnd(c.node, w.b); } catch (e2) { return null; }
     }
     if (rg.collapsed) return null;
-    var list = rg.getClientRects();
+    var list = inkRects(rg);
     if (!list || !list.length) return null;
     var boxes = V.merge(list, base.left, base.top), keep = [], i;
     for (i = 0; i < boxes.length; i++) if (hitRun(run, boxes[i])) keep.push(boxes[i]);

@@ -2108,6 +2108,13 @@
     }
     return true;
   }
+  /*@3.NOCJ.143*/
+  function dblTap(cv, st) {
+    var now = Date.now(), p0 = st.pts[0], pv = cv._tap, z = (cv.cam && cv.cam.z) || 1;
+    cv._tap = { x: p0.x, y: p0.y, t: now };
+    if (pv && now - pv.t < 450 && Math.abs(pv.x - p0.x) * z < 12 && Math.abs(pv.y - p0.y) * z < 12) { cv._tap = null; return true; }
+    return false;
+  }
   function wordMark(cv, st) {
     var lines = null;
     try { lines = cv.snapWord(st.pts[0]); } catch (eW) { lines = null; }
@@ -2748,6 +2755,7 @@
         if (st.ty === 'st' && st.hi) {
           var snapped = false;
           /*@3.NOCJ.131*/
+          if (self.hiMode === 'text' && self.snapLines && tapWord(self, st) && !dblTap(self, st)) { self.paintWet(); return; }
           if (self.hiMode === 'text' && self.snapLines && (tapWord(self, st) || st.pts.length > 1)) {
             var lines = tapWord(self, st) ? wordMark(self, st) : textMark(self, st);
             delete st._lines;

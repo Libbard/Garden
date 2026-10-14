@@ -29,7 +29,7 @@
   function load(src, opts) {
     var o = opts || {};
     return lib().then(function (m) {
-      var args = { isEvalSupported: false, disableAutoFetch: false };
+      var args = { isEvalSupported: false, disableAutoFetch: false, fontExtraProperties: true };
       if (typeof src === 'string') args.url = src;
       else args.data = src;
       if (o.password) args.password = o.password;
@@ -868,8 +868,10 @@
       viewport: vp
     });
     s.tl = tl;
-    tl.render().then(function () {
+    var items = s.page.getTextContent({ includeMarkedContent: false }).then(function (c) { return c.items; }, function () { return null; });
+    Promise.all([tl.render(), items]).then(function (two) {
       if (self.dead || gen !== self.gen || !self.slots[n]) return;
+      tagFonts(tl, two[1], s.page);
       /*@3.NOPJ3.25*/
       var eoc = document.createElement('div');
       eoc.className = 'endOfContent';
@@ -883,6 +885,81 @@
       self.onSel();
     }).catch(function () { if (self.slots[n]) self.slots[n].tbusy = 0; });
   };
+
+  /*@3.NOPJ3.81*/
+  function tagFonts(tl, items, page) {
+    var divs = tl && tl.textDivs, strs = tl && tl.textContentItemsStr;
+    if (!divs || !items || !strs) return;
+    var v = page.view || [0, 0, 0, 0], pw = (page.rotate || 0) % 180 ? (v[3] - v[1]) : (v[2] - v[0]);
+    for (var i = 0, j = 0; i < strs.length && j < items.length; i++, j++) {
+      while (j < items.length && items[j].str !== strs[i]) j++;
+      var it = items[j], sp = divs[i];
+      if (!it || !sp) continue;
+      var tr = it.transform || [];
+      if (it.dir === 'rtl' || Math.abs(tr[1] || 0) > 0.01 || Math.abs(tr[2] || 0) > 0.01) continue;
+      sp.__pg = page; sp.__fn = it.fontName; sp.__w = it.width; sp.__fs = Math.abs(tr[3] || tr[0] || 0); sp.__pw = pw;
+    }
+  }
+
+  function invOf(f) {
+    if (f.__inv !== undefined) return f.__inv;
+    var tu = f.toUnicode, inv = null, k;
+    if (tu && Array.isArray(tu._map)) {
+      inv = {};
+      for (k = 0; k < tu._map.length; k++) { var u = tu._map[k]; if (typeof u === 'string' && u.length === 1 && inv[u] == null) inv[u] = k; }
+    } else if (tu && tu.firstChar != null && tu.lastChar != null) {
+      inv = {};
+      for (k = tu.firstChar; k <= tu.lastChar; k++) inv[String.fromCharCode(k)] = k;
+    }
+    f.__inv = inv;
+    return inv;
+  }
+
+  function advOf(sp) {
+    if (sp.__adv) return sp.__adv;
+    if (!sp.__pg || !sp.__fn || !(sp.__w > 0) || !(sp.__fs > 0)) return null;
+    var f = null;
+    try { if (sp.__pg.commonObjs.has(sp.__fn)) f = sp.__pg.commonObjs.get(sp.__fn); } catch (e) { f = null; }
+    if (!f || !f.widths) return null;
+    var inv = invOf(f), str = sp.textContent || '', pre = [0], got = 0, miss = 0, k, ws = [];
+    if (!inv) return null;
+    for (k = 0; k < str.length; k++) {
+      var code = inv[str.charAt(k)], w = code != null ? f.widths[code] : null;
+      if (w == null || !(w >= 0)) {
+        if (!/\s/.test(str.charAt(k))) { sp.__pg = null; return null; }
+        ws.push(null); miss++;
+      } else { ws.push(w * sp.__fs / 1000); got += w * sp.__fs / 1000; }
+    }
+    var gap = miss ? Math.max(0, sp.__w - got) / miss : 0, tot = 0;
+    for (k = 0; k < ws.length; k++) { tot += ws[k] == null ? gap : ws[k]; pre.push(tot); }
+    if (!(tot > 0)) return null;
+    sp.__adv = pre;
+    return pre;
+  }
+
+  function glyphX(node, k) {
+    var sp = node && node.parentNode;
+    if (!sp || node.nodeType !== 3 || !sp.classList || !sp.parentNode || !sp.parentNode.classList || !sp.parentNode.classList.contains('gpv-text')) return null;
+    var pre = advOf(sp), u = pre && unit(sp);
+    if (!u || k < 0 || k >= pre.length) return null;
+    return sp.getBoundingClientRect().left + pre[k] * u;
+  }
+
+  function unit(sp) {
+    var td = sp.parentNode, w = td && td.getBoundingClientRect().width;
+    return (w > 0 && sp.__pw > 0) ? w / sp.__pw : null;
+  }
+
+  function glyphAt(node, x) {
+    var sp = node && node.parentNode, pre = sp && advOf(sp), u = pre && unit(sp);
+    if (!u) return null;
+    var l = sp.getBoundingClientRect().left, k;
+    for (k = 0; k < pre.length - 1; k++) {
+      var a = l + pre[k] * u, b = l + pre[k + 1] * u;
+      if (x >= a - 0.5 && x <= b + 0.5) return { a: k, b: k + 1 };
+    }
+    return null;
+  }
 
   View.prototype.setOcr = function (p) {
     this.ocr = p && typeof p === 'object' ? p : null;
@@ -1344,6 +1421,8 @@
     fitScale: fitScale,
     grid: grid,
     merge: merge,
+    glyphX: glyphX,
+    glyphAt: glyphAt,
     paintBoxes: paintBoxes,
     ready: function () { return lib(); }
   };
