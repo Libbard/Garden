@@ -6472,19 +6472,49 @@ svg:not([data-font]) tspan,
   }
 
   .mobile-fab-container.scrolling-down {
-    opacity: 0.15;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
   }
 
-  [dir="rtl"] .mobile-fab-container.scrolling-down {
-    transform: translateX(20px);
+  .mobile-fab-tuck {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 22px;
+    padding: 0;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-inline-start: none;
+    border-start-end-radius: var(--radius-md);
+    border-end-end-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    opacity: 0.45;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease;
   }
 
-  [dir="ltr"] .mobile-fab-container.scrolling-down {
-    transform: translateX(-20px);
+  [dir="ltr"] .mobile-fab-tuck i { transform: scaleX(-1); }
+
+  .mobile-fab-tuck:active { opacity: 1; color: var(--brand-500); }
+
+  .mobile-fab-container.tucked .mobile-fab { display: none; }
+
+  .mobile-fab-container.tucked .mobile-fab-tuck {
+    width: 16px;
+    height: 44px;
+    opacity: 0.55;
   }
 
-  .mobile-fab-container.docked {
-    display: none !important;
+  [dir="rtl"] .mobile-fab-container.tucked .mobile-fab-tuck i { transform: scaleX(-1); }
+  [dir="ltr"] .mobile-fab-container.tucked .mobile-fab-tuck i { transform: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-fab-container, .mobile-fab, .mobile-fab-tuck { transition: opacity 0.15s linear; }
+    .mobile-fab-container.scrolling-down { transform: none; }
   }
 
   /*@3.GARC.231*/
@@ -7909,10 +7939,8 @@ mjx-container::-webkit-scrollbar-thumb {
 
 /*@3.GARC.334*/
 .garden-scroll-top {
-  inset-inline-start: 1.75rem;
-  inset-inline-end: auto;
-  left: auto;
-  right: auto;
+  inset-inline-end: 1.75rem;
+  inset-inline-start: auto;
 }
 
 .garden-scroll-top.visible {
@@ -7921,28 +7949,39 @@ mjx-container::-webkit-scrollbar-thumb {
   transform: translateY(0);
 }
 
-.garden-scroll-top:hover {
-  background: var(--brand-500);
-  color: #fff;
-  border-color: var(--brand-500);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .garden-scroll-top:hover {
+    background: color-mix(in oklab, var(--brand-500) 16%, var(--bg-surface));
+    color: var(--brand-500);
+    border-color: var(--brand-500);
+    transform: translateY(-2px);
+  }
+}
+
+.garden-scroll-top:focus-visible {
+  outline: 2px solid var(--brand-500);
+  outline-offset: 2px;
 }
 
 /*@3.GARC.335*/
 @media (max-width: 1024px) {
   .garden-scroll-top {
-    bottom: calc(5.5rem + var(--sa-b));
+    bottom: calc(1.25rem + var(--sa-b));
+    inset-inline-end: 1rem;
     width: 40px;
     height: 40px;
     font-size: 1rem;
   }
+}
 
-  .garden-scroll-top {
-    inset-inline-start: 1rem;
-    inset-inline-end: auto;
-    left: auto;
-    right: auto;
+@media (max-width: 768px) {
+  body:has(> .bottom-nav) .garden-scroll-top {
+    bottom: calc(5rem + var(--sa-b));
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden-scroll-top { transition: opacity 0.15s linear; transform: none !important; }
 }
 
 /*@3.GARC.336*/

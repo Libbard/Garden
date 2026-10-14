@@ -4411,11 +4411,15 @@
     btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     document.body.appendChild(btn);
 
-    let ticking = false;
+    let ticking = false, lastY = window.scrollY;
     window.addEventListener('scroll', () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          btn.classList.toggle('visible', window.scrollY > 400);
+          const y = window.scrollY, dy = y - lastY;
+          if (y <= 400) btn.classList.remove('visible');
+          else if (dy < -4) btn.classList.add('visible');
+          else if (dy > 4) btn.classList.remove('visible');
+          if (Math.abs(dy) > 4 || y <= 400) lastY = y;
           ticking = false;
         });
         ticking = true;
@@ -4614,6 +4618,8 @@
     if (hasNotes) {
       const nfab = document.createElement('button');
       nfab.className = 'mobile-fab';
+      nfab.setAttribute('aria-label', currentLang === 'ar' ? 'ملاحظاتي' : 'My notes');
+      nfab.dataset.arTitle = 'ملاحظاتي'; nfab.dataset.enTitle = 'My notes';
       nfab.innerHTML = '<i class="fa-solid fa-note-sticky" aria-hidden="true"></i>';
       const nbadge = document.createElement('span');
       nbadge.className = 'fab-badge'; nbadge.id = 'fab-notes-badge';
@@ -4625,11 +4631,34 @@
       if (nc) new MutationObserver(() => { nbadge.textContent = nc.textContent; }).observe(nc, { childList: true, characterData: true, subtree: true });
     }
 
+    const tuck = document.createElement('button');
+    tuck.className = 'mobile-fab-tuck';
+    tuck.innerHTML = '<i class="fa-solid fa-chevron-right" aria-hidden="true"></i>';
+    const TUCK_KEY = 'garden_fab_tucked';
+    const setTucked = on => {
+      ctn.classList.toggle('tucked', on);
+      const ar = on ? 'إظهار زر الملاحظات' : 'إخفاء زر الملاحظات';
+      const en = on ? 'Show notes button' : 'Hide notes button';
+      tuck.setAttribute('aria-label', currentLang === 'ar' ? ar : en);
+      tuck.setAttribute('aria-expanded', on ? 'false' : 'true');
+      tuck.dataset.arTitle = ar; tuck.dataset.enTitle = en;
+    };
+    let tucked = false;
+    try { tucked = localStorage.getItem(TUCK_KEY) === '1'; } catch (e) {}
+    setTucked(tucked);
+    tuck.addEventListener('click', () => {
+      tucked = !ctn.classList.contains('tucked');
+      setTucked(tucked);
+      try { localStorage.setItem(TUCK_KEY, tucked ? '1' : '0'); } catch (e) {}
+    });
+    ctn.appendChild(tuck);
+
     document.body.appendChild(ctn);
     let lastY = window.scrollY;
     window.addEventListener('scroll', () => {
-      const y = window.scrollY;
-      ctn.classList.toggle('scrolling-down', y > lastY && y > 150);
+      const y = window.scrollY, dy = y - lastY;
+      if (Math.abs(dy) < 4) return;
+      ctn.classList.toggle('scrolling-down', dy > 0 && y > 150);
       lastY = y;
     }, { passive: true });
   }
