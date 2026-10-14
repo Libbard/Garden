@@ -347,6 +347,7 @@
 
   function eachPoint(el, fn) {
     dropBox(el);
+    if (el.ta) delete el.ta;
     if (el.ty === 'tx') {
       var m2 = fn(el.x + el.w / 2, el.y + el.h / 2);
       el.x = m2[0] - el.w / 2; el.y = m2[1] - el.h / 2;
@@ -813,7 +814,8 @@
   }
 
   Canvas.prototype.dpr = function (w, h) {
-    var d = Math.min(4, Math.max(1, (window.devicePixelRatio || 1) * this.vz()));
+    var vv = window.visualViewport, vs = (vv && vv.scale > 0.05 && isFinite(vv.scale)) ? vv.scale : 1;
+    var d = Math.min(vs > 1.05 ? 6 : 4, Math.max(vs < 0.95 ? 0.75 : 1, (window.devicePixelRatio || 1) * this.vz() * vs));
     /*@3.NOCJ.53*/
     if (w > 0 && h > 0 && w * h * d * d > 24000000) {
       d = Math.max(0.75, Math.sqrt(24000000 / (w * h)));
@@ -1063,6 +1065,7 @@
   /*@3.NOCJ.27*/
   /*@3.NOCJ.92*/
   var ONSET_N = 6, ONSET_W = 3.5, ONSET_TH = 0.62;
+  var DOT_P = 0.5;
 
   function medPress(pts) {
     var a = [], i;
@@ -1180,6 +1183,18 @@
     }
     if (!raw.length) return null;
     if (tilted) fillTilt(raw);
+    if (!el.hi && nib.resp) {
+      var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+      for (i = 0; i < raw.length; i++) {
+        if (raw[i].x < x0) x0 = raw[i].x;
+        if (raw[i].x > x1) x1 = raw[i].x;
+        if (raw[i].y < y0) y0 = raw[i].y;
+        if (raw[i].y > y1) y1 = raw[i].y;
+      }
+      if (Math.max(x1 - x0, y1 - y0) <= Math.max(2 * sc, base * 1.6)) {
+        for (i = 0; i < raw.length; i++) if (raw[i].p < DOT_P) raw[i].p = DOT_P;
+      }
+    }
     var pts = smoothPts(holdEnds(raw, base));
     if (tilted) leanOf(pts);
     var alpha = (el.o == null ? 1 : el.o) *
@@ -1862,6 +1877,7 @@
         for (var key in el) copy[key] = el[key];
         copy.id = uid();
         copy.pts = runs[j];
+        delete copy.ta;
         out.push(copy);
       }
     }

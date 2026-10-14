@@ -189,13 +189,15 @@
     alexandria: 'Alexandria', vazir: 'Vazirmatn', kufi: 'Noto Kufi Arabic',
     messiri: 'El Messiri', zain: 'Zain', rubik: 'Rubik',
     /*@3.SUTJ.24*/
-    thmanyah: 'Thmanyah Sans', thmanyahserif: 'Thmanyah Serif Text', frutiger: 'Frutiger LT Arabic'
+    thmanyah: 'Thmanyah Sans', thmanyahserif: 'Thmanyah Serif Text', frutiger: 'Frutiger LT Arabic',
+    cairo: 'Cairo'
   };
   var MF_LAT = {
     sourceserif: 'Source Serif 4', newsreader: 'Newsreader', literata: 'Literata',
     atkinson: 'Atkinson Hyperlegible', merriweather: 'Merriweather', lora: 'Lora',
     garamond: 'EB Garamond', spectral: 'Spectral', fraunces: 'Fraunces',
-    plexsans: 'IBM Plex Sans', sourcesans: 'Source Sans 3', geist: 'Geist'
+    plexsans: 'IBM Plex Sans', sourcesans: 'Source Sans 3', geist: 'Geist',
+    inter: 'Inter'
   };
 
   var _fontBase = (function () {

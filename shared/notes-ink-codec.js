@@ -479,6 +479,7 @@
         if (d.ts && d.ts[i] != null && d.ts[i] >= 0) e.ts = d.ts[i];
         if (d.ei && d.ei[i]) e.eid = d.ei[i];
         if (d.em && d.em[i] != null) e.mt = d.em[i];
+        if (d.ta && d.ta[i]) e.ta = d.ta[i];
         out.push(e);
       }
       return out.concat(JSON.parse(JSON.stringify(d[A.kk] || [])));
@@ -486,7 +487,7 @@
   }
 
   function splitEls(els) {
-    var st = [], ts = [], ei = [], em = [], keep = [], i;
+    var st = [], ts = [], ei = [], em = [], ta = [], keep = [], i;
     for (i = 0; i < (els || []).length; i++) {
       var e = els[i];
       if (!e) continue;
@@ -495,9 +496,10 @@
         ts.push(e.ts == null ? -1 : e.ts);
         ei.push(e.eid || '');
         em.push(+e.mt || 0);
+        ta.push(e.ta || 0);
       } else keep.push(e);
     }
-    return { st: st, ts: ts, ei: ei, em: em, keep: keep };
+    return { st: st, ts: ts, ei: ei, em: em, ta: ta, keep: keep };
   }
 
   function pagePack(els, extra, A) {
@@ -507,6 +509,7 @@
     page[A.kk] = parts.keep;
     if (parts.ts.some(function (t) { return t >= 0; })) page.ts = parts.ts;
     if (parts.ei.some(function (x) { return !!x; })) { page.ei = parts.ei; page.em = parts.em; }
+    if (parts.ta.some(function (x) { return !!x; })) page.ta = parts.ta;
     if (!parts.st.length && A === PDF) return Promise.resolve(page);
     return pack(parts.st).then(function (packed) { page[A.sk] = packed; return page; });
   }
@@ -538,7 +541,7 @@
     return Promise.all([pageEls(lo, OV), pageEls(ro, OV)]).then(function (two) {
       var m = mergeEls(two[0], lo.gn, two[1], ro.gn), extra = {}, k;
       for (k in ro) {
-        if (!Object.prototype.hasOwnProperty.call(ro, k) || /^(ink|shapes|ts|ei|em|gn|raw)$/.test(k)) continue;
+        if (!Object.prototype.hasOwnProperty.call(ro, k) || /^(ink|shapes|ts|ei|em|ta|gn|raw)$/.test(k)) continue;
         extra[k] = ro[k];
       }
       ['h', 'ch'].forEach(function (f) { if (+lo[f] > +(extra[f] || 0)) extra[f] = lo[f]; });

@@ -131,6 +131,7 @@
     var o = { ink: L.ink || '', shapes: L.shapes || [], ts: L.ts || null, lg: L.lg ? 1 : 0 };
     if (L.ei) { o.ei = L.ei; o.em = L.em; }
     if (L.gn) o.gn = L.gn;
+    if (L.ta) o.ta = L.ta;
     return o;
   }
 
@@ -140,6 +141,7 @@
     if (d.lg) o.lg = 1;
     if (d.ei) { o.ei = d.ei; o.em = d.em; }
     if (d.gn) o.gn = d.gn;
+    if (d.ta) o.ta = d.ta;
     return o;
   }
 
@@ -188,6 +190,11 @@
     get scrollLeft() { return window.scrollX; },
     set scrollLeft(v) { window.scrollTo(v, window.scrollY); },
     getBoundingClientRect: function () {
+      var v = window.visualViewport;
+      if (v && v.width > 0 && v.height > 0) {
+        return { top: v.offsetTop, left: v.offsetLeft, right: v.offsetLeft + v.width, bottom: v.offsetTop + v.height,
+                 width: v.width, height: v.height, x: v.offsetLeft, y: v.offsetTop };
+      }
       var w = document.documentElement.clientWidth, h = window.innerHeight;
       return { top: 0, left: 0, right: w, bottom: h, width: w, height: h, x: 0, y: 0 };
     },
@@ -200,7 +207,7 @@
   var S = {
     on: false, drawing: false, ov: null, main: null, lay: null, mem: {}, sig: {},
     store: null, base: {}, dirty: {}, saveT: 0, busy: false, vp: null, opened: [], ro: null,
-    reT: 0, btn: null, fab: null, seq: 0
+    reT: 0, btn: null, fab: null, seq: 0, t0: Date.now(), rfT: [], nta: (typeof WeakSet === 'function') ? new WeakSet() : null
   };
 
   function nid() { S.seq += 1; return 'm' + S.seq.toString(36) + Math.random().toString(36).slice(2, 5); }
@@ -311,21 +318,231 @@
   }
 
   function shifted(el, dy) {
-    var c = JSON.parse(JSON.stringify(el));
+    var c = JSON.parse(JSON.stringify(el)), ta = c.ta;
     window.GardenCanvas.eachPoint(c, function (x, y) { return [x, y + dy]; });
+    if (ta) c.ta = ta;
     c._bb = null;
     return c;
   }
 
-  function sigOf(list) {
-    var s = JSON.stringify(list.map(function (e) {
-      var c = {}, k;
-      for (k in e) if (k !== 'id' && k !== '_bb' && k !== 'eid' && k !== 'mt' && Object.prototype.hasOwnProperty.call(e, k)) c[k] = e[k];
-      return c;
-    }));
-    var h = 2166136261, i;
-    for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
-    return (h >>> 0).toString(36) + ':' + s.length;
+  var TIP_SEL = '.smart-term-tooltip';
+  function isBand(e) {
+    return !!(e && e.ty === 'st' && e.hi && e.pts && e.pts.length === 2 && Math.abs(e.pts[0].y - e.pts[1].y) < 0.01);
+  }
+  function hostsIn(sec) {
+    var out = [], all = sec.querySelectorAll(LINE_SEL), i;
+    for (i = 0; i < all.length; i++) if (all[i].getClientRects().length) out.push(all[i]);
+    return out;
+  }
+  function textNodes(host) {
+    var out = [], tw = document.createTreeWalker(host, NodeFilter.SHOW_TEXT), n;
+    while ((n = tw.nextNode())) {
+      var p = n.parentNode;
+      if (p && p.closest && p.closest(TIP_SEL)) continue;
+      out.push(n);
+    }
+    return out;
+  }
+  function textOf(ns) { var t = '', i; for (i = 0; i < ns.length; i++) t += ns[i].nodeValue || ''; return t; }
+  function offOf(ns, node, o) {
+    var s = 0, i;
+    for (i = 0; i < ns.length; i++) { if (ns[i] === node) return s + o; s += (ns[i].nodeValue || '').length; }
+    return -1;
+  }
+  var RG = null;
+  function charBox(n, k) {
+    RG = RG || document.createRange();
+    try { RG.setStart(n, k); RG.setEnd(n, k + 1); } catch (e) { return null; }
+    return RG.getBoundingClientRect();
+  }
+  function hitAt(x, y) {
+    var all = S.main ? S.main.querySelectorAll(LINE_SEL) : [], host = null, i, k;
+    for (i = 0; i < all.length; i++) {
+      var r = all[i].getBoundingClientRect();
+      if (r.width > 0 && x >= r.left - 1 && x <= r.right + 1 && y >= r.top - 1 && y <= r.bottom + 1) host = all[i];
+    }
+    if (!host) return null;
+    var ns = textNodes(host);
+    for (i = 0; i < ns.length; i++) {
+      var t = ns[i].nodeValue || '';
+      for (k = 0; k < t.length; k++) {
+        var bx = charBox(ns[i], k);
+        if (bx && bx.width > 0 && x >= bx.left - 0.75 && x <= bx.right + 0.75 && y >= bx.top - 1 && y <= bx.bottom + 1) return { n: ns[i], k: k, r: bx };
+      }
+    }
+    return null;
+  }
+
+  function anchorOf(el) {
+    var ov = S.ov;
+    if (!ov || !ov.cv || !isBand(el)) return null;
+    var y = el.pts[0].y, xa = Math.min(el.pts[0].x, el.pts[1].x), xb = Math.max(el.pts[0].x, el.pts[1].x);
+    var A = ov.worldToClient({ x: xa, y: y }), B = ov.worldToClient({ x: xb, y: y });
+    if (B.x - A.x < 3) return null;
+    var ha = null, hb = null;
+    try { ha = hitAt(A.x + 1.5, A.y); hb = hitAt(B.x - 1.5, B.y); } catch (e) { ha = hb = null; }
+    if (!ha || !hb) return null;
+    var host = ha.n.parentNode && ha.n.parentNode.closest ? ha.n.parentNode.closest(LINE_SEL) : null;
+    if (!host || !hb.n.parentNode || hb.n.parentNode.closest(LINE_SEL) !== host) return null;
+    var sec = host.closest('.main-content > section');
+    if (!sec || !sec.id) return null;
+    var ns = textNodes(host), oa = offOf(ns, ha.n, ha.k), ob = offOf(ns, hb.n, hb.k);
+    if (oa < 0 || ob < 0) return null;
+    var a = Math.min(oa, ob), b = Math.max(oa, ob) + 1, i = hostsIn(sec).indexOf(host);
+    if (i < 0) return null;
+    var t0 = ov.clientToWorld(0, ha.r.top), t1 = ov.clientToWorld(0, ha.r.bottom);
+    return { s: sec.id, i: i, a: a, b: b, t: textOf(ns).slice(a, b), h: Math.round((t1.y - t0.y) * 100) / 100 };
+  }
+
+  function findHost(ta) {
+    var sec = ta && ta.t ? document.getElementById(ta.s) : null;
+    if (!sec) return null;
+    var hs = hostsIn(sec), h = hs[ta.i];
+    if (h) {
+      var ns0 = textNodes(h);
+      if (textOf(ns0).slice(ta.a, ta.b) === ta.t) return { h: h, ns: ns0, i: ta.i, a: ta.a, b: ta.b };
+    }
+    var best = null, bd = Infinity, j;
+    for (j = 0; j < hs.length; j++) {
+      var ns = textNodes(hs[j]), tx = textOf(ns), at = tx.indexOf(ta.t);
+      while (at >= 0) {
+        var d = Math.abs(j - ta.i) * 100000 + Math.abs(at - ta.a);
+        if (d < bd) { bd = d; best = { h: hs[j], ns: ns, i: j, a: at, b: at + ta.t.length }; }
+        at = tx.indexOf(ta.t, at + 1);
+      }
+    }
+    return best;
+  }
+
+  function segsOf(ns, a, b) {
+    var out = [], pos = 0, i, k;
+    for (i = 0; i < ns.length && pos < b; i++) {
+      var n = ns[i], len = (n.nodeValue || '').length;
+      for (k = Math.max(0, a - pos); k < len && pos + k < b; k++) {
+        var r = charBox(n, k);
+        if (!r || !(r.width > 0) || !(r.height > 0)) continue;
+        var mid = (r.top + r.bottom) / 2, g = null, j, at = pos + k;
+        for (j = 0; j < out.length; j++) {
+          if (Math.abs(mid - out[j].mid) <= Math.min(out[j].h, r.height) * 0.6 + 1) { g = out[j]; break; }
+        }
+        if (!g) { out.push({ a: at, b: at + 1, l: r.left, r: r.right, t: r.top, bot: r.bottom, mid: mid, h: r.height }); continue; }
+        if (at < g.a) g.a = at;
+        if (at + 1 > g.b) g.b = at + 1;
+        if (r.left < g.l) g.l = r.left;
+        if (r.right > g.r) g.r = r.right;
+        if (r.top < g.t) g.t = r.top;
+        if (r.bottom > g.bot) g.bot = r.bottom;
+      }
+      pos += len;
+    }
+    out.sort(function (x, y) { return x.a - y.a; });
+    return out;
+  }
+
+  function reanchor(list) {
+    var ov = S.ov, out = [], n = 0;
+    if (!ov || !ov.cv) return { els: list, n: 0 };
+    list.forEach(function (e) {
+      if (!e || !e.ta || !isBand(e)) { out.push(e); return; }
+      var f = null, segs = null;
+      try { f = findHost(e.ta); segs = f ? segsOf(f.ns, f.a, f.b) : null; } catch (er) { segs = null; }
+      if (!segs || !segs.length) { out.push(e); return; }
+      var full = textOf(f.ns), h0 = e.ta.h > 0 ? e.ta.h : 0, src = e.ta.s;
+      segs.forEach(function (g, j) {
+        var p0 = ov.clientToWorld(g.l, g.t), p1 = ov.clientToWorld(g.r, g.bot);
+        var x0 = Math.min(p0.x, p1.x), x1 = Math.max(p0.x, p1.x), y = (p0.y + p1.y) / 2, h = Math.abs(p1.y - p0.y);
+        var ta = { s: src, i: f.i, a: g.a, b: g.b, t: full.slice(g.a, g.b), h: Math.round(h * 100) / 100 };
+        var w = (h0 && h > 0) ? e.w * h / h0 : e.w;
+        if (!j) {
+          var q0 = e.pts[0], q1 = e.pts[1], l0 = Math.min(q0.x, q1.x), r0 = Math.max(q0.x, q1.x);
+          var same = segs.length === 1 && Math.abs(l0 - x0) < 0.75 && Math.abs(r0 - x1) < 0.75 && Math.abs(q0.y - y) < 0.75;
+          e.ta = ta;
+          if (same) { out.push(e); return; }
+          var lr = q0.x <= q1.x;
+          e.w = w;
+          e.pts = [{ x: lr ? x0 : x1, y: y, p: q0.p }, { x: lr ? x1 : x0, y: y, p: q1.p }];
+          e._bb = null;
+          out.push(e);
+          n++;
+          return;
+        }
+        var c = JSON.parse(JSON.stringify(e));
+        c.id = nid();
+        delete c.eid; delete c.mt;
+        if (c.ts > 0) c.ts = c.ts + j;
+        c.ta = ta;
+        c.w = w;
+        c.pts = [{ x: x0, y: y, p: e.pts[0].p }, { x: x1, y: y, p: e.pts[1].p }];
+        c._bb = null;
+        out.push(c);
+        n++;
+      });
+    });
+    return { els: out, n: n };
+  }
+
+  function anchorNew(els) {
+    var i, e, ta;
+    for (i = 0; i < els.length; i++) {
+      e = els[i];
+      if (!isBand(e) || e.ta || !(e.ts >= S.t0) || (S.nta && S.nta.has(e))) continue;
+      try { ta = anchorOf(e); } catch (er) { ta = null; }
+      if (ta) e.ta = ta;
+      else if (S.nta) S.nta.add(e);
+    }
+  }
+
+  function reflowNow() {
+    if (!S.on || !S.ov || !S.ov.cv || !S.lay) return;
+    fitZoom();
+    S.ov.fit();
+    var now = layout(), same = now.length === S.lay.length, i;
+    for (i = 0; same && i < now.length; i++) {
+      if (now[i].key !== S.lay[i].key || now[i].top !== S.lay[i].top || now[i].end !== S.lay[i].end) same = false;
+    }
+    if (!same) { split(); compose(true); return; }
+    var cv = S.ov.cv, r = reanchor(cv.els || []);
+    if (r.n) { cv.els = r.els; cv.paint(); }
+  }
+  function reflowSoon() {
+    if (!S.on) return;
+    S.rfT.forEach(clearTimeout);
+    S.rfT = [160, 700, 1600].map(function (ms) { return setTimeout(reflowNow, ms); });
+  }
+
+  var YK = { y: 1, y1: 1, y2: 1 }, SKIP = { id: 1, _bb: 1, eid: 1, mt: 1 };
+  function sigOf(list, dy) {
+    dy = dy || 0;
+    var h = 2166136261, n = 0, own = Object.prototype.hasOwnProperty;
+    function mix(v) { h ^= v; h = Math.imul(h, 16777619); }
+    function str(s) { for (var i = 0; i < s.length; i++) mix(s.charCodeAt(i)); mix(31); }
+    function val(v, k) {
+      if (typeof v === 'number') { mix(Math.round((YK[k] ? v + dy : v) * 64) | 0); n++; return; }
+      if (v == null) { mix(7); return; }
+      if (typeof v !== 'object') { str(String(v)); return; }
+      var i, kk;
+      if (k === 'pts' && Array.isArray(v)) {
+        mix(80);
+        for (i = 0; i < v.length; i++) {
+          var p = v[i];
+          mix(Math.round(p.x * 64) | 0); mix(Math.round((p.y + dy) * 64) | 0); mix(Math.round((p.p || 0) * 64) | 0);
+          if (p.tz != null) { mix(Math.round(p.tz * 64) | 0); mix(Math.round((p.az || 0) * 64) | 0); }
+        }
+        n += v.length;
+        return;
+      }
+      if (Array.isArray(v)) { mix(91); for (i = 0; i < v.length; i++) val(v[i], ''); mix(93); return; }
+      mix(123);
+      for (kk in v) if (own.call(v, kk)) { str(kk); val(v[kk], kk); }
+      mix(125);
+    }
+    for (var j = 0; j < list.length; j++) {
+      var e = list[j], k;
+      mix(40);
+      for (k in e) if (!SKIP[k] && own.call(e, k)) { str(k); val(e[k], k); }
+      mix(41);
+    }
+    return (h >>> 0).toString(36) + ':' + n + ':' + list.length;
   }
 
   function partOf(lay, el) {
@@ -343,17 +560,20 @@
   function split() {
     if (!S.ov || !S.ov.cv || !S.lay) return;
     var els = S.ov.cv.els || [], by = {}, i, lay = S.lay;
+    anchorNew(els);
     for (i = 0; i < lay.length; i++) by[lay[i].key] = [];
     (S.vis || []).forEach(function (b) { by[b.key] = []; });
+    var tops = {};
     for (i = 0; i < els.length; i++) {
       var pt = partOf(lay, els[i]);
-      (by[pt.key] = by[pt.key] || []).push(shifted(els[i], -pt.top));
+      (by[pt.key] = by[pt.key] || []).push(els[i]);
+      tops[pt.key] = pt.top;
     }
     for (var key in by) {
       if (!Object.prototype.hasOwnProperty.call(by, key)) continue;
-      var sg = sigOf(by[key]);
+      var dy = -(tops[key] || 0), sg = sigOf(by[key], dy);
       if (sg === S.sig[key]) continue;
-      S.mem[key] = by[key];
+      S.mem[key] = by[key].map(function (e) { return shifted(e, dy); });
       S.sig[key] = sg;
       S.dirty[key] = 1;
     }
@@ -385,6 +605,7 @@
         d.ei = strokes.map(function (e) { return e.eid || ''; });
         d.em = strokes.map(function (e) { return +e.mt || 0; });
       }
+      if (strokes.some(function (e) { return !!e.ta; })) d.ta = strokes.map(function (e) { return e.ta || 0; });
       if (gn && Object.keys(gn).length) d.gn = gn;
       return d;
     });
@@ -426,6 +647,7 @@
                   o: st.tool === 'hi' ? 0.32 : (st.o == null ? 1 : st.o), hi: st.tool === 'hi' ? 1 : 0, pts: st.pts };
         if (tsOk && d.ts[k] > 0) e.ts = d.ts[k];
         if (d.ei && d.ei[k]) { e.eid = d.ei[k]; e.mt = (d.em && d.em[k]) || 0; }
+        if (d.ta && d.ta[k]) e.ta = d.ta[k];
         return e;
       }).concat(shapes);
       S.base[key] = { els: JSON.parse(JSON.stringify(list)), gn: d.gn || null };
@@ -491,7 +713,10 @@
       var held = was && (cv.undoS.length || cv.redoS.length) && carryHist(cv, was, lay, vis, fresh);
       if (!held) { cv.undoS = []; cv.redoS = []; }
       if (cv.deselect) cv.deselect();
-      cv.w = 0; cv.resize(); cv.paint();
+      cv.w = 0; cv.resize();
+      var ra = reanchor(cv.els);
+      if (ra.n) cv.els = ra.els;
+      cv.paint();
       if (cv.emit) cv.emit();
     });
   }
@@ -922,6 +1147,8 @@
       window.addEventListener('pointerdown', onPenWake, true);
       window.addEventListener('keydown', onUndoKey, true);
       window.addEventListener('resize', onResize);
+      listenVv(true);
+      listenPen(true);
       if (window.ResizeObserver) {
         S.ro = new ResizeObserver(relayout);
         sections().forEach(function (s) { S.ro.observe(s); });
@@ -944,6 +1171,71 @@
     placeDock(readPos());
     fitZoom();
     if (S.ov) S.ov.fit();
+    reflowSoon();
+  }
+
+  var PEN_HOLD = 1500, penT = 0, pens = {};
+  function onPenDown(e) {
+    if (!S.on || e.pointerType !== 'pen') return;
+    pens[e.pointerId] = 1;
+    clearTimeout(penT);
+    document.documentElement.classList.add('mi-pen');
+  }
+  function onPenUp(e) {
+    if (e.pointerType !== 'pen' || !pens[e.pointerId]) return;
+    delete pens[e.pointerId];
+    if (Object.keys(pens).length) return;
+    clearTimeout(penT);
+    penT = setTimeout(function () { document.documentElement.classList.remove('mi-pen'); }, PEN_HOLD);
+  }
+  function listenPen(on) {
+    var f = on ? 'addEventListener' : 'removeEventListener';
+    window[f]('pointerdown', onPenDown, true);
+    window[f]('pointerup', onPenUp, true);
+    window[f]('pointercancel', onPenUp, true);
+    if (!on) { pens = {}; clearTimeout(penT); document.documentElement.classList.remove('mi-pen'); }
+  }
+
+  var vvT = 0, vvF = 0;
+  function onVvScroll() {
+    if (!S.on || !S.ov || vvF) return;
+    vvF = requestAnimationFrame(function () { vvF = 0; if (S.ov) S.ov.syncWindow(); });
+  }
+  function onVvResize() {
+    if (!S.on) return;
+    onVvScroll();
+    clearTimeout(vvT);
+    vvT = setTimeout(function () {
+      var cv = S.ov && S.ov.cv;
+      if (!cv) return;
+      cv.w = 0; cv.resize();
+      S.ov.syncWindow();
+    }, 180);
+  }
+  function listenVv(on) {
+    var v = window.visualViewport, f = on ? 'addEventListener' : 'removeEventListener';
+    if (v) { v[f]('resize', onVvResize); v[f]('scroll', onVvScroll); }
+    try { if (document.fonts && document.fonts[f]) document.fonts[f]('loadingdone', reflowSoon); } catch (e) {}
+    document[f]('garden:moduleThemeChanged', reflowSoon);
+    document[f]('garden:moduleDesignChanged', reflowSoon);
+    document[f]('garden:skinChanged', reflowSoon);
+    if (S.mo) { S.mo.disconnect(); S.mo = null; }
+    if (on && window.MutationObserver) {
+      var bare = function (c) { return String(c || '').split(/\s+/).filter(function (x) { return x && !/^(mi|nov)-/.test(x); }).sort().join(' '); };
+      S.mo = new MutationObserver(function (recs) {
+        for (var i = 0; i < recs.length; i++) {
+          var r = recs[i];
+          if (r.type === 'attributes' && r.attributeName === 'class' && bare(r.oldValue) === bare(r.target.getAttribute('class'))) continue;
+          if (r.type === 'attributes' && r.attributeName === 'style' && r.target === document.documentElement &&
+              String(r.oldValue || '').replace(/--mi-ui:[^;]*;?/g, '') === String(r.target.getAttribute('style') || '').replace(/--mi-ui:[^;]*;?/g, '')) continue;
+          reflowSoon();
+          return;
+        }
+      });
+      S.mo.observe(document.documentElement, { attributes: true, attributeOldValue: true });
+      if (document.body) S.mo.observe(document.body, { attributes: true, attributeOldValue: true, attributeFilter: ['class', 'style', 'data-design', 'data-skin'] });
+      S.mo.observe(document.head, { childList: true });
+    }
   }
 
   function disable() {
@@ -956,6 +1248,9 @@
     window.removeEventListener('pointerdown', onPenWake, true);
     window.removeEventListener('keydown', onUndoKey, true);
     window.removeEventListener('resize', onResize);
+    listenVv(false);
+    listenPen(false);
+    S.rfT.forEach(clearTimeout);
     if (S.ro) { S.ro.disconnect(); S.ro = null; }
     if (S.ov) { try { S.ov.destroy(); } catch (e) {} S.ov = null; }
     if (S.dock) S.dock.hidden = true;

@@ -91,6 +91,7 @@
   /*@3.MOTJ.11*/
   var FONTS = [
     { id: 'garden',   css: null,                   star: 1, ar: 'خطُّ الموقع (القاهرة)', en: 'Site font (Cairo)' },
+    { id: 'cairo',    css: 'Cairo',                star: 1, ar: 'القاهرة · خطُّ الموقع', en: 'Cairo · site font' },
     /*@3.MOTJ.27*/
     { id: 'thmanyah', css: 'Thmanyah Sans',         star: 1, ar: 'ثمانية',        en: 'Thmanyah Sans' },
     { id: 'frutiger', css: 'Frutiger LT Arabic',    star: 1, ar: 'فروتيجر',       en: 'Frutiger' },
@@ -113,6 +114,7 @@
   /*@3.MOTJ.16*/
   var FONTS_LAT = [
     { id: 'garden',      css: null,                    star: 1, ar: 'خطُّ الموقع (إنتر)', en: 'Site font (Inter)' },
+    { id: 'inter',       css: 'Inter',                 star: 1, ar: 'إنتر · خطُّ الموقع', en: 'Inter · site font' },
     { id: 'sourceserif', css: 'Source Serif 4',        star: 1, ar: 'سورس سيريف',  en: 'Source Serif 4' },
     { id: 'newsreader',  css: 'Newsreader',            star: 1, ar: 'نيوزريدر',    en: 'Newsreader' },
     { id: 'literata',    css: 'Literata',              star: 1, ar: 'ليتيراتا',    en: 'Literata' },

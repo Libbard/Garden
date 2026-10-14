@@ -1090,6 +1090,10 @@
         var gg = self.gest[e.pointerId];
         delete self.gest[e.pointerId];
         if (e.type === 'pointerup' && self.passable(gg)) self.onPass(gg.px, gg.py, gg.src);
+        if (e.type !== 'pointerup') {
+          if (!self._taps || now() - self._taps.t0 > TAP_MS * 1.6) self._taps = { t0: gg.t0 || now(), n: 0, moved: 0 };
+          self._taps.moved = Infinity;
+        }
         self.noteTap(gg);
         self.emitGesture(self.gestureCount() ? 'move' : 'end');
         if (gg.act === 'hand' && (gg.moved || 0) < TAP_PX && now() - (gg.t0 || 0) < 400 && self.onEndMod) {
