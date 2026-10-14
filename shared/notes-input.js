@@ -1128,6 +1128,17 @@
     el.addEventListener('pointercancel', this._up);
     /*@3.NOIJ2.7*/
     el.addEventListener('lostpointercapture', this._up);
+    /*@3.NOIJ2.37*/
+    this._tch = function (e) {
+      if (!e.cancelable) return;
+      var t = e.changedTouches, i, pen = false;
+      for (i = 0; t && i < t.length; i++) if (t[i].touchType === 'stylus') { pen = true; break; }
+      if (!pen) return;
+      for (var id in self.passing) if (self.passing[id] && self.passing[id].src === 'pen') return;
+      e.preventDefault();
+    };
+    el.addEventListener('touchstart', this._tch, { passive: false });
+    el.addEventListener('touchmove', this._tch, { passive: false });
   };
 
   Router.prototype.emitGesture = function (phase) {
@@ -1156,6 +1167,8 @@
     el.removeEventListener('pointerup', this._up);
     el.removeEventListener('pointercancel', this._up);
     el.removeEventListener('lostpointercapture', this._up);
+    el.removeEventListener('touchstart', this._tch, { passive: false });
+    el.removeEventListener('touchmove', this._tch, { passive: false });
   };
 
   var SEEN = { tilt: 0 };

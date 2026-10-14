@@ -374,7 +374,9 @@
 
 
   var SCR_LS = 'garden_ink_scratch';
-  function scratchOn() { try { return localStorage.getItem(SCR_LS) !== 'off'; } catch (e) { return true; } }
+  /*@3.NOCJ.144*/
+  var SCR_PAUSED = true;
+  function scratchOn() { if (SCR_PAUSED) return false; try { return localStorage.getItem(SCR_LS) !== 'off'; } catch (e) { return true; } }
   function setScratch(on) {
     try { if (on) localStorage.removeItem(SCR_LS); else localStorage.setItem(SCR_LS, 'off'); } catch (e) {}
     try { document.dispatchEvent(new CustomEvent('garden:scratchPref', { detail: { on: !!on } })); } catch (e2) {}
@@ -2995,6 +2997,7 @@
     },
     bboxOf: bboxOf,
     scratchOn: scratchOn,
+    scratchPaused: SCR_PAUSED,
     setScratch: setScratch,
     scribbleOf: scribbleOf,
     segDist: segDist,

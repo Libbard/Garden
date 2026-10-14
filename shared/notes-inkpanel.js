@@ -306,7 +306,7 @@
         sw('swap', hp.swap, 'زرُّ القلم ⇄ التظليل', 'Pen ⇄ highlighter button', 'لمسةٌ واحدةٌ تبدّل بينهما', 'One tap switches between them') + '</div>');
     }
     var G = window.GardenCanvas;
-    if (G && G.scratchOn) {
+    if (G && G.scratchOn && !G.scratchPaused) {
       h += this.sec(L('الشخبطة', 'Scribble'), '<div class="nip-col"><button type="button" class="nip-switch" role="switch" data-scr="1" aria-checked="' + G.scratchOn() + '"><span>' +
         esc(L('الشخبطةُ تمحو', 'Scribble to erase')) + '<br><small class="nip-note">' +
         esc(L('اشطبْ بالقلم ذهاباً وإياباً فوق رسمٍ أو تظليلٍ أو كلمةٍ كتبتَها فتُمحى — وتراجعْ إن لم تقصد', 'Scratch back and forth over a drawing, highlight or word you typed to erase it — undo if you did not mean to')) +
