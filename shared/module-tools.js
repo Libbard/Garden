@@ -411,14 +411,18 @@
     var out = [], seen = new Set();
     var all = sec.querySelectorAll('h2, h3, h4, p, li, pre, blockquote, td, th, figcaption, .content-target');
     Array.prototype.forEach.call(all, function (el) {
-      if (!visible(el) || el.closest(SKIP)) return;
+      /*@3.MOTJ2.21*/
+      var sk = el.closest(SKIP), ask = sk && sk.matches('.accordion-trigger') ? sk : null;
+      if (!visible(el) || (sk && !ask)) return;
+      if (el.matches('.content-target') && el.querySelector('h2, h3, h4, p, li, pre, blockquote, td, th')) return;
       for (var p = el.parentElement; p && p !== sec; p = p.parentElement) if (seen.has(p)) return;
       seen.add(el);
       var t;
       if (el.tagName === 'PRE') { t = el.innerText.replace(/\s+$/, ''); out.push({ k: 'code', t: t }); return; }
       t = el.innerText.replace(/\s+/g, ' ').trim();
+      if (el.tagName === 'LI') t = t.replace(/^[^\p{L}\p{N}(]{1,2}\s*/u, '');
       if (!t) return;
-      var k = /^H[2-4]$/.test(el.tagName) ? 'h' : (el.tagName === 'LI' ? 'li' : 'p');
+      var k = ask ? 'q' : /^H[2-4]$/.test(el.tagName) ? 'h' : (el.tagName === 'LI' ? 'li' : 'p');
       var ol = k === 'li' && el.parentElement && el.parentElement.tagName === 'OL' ? el.parentElement : null;
       out.push({ k: k, t: t, n: ol ? (Number(ol.getAttribute('start')) || 1) + Array.prototype.indexOf.call(ol.children, el) : 0 });
     });
@@ -429,6 +433,7 @@
     bl.forEach(function (b, i) {
       if (b.k === 'h') out.push((i ? '\n' : '') + '## ' + b.t);
       else if (b.k === 'li') out.push((b.n ? b.n + '. ' : '- ') + b.t);
+      else if (b.k === 'q') out.push('\n**' + b.t + '**');
       else if (b.k === 'code') out.push('```\n' + b.t + '\n```');
       else out.push(b.t);
     });
@@ -437,7 +442,7 @@
   }
 
   /*@3.MOTJ2.2*/
-  var SHOT_W = 720, SHOT_MAX = 1650;
+  var SHOT_W = 720, SHOT_MAX = 2400, SHOT_PX = 16e6;
   /*@3.MOTJ2.9*/
   var ALGO_SEL = '[id^="algo-widget-"], .algo-widget, [data-algo], .algo-toolbar';
   var SVG_PROPS = ['fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'stroke-linecap', 'stroke-linejoin', 'stroke-opacity',
@@ -596,20 +601,46 @@
     });
     Array.prototype.forEach.call(el.querySelectorAll('[id]'), function (e) { e.removeAttribute('id'); });
     Array.prototype.forEach.call(el.querySelectorAll('ol > li, ul > li'), function (li) {
-      var ls = li.parentNode, k = ls.tagName === 'OL';
+      var ls = li.parentNode, k = ls.tagName === 'OL', ic = li.firstElementChild;
+      /*@3.MOTJ2.19*/
+      if (ic && !ic.querySelector('img') && ic.textContent.trim().length <= 2 && !/[0-9A-Za-z\u0600-\u06FF]/.test(ic.textContent)) ic.remove();
       var n = (Number(ls.getAttribute('start')) || 1) + Array.prototype.indexOf.call(ls.children, li);
       var mk = document.createElement('span');
-      mk.className = 'mt-shot-mk';
-      mk.textContent = k ? n + '.' : '•';
+      mk.className = k ? 'mt-shot-mk' : 'mt-shot-mk mt-shot-mk--dot';
+      if (k) mk.textContent = n + '.'; else mk.innerHTML = '<span class="mt-shot-dotb"></span>';
       li.insertBefore(mk, li.firstChild);
     });
     return el;
   }
   function inner(host) {
     var t = host && (host.querySelector(':scope > .content-target') || host);
-    var box = document.createElement('div');
+    /*@3.MOTJ2.20*/
+    var box = document.createElement(host && /^(UL|OL)$/.test(host.tagName) ? host.tagName : 'div');
     if (t) Array.prototype.forEach.call(t.childNodes, function (n) { box.appendChild(n.cloneNode(true)); });
     return box;
+  }
+  /*@3.MOTJ2.16*/
+  function codeLines(src) {
+    var out = [], cur = null;
+    var open = function (stack) {
+      var ln = document.createElement('span'); ln.className = 'mt-shot-lc'; out.push(ln); cur = ln;
+      stack.forEach(function (e) { var c = e.cloneNode(false); cur.appendChild(c); cur = c; });
+    };
+    var walk = function (n, stack) {
+      if (n.nodeType === 3) {
+        n.data.split('\n').forEach(function (p, i) { if (i) open(stack); if (p) cur.appendChild(document.createTextNode(p)); });
+      } else if (n.nodeType === 1) {
+        if (n.tagName === 'BR') { open(stack); return; }
+        var c = n.cloneNode(false); cur.appendChild(c); cur = c; stack.push(n);
+        Array.prototype.forEach.call(n.childNodes, function (k) { walk(k, stack); });
+        stack.pop(); cur = cur.parentNode;
+      }
+    };
+    open([]);
+    Array.prototype.forEach.call(src.childNodes, function (k) { walk(k, []); });
+    while (out.length > 1 && !out[out.length - 1].textContent.trim()) out.pop();
+    while (out.length > 1 && !out[0].textContent.trim()) out.shift();
+    return out;
   }
   /*@3.MOTJ2.4*/
   function shotBlocks(sec, maths) {
@@ -622,11 +653,27 @@
     });
     mathImgs(body, maths);
     Array.prototype.forEach.call(body.querySelectorAll(ALGO_SEL), function (w) { w.remove(); });
-    var out = document.createElement('div');
+    var out = document.createElement('div'), tt = titleOf(sec);
     out.className = 'mt-shot-body';
     Array.prototype.forEach.call(body.children, function (b) {
       var c = b.classList, el = null;
       if (c.contains('concept-header') || c.contains('depth-tabs') || c.contains('ai-explain-btn') || b.tagName === 'TEMPLATE') return;
+      /*@3.MOTJ2.18*/
+      if ((/^H[1-3]$/.test(b.tagName) || b.querySelector('h1, h2, h3')) && tt &&
+          b.textContent.replace(/\s+/g, ' ').trim().replace(/^\d+\s+/, '') === tt) return;
+      if (c.contains('accordion') || b.querySelector(':scope > .accordion-item')) {
+        Array.prototype.forEach.call(b.querySelectorAll('.accordion-item'), function (it) {
+          var tq = it.querySelector('.accordion-trigger'), q = tq && (tq.querySelector('[data-bilingual]') || tq), a = it.querySelector('.accordion-body-inner, .accordion-body');
+          if (!q) return;
+          var f = document.createElement('div'); f.className = 'mt-shot-faq';
+          var fq = flatText(inner(q)); fq.className = 'mt-shot-fq';
+          var mk = document.createElement('span'); mk.className = 'mt-shot-qa-mark'; mk.setAttribute('aria-hidden', 'true'); mk.textContent = L('؟', '?');
+          var row = document.createElement('div'); row.className = 'mt-shot-fqr'; row.appendChild(mk); row.appendChild(fq); f.appendChild(row);
+          if (a) { var fa = flatText(inner(a)); fa.className = 'mt-shot-fa'; f.appendChild(fa); }
+          out.appendChild(f);
+        });
+        return;
+      }
       if (c.contains('depth-layer')) {
         if (!c.contains('active')) return;
         el = flatText(inner(b)); el.className = 'mt-shot-text';
@@ -634,8 +681,13 @@
         var pre = b.querySelector('pre'), lang = b.querySelector('.code-block-header span');
         if (!pre) return;
         el = document.createElement('div'); el.className = 'mt-shot-code';
-        if (lang) { var lb = document.createElement('span'); lb.className = 'mt-shot-lang'; lb.textContent = lang.textContent.trim(); el.appendChild(lb); }
-        var p2 = pre.cloneNode(true); p2.removeAttribute('class'); p2.setAttribute('dir', 'ltr');
+        if (lang) { var lb = document.createElement('span'); lb.className = 'mt-shot-lang'; lb.innerHTML = '<span class="mt-shot-dot"></span>'; lb.appendChild(document.createTextNode(lang.textContent.trim())); el.appendChild(lb); }
+        var p2 = document.createElement('div'); p2.className = 'mt-shot-pre'; p2.setAttribute('dir', 'ltr');
+        codeLines(pre.querySelector('code') || pre).forEach(function (ln, i) {
+          var row = document.createElement('div'), no = document.createElement('span');
+          row.className = 'mt-shot-ln'; no.className = 'mt-shot-lno'; no.textContent = i + 1;
+          row.appendChild(no); row.appendChild(ln); p2.appendChild(row);
+        });
         el.appendChild(p2);
       } else if (b.tagName === 'DETAILS') {
         var q = b.querySelector('summary'), a = b.querySelector(':scope > div');
@@ -643,8 +695,10 @@
         el.innerHTML = '<div class="mt-shot-qa-h"><span class="mt-shot-qa-mark" aria-hidden="true">' + L('؟', '?') + '</span><span>' + esc(L('سؤالٌ للتفكير', 'Think about it')) + '</span></div>';
         var qq = flatText(inner(q)); qq.className = 'mt-shot-q'; el.appendChild(qq);
         if (a) {
-          var al = document.createElement('div'); al.className = 'mt-shot-al'; al.textContent = L('الجواب', 'Answer'); el.appendChild(al);
-          var aa = flatText(inner(a)); aa.className = 'mt-shot-a'; el.appendChild(aa);
+          var ans = document.createElement('div'); ans.className = 'mt-shot-ans';
+          var al = document.createElement('div'); al.className = 'mt-shot-al'; al.innerHTML = '<span class="mt-shot-bar"></span>'; al.appendChild(document.createTextNode(L('الجواب', 'Answer'))); ans.appendChild(al);
+          var aa = flatText(inner(a)); aa.className = 'mt-shot-a'; ans.appendChild(aa);
+          el.appendChild(ans);
         }
       } else if (c.contains('formula-block')) {
         el = document.createElement('div'); el.className = 'mt-shot-formula';
@@ -657,8 +711,33 @@
         if (!el.children.length && b.tagName === 'svg') el.appendChild(b);
       } else if (b.tagName === 'TABLE' || b.querySelector('table')) {
         el = document.createElement('div'); el.className = 'mt-shot-table';
-        var tb = (b.tagName === 'TABLE' ? b : b.querySelector('table')).cloneNode(true);
+        var tb = (b.tagName === 'TABLE' ? b : b.querySelector('table')).cloneNode(true), tone = {};
+        /*@3.MOTJ2.17*/
+        Array.prototype.forEach.call(tb.querySelectorAll('th, td'), function (td) {
+          var k = td.tagName === 'TD' && /\btd-(good|bad|neutral|medium)\b/.exec(td.className);
+          var cell = document.createElement('span'), ct = document.createElement('span');
+          cell.className = 'mt-shot-cell'; ct.className = 'mt-shot-ct';
+          while (td.firstChild) ct.appendChild(td.firstChild);
+          if (!/[\u0600-\u06FF]/.test(ct.textContent)) ct.setAttribute('dir', 'ltr');
+          cell.appendChild(ct);
+          if (k) {
+            k = k[1] === 'medium' ? 'neutral' : k[1]; tone[k] = 1;
+            var tk = document.createElement('span'); tk.className = 'mt-shot-tk mt-shot-tk--' + k; tk.setAttribute('aria-hidden', 'true'); tk.innerHTML = '<span class="mt-shot-tk-a"></span><span class="mt-shot-tk-b"></span>';
+            cell.appendChild(tk); td.setAttribute('data-tone', k);
+          }
+          td.appendChild(cell);
+        });
         el.appendChild(flatText(tb));
+        if (tone.good || tone.bad) {
+          var lg = document.createElement('div'); lg.className = 'mt-shot-legend';
+          [['good', L('ميزة', 'Strength')], ['bad', L('عيب', 'Weakness')], ['neutral', L('بين بين', 'In between')]].forEach(function (p) {
+            if (!tone[p[0]]) return;
+            var it = document.createElement('span'); it.className = 'mt-shot-lgi';
+            it.innerHTML = '<span class="mt-shot-tk mt-shot-tk--' + p[0] + '" aria-hidden="true"><span class="mt-shot-tk-a"></span><span class="mt-shot-tk-b"></span></span>';
+            it.appendChild(document.createTextNode(p[1])); lg.appendChild(it);
+          });
+          el.appendChild(lg);
+        }
       } else {
         el = flatText(inner(b)); el.className = 'mt-shot-text';
         if (!el.textContent.trim() && !el.querySelector('img')) return;
@@ -666,6 +745,47 @@
       out.appendChild(el);
     });
     return out;
+  }
+  function shotUrl(sec) {
+    var at = location.href.split('#')[0].split('?')[0];
+    var rel = at.indexOf(ROOT) === 0 ? at.slice(ROOT.length) : location.pathname.replace(/^\/(Garden\/)?/, '');
+    return 'https://libbard.github.io/Garden/' + rel + (sec.id ? '#' + sec.id : '');
+  }
+  function tokRgb(v) {
+    var p = document.createElement('span');
+    p.style.color = 'var(' + v + ')';
+    document.body.appendChild(p);
+    var m = getComputedStyle(p).color.match(/[\d.]+/g) || [0, 0, 0];
+    p.remove();
+    return m.slice(0, 3).map(Number);
+  }
+  function lum(c) {
+    var f = function (x) { x /= 255; return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+  }
+  function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+  /*@3.MOTJ2.14*/
+  function shotQR(sec) {
+    if (!window.GardenQR) return '';
+    var q;
+    try { q = window.GardenQR.build(shotUrl(sec)); } catch (e) { return ''; }
+    var n = q.size, bg = tokRgb('--bg-body'), fg = tokRgb('--text-primary'), ac = tokRgb('--brand-500');
+    if (contrast(ac, bg) < 3.2) ac = fg;
+    var rgb = function (c) { return 'rgb(' + c.join(',') + ')'; };
+    var eye = function (r, c) { return (r < 7 && c < 7) || (r < 7 && c >= n - 7) || (r >= n - 7 && c < 7); };
+    var d = '', R = 0.43;
+    for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) {
+      if (!q.modules[r][c] || eye(r, c)) continue;
+      d += 'M' + (c + 1 + 0.5 - R) + ' ' + (r + 1.5) + 'a' + R + ' ' + R + ' 0 1 0 ' + 2 * R + ' 0a' + R + ' ' + R + ' 0 1 0 ' + -2 * R + ' 0';
+    }
+    var eyes = [[0, 0], [0, n - 7], [n - 7, 0]].map(function (e) {
+      var x = e[1] + 1, y = e[0] + 1;
+      return '<rect x="' + (x + 0.5) + '" y="' + (y + 0.5) + '" width="6" height="6" rx="1.9" fill="none" stroke="' + rgb(ac) + '" stroke-width="1"/>' +
+             '<rect x="' + (x + 2) + '" y="' + (y + 2) + '" width="3" height="3" rx="0.95" fill="' + rgb(ac) + '"/>';
+    }).join('');
+    var t = n + 2;
+    return '<div class="mt-shot-qr"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + t + ' ' + t + '" width="88" height="88" aria-hidden="true">' +
+      '<path d="' + d + '" fill="' + rgb(fg) + '"/>' + eyes + '</svg></div>';
   }
   function pad2(n) { n = String(n || '').trim(); return /^\d$/.test(n) ? '0' + n : n; }
   function shotCard(sec, maths, cat) {
@@ -687,8 +807,8 @@
         '<div class="mt-shot-t">' + (num ? '<div class="mt-shot-cn"><small>' + esc(L('المفهوم', 'Concept')) + '</small><b dir="ltr">' + esc(pad2(num.textContent)) + '</b></div>' : '') +
         '<h2>' + esc(title) + '</h2></div>' +
       '</div>' +
-      '<footer class="mt-shot-f"><span>' + esc(L('ادرسْه كاملاً بثلاثة أعماق، مع أسئلةٍ وبطاقات', 'Study it in full — three depths, questions and flashcards')) + '</span>' +
-      '<b dir="ltr">libbard.github.io/Garden</b></footer>';
+      '<footer class="mt-shot-f"><div class="mt-shot-fl"><span>' + esc(L('ادرسْه كاملاً بثلاثة أعماق، مع أسئلةٍ وبطاقات', 'Study it in full — three depths, questions and flashcards')) + '</span>' +
+      '<b dir="ltr">libbard.github.io/Garden</b></div>' + shotQR(sec) + '</footer>';
     card.querySelector('.mt-shot-paper').appendChild(shotBlocks(sec, maths));
     return card;
   }
@@ -696,8 +816,8 @@
     var roots = [sec];
     var shut = Array.prototype.filter.call(sec.querySelectorAll('details:not([open])'), function (d) { d.open = true; return true; });
     var restore = function () { shut.forEach(function (d) { d.open = false; }); untag(roots); };
-    return Promise.all([X.ensureCanvas(), logoReady(), catalogOf(document.documentElement.getAttribute('data-subject') || '')]).then(function (r) {
-      return new Promise(function (ok) { setTimeout(function () { ok(r[2]); }, 80); });
+    return Promise.all([X.ensureCanvas(), logoReady(), js('qr.js', function () { return !!window.GardenQR; }).catch(function () {}), catalogOf(document.documentElement.getAttribute('data-subject') || '')]).then(function (r) {
+      return new Promise(function (ok) { setTimeout(function () { ok(r[3]); }, 80); });
     }).then(function (cat) {
       return mathShots(roots, X).then(function (maths) {
         var card = shotCard(sec, maths, cat || {});
@@ -706,17 +826,39 @@
       });
     }, function (e) { restore(); throw e; }).catch(function (e) { restore(); throw e; });
   }
+  /*@3.MOTJ2.15*/
+  function fitShot(card, ph) {
+    ph.appendChild(card);
+    var paper = card.querySelector('.mt-shot-paper'), body = card.querySelector('.mt-shot-body');
+    if (paper.scrollHeight > SHOT_MAX) {
+      var top = paper.getBoundingClientRect().top, lim = SHOT_MAX - 26 - 64, cut = false;
+      Array.prototype.slice.call(body.children, 1).forEach(function (k) {
+        if (k.getBoundingClientRect().bottom - top > lim) { k.remove(); cut = true; }
+      });
+      if (cut) {
+        var more = document.createElement('div'); more.className = 'mt-shot-more';
+        more.innerHTML = '<span class="mt-shot-rule"></span><span></span><span class="mt-shot-rule"></span>';
+        more.children[1].textContent = L('وبقيّةُ المفهوم في الموقع', 'The rest of this concept is on the site');
+        body.appendChild(more);
+      }
+      if (paper.scrollHeight > SHOT_MAX) card.setAttribute('data-cut', '1');
+    }
+    var h = card.offsetHeight || SHOT_W;
+    ph.removeChild(card);
+    return Math.min(3, Math.sqrt(SHOT_PX / (SHOT_W * h)));
+  }
   function shareCard(sec) {
     return exportLib().then(function (X) {
       return shotDom(sec, X).then(function (card) {
         var ph = document.createElement('div');
         ph.className = 'mt-shot-ph';
         document.body.appendChild(ph);
+        var px = fitShot(card, ph);
         var bcs = getComputedStyle(document.body), bg = bcs.backgroundColor;
         if (!bg || bg === 'rgba(0, 0, 0, 0)') bg = getComputedStyle(document.documentElement).backgroundColor;
         if (!bg || bg === 'rgba(0, 0, 0, 0)') bg = '#0f1117';
         return window.html2canvas(ph, {
-          backgroundColor: bg, scale: 3, useCORS: true, logging: false, scrollX: 0, scrollY: 0,
+          backgroundColor: bg, scale: px, useCORS: true, logging: false, scrollX: 0, scrollY: 0,
           windowWidth: 1280, windowHeight: 900,
           onclone: function (doc) {
             var c = doc.querySelector('.mt-shot-ph');
@@ -726,8 +868,6 @@
             st.textContent = '.mt-shot-ph *, .mt-shot-ph *::before, .mt-shot-ph *::after { animation: none !important; transition: none !important; letter-spacing: normal !important; word-spacing: normal !important; }' +
 '';
             doc.head.appendChild(st);
-            var paper = c.querySelector('.mt-shot-paper');
-            if (paper.scrollHeight > SHOT_MAX) c.querySelector('.mt-shot').setAttribute('data-cut', '1');
             X.fixColors(c);
           }
         }).then(function (cv) {
@@ -810,7 +950,7 @@
     var title = titleOf(sec), out = '', prevLi = false;
     blocksOf(sec).forEach(function (b, i) {
       if (!i && b.k !== 'code' && b.t.replace(/^\d+\s*/, '').trim() === title) return;
-      var s = b.k === 'h' ? '### ' + b.t : b.k === 'li' ? (b.n ? b.n + '. ' : '- ') + b.t : b.k === 'code' ? '```\n' + b.t + '\n```' : b.t;
+      var s = b.k === 'h' ? '### ' + b.t : b.k === 'q' ? '**' + b.t + '**' : b.k === 'li' ? (b.n ? b.n + '. ' : '- ') + b.t : b.k === 'code' ? '```\n' + b.t + '\n```' : b.t;
       out += (out ? (b.k === 'li' && prevLi ? '\n' : '\n\n') : '') + s;
       prevLi = b.k === 'li';
     });
@@ -1169,5 +1309,5 @@
   function hlMenu(hit, x, y) { return smart(x, y, { hit: hit, sec: secOf(hit.rg.startContainer) }); }
 
   window.GardenModTools = { sel: showSel, hideSel: hideSel, moving: moving, selSheet: selSheet, smart: smart, onContext: onContext, hlMenu: hlMenu,
-                            shareCard: shareCard, shareImage: shareImage, aiPrompt: aiPrompt, shotDom: function (sec) { return exportLib().then(function (X) { return shotDom(sec, X); }); }, md: mdOf, focus: focusOn };
+                            shareCard: shareCard, shareImage: shareImage, aiPrompt: aiPrompt, shotDom: function (sec) { return exportLib().then(function (X) { return shotDom(sec, X); }); }, _fit: fitShot, md: mdOf, focus: focusOn };
 })();
