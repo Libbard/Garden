@@ -3592,6 +3592,23 @@
       if (o && o.id) location.href = ROOT + 'hub/notes.html?id=' + encodeURIComponent(o.id);
     });
   }
+  function _touchUi() { return !!(window.matchMedia && matchMedia('(pointer: coarse)').matches); }
+  function _overText(x, y) {
+    let rg = null;
+    try {
+      if (document.caretRangeFromPoint) rg = document.caretRangeFromPoint(x, y);
+      else if (document.caretPositionFromPoint) { const cp = document.caretPositionFromPoint(x, y); if (cp) { rg = document.createRange(); rg.setStart(cp.offsetNode, cp.offset); } }
+    } catch (e) { rg = null; }
+    const n = rg && rg.startContainer;
+    if (!n || n.nodeType !== 3) return false;
+    const s = n.nodeValue || '', i = rg.startOffset;
+    for (let k = i - 1; k <= i; k++) {
+      if (k < 0 || k >= s.length || /\s/.test(s.charAt(k))) continue;
+      const r = document.createRange(); r.setStart(n, k); r.setEnd(n, k + 1);
+      for (const q of r.getClientRects()) if (x >= q.left - 6 && x <= q.right + 6 && y >= q.top - 6 && y <= q.bottom + 6) return true;
+    }
+    return false;
+  }
   function _modSel(rect, text) {
     hideNotesTooltip();
     hideMobileNoteSaveBar();
@@ -3640,7 +3657,7 @@
         if (sessionStorage.getItem('garden_notes_paused') === '1') return;
         const sel = window.getSelection();
         const text = sel?.toString().trim();
-        if (text && text.length >= 1 && text.length < 500) {
+        if (text && text.length >= 1 && text.length < (_isModPage() ? 6000 : 500)) {
           _captureSelection(sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null, text);
           const rect = _gardenSelRange ? _gardenSelRange.getBoundingClientRect() : null;
           if (_isModPage()) { _modSel(rect, text); return; }
@@ -3650,31 +3667,57 @@
     });
 
     let mobileSelTimeout;
+    const modPage = _isModPage();
     document.addEventListener('selectionchange', () => {
       clearTimeout(mobileSelTimeout);
-      if (window.innerWidth > 1024) return;
+      if (window.innerWidth > 1024 && !_touchUi()) return;
+      /*@3.GARJ.700*/
+      if (modPage && window.GardenModTools) GardenModTools.moving();
       mobileSelTimeout = setTimeout(() => {
         if (sessionStorage.getItem('garden_notes_paused') === '1') return;
         const sel = window.getSelection();
         const text = sel?.toString().trim();
-        if (text && text.length >= 1 && text.length < 500 && mainContent?.contains(sel.anchorNode)) {
+        if (text && text.length >= 1 && text.length < (modPage ? 6000 : 500) && mainContent?.contains(sel.anchorNode)) {
           _captureSelection(sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null, text);
-          if (_isModPage()) { _modSel(_gardenSelRange ? _gardenSelRange.getBoundingClientRect() : null, text); return; }
+          if (modPage) { _modSel(_gardenSelRange ? _gardenSelRange.getBoundingClientRect() : null, text); return; }
           showMobileNoteSaveBar(text);
-        } else { hideMobileNoteSaveBar(); }
-      }, 800);
+        } else { hideMobileNoteSaveBar(); if (modPage && window.GardenModTools) GardenModTools.hideSel(); }
+      }, modPage ? 400 : 800);
     });
 
     if (_isModPage()) {
+      let lastTouch = 0, held = 0, holdT = 0, hx = 0, hy = 0;
+      const skip = (t) => !!(t && t.closest && t.closest('a[href], input, textarea, select, button, [contenteditable="true"], .mt-sel, .gsf-menu, dialog'));
+      const inkOn = () => !!(window.GardenModuleInk && GardenModuleInk.isOn && GardenModuleInk.isOn());
+      const smartAt = (x, y, t) => {
+        held = Date.now();
+        const ev = { clientX: x, clientY: y, target: t, shiftKey: false, defaultPrevented: false, preventDefault() {} };
+        _modTools().then((T) => T.onContext(ev, { onNote: _modNote }), () => {});
+      };
       mainContent?.addEventListener('contextmenu', (e) => {
         if (e.shiftKey) return;
         const t = e.target;
         if (t && t.closest && t.closest('a[href], input, textarea, select, [contenteditable="true"]')) return;
-        if (window.GardenModuleInk && GardenModuleInk.isOn && GardenModuleInk.isOn()) return;
+        if (inkOn()) return;
+        /*@3.GARJ.699*/
+        const touch = e.pointerType === 'touch' || e.pointerType === 'pen' || Date.now() - lastTouch < 1500;
+        if (touch && _overText(e.clientX, e.clientY)) return;
         e.preventDefault();
-        const ev = { clientX: e.clientX, clientY: e.clientY, target: t, shiftKey: false, defaultPrevented: false, preventDefault() {} };
-        _modTools().then((T) => T.onContext(ev, { onNote: _modNote }), () => {});
+        clearTimeout(holdT);
+        if (touch && Date.now() - held < 900) return;
+        smartAt(e.clientX, e.clientY, t);
       });
+      mainContent?.addEventListener('touchstart', (e) => {
+        lastTouch = Date.now(); clearTimeout(holdT);
+        if (e.touches.length !== 1 || skip(e.target) || inkOn()) return;
+        const p = e.touches[0]; hx = p.clientX; hy = p.clientY;
+        if (_overText(hx, hy)) return;
+        const t = e.target;
+        holdT = setTimeout(() => { if (Date.now() - held > 900 && !String(window.getSelection() || '').trim()) smartAt(hx, hy, t); }, 520);
+      }, { passive: true });
+      mainContent?.addEventListener('touchmove', (e) => { const p = e.touches[0]; if (p && Math.abs(p.clientX - hx) + Math.abs(p.clientY - hy) > 10) clearTimeout(holdT); }, { passive: true });
+      ['touchend', 'touchcancel'].forEach((k) => mainContent?.addEventListener(k, () => { lastTouch = Date.now(); clearTimeout(holdT); }, { passive: true }));
+      window.addEventListener('scroll', () => clearTimeout(holdT), { passive: true });
     }
 
     /*@3.GARJ.172*/
