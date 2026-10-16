@@ -179,8 +179,8 @@
     if (coarse()) {
       var vv = window.visualViewport, vt = vv ? vv.offsetTop : 0, vh2 = vv ? vv.height : vh;
       var rs = SEL.range && SEL.range.getClientRects ? SEL.range.getClientRects() : null;
-      var end = rs && rs.length ? rs[rs.length - 1] : r, head = vt + headBottom() + 8;
-      var y = SEL.top ? -1 : end.bottom + 28;
+      var end = rs && rs.length ? rs[rs.length - 1] : r, first = rs && rs.length ? rs[0] : r, head = vt + headBottom() + 8;
+      var y = SEL.top ? -1 : end.bottom + (first.top - head < 64 ? 84 : 28);
       if (y < head || y + h > vt + vh2 - pad) { y = head; el.setAttribute('data-dock', 'head'); }
       el.style.top = Math.round(y) + 'px';
       el.style.left = Math.round(Math.max(pad, Math.min(vw - w - pad, (end.left + end.right) / 2 - w / 2))) + 'px';

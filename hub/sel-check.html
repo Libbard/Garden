@@ -13,10 +13,10 @@
       document.documentElement.setAttribute('dir','rtl');
     })();
   </script>
-  <link rel="stylesheet" href="../shared/vendor/fonts/garden/garden-core.css?v=1.0.8.68">
-  <link rel="stylesheet" href="../shared/skin.css?v=1.0.8.68">
-  <link rel="stylesheet" href="../shared/surface.css?v=1.0.8.68">
-  <link rel="stylesheet" href="../shared/vendor/fontawesome/css/garden-icons.css?v=1.0.8.68">
+  <link rel="stylesheet" href="../shared/vendor/fonts/garden/garden-core.css?v=1.0.8.69">
+  <link rel="stylesheet" href="../shared/skin.css?v=1.0.8.69">
+  <link rel="stylesheet" href="../shared/surface.css?v=1.0.8.69">
+  <link rel="stylesheet" href="../shared/vendor/fontawesome/css/garden-icons.css?v=1.0.8.69">
   <link rel="icon" type="image/svg+xml" href="../shared/icons/logo-mark.svg">
   <style>
     body { margin: 0; background: var(--bg-primary); color: var(--text-primary); font-family: var(--font-ar, system-ui), system-ui, sans-serif; }
@@ -50,6 +50,8 @@
     .sc-mock[hidden] { display: none; }
     .sc-mock[data-moving] { opacity: .12; pointer-events: none; }
     .sc-mock i { inline-size: 2.2rem; block-size: 2.2rem; display: grid; place-items: center; border-radius: 50%; color: var(--text-secondary); }
+    .sc-toast { position: fixed; z-index: 60; inset-inline: 16px; inset-block-end: calc(16px + env(safe-area-inset-bottom, 0px)); padding: .6rem .9rem; border-radius: 12px; background: var(--bg-card, #1f2937); border: 1px solid var(--border-color, rgba(127,127,127,.3)); font-size: .88rem; text-align: center; box-shadow: 0 10px 28px rgba(0,0,0,.3); }
+    .sc-toast[hidden] { display: none; }
     .sc-mock .sc-dot { inline-size: 1.5rem; block-size: 1.5rem; border-radius: 50%; background: #fde047; margin-inline: .35rem; }
   </style>
 <!--garden-ga-->
@@ -67,7 +69,7 @@
       <ol class="sc-steps">
         <li><b>اضغطْ مطوّلاً على كلمةٍ عربيّة</b> في الفقرة الأولى، وانظرْ: هل ظهرت قائمةُ النظام (‏نسخ · تحديد الكلّ…)؟ وأين؟ أجبْ بالأزرار تحت الفقرات.</li>
         <li><b>اسحبْ مقبضَ نهاية التحديد</b> إلى آخر الفقرة الثانية ثمّ ارفعْ إصبعك — هل عاد الشريطُ التجريبيُّ (‏الأصفر) تحت التحديد؟</li>
-        <li><b>اضغطْ مطوّلاً على المساحة الفارغة</b> المنقّطة، ثمّ <b>على الرسمة</b>.</li>
+        <li><b>اضغطْ مطوّلاً على المساحة الفارغة</b> المنقّطة، ثمّ <b>على الرسمة</b> — هنا لا تُفتح قائمة، بل تظهر رسالةٌ أسفلَ الشاشة: «هنا تُفتح قائمتُنا».</li>
         <li><b>فعّلِ «السلوكَ القديم»</b> وكرّرِ الخطوة ١ — لنرى الفرقَ الذي تشكو منه.</li>
         <li><b>اضغطْ «انسخِ النتيجة»</b> والصقها لي، مع اسم الهاتف والمتصفّح.</li>
       </ol>
@@ -121,14 +123,15 @@
     </section>
   </main>
 
+  <div class="sc-toast" id="sc-toast" hidden role="status"></div>
   <div class="sc-mock" id="sc-mock" hidden aria-hidden="true"><span class="sc-dot"></span><i class="fa-solid fa-underline"></i><i class="fa-solid fa-pen-to-square"></i><i class="fa-solid fa-ellipsis"></i></div>
 
   <script>
   (function () {
     var T0 = performance.now(), $ = function (id) { return document.getElementById(id); };
-    var S = { cmText: 0, cmTextKept: 0, cmEmpty: 0, cmImg: 0, cmTouch: 0, lpOurs: 0, selChanges: 0, selNoTouch: 0, drags: 0,
+    var S = { cmText: 0, cmTextKept: 0, cmEmpty: 0, cmImg: 0, cmTouch: 0, cmWithSel: 0, cmNoStart: 0, cmPtr: {}, lpOurs: 0, selChanges: 0, selNoTouch: 0, drags: 0,
               maxGapMs: 0, ptrDuringDrag: 0, mockShown: 0, mockBack: 0, mockMaxLen: 0, vvShrink: 0, ans: {} };
-    var log = [], touching = false, lastTouch = 0, lastSel = 0, selTimer = 0, dragging = false;
+    var log = [], touching = false, lastTouch = 0, lastStart = 0, lastSel = 0, selTimer = 0, dragging = false;
     function t() { return Math.round(performance.now() - T0); }
     function L(s) { log.push(t() + ' ' + s); if (log.length > 80) log.shift(); $('sc-log').textContent = log.slice().reverse().join('\n'); paint(); }
 
@@ -164,7 +167,7 @@
 
     var lp = 0, lpX = 0, lpY = 0;
     document.addEventListener('touchstart', function (e) {
-      touching = true; lastTouch = Date.now();
+      touching = true; lastTouch = lastStart = Date.now();
       if (dragging) S.ptrDuringDrag++;
       var p = e.touches[0]; lpX = p.clientX; lpY = p.clientY;
       clearTimeout(lp);
@@ -184,10 +187,15 @@
       if (!$('sc-text').contains(e.target)) return;
       var k = kindAt(e), pt = e.pointerType || (Date.now() - lastTouch < 1200 ? 'touch?' : '');
       if (/touch/.test(pt)) S.cmTouch++;
+      var pk = e.pointerType || 'none'; S.cmPtr[pk] = (S.cmPtr[pk] || 0) + 1;
+      var hasSel = !getSelection().isCollapsed && String(getSelection()).trim().length > 0;
+      if (hasSel) S.cmWithSel++;
+      if (Date.now() - lastStart > 900) S.cmNoStart++;
       if (k === 'text') S.cmText++; else if (k === 'img') S.cmImg++; else S.cmEmpty++;
       clearTimeout(lp);
       var old = $('sc-old').checked;
       if (old || k !== 'text') e.preventDefault();
+      if (!old && k !== 'text' && Date.now() - lastStart <= 900) { var tt = $('sc-toast'); tt.textContent = 'هنا تُفتح قائمتُنا (‏' + (k === 'img' ? 'رسمة' : 'فراغ') + ')'; tt.hidden = false; clearTimeout(tt._t); tt._t = setTimeout(function () { tt.hidden = true; }, 1800); }
       L('contextmenu on ' + k + ' ptr=' + pt + (old || k !== 'text' ? ' (prevented)' : ' (left to OS)'));
       if (k === 'text') setTimeout(function () { var n = String(getSelection()).length; if (n) S.cmTextKept++; L('  selection after 600ms: ' + n + ' chars'); }, 600);
     });
@@ -239,7 +247,7 @@
     });
 
     var ROWS = [['contextmenu على النصّ', 'cmText'], ['… وبقي تحديدُ النظام بعده', 'cmTextKept'], ['contextmenu على الفراغ', 'cmEmpty'], ['contextmenu على الرسمة', 'cmImg'],
-      ['contextmenu من لمس', 'cmTouch'], ['ضغطةٌ مطوّلةٌ حسبناها نحن (‏فراغ/رسمة)', 'lpOurs'], ['selectionchange', 'selChanges'], ['… بلا لمسٍ يصل الصفحة (‏المقابض)', 'selNoTouch'],
+      ['contextmenu من لمس', 'cmTouch'], ['… والتحديدُ قائم', 'cmWithSel'], ['… بلا لمسةِ بدءٍ قريبة (‏إفلاتُ المقبض)', 'cmNoStart'], ['ضغطةٌ مطوّلةٌ حسبناها نحن (‏فراغ/رسمة)', 'lpOurs'], ['selectionchange', 'selChanges'], ['… بلا لمسٍ يصل الصفحة (‏المقابض)', 'selNoTouch'],
       ['سحباتُ مقبض', 'drags'], ['لمسٌ وصل الصفحةَ أثناء السحب', 'ptrDuringDrag'], ['أطولُ فجوةٍ بين تغيّرين (‏مل)', 'maxGapMs'], ['عاد الشريطُ بعد السحب', 'mockBack'],
       ['أطولُ تحديد (‏محرف)', 'mockMaxLen'], ['انكماشُ الشاشة المرئيّة', 'vvShrink']];
     function report() { return JSON.stringify({ ua: navigator.userAgent, vw: innerWidth, vh: innerHeight, dpr: devicePixelRatio, old: $('sc-old').checked, bottom: $('sc-bottom').checked, s: S }); }

@@ -3686,7 +3686,7 @@
     });
 
     if (_isModPage()) {
-      let lastTouch = 0, held = 0, holdT = 0, hx = 0, hy = 0;
+      let lastTouch = 0, lastStart = 0, held = 0, holdT = 0, hx = 0, hy = 0, selAtStart = false;
       const skip = (t) => !!(t && t.closest && t.closest('a[href], input, textarea, select, button, [contenteditable="true"], .mt-sel, .gsf-menu, dialog'));
       const inkOn = () => !!(window.GardenModuleInk && GardenModuleInk.isOn && GardenModuleInk.isOn());
       const smartAt = (x, y, t) => {
@@ -3700,7 +3700,10 @@
         if (t && t.closest && t.closest('a[href], input, textarea, select, [contenteditable="true"]')) return;
         if (inkOn()) return;
         /*@3.GARJ.699*/
-        const touch = e.pointerType === 'touch' || e.pointerType === 'pen' || Date.now() - lastTouch < 1500;
+        const touch = (e.pointerType ? e.pointerType !== 'mouse' : _touchUi()) || Date.now() - lastTouch < 1500;
+        const sel = window.getSelection();
+        const selOn = !!(sel && !sel.isCollapsed && String(sel).trim() && mainContent.contains(sel.anchorNode));
+        if (_touchUi() && selOn && Date.now() - lastStart > 900) return;
         if (touch && _overText(e.clientX, e.clientY)) return;
         e.preventDefault();
         clearTimeout(holdT);
@@ -3708,12 +3711,13 @@
         smartAt(e.clientX, e.clientY, t);
       });
       mainContent?.addEventListener('touchstart', (e) => {
-        lastTouch = Date.now(); clearTimeout(holdT);
+        lastTouch = lastStart = Date.now(); clearTimeout(holdT);
+        selAtStart = !!String(window.getSelection() || '').trim();
         if (e.touches.length !== 1 || skip(e.target) || inkOn()) return;
         const p = e.touches[0]; hx = p.clientX; hy = p.clientY;
         if (_overText(hx, hy)) return;
         const t = e.target;
-        holdT = setTimeout(() => { if (Date.now() - held > 900 && !String(window.getSelection() || '').trim()) smartAt(hx, hy, t); }, 520);
+        holdT = setTimeout(() => { if (Date.now() - held > 900 && !selAtStart) smartAt(hx, hy, t); }, 520);
       }, { passive: true });
       mainContent?.addEventListener('touchmove', (e) => { const p = e.touches[0]; if (p && Math.abs(p.clientX - hx) + Math.abs(p.clientY - hy) > 10) clearTimeout(holdT); }, { passive: true });
       ['touchend', 'touchcancel'].forEach((k) => mainContent?.addEventListener(k, () => { lastTouch = Date.now(); clearTimeout(holdT); }, { passive: true }));
