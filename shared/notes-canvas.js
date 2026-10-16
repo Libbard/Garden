@@ -25,20 +25,20 @@
 
   /*@3.NOCJ.80*/
   var HI_TONES = {
-    yellow:  { dark: '#ffe14d', light: '#ffe14d' },
-    lime:    { dark: '#c3f14a', light: '#c3f14a' },
-    emerald: { dark: '#7cf0b0', light: '#7cf0b0' },
-    teal:    { dark: '#6cebe2', light: '#6cebe2' },
-    sky:     { dark: '#8ad4ff', light: '#8ad4ff' },
-    indigo:  { dark: '#a9aaff', light: '#a9aaff' },
-    violet:  { dark: '#d9adff', light: '#d9adff' },
-    pink:    { dark: '#ffa8d2', light: '#ffa8d2' },
-    orange:  { dark: '#ffbc70', light: '#ffbc70' },
-    red:     { dark: '#ff9d9d', light: '#ff9d9d' },
-    amber:   { dark: '#ffd166', light: '#ffd166' },
-    rose:    { dark: '#ffa3ba', light: '#ffa3ba' },
-    brown:   { dark: '#e0bda6', light: '#e0bda6' },
-    ink:     { dark: '#c9ccd4', light: '#c9ccd4' }
+    yellow:  { dark: '#ffd400', light: '#ffe14d' },
+    lime:    { dark: '#a6e22e', light: '#c3f14a' },
+    emerald: { dark: '#2fe08c', light: '#7cf0b0' },
+    teal:    { dark: '#22d3c5', light: '#6cebe2' },
+    sky:     { dark: '#45a9ff', light: '#8ad4ff' },
+    indigo:  { dark: '#8183ff', light: '#a9aaff' },
+    violet:  { dark: '#c77dff', light: '#d9adff' },
+    pink:    { dark: '#ff66b3', light: '#ffa8d2' },
+    orange:  { dark: '#ff9a3c', light: '#ffbc70' },
+    red:     { dark: '#ff6b6b', light: '#ff9d9d' },
+    amber:   { dark: '#ffbb00', light: '#ffd166' },
+    rose:    { dark: '#ff7096', light: '#ffa3ba' },
+    brown:   { dark: '#d0946a', light: '#e0bda6' },
+    ink:     { dark: '#b0b8c8', light: '#c9ccd4' }
   };
 
   /*@3.NOCJ.11*/
@@ -128,6 +128,44 @@
   /*@3.NOCJ.83*/
   var HI_DARK = 0.45;
   var HI_FLAT = 0.55;
+
+  var HI_BAND_LUM = 0.1, HI_BAND_MIN = 0.2, _hiA = {};
+  function paperRGB() {
+    var v = _paperOverride;
+    if (!v) {
+      var cs = getComputedStyle(document.documentElement);
+      v = (cs.getPropertyValue('--bg-card') || '').trim() || (cs.getPropertyValue('--bg-surface') || '').trim();
+    }
+    if (!v) return null;
+    if (v.charAt(0) === '#') {
+      if (v.length === 4) v = '#' + v[1] + v[1] + v[2] + v[2] + v[3] + v[3];
+      if (v.length !== 7) return null;
+      var n = parseInt(v.slice(1), 16);
+      return [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+    }
+    var m = v.match(/(-?[\d.]+)/g);
+    if (!m || m.length < 3) return null;
+    return [0, 1, 2].map(function (i) { return Math.max(0, Math.min(1, parseFloat(m[i]) / 255)); });
+  }
+  function lumRGB(c) {
+    var f = function (x) { return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+  }
+  /*@3.NOCJ.145*/
+  function hiBandAlpha(name) {
+    if (isLight()) return 1;
+    var P = paperRGB();
+    if (!P) return HI_DARK;
+    var hex = hiHexOf(name), key = P.join(',') + hex;
+    if (_hiA[key] != null) return _hiA[key];
+    var n = parseInt(hex.slice(1), 16), C = [((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255];
+    var at = function (a) { return lumRGB(P.map(function (p, i) { return p + a * (1 - p) * C[i]; })); };
+    var lo = HI_BAND_MIN, hi = 1, k;
+    if (at(1) <= HI_BAND_LUM) return (_hiA[key] = 1);
+    if (at(lo) > HI_BAND_LUM) return (_hiA[key] = lo);
+    for (k = 0; k < 14; k++) { var mid = (lo + hi) / 2; if (at(mid) <= HI_BAND_LUM) lo = mid; else hi = mid; }
+    return (_hiA[key] = Math.round(lo * 1000) / 1000);
+  }
 
   function themeIsLight() {
     var l = docLum();
@@ -1456,7 +1494,7 @@
     }
     if (!qs.length) return;
     g.save();
-    g.globalAlpha = el._fade || 1;
+    g.globalAlpha = (el._fade || 1) * hiBandAlpha(el.c);
     g.strokeStyle = hiHexOf(el.c);
     var nibS = (NIBS[el.nib] && NIBS[el.nib].scale) || 1;
     g.lineWidth = Math.max(1, (el.w || 2) * nibS * (this.cam.z || 1));
@@ -2094,10 +2132,9 @@
     for (li = 0; li < lines.length; li++) {
       L0 = lines[li];
       if (cv.hiStyle === 'under') {
-        var gr = Math.max(1, Math.min(6, (cv.width > 0 ? cv.width : 14) / 6));
-        th = Math.max(1, Math.min(L0.h * 0.34, L0.h * 0.075 * gr));
-        uy = L0.y + L0.h * 0.92 - th / 2;
-        bands.push({ id: uid(), ty: 'st', c: st.c, w: th, nib: 'marker', o: st.o, hi: 0, u: 1,
+        var ud = underOf(cv, L0);
+        th = ud.w; uy = ud.y;
+        bands.push({ id: uid(), ty: 'st', c: st.c, w: th, nib: 'marker', o: ud.o == null ? st.o : ud.o, hi: 0, u: 1,
                      pts: [{ x: L0.x0, y: uy, p: 0.6 }, { x: L0.x1, y: uy, p: 0.6 }] });
       } else {
         my = L0.y + L0.h / 2;
@@ -2107,6 +2144,19 @@
       if (st.ts > 0) bands[bands.length - 1].ts = st.ts;
     }
     return bands;
+  }
+  /*@3.NOCJ.146*/
+  var UND_W = [6, 10, 14, 20, 28, 38], UND_G = [0.75, 1, 1.25, 1.5, 1.8, 2.2];
+  function underOf(cv, L0) {
+    var gr = Math.max(1, Math.min(6, (cv.width > 0 ? cv.width : 14) / 6));
+    if (!(L0.u > 0)) {
+      var th0 = Math.max(1, Math.min(L0.h * 0.34, L0.h * 0.075 * gr));
+      return { w: th0, y: L0.y + L0.h * 0.92 - th0 / 2 };
+    }
+    var i, g = UND_G[0], cw = cv.width > 0 ? cv.width : 14;
+    for (i = 0; i < UND_W.length; i++) if (cw >= UND_W[i]) g = UND_G[i];
+    var em = L0.em > 0 ? L0.em : L0.h / 1.8, th = Math.max(1, em * 0.075 * g);
+    return { w: th / (NIBS.marker.scale || 1), y: L0.y + (L0.ar ? L0.u + th / 2 : Math.min(L0.h - th / 2, L0.u + th / 2)), o: 0.9 };
   }
   function textMark(cv, st) {
     if (!(st && st.ty === 'st' && st.hi && cv.hiMode === 'text' && cv.snapLines && st.pts && st.pts.length > 1)) return null;
@@ -2162,10 +2212,9 @@
     }
     /*@3.NOCJ.121*/
     if (cv.hiStyle === 'under') {
-      var gr = Math.max(1, Math.min(6, (cv.width > 0 ? cv.width : 14) / 6));
-      var th = Math.max(1, Math.min(line.h * 0.34, line.h * 0.075 * gr));
-      var uy = line.y + line.h * 0.92 - th / 2;
-      st.w = th;
+      var ud = underOf(cv, line), uy = ud.y;
+      st.w = ud.w;
+      if (ud.o != null) st.o = ud.o;
       st.nib = 'marker';
       st.hi = 0;
       st.pts = [{ x: ax, y: uy, p: 0.6 }, { x: bx, y: uy, p: 0.6 }];
@@ -2973,6 +3022,7 @@
     hexOf: hexOf,
     lastTool: lastTool,
     hiHexOf: hiHexOf,
+    hiBandAlpha: hiBandAlpha,
     TONES: TONES,
     HI_TONES: HI_TONES,
     NIBS: NIBS,

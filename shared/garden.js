@@ -2862,7 +2862,9 @@
         ut: n.ut || n.ts || 0,
         lang: n.lang || currentLang,
         anchor: n.anchor || (n.highlight && !n.free ? { text: n.highlight, occurrence: 0 } : null),
-        blockIndex: (n.blockIndex != null ? n.blockIndex : -1)
+        blockIndex: (n.blockIndex != null ? n.blockIndex : -1),
+        /*@3.GARJ.678*/
+        mig: (n.mig && typeof n.mig === 'object') ? n.mig : undefined
       }));
     } catch (e) { return []; }
   }
@@ -3130,12 +3132,11 @@
   }
 
   /*@3.GARJ.162*/
-  function findAndHighlight(note, reveal) {
+  function noteRange(note) {
     const root = getContentRoot();
-    if (!root) return false;
+    if (!root) return null;
     const text = (note.anchor && note.anchor.text) || note.highlight;
-    if (!text) return false;
-    if (markOf(note.id, root)) return true;
+    if (!text) return null;
     const occurrence = (note.anchor && note.anchor.occurrence) || 0;
     const full = root.textContent;
     let idx, from = 0, count = 0, found = -1;
@@ -3144,8 +3145,15 @@
       count++; from = idx + 1;
     }
     if (found === -1) found = full.indexOf(text);
-    if (found === -1) return false;        /*@3.GARJ.163*/
-    const range = rangeFromCharOffsets(root, found, found + text.length);
+    if (found === -1) return null;        /*@3.GARJ.163*/
+    return rangeFromCharOffsets(root, found, found + text.length);
+  }
+  function findAndHighlight(note, reveal) {
+    const root = getContentRoot();
+    if (!root) return false;
+    if (!((note.anchor && note.anchor.text) || note.highlight)) return false;
+    if (markOf(note.id, root)) return true;
+    const range = noteRange(note);
     if (!range) return false;
     /*@3.GARJ.641*/
     if (reveal) revealFor(range.startContainer);
@@ -3174,8 +3182,152 @@
     const root = getContentRoot();
     if (!root) return;
     clearHighlights();
+    /*@3.GARJ.679*/
+    const st = _migOk() ? inkStore() : null;
+    const notes = loadNotes();
+    let dirty = false, want = 0;
     /*@3.GARJ.165*/
-    loadNotes().forEach(n => { if (!n.free) findAndHighlight(n); });
+    notes.forEach(n => {
+      if (n.free) return;
+      if (n.mig && n.mig.rn && _richGone(n.mig.rn)) return;
+      /*@3.GARJ.696*/
+      if (st && !n.highlightOnly && n.mig && n.mig.rn && n.mig.e && _migHides() && migState(n, st) === 'here') return;
+      if (st && n.highlightOnly) {
+        if (n.mig && n.mig.x) return;
+        const s = migState(n, st);
+        if (s === 'here') {
+          if (!n.mig) { n.mig = { t: Date.now(), e: migEid(n) }; dirty = true; }
+          if (_migHides()) return;
+        } else if (s === 'gone') {
+          n.mig = Object.assign(n.mig || { t: Date.now(), e: migEid(n) }, { x: Date.now() });
+          dirty = true;
+          return;
+        } else want++;
+      }
+      findAndHighlight(n);
+    });
+    if (dirty) saveNotes(notes);
+    if (want) _migSoon();
+  }
+
+  /*@3.GARJ.680*/
+  const MIG_TONE = { amber: 'orange', blue: 'sky', cyan: 'teal', green: 'emerald' };
+  function migTone(c) {
+    if (isCustomColor(c)) {
+      let h = String(c).toLowerCase();
+      if (/^#[0-9a-f]{3}$/.test(h)) h = '#' + h.slice(1).split('').map(x => x + x).join('');
+      return /^#[0-9a-f]{6}$/.test(h) ? h : 'orange';
+    }
+    return MIG_TONE[c] || (NOTE_COLORS[c] ? c : 'orange');
+  }
+  /*@3.GARJ.681*/
+  function migEid(n) { return 'L' + String(n.id).replace(/[^0-9A-Za-z]/g, ''); }
+  function _migPage() { const m = /(L\d+\/[^/]+\/[^/]+)\.html$/.exec(location.pathname); return m ? m[1] : null; }
+  function _migOk() { return _isModPage() && !!_migPage() && !document.body.hasAttribute('data-no-notes'); }
+  /*@3.GARJ.682*/
+  function _migHides() { return !!(window.CSS && CSS.highlights && typeof window.Highlight === 'function'); }
+  function inkStore() {
+    try {
+      const s = JSON.parse(localStorage.getItem('garden_mink:' + _migPage()) || 'null');
+      return (s && s.L) ? s : { L: {} };
+    } catch (e) { return { L: {} }; }
+  }
+  /*@3.GARJ.683*/
+  function migState(n, st) {
+    const e = (n.mig && n.mig.e) || migEid(n);
+    const own = (x) => x === e || (typeof x === 'string' && x.indexOf(e + '_') === 0);
+    let gone = false;
+    for (const k in st.L) {
+      const d = st.L[k];
+      if (!d) continue;
+      if (Array.isArray(d.ei) && d.ei.some(own)) return 'here';
+      if (d.gn && Object.keys(d.gn).some(own)) gone = true;
+    }
+    if (gone) return 'gone';
+    const m = n.mig;
+    if (m && Array.isArray(m.k) && m.k.length && st.dt && m.k.every(k => !st.L[k] && (st.dt[k] || 0) > (m.t || 0))) return 'gone';
+    return 'away';
+  }
+
+  let _miP = null;
+  function _modInk() {
+    if (window.GardenModuleInk) return Promise.resolve(window.GardenModuleInk);
+    if (_miP) return _miP;
+    const v = ((_thisScript && _thisScript.src) || '').split('?')[1];
+    _miP = new Promise((ok, no) => {
+      const s = document.createElement('script');
+      s.src = ROOT + 'shared/module-ink.js' + (v ? '?' + v : '');
+      s.onload = () => (window.GardenModuleInk ? ok(window.GardenModuleInk) : no(new Error('module-ink')));
+      s.onerror = () => { _miP = null; no(new Error('module-ink')); };
+      document.head.appendChild(s);
+    });
+    return _miP;
+  }
+
+  /*@3.GARJ.684*/
+  function _migChars(s) { return String(s || '').replace(/[\s\u2000-\u2bff]/g, '').length; }
+  function _rangeText(rg) {
+    let root = rg.commonAncestorContainer, out = '';
+    if (root.nodeType === 3) root = root.parentNode;
+    const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let n;
+    while ((n = w.nextNode())) {
+      if (!rg.intersectsNode(n)) continue;
+      const p = n.parentNode;
+      if (p && p.closest && p.closest('.smart-term-tooltip')) continue;
+      const t = n.nodeValue || '';
+      out += t.slice(n === rg.startContainer ? rg.startOffset : 0, n === rg.endContainer ? rg.endOffset : t.length);
+    }
+    return out;
+  }
+
+  let _migT = 0, _migBusy = false, _migPulled = 0;
+  function _migSoon(ms) {
+    clearTimeout(_migT);
+    _migT = setTimeout(() => {
+      const idle = window.requestIdleCallback || ((f) => setTimeout(f, 1));
+      idle(_migRun, { timeout: 2000 });
+    }, ms == null ? 600 : ms);
+  }
+  /*@3.GARJ.685*/
+  function _migRun() {
+    if (_migBusy || !_migOk()) return;
+    if (window.GardenModuleInk && GardenModuleInk.isOn && GardenModuleInk.isOn()) return;
+    const st = inkStore();
+    const cand = loadNotes().filter(n => !n.free && n.highlightOnly && !(n.mig && n.mig.x) && migState(n, st) === 'away');
+    if (!cand.length) return;
+    _migBusy = true;
+    _modInk().then((I) => {
+      if (!I || !I.addHighlight || !I.anchorsOf) return;
+      if (!_migPulled && cand.some(n => n.mig)) {
+        _migPulled = 1;
+        return Promise.resolve(I.pull ? I.pull() : false).then((got) => {
+          if (Array.isArray(got)) _migPulled = 2;
+          _migBusy = false;
+          restoreHighlights();
+          if (I.paintKept) I.paintKept();
+        });
+      }
+      const mine = cand.filter(n => !n.mig || _migPulled === 2);
+      let done = 0;
+      return mine.reduce((p, n) => p.then(() => _migOne(I, n)).then((c) => { done += c ? 1 : 0; }), Promise.resolve())
+        .then(() => { _migBusy = false; if (done) restoreHighlights(); });
+    }).catch(() => {}).then(() => { _migBusy = false; });
+  }
+  function _migOne(I, n) {
+    const rg = noteRange(n);
+    if (!rg) return Promise.resolve(0);
+    let items = [];
+    try { items = I.anchorsOf(rg) || []; } catch (e) { items = []; }
+    /*@3.GARJ.686*/
+    if (!items.length || _migChars(items.map(x => x.ta.t).join('')) !== _migChars(_rangeText(rg))) return Promise.resolve(0);
+    const e = (n.mig && n.mig.e) || migEid(n), keys = [];
+    return I.addHighlight(rg, migTone(n.color), 'fill', { eid: e, ts: +n.ts || +n.id || 0, keys: keys }).then((c) => {
+      if (!c) return 0;
+      const all = loadNotes(), i = all.findIndex(x => String(x.id) === String(n.id));
+      if (i >= 0) { all[i].mig = { t: Date.now(), e: e, k: keys }; saveNotes(all); }
+      return c;
+    }, () => 0);
   }
 
   /*@3.GARJ.166*/
@@ -3266,6 +3418,187 @@
     return a;
   }
 
+  /*@3.GARJ.677*/
+  function _isModPage() {
+    const h = document.documentElement;
+    return h.hasAttribute('data-module') && h.hasAttribute('data-subject');
+  }
+  let _mtP = null;
+  function _modTools() {
+    if (window.GardenModTools) return Promise.resolve(window.GardenModTools);
+    if (_mtP) return _mtP;
+    const v = ((_thisScript && _thisScript.src) || '').split('?')[1];
+    _mtP = new Promise((ok, no) => {
+      const s = document.createElement('script');
+      s.src = ROOT + 'shared/module-tools.js' + (v ? '?' + v : '');
+      s.onload = () => ok(window.GardenModTools);
+      s.onerror = () => { _mtP = null; no(new Error('module-tools')); };
+      document.head.appendChild(s);
+    });
+    return _mtP;
+  }
+  /*@3.GARJ.698*/
+  const MARKS_OFF = 'garden_marks_off';
+  function _marksOff() { try { return sessionStorage.getItem(MARKS_OFF) === '1'; } catch (e) { return false; } }
+  function _paintMarksBtn(b) {
+    const off = _marksOff();
+    const ar = off ? 'أظهِرْ ملاحظاتِك وتظليلَك' : 'أخفِ ملاحظاتِك وتظليلَك مؤقّتاً';
+    const en = off ? 'Show your notes and highlights' : 'Hide your notes and highlights for now';
+    b.setAttribute('aria-pressed', off ? 'true' : 'false');
+    b.setAttribute('aria-label', nL(ar, en)); b.title = nL(ar, en);
+    b.dataset.arTitle = ar; b.dataset.enTitle = en;
+    b.innerHTML = '<i class="fa-solid ' + (off ? 'fa-eye-slash' : 'fa-eye') + '" aria-hidden="true"></i>';
+  }
+  function _applyMarks() {
+    const off = _marksOff(), h = document.documentElement;
+    h.setAttribute('data-marks-switch', '');
+    h.toggleAttribute('data-marks-off', off);
+    requestAnimationFrame(() => requestAnimationFrame(() => h.removeAttribute('data-marks-switch')));
+    document.querySelectorAll('[data-marks-btn]').forEach(_paintMarksBtn);
+    if (off && window.GardenModPeek) GardenModPeek.hideAll();
+    try { document.dispatchEvent(new CustomEvent('garden:marksToggle', { detail: { off } })); } catch (e) {}
+  }
+  function _setMarks(off, quiet) {
+    try { if (off) sessionStorage.setItem(MARKS_OFF, '1'); else sessionStorage.removeItem(MARKS_OFF); } catch (e) {}
+    if (off && window.GardenModuleInk && GardenModuleInk.isOn && GardenModuleInk.isOn()) { try { GardenModuleInk.toggle(); } catch (e) {} }
+    _applyMarks();
+    if (!quiet) notesToast(off ? nL('أُخفيت ملاحظاتُك وتظليلُك — اضغطِ العينَ لإعادتها', 'Notes and highlights hidden — tap the eye to bring them back')
+                               : nL('عادت ملاحظاتُك وتظليلُك ✓', 'Notes and highlights are back ✓'));
+  }
+  function _marksBtn() {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'sidebar-notes-btn sidebar-marks-btn';
+    b.setAttribute('data-marks-btn', '');
+    _paintMarksBtn(b);
+    b.addEventListener('click', () => _setMarks(!_marksOff()));
+    return b;
+  }
+  window.GardenMarks = { off: _marksOff, set: _setMarks, button: _marksBtn, paint: _paintMarksBtn };
+  if (_isModPage() && _marksOff()) _applyMarks();
+  let _mpkP = null;
+  function _modPeek() {
+    if (window.GardenModPeek) return Promise.resolve(window.GardenModPeek);
+    if (_mpkP) return _mpkP;
+    const v = ((_thisScript && _thisScript.src) || '').split('?')[1];
+    _mpkP = new Promise((ok, no) => {
+      const s = document.createElement('script');
+      s.src = ROOT + 'shared/module-peek.js' + (v ? '?' + v : '');
+      s.onload = () => (window.GardenModPeek ? ok(window.GardenModPeek) : no(new Error('module-peek')));
+      s.onerror = () => { _mpkP = null; no(new Error('module-peek')); };
+      document.head.appendChild(s);
+    });
+    return _mpkP;
+  }
+  /*@3.GARJ.695*/
+  function _legacyHit(mark) {
+    const note = loadNotes().find(n => String(n.id) === String(mark.dataset.noteId));
+    if (!note || note.highlightOnly) return null;
+    const rg = document.createRange();
+    rg.selectNodeContents(mark);
+    const mig = note.mig && note.mig.rn && _richHas(note.mig.rn) ? note.mig : null;
+    return {
+      ta: { n: mig ? mig.rn + '#' + (mig.b || '') : '', t: note.highlight || mark.textContent || '', c: migTone(note.color) },
+      rg: rg, r: mark.getBoundingClientRect(),
+      legacy: { id: note.id, title: note.title && note.title !== smartTitle(note.highlight || '') ? note.title : '', body: note.body || '', adopt: () => { hideNotePop(); _adoptLegacy(note); } }
+    };
+  }
+  window.GardenLegacyPeek = (mark) => (_isModPage() ? _legacyHit(mark) : null);
+  /*@3.GARJ.697*/
+  window.GardenLegacyByRef = (ref) => {
+    if (!ref || !_isModPage()) return null;
+    const n = loadNotes().find(x => x.mig && x.mig.rn === ref.id && x.mig.b === ref.bid);
+    return n ? { title: n.title && n.title !== smartTitle(n.highlight || '') ? n.title : '', body: n.body || '' } : null;
+  };
+  function _legacyOpen() {
+    return loadNotes().filter(n => !n.highlightOnly && !(n.mig && n.mig.rn && (_richHas(n.mig.rn) || _richGone(n.mig.rn))));
+  }
+  function _linkAdopted(I) {
+    const st = inkStore();
+    const todo = loadNotes().filter(n => !n.free && !n.highlightOnly && n.mig && n.mig.rn && n.mig.b && !n.mig.e && migState(n, st) !== 'here');
+    return todo.reduce((p, n) => p.then(() => {
+      const rg = noteRange(n);
+      if (!rg) return 0;
+      const e = migEid(n), keys = [];
+      return I.addHighlight(rg, migTone(n.color), 'fill', { eid: e, ts: +n.ts || +n.id || 0, keys: keys, n: n.mig.rn + '#' + n.mig.b }).then((c) => {
+        if (!c) return 0;
+        const all = loadNotes(), i = all.findIndex(x => String(x.id) === String(n.id));
+        if (i >= 0) { all[i].mig = Object.assign({}, all[i].mig, { e: e, k: keys }); saveNotes(all); }
+        return c;
+      }, () => 0);
+    }), Promise.resolve()).then(() => todo.length);
+  }
+  function _adoptAll() {
+    const ids = _legacyOpen().map(n => n.id);
+    if (!ids.length) return Promise.resolve(0);
+    return _modNoteLib().then((M) => (M.adoptAll ? M.adoptAll(ids) : 0)).then((got) => {
+      return _modInk().then((I) => _linkAdopted(I)).catch(() => 0).then(() => {
+        restoreHighlights();
+        if (window.GardenModuleInk && GardenModuleInk.paintKept) GardenModuleInk.paintKept();
+        try { document.dispatchEvent(new CustomEvent('garden:moduleInkSaved')); } catch (e) {}
+        return got;
+      });
+    });
+  }
+  document.addEventListener('garden:moduleNoteClosed', () => {
+    if (!_isModPage() || !loadNotes().some(n => !n.highlightOnly && n.mig && n.mig.rn && n.mig.b && !n.mig.e)) return;
+    _modInk().then((I) => _linkAdopted(I)).then((n) => { if (n) restoreHighlights(); }).catch(() => {});
+  });
+  let _mnP = null;
+  /*@3.GARJ.687*/
+  function _modNoteLib() {
+    if (window.GardenModNote) return Promise.resolve(window.GardenModNote);
+    if (_mnP) return _mnP;
+    const v = ((_thisScript && _thisScript.src) || '').split('?')[1];
+    _mnP = new Promise((ok, no) => {
+      const s = document.createElement('script');
+      s.src = ROOT + 'shared/module-note.js' + (v ? '?' + v : '');
+      s.onload = () => (window.GardenModNote ? ok(window.GardenModNote) : no(new Error('module-note')));
+      s.onerror = () => { _mnP = null; no(new Error('module-note')); };
+      document.head.appendChild(s);
+    });
+    return _mnP;
+  }
+  function _modNote() {
+    const { text, anchor } = _resolveSel();
+    if (!text) return;
+    const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
+    let sec = null;
+    if (range) {
+      const n = range.startContainer.nodeType === 3 ? range.startContainer.parentNode : range.startContainer;
+      sec = n && n.closest ? n.closest('.main-content > section[id]') : null;
+    }
+    window.getSelection()?.removeAllRanges();
+    _modNoteLib().then((M) => M.open({ quote: text, range: range, sec: sec && sec.id }),
+      () => openNoteEditor({ free: false, highlightText: text, anchor: anchor }));
+  }
+  /*@3.GARJ.688*/
+  function _richIdx() {
+    try { const a = JSON.parse(localStorage.getItem('notes_index') || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; }
+  }
+  function _richGone(id) {
+    if (_richIdx().some(r => r && r.id === id)) return false;
+    try { const t = JSON.parse(localStorage.getItem('__tomb_notes_index') || '{}'); return !!(t && t[id]); } catch (e) { return false; }
+  }
+  function _richHas(id) { return _richIdx().some(r => r && r.id === id && !(r.d > 0)); }
+  function moduleRich() {
+    if (!_isModPage()) return [];
+    const h = document.documentElement, c = h.getAttribute('data-subject'), m = Number(h.getAttribute('data-module'));
+    return _richIdx().filter(r => r && r.o && r.o.c === c && Number(r.o.m) === m && !r.pv && !(r.d > 0))
+      .sort((a, b) => (b.updated_at || 0) - (a.updated_at || 0));
+  }
+  function openRich(o) {
+    return _modNoteLib().then((M) => M.open(o), () => {
+      if (o && o.id) location.href = ROOT + 'hub/notes.html?id=' + encodeURIComponent(o.id);
+    });
+  }
+  function _modSel(rect, text) {
+    hideNotesTooltip();
+    hideMobileNoteSaveBar();
+    const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
+    _modTools().then((T) => T.sel(range, text, rect, { onNote: _modNote }), () => showNotesTooltip(rect, text));
+  }
+
   /*@3.GARJ.169*/
   function initNotes() {
     /*@3.GARJ.170*/
@@ -3280,12 +3613,18 @@
       const notesBtn = document.createElement('button');
       notesBtn.className = 'sidebar-notes-btn';
       notesBtn.id = 'sidebar-notes-btn';
-      const notes = loadNotes();
-      notesBtn.innerHTML = `<i class="fa-solid fa-note-sticky" aria-hidden="true"></i> <span data-i18n="notes.btn">${nL('ملاحظاتي', 'My Notes')}</span> <span class="notes-count" id="notes-count">${notes.length}</span>`;
+      notesBtn.innerHTML = `<i class="fa-solid fa-note-sticky" aria-hidden="true"></i> <span data-i18n="notes.btn">${nL('ملاحظاتي', 'My Notes')}</span> <span class="notes-count" id="notes-count">${_notesShown()}</span>`;
       notesBtn.addEventListener('click', openNotesPanel);
-      widget.parentNode.insertBefore(notesBtn, widget.nextSibling);
+      let anchor = notesBtn;
+      if (_isModPage() && !document.body.hasAttribute('data-no-notes')) {
+        anchor = document.createElement('div');
+        anchor.className = 'sidebar-notes-row';
+        anchor.appendChild(notesBtn);
+        anchor.appendChild(_marksBtn());
+      }
+      widget.parentNode.insertBefore(anchor, widget.nextSibling);
       const slidesBtn = slidesLink();
-      if (slidesBtn) notesBtn.parentNode.insertBefore(slidesBtn, notesBtn.nextSibling);
+      if (slidesBtn) anchor.parentNode.insertBefore(slidesBtn, anchor.nextSibling);
     }
 
     let selectionTimeout;
@@ -3304,8 +3643,9 @@
         if (text && text.length >= 1 && text.length < 500) {
           _captureSelection(sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null, text);
           const rect = _gardenSelRange ? _gardenSelRange.getBoundingClientRect() : null;
+          if (_isModPage()) { _modSel(rect, text); return; }
           showNotesTooltip(rect, text);
-        } else { hideNotesTooltip(); }
+        } else { hideNotesTooltip(); if (window.GardenModTools) GardenModTools.hideSel(); }
       }, 200);
     });
 
@@ -3319,20 +3659,45 @@
         const text = sel?.toString().trim();
         if (text && text.length >= 1 && text.length < 500 && mainContent?.contains(sel.anchorNode)) {
           _captureSelection(sel.rangeCount > 0 ? sel.getRangeAt(0).cloneRange() : null, text);
+          if (_isModPage()) { _modSel(_gardenSelRange ? _gardenSelRange.getBoundingClientRect() : null, text); return; }
           showMobileNoteSaveBar(text);
         } else { hideMobileNoteSaveBar(); }
       }, 800);
     });
 
+    if (_isModPage()) {
+      mainContent?.addEventListener('contextmenu', (e) => {
+        if (e.shiftKey) return;
+        const t = e.target;
+        if (t && t.closest && t.closest('a[href], input, textarea, select, [contenteditable="true"]')) return;
+        if (window.GardenModuleInk && GardenModuleInk.isOn && GardenModuleInk.isOn()) return;
+        e.preventDefault();
+        const ev = { clientX: e.clientX, clientY: e.clientY, target: t, shiftKey: false, defaultPrevented: false, preventDefault() {} };
+        _modTools().then((T) => T.onContext(ev, { onNote: _modNote }), () => {});
+      });
+    }
+
     /*@3.GARJ.172*/
     mainContent?.addEventListener('click', (e) => {
       const mark = e.target.closest('.user-highlight, .user-highlight-txt');
-      if (!mark) return;
+      if (!mark || _marksOff()) return;
       /*@3.GARJ.173*/
       if ((window.getSelection()?.toString() || '').trim().length > 3) return;
       const id = mark.dataset.noteId;
       const note = loadNotes().find(n => String(n.id) === String(id));
+      /*@3.GARJ.689*/
+      if (note && _isModPage() && !note.highlightOnly) {
+        e.stopPropagation();
+        const hit = _legacyHit(mark);
+        _modPeek().then((P) => { P.on(); P.show(hit, { hold: 1 }); }, () => {
+          if (note.mig && note.mig.rn && _richHas(note.mig.rn)) openRich({ id: note.mig.rn }); else showNotePop(note, mark.getBoundingClientRect());
+        });
+        return;
+      }
       if (note) { e.stopPropagation(); showNotePop(note, mark.getBoundingClientRect()); }
+    });
+    if (_isModPage()) mainContent?.addEventListener('pointerover', (e) => {
+      if (!window.GardenModPeek && e.target.closest && e.target.closest('.user-highlight, .user-highlight-txt')) _modPeek().catch(() => {});
     });
 
     /*@3.GARJ.174*/
@@ -3355,6 +3720,21 @@
 
     restoreHighlights();
 
+    document.addEventListener('garden:moduleNoteClosed', () => {
+      updateNotesCount();
+      restoreHighlights();
+      if (document.querySelector('.notes-panel')) renderNotesPanelBody(document.querySelector('#notes-search')?.value);
+    });
+
+    /*@3.GARJ.690*/
+    if (_migOk()) {
+      let rT = 0;
+      document.addEventListener('garden:moduleInkSaved', () => { clearTimeout(rT); rT = setTimeout(restoreHighlights, 300); });
+      document.addEventListener('click', (e) => {
+        if (e.target && e.target.closest && e.target.closest('.depth-tab, .accordion-trigger, summary')) _migSoon(700);
+      }, true);
+    }
+
     /*@3.GARJ.575*/
     openNoteFromHash();
     window.addEventListener('hashchange', openNoteFromHash);
@@ -3373,16 +3753,11 @@
   /*@3.GARJ.177*/
   function buildSelectionTooltip(tip) {
     const isPaused = sessionStorage.getItem('garden_notes_paused') === '1';
-    /*@3.GARJ.178*/
-    const explainBtn = _isContentPage()
-      ? `<button class="notes-tip-btn notes-tip-explain" id="tip-explain" title="${nL('اشرح بالذكاء','Explain')}"><i class="fa-solid fa-wand-magic-sparkles"></i><span>${nL('اشرح','Explain')}</span></button>`
-      : '';
     tip.innerHTML = `
       <div class="notes-tip-main">
         <button class="notes-tip-btn notes-tip-color" id="tip-color" title="${nL('تلوين النص','Highlight')}"><i class="fa-solid fa-highlighter"></i><span>${nL('تلوين','Highlight')}</span></button>
         <button class="notes-tip-btn notes-tip-copy"  id="tip-copy"  title="${nL('نسخ النص','Copy')}"><i class="fa-solid fa-copy"></i><span>${nL('نسخ','Copy')}</span></button>
         <button class="notes-tip-btn notes-tip-note"  id="tip-note"  title="${nL('إضافة ملاحظة','Add note')}"><i class="fa-solid fa-pen-to-square"></i><span>${nL('ملاحظة','Note')}</span></button>
-        ${explainBtn}
         <button class="notes-tip-pause" id="tip-pause" title="${nL('إخفاء مؤقت','Dismiss for session')}"><i class="fa-solid fa-eye-slash"></i></button>
       </div>
       <div class="notes-tip-colors notes-cp" id="tip-colors" style="display:none;">
@@ -3411,22 +3786,6 @@
       main.style.display = 'none';
       colors.style.display = 'block';
       requestAnimationFrame(() => repositionTooltip());
-    });
-
-    const explainEl = tip.querySelector('#tip-explain');
-    if (explainEl) explainEl.addEventListener('click', () => {
-      const range = _gardenSelRange ? _gardenSelRange.cloneRange() : null;
-      const text = (range ? range.toString() : (window._gardenNotesSelection || '')).trim();
-      if (!text) return;
-      let title = '';
-      const node = range ? range.startContainer : null;
-      const host = node ? (node.nodeType === 1 ? node : node.parentElement) : null;
-      const card = host && host.closest ? host.closest('.concept-card, .vault-section, .objectives-card, .accordion-item, .professor-card') : null;
-      if (card) { const hh = card.querySelector('h2, h3'); title = hh ? hh.textContent.trim().slice(0, 80) : ''; }
-      if (!title) title = (document.title.split('·')[0] || '').trim();
-      hideNotesTooltip();
-      try { window.getSelection()?.removeAllRanges(); } catch (_) {}
-      showAiModal({ title, content: text, background: '', activeLayer: '', allLayersText: '', svgBlock: '', type: 'selection', hasSVG: false, hasAlgo: false, svgOnly: false });
     });
 
     tip.querySelector('#tip-pause').addEventListener('click', (e) => {
@@ -3705,6 +4064,8 @@
     pop.querySelector('#note-pop-edit').onclick = () => {
       hideNotePop();
       const fresh = loadNotes().find(n => String(n.id) === String(note.id)) || note;
+      /*@3.GARJ.691*/
+      if (_isModPage() && !fresh.highlightOnly) { _adoptLegacy(fresh); return; }
       openNoteEditor({ note: fresh });
     };
     pop.querySelector('#note-pop-del').onclick = deleteNote;
@@ -3902,7 +4263,23 @@
 
   function updateNotesCount() {
     const el = document.getElementById('notes-count');
-    if (el) el.textContent = loadNotes().length;
+    if (el) el.textContent = _notesShown();
+  }
+  /*@3.GARJ.692*/
+  function _notesShown() {
+    if (!_isModPage()) return loadNotes().length;
+    return loadNotes().filter(n => !n.highlightOnly && !(n.mig && n.mig.rn && (_richHas(n.mig.rn) || _richGone(n.mig.rn)))).length + moduleRich().length;
+  }
+
+  function _adoptLegacy(note) {
+    if (note.mig && note.mig.rn && _richHas(note.mig.rn)) return openRich({ id: note.mig.rn });
+    const range = noteRange(note);
+    let sec = null;
+    if (range) {
+      const n = range.startContainer.nodeType === 3 ? range.startContainer.parentNode : range.startContainer;
+      sec = n && n.closest ? n.closest('.main-content > section[id]') : null;
+    }
+    return _modNoteLib().then((M) => M.open({ adopt: note.id, sec: sec && sec.id }), () => openNoteEditor({ note: note }));
   }
 
   /*@3.GARJ.195*/
@@ -3963,7 +4340,42 @@
     document.querySelector('.notes-panel')?.remove();
   }
 
+  /*@3.GARJ.694*/
+  let _mpP = null;
+  function _modPanel() {
+    const legacy = loadNotes().filter(n => !n.highlightOnly && !(n.mig && n.mig.rn && (_richHas(n.mig.rn) || _richGone(n.mig.rn)))).map(n => {
+      let sec = '';
+      try {
+        const rg = n.free ? null : noteRange(n);
+        const el = rg ? (rg.startContainer.nodeType === 3 ? rg.startContainer.parentNode : rg.startContainer) : null;
+        const s = el && el.closest ? el.closest('.main-content > section[id]') : null;
+        sec = s ? s.id : '';
+      } catch (e) {}
+      return { id: n.id, title: n.title || '', body: n.body || '', highlight: n.free ? '' : (n.highlight || ''), sec: sec };
+    });
+    const onLegacy = (id) => {
+      const note = loadNotes().find(n => String(n.id) === String(id));
+      if (!note) return;
+      if (note.free) showNotePop(note, null); else _adoptLegacy(note);
+    };
+    if (!_mpP) {
+      const v = ((_thisScript && _thisScript.src) || '').split('?')[1];
+      _mpP = new Promise((ok, no) => {
+        const s = document.createElement('script');
+        s.src = ROOT + 'shared/module-notes-panel.js' + (v ? '?' + v : '');
+        s.onload = () => (window.GardenModPanel ? ok(window.GardenModPanel) : no(new Error('panel')));
+        s.onerror = () => { _mpP = null; no(new Error('panel')); };
+        document.head.appendChild(s);
+      });
+    }
+    return _mpP.then((P) => P.open({ legacy: legacy, onLegacy: onLegacy, onLegacyAll: _adoptAll }));
+  }
+
   function openNotesPanel() {
+    if (_isModPage()) { _modPanel().catch(() => openNotesPanelOld()); return; }
+    openNotesPanelOld();
+  }
+  function openNotesPanelOld() {
     closeNotesPanel();
     const L = currentLang;
 
@@ -4005,7 +4417,10 @@
     document.addEventListener('keydown', function escN(e) {
       if (e.key === 'Escape') { closeNotesPanel(); document.removeEventListener('keydown', escN); }
     });
-    panel.querySelector('#notes-add-free').addEventListener('click', () => openNoteEditor({ free: true }));
+    panel.querySelector('#notes-add-free').addEventListener('click', () => {
+      if (_isModPage()) { closeNotesPanel(); openRich({}); return; }
+      openNoteEditor({ free: true });
+    });
     panel.querySelector('#notes-search').addEventListener('input', (e) => renderNotesPanelBody(e.target.value));
     panel.querySelector('#notes-clear-highlights').addEventListener('click', clearAllHighlights);
     panel.querySelector('#notes-clear-all').addEventListener('click', clearAllNotes);
@@ -4114,14 +4529,16 @@
     const titleEl = panel.querySelector('#notes-panel-title');
     let notes = loadNotes();
     /*@3.GARJ.207*/
-    notes = notes.filter(n => !n.highlightOnly);
-    const total = notes.length;
+    notes = notes.filter(n => !n.highlightOnly && !(n.mig && n.mig.rn && (_richHas(n.mig.rn) || _richGone(n.mig.rn))));
+    let rich = moduleRich();
+    const total = notes.length + rich.length;
 
     const q = (filter || '').trim().toLowerCase();
     if (q) notes = notes.filter(n =>
       (n.title || '').toLowerCase().includes(q) ||
       (n.body || '').toLowerCase().includes(q) ||
       (n.highlight || '').toLowerCase().includes(q));
+    if (q) rich = rich.filter(r => ((r.t || '') + ' ' + (r.x || '')).toLowerCase().includes(q));
 
     if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-note-sticky" aria-hidden="true"></i> ${L === 'ar' ? 'ملاحظاتي' : 'My Notes'} <span class="notes-title-count">${total}</span>`;
 
@@ -4133,12 +4550,28 @@
       </div>`;
       return;
     }
-    if (notes.length === 0) {
+    if (notes.length === 0 && rich.length === 0) {
       body.innerHTML = `<div class="notes-empty"><div class="notes-empty-icon"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i></div><div>${L === 'ar' ? 'لا نتائج مطابقة' : 'No matching notes'}</div></div>`;
       return;
     }
 
-    body.innerHTML = notes.map(n => {
+    /*@3.GARJ.693*/
+    const richHtml = rich.map(r => {
+      const d = r.updated_at ? new Date(r.updated_at).toISOString().split('T')[0] : '';
+      return `
+        <div class="note-card is-navigable note-card--rich" data-rich-id="${escapeHTML(String(r.id))}" data-color="violet">
+          <div class="note-card-head">
+            <div class="note-card-title">${escapeHTML(r.t || (L === 'ar' ? 'ملاحظة بلا عنوان' : 'Untitled note'))}</div>
+          </div>
+          ${r.x ? `<div class="note-user-text clamp">${escapeHTML(String(r.x).slice(0, 220))}</div>` : ''}
+          <div class="note-meta">
+            <span class="note-meta-date"><i class="fa-regular fa-calendar"></i> ${d}</span>
+            <span class="note-badge note-badge--source"><i class="fa-solid fa-book-open"></i> ${L === 'ar' ? 'في ملاحظاتي' : 'In My Notes'}</span>
+          </div>
+        </div>`;
+    }).join('');
+
+    body.innerHTML = richHtml + notes.map(n => {
       const navigable = !n.free && (n.anchor || n.highlight);
       const bodyHtml = renderNoteBody(n.body);
       const quote = (!n.free && n.highlight) ? `
@@ -4180,8 +4613,11 @@
         if (note) gotoNoteSource(note);
       });
     });
+    body.querySelectorAll('.note-card--rich').forEach(card => {
+      card.addEventListener('click', () => { closeNotesPanel(); openRich({ id: card.getAttribute('data-rich-id') }); });
+    });
     /*@3.GARJ.209*/
-    body.querySelectorAll('.note-card').forEach(card => {
+    body.querySelectorAll('.note-card:not(.note-card--rich)').forEach(card => {
       card.addEventListener('click', (e) => {
         if (e.target.closest('.note-act') || e.target.closest('[data-goto]')) return;
         const id = parseInt(card.getAttribute('data-note-id'));
@@ -4197,6 +4633,7 @@
         e.stopPropagation();
         const id = parseInt(btn.getAttribute('data-edit-id'));
         const note = loadNotes().find(n => n.id === id);
+        if (note && _isModPage() && !note.highlightOnly) { closeNotesPanel(); _adoptLegacy(note); return; }
         if (note) openNoteEditor({ note: note });
       });
     });
@@ -6376,7 +6813,8 @@ ${baseRules}`) + regenSuffix;
     /*@3.GARJ.384*/
     function promptTextOut() {
       const ROLE_LABEL = { system: '[System]', user: '[User]', assistant: '[Assistant]' };
-      return currentMessages()
+      const p = currentPrompt(false);
+      return [{ role: 'system', content: p.systemPrompt }, { role: 'user', content: p.userMsg }]
         .map(m => `${ROLE_LABEL[m.role] || '[' + m.role + ']'}:\n${m.content}`)
         .join('\n\n');
     }

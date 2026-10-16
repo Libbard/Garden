@@ -128,6 +128,8 @@
         var body = String(n.body != null ? n.body : (n.note || ''));
         /*@3.NOMJ.2*/
         if (n.highlightOnly || !body.trim()) continue;
+        /*@3.NOMJ.11*/
+        if (n.mig && n.mig.rn) continue;
         var title = n.title || (n.highlight ? firstLine(n.highlight, 46) : '');
         out.push({
           uid: 'mod:' + code + ':' + mod + ':' + n.id,

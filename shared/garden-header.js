@@ -207,22 +207,28 @@
     document.head.appendChild(s);
   }
 
-  var _miLoad = 0;
+  var _miLoad = null;
+  function _loadModuleInk() {
+    if (window.GardenModuleInk) return Promise.resolve();
+    if (_miLoad) return _miLoad;
+    var q = ((thisScript && thisScript.src) || '').split('?')[1];
+    _miLoad = new Promise(function (ok, no) {
+      var s = document.createElement('script');
+      s.src = ROOT + 'shared/module-ink.js' + (q ? '?' + q : '');
+      s.onload = function () { ok(); };
+      s.onerror = function () { _miLoad = null; no(); };
+      document.head.appendChild(s);
+    });
+    return _miLoad;
+  }
   function _openModuleInk(btn) {
     if (window.GardenModuleInk) { GardenModuleInk.bind(btn); GardenModuleInk.toggle(); return; }
-    if (_miLoad) return;
-    _miLoad = 1;
+    if (btn.getAttribute('aria-busy') === 'true') return;
     btn.setAttribute('aria-busy', 'true');
-    var q = ((thisScript && thisScript.src) || '').split('?')[1];
-    var s = document.createElement('script');
-    s.src = ROOT + 'shared/module-ink.js' + (q ? '?' + q : '');
-    s.onload = function () {
-      _miLoad = 0;
+    _loadModuleInk().then(function () {
       btn.removeAttribute('aria-busy');
       if (window.GardenModuleInk) { GardenModuleInk.bind(btn); GardenModuleInk.toggle(); }
-    };
-    s.onerror = function () { _miLoad = 0; btn.removeAttribute('aria-busy'); };
-    document.head.appendChild(s);
+    }, function () { btn.removeAttribute('aria-busy'); });
   }
 
   /*@3.GAHJ.102*/
@@ -590,6 +596,13 @@
         var mk = /(L\d+\/[^/]+\/[^/]+)\.html$/.exec(location.pathname);
         if (localStorage.getItem('garden_mink:' + (mk ? mk[1] : location.pathname))) inkBtn.classList.add('mi-has');
       } catch (eMi) {}
+      /*@3.GAHJ.106*/
+      try {
+        if (inkBtn.classList.contains('mi-has') && localStorage.getItem('garden_mi_keep') !== '0' && window.CSS && CSS.highlights) {
+          var miIdle = window.requestIdleCallback || function (f) { return setTimeout(f, 1200); };
+          miIdle(function () { _loadModuleInk().then(function () { if (window.GardenModuleInk) GardenModuleInk.bind(inkBtn); }, function () {}); }, { timeout: 4000 });
+        }
+      } catch (eMk) {}
       inkBtn.addEventListener('click', function () { _openModuleInk(inkBtn); });
       inline.appendChild(inkBtn);
       window.addEventListener('keydown', function (e) {

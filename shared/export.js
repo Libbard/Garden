@@ -29,6 +29,12 @@
       document.head.appendChild(s);
     });
   }
+  var _h2cP = null;
+  function ensureCanvas() {
+    if (typeof window.html2canvas === 'function') return Promise.resolve(true);
+    if (!_h2cP) _h2cP = loadOne(LIBS[0]).catch(function (e) { _h2cP = null; throw e; });
+    return _h2cP;
+  }
   var _libsP = null;
   function ensureLibs() {
     if (hasLibs()) return Promise.resolve(true);
@@ -42,22 +48,36 @@
   }
 
   /*@3.EXPJ2.2*/
-  var COLOR_PROPS = ['backgroundColor', 'color', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor', 'outlineColor'];
-  var KEBAB = { backgroundColor: 'background-color', color: 'color', borderTopColor: 'border-top-color', borderRightColor: 'border-right-color', borderBottomColor: 'border-bottom-color', borderLeftColor: 'border-left-color', outlineColor: 'outline-color' };
+  var COLOR_PROPS = ['backgroundColor', 'color', 'borderTopColor', 'borderRightColor', 'borderBottomColor', 'borderLeftColor', 'outlineColor',
+                     'backgroundImage', 'boxShadow', 'textShadow', 'textDecorationColor'];
+  var KEBAB = { backgroundColor: 'background-color', color: 'color', borderTopColor: 'border-top-color', borderRightColor: 'border-right-color', borderBottomColor: 'border-bottom-color', borderLeftColor: 'border-left-color', outlineColor: 'outline-color',
+                backgroundImage: 'background-image', boxShadow: 'box-shadow', textShadow: 'text-shadow', textDecorationColor: 'text-decoration-color' };
+  var FN_RE = /(?:color|oklab|oklch|lab|lch|hwb)\([^()]*\)/g;
+  var _px = null, _seen = {};
+  function oneRgba(fn) {
+    if (_seen[fn]) return _seen[fn];
+    var out = 'rgba(0,0,0,0)';
+    try {
+      _px = _px || (function () { var c = document.createElement('canvas'); c.width = c.height = 1; return c.getContext('2d', { willReadFrequently: true }); })();
+      _px.clearRect(0, 0, 1, 1);
+      _px.fillStyle = '#000'; _px.fillStyle = fn;
+      _px.fillRect(0, 0, 1, 1);
+      var d = _px.getImageData(0, 0, 1, 1).data;
+      out = 'rgba(' + d[0] + ',' + d[1] + ',' + d[2] + ',' + Math.round(d[3] / 255 * 1000) / 1000 + ')';
+    } catch (e) {}
+    return (_seen[fn] = out);
+  }
   function colorToRgba(v) {
-    if (!v || v.indexOf('color(') !== 0) return null;
-    var m = v.match(/color\(\s*srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\s*\)/i);
-    if (!m) return null;
-    var r = Math.round(parseFloat(m[1]) * 255), g = Math.round(parseFloat(m[2]) * 255), b = Math.round(parseFloat(m[3]) * 255);
-    var a = (m[4] !== undefined) ? parseFloat(m[4]) : 1;
-    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
+    if (!v || v.search(FN_RE) < 0) return null;
+    return v.replace(FN_RE, oneRgba);
   }
   function neutralizeColorFns(root) {
     var reverts = [];
     var all = [root].concat(Array.prototype.slice.call(root.querySelectorAll('*')));
+    var view = (root.ownerDocument && root.ownerDocument.defaultView) || window;
     all.forEach(function (el) {
       var cs;
-      try { cs = getComputedStyle(el); } catch (e) { return; }
+      try { cs = view.getComputedStyle(el); } catch (e) { return; }
       COLOR_PROPS.forEach(function (prop) {
         var rgba = colorToRgba(cs[prop]);
         if (rgba) {
@@ -92,7 +112,7 @@
 
   async function capture(element, opts) {
     opts = opts || {};
-    await ensureLibs();
+    await ensureCanvas();
     if (typeof window.html2canvas !== 'function') {
       throw new Error('html2canvas غير محمّل');
     }
@@ -199,6 +219,6 @@
     document.addEventListener(t, warm, { passive: true, capture: true });
   });
 
-  window.Export = { toPNG: toPNG, toPDF: toPDF, capture: capture,
+  window.Export = { toPNG: toPNG, toPDF: toPDF, capture: capture, ensureCanvas: ensureCanvas, fixColors: neutralizeColorFns,
                     ensureLibs: ensureLibs, hasLibs: hasLibs, warm: warm };
 })();

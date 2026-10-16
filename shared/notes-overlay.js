@@ -137,9 +137,12 @@
       }
       if (!hit) {
         out.push({ top: r.top, bot: r.bottom, left: r.left, right: r.right,
-                   h: r.height });
+                   h: r.height, ub: r.ub, em: r.em, ar: r.ar });
         continue;
       }
+      if (r.ub != null && !(hit.ub >= r.ub)) hit.ub = r.ub;
+      if (r.em > 0 && !(hit.em >= r.em)) hit.em = r.em;
+      if (r.ar) hit.ar = 1;
       if (r.top < hit.top) hit.top = r.top;
       if (r.bottom > hit.bot) hit.bot = r.bottom;
       if (r.left < hit.left) hit.left = r.left;
@@ -149,7 +152,36 @@
   }
 
   /*@3.NOOJ.36*/
-  function textRects(rg) {
+  /*@3.NOOJ.39*/
+  var MCX = null;
+  function inkFoot(n, a, b, h) {
+    var el = n.parentNode;
+    if (!el || !(h > 0)) return null;
+    try {
+      MCX = MCX || document.createElement('canvas').getContext('2d');
+      var cs = getComputedStyle(el), fs = parseFloat(cs.fontSize) || 16;
+      MCX.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+      var str = n.nodeValue.slice(a, b), m = MCX.measureText(str);
+      var asc = m.fontBoundingBoxAscent, desc = m.fontBoundingBoxDescent;
+      if (!(asc + desc > 0)) return null;
+      var k = h / (asc + desc), ink = Math.max(m.actualBoundingBoxDescent || 0, fs * 0.06);
+      if (/[\u0600-\u06ff\u0750-\u077f\ufb50-\ufdff\ufe70-\ufeff]/.test(str)) {
+        return { u: (asc + Math.max(ink, fs * 0.28) + fs * 0.2) * k, em: fs * k, ar: 1 };
+      }
+      return { u: Math.min(asc + desc, asc + ink + fs * 0.1) * k, em: fs * k };
+    } catch (e) { return null; }
+  }
+
+  function footOf(ov, L0, o) {
+    if (L0.ub == null || !(L0.bot - L0.top > 0)) return o;
+    var sc = o.h / (L0.bot - L0.top);
+    o.u = (L0.ub - L0.top) * sc;
+    if (L0.em > 0) o.em = L0.em * sc;
+    if (L0.ar) o.ar = 1;
+    return o;
+  }
+
+  function textRects(rg, foot) {
     var out = [], root = rg.commonAncestorContainer, n, sub = document.createRange(), rs, k, a, b;
     if (root.nodeType === 3) root = root.parentNode;
     if (!root) return out;
@@ -161,7 +193,11 @@
       b = (n === rg.endContainer) ? rg.endOffset : n.nodeValue.length;
       if (b <= a) continue;
       try { sub.setStart(n, a); sub.setEnd(n, b); rs = sub.getClientRects(); } catch (e) { continue; }
-      for (k = 0; k < rs.length; k++) out.push(rs[k]);
+      for (k = 0; k < rs.length; k++) {
+        var ft = foot && rs[k].height > 0 ? inkFoot(n, a, b, rs[k].height) : null;
+        out.push(ft ? { top: rs[k].top, bottom: rs[k].bottom, left: rs[k].left, right: rs[k].right,
+                        width: rs[k].width, height: rs[k].height, ub: rs[k].top + ft.u, em: ft.em, ar: ft.ar } : rs[k]);
+      }
     }
     return out;
   }
@@ -228,7 +264,7 @@
       try {
         var rg = document.createRange();
         rg.selectNodeContents(hosts[i]);
-        rects = textRects(rg);
+        rects = textRects(rg, this.surface === 'module');
       } catch (e) { rects = null; }
       if (!rects || !rects.length) continue;
       mergeLines(rects, lines);
@@ -261,9 +297,9 @@
     var p1 = this.clientToWorld(best.right, best.bot);
     var q0 = this.clientToWorld(sL, best.top);
     var q1 = this.clientToWorld(sR, best.bot);
-    return { x0: Math.min(p0.x, p1.x), x1: Math.max(p0.x, p1.x),
+    return footOf(this, best, { x0: Math.min(p0.x, p1.x), x1: Math.max(p0.x, p1.x),
              y: Math.min(p0.y, p1.y), h: Math.abs(p1.y - p0.y),
-             sx0: Math.min(q0.x, q1.x), sx1: Math.max(q0.x, q1.x) };
+             sx0: Math.min(q0.x, q1.x), sx1: Math.max(q0.x, q1.x) });
   };
 
   /*@3.NOOJ.34*/
@@ -294,7 +330,7 @@
       if (h1) rg.setEnd(h1.node, h1.b); else rg.setEnd(r1.startContainer, r1.startOffset);
     } catch (e2) { return null; }
     if (rg.collapsed) return null;
-    var rects = textRects(rg), lines = [], i;
+    var rects = textRects(rg, this.surface === 'module'), lines = [], i;
     if (!rects || !rects.length) return null;
     mergeLines(rects, lines);
     lines.sort(function (x, y) { return x.top - y.top; });
@@ -303,7 +339,7 @@
       var L0 = lines[i];
       if (!(L0.h > 3) || !(L0.right - L0.left > 2)) continue;
       var p0 = this.clientToWorld(L0.left, L0.top), p1 = this.clientToWorld(L0.right, L0.bot);
-      out.push({ x0: Math.min(p0.x, p1.x), x1: Math.max(p0.x, p1.x), y: Math.min(p0.y, p1.y), h: Math.abs(p1.y - p0.y) });
+      out.push(footOf(this, L0, { x0: Math.min(p0.x, p1.x), x1: Math.max(p0.x, p1.x), y: Math.min(p0.y, p1.y), h: Math.abs(p1.y - p0.y) }));
     }
     return out.length ? out : null;
   };
@@ -337,12 +373,12 @@
     }
     if (!hit) return null;
     var lines = [], out = [];
-    mergeLines(textRects(wr), lines);
+    mergeLines(textRects(wr, this.surface === 'module'), lines);
     for (k = 0; k < lines.length; k++) {
       var L0 = lines[k];
       if (!(L0.h > 3) || !(L0.right - L0.left > 2)) continue;
       var p0 = this.clientToWorld(L0.left, L0.top), p1 = this.clientToWorld(L0.right, L0.bot);
-      out.push({ x0: Math.min(p0.x, p1.x), x1: Math.max(p0.x, p1.x), y: Math.min(p0.y, p1.y), h: Math.abs(p1.y - p0.y) });
+      out.push(footOf(this, L0, { x0: Math.min(p0.x, p1.x), x1: Math.max(p0.x, p1.x), y: Math.min(p0.y, p1.y), h: Math.abs(p1.y - p0.y) }));
     }
     return out.length ? out : null;
   };

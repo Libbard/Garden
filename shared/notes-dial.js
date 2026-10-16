@@ -217,67 +217,19 @@
     try { localStorage.setItem(PIN_KEY, on ? '1' : '0'); } catch (e) {}
   }
 
-  var PL_KEY = 'garden_ink_palettes', PL_REC_KEY = 'garden_ink_recent_colors';
-  var PL_MAX = 12, PL_LISTS_MAX = 8, PL_REC_MAX = 8;
-  var PL_DEFAULTS = {
-    pen: [['ink', 'red', 'sky', 'emerald', 'orange', 'violet'],
-          ['teal', 'indigo', 'brown', 'pink', 'lime', 'ink'],
-          ['red', 'orange', 'yellow', 'lime', 'sky', 'pink']],
-    hi:  [['yellow', 'lime', 'sky', 'pink', 'orange', 'violet'],
-          ['amber', 'emerald', 'teal', 'rose', 'indigo', 'brown'],
-          ['yellow', 'pink', 'sky', 'lime', 'red', 'teal']]
-  };
-  var PL_NAMES = {
-    pen: [['أساسيّ', 'Basic'], ['هادئ', 'Calm'], ['زاهٍ', 'Bright']],
-    hi:  [['للمراجعة', 'Revision'], ['هادئ', 'Soft'], ['مفاتيحُ الامتحان', 'Exam keys']]
-  };
-  function plName(kind, i, list) {
-    var dft = PL_DEFAULTS[kind][i];
-    if (dft && list && list.join(',') === dft.join(',')) return L(PL_NAMES[kind][i][0], PL_NAMES[kind][i][1]);
-    return L('لوحتي ', 'My palette ') + arDigits(i + 1);
-  }
+  var PL_MAX = 12, PL_LISTS_MAX = 24;
+  /*@3.NODJ.141*/
+  function PAL() { return window.GardenSwatch.pal; }
+  function plName(kind, i, list) { return PAL().name(kind, i, list); }
+  function plRing(P) { return PAL().ring(P); }
+  function plNext(P) { return PAL().next(P); }
   function plKind(cv) { return (cv && cv.tool === 'hi') ? 'hi' : 'pen'; }
-  function plOk(c) {
-    return typeof c === 'string' && (ALL_TONES.indexOf(c) >= 0 || TONES.indexOf(c) >= 0 ||
-      /^#[0-9a-f]{6}$/i.test(c) || c === 'amber' || c === 'rose');
-  }
-  function plRead() {
-    var d = null;
-    try { d = JSON.parse(localStorage.getItem(PL_KEY) || 'null'); } catch (e) {}
-    var out = { v: 1 };
-    ['pen', 'hi'].forEach(function (k) {
-      var src = d && d[k], lists = [], cur = 0;
-      if (src && Array.isArray(src.lists)) {
-        src.lists.forEach(function (l) {
-          if (lists.length >= PL_LISTS_MAX) return;
-          lists.push({ c: (l && Array.isArray(l.c)) ? l.c.filter(plOk).slice(0, PL_MAX) : [] });
-        });
-        cur = Math.max(0, Math.min(lists.length - 1, Number(src.cur) || 0));
-      }
-      if (!lists.length) lists = PL_DEFAULTS[k].map(function (c) { return { c: c.slice() }; });
-      out[k] = { cur: cur, lists: lists };
-    });
-    return out;
-  }
-  function plWrite(d) { try { localStorage.setItem(PL_KEY, JSON.stringify(d)); } catch (e) {} }
-  function plRecents(kind) {
-    try {
-      var a = JSON.parse(localStorage.getItem(PL_REC_KEY) || 'null');
-      if (a && Array.isArray(a[kind])) return a[kind].filter(plOk).slice(0, PL_REC_MAX);
-    } catch (e) {}
-    return [];
-  }
-  function noteRecentColor(kind, c) {
-    if (!plOk(c)) return false;
-    var a = null;
-    try { a = JSON.parse(localStorage.getItem(PL_REC_KEY) || 'null'); } catch (e) {}
-    if (!a || typeof a !== 'object') a = {};
-    var list = (Array.isArray(a[kind]) ? a[kind] : []).filter(function (x) { return x !== c; });
-    list.unshift(c);
-    a[kind] = list.slice(0, PL_REC_MAX);
-    try { localStorage.setItem(PL_REC_KEY, JSON.stringify(a)); } catch (e2) {}
-    return true;
-  }
+  function plOk(c) { return PAL().ok(c); }
+  function plRead() { return PAL().read(); }
+  function plWrite(d) { PAL().write(d); }
+  function plRecents(kind) { return PAL().recents(kind); }
+  function noteRecentColor(kind, c) { return PAL().noteRecent(kind, c); }
+
   function arDigits(n) {
     return isAr() ? String(n).replace(/\d/g, function (ch) { return '٠١٢٣٤٥٦٧٨٩'.charAt(+ch); }) : String(n);
   }
@@ -1207,8 +1159,9 @@
     var rec = this._plView === 'recent';
     var hexK = function (t) { return (kind === 'hi' && K && K.hiHexOf) ? K.hiHexOf(t) : hexOf(t); };
     var nameOf = function (t) { return TONE_AR[t] ? L(TONE_AR[t], TONE_EN[t]) : t; };
-    var h = '<span class="ndl-pl-tabs" role="tablist">';
+    var h = '<span class="ndl-pl-tabs" role="tablist">', ring = plRing(P);
     P.lists.forEach(function (l, i) {
+      if (ring.indexOf(i) < 0 && i !== P.cur) return;
       var nm = L('قائمة ', 'List ') + (i + 1);
       h += '<button type="button" class="ndl-fav ndl-pl-tab" data-pl="' + i + '" role="tab"' +
         ' aria-selected="' + (!rec && i === P.cur ? 'true' : 'false') + '"' +
@@ -1322,14 +1275,19 @@
       if (P.lists.length >= PL_LISTS_MAX) return false;
       P.lists.push({ c: plOk(c) ? [c] : [] });
       P.cur = P.lists.length - 1;
+      if (P.pin.indexOf(P.cur) < 0) P.pin.push(P.cur);
       this._plView = 'list';
     } else if (act === 'dellist') {
       if (P.lists.length <= 1) return false;
-      P.lists.splice(ix >= 0 ? ix : P.cur, 1);
+      var gone = ix >= 0 ? ix : P.cur;
+      P.lists.splice(gone, 1);
+      P.pin = P.pin.filter(function (i) { return i !== gone; }).map(function (i) { return i > gone ? i - 1 : i; });
       P.cur = Math.min(P.cur, P.lists.length - 1);
       this._plView = 'list';
     } else if (act === 'reset') {
-      P.lists = PL_DEFAULTS[kind].map(function (x) { return { c: x.slice() }; });
+      P.lists = PAL().DEFAULTS[kind].map(function (x) { return { c: x.slice() }; });
+      P.pin = [0, 1, 2];
+      P.rot = 'pin';
       P.cur = 0;
       this._plView = 'list';
     } else if (act === 'clear-rec') {
@@ -2665,9 +2623,18 @@
                  cls: 'ndl-sw', style: '--t:' + swHex(t),
                  pressed: cv && cv.color === t, html: '' };
       });
+      plRecents(isHi ? 'hi' : 'pen').filter(function (c) { return c.charAt(0) === '#'; }).slice(0, 6).forEach(function (c) {
+        out.push({ k: 'c:' + c, ar: 'لونُك ' + c, en: 'Your colour ' + c, cls: 'ndl-sw ndl-sw--mine', style: '--t:' + c,
+                   pressed: cv && cv.color === c, html: '' });
+      });
       out.push({ k: 'c:custom', icon: 'fa-eye-dropper',
-                 ar: 'لون مخصّص', en: 'Custom colour',
+                 ar: 'لونٌ جديد من لوح الألوان', en: 'A new colour from the colour board',
                  pressed: !!(cv && typeof cv.color === 'string' && cv.color.charAt(0) === '#') });
+      var P0 = plRead()[isHi ? 'hi' : 'pen'], L0 = P0.lists[P0.cur].c;
+      if (cv && plOk(cv.color) && L0.indexOf(cv.color) < 0 && L0.length < PL_MAX) {
+        out.push({ k: 'pl:add', icon: 'fa-plus', ar: 'أضِفِ اللونَ الحاليَّ إلى اللوحة ' + arDigits(P0.cur + 1),
+                   en: 'Add the current colour to palette ' + (P0.cur + 1) });
+      }
       return out;
     }
     if (kind === 'zoom') {
@@ -2733,11 +2700,11 @@
       return '<button type="button" class="ndl-hc" data-hc="' + esc(t) + '" style="' + pos(i) + ';--t:' + esc(hx(t)) + '"' +
         ' aria-pressed="' + (cur === t) + '" aria-label="' + esc(nm) + '" data-ar="' + esc(TONE_AR[t] || t) + '" data-en="' + esc(TONE_EN[t] || t) + '"></button>';
     });
-    var pn = plName(kind, P.cur, list);
+    var pn = plName(kind, P.cur, list), pno = arDigits(P.cur + 1);
     out.push('<button type="button" class="ndl-hp" data-hp="1" style="' + pos(6) + '"' +
-      ' aria-label="' + esc(L('اللوحةُ: ' + pn + ' — المسْ للتالية', 'Palette: ' + pn + ' — tap for the next')) + '"' +
-      ' data-ar="' + esc('اللوحةُ: ' + pn + ' — المسْ للتالية') + '" data-en="' + esc('Palette: ' + pn + ' — tap for the next') + '">' +
-      '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i></button>');
+      ' aria-label="' + esc(L('اللوحةُ ' + pno + ': ' + pn + ' — المسْ للتالية', 'Palette ' + pno + ': ' + pn + ' — tap for the next')) + '"' +
+      ' data-ar="' + esc('اللوحةُ ' + pno + ': ' + pn + ' — المسْ للتالية') + '" data-en="' + esc('Palette ' + pno + ': ' + pn + ' — tap for the next') + '">' +
+      '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i><b class="ndl-hp-n" aria-hidden="true">' + esc(pno) + '</b></button>');
     if (pr.swap) {
       var toHi = !isHi;
       out.push('<button type="button" class="ndl-hs" data-hs="' + (toHi ? 'hi' : 'pen') + '" style="' + pos(7) + '"' +
@@ -2760,11 +2727,10 @@
       noteRecentColor(plKind(cv), t);
     } else if (b.hasAttribute('data-hp')) {
       var d = plRead(), k = plKind(cv), P = d[k];
-      P.cur = (P.cur + 1) % Math.max(1, P.lists.length);
+      P.cur = plNext(P);
       plWrite(d);
       this.paintHalo();
-      var nb = this.halo.querySelector('[data-hp]');
-      if (nb) this.showTip(nb);
+      this.flashPal();
       if (this.panel && this.panel.open) this.panel.render();
       return;
     } else if (b.hasAttribute('data-hs')) {
@@ -2782,9 +2748,18 @@
     this._tipT = setTimeout(function () { tip.setAttribute('data-on', '0'); }, 1600);
   };
 
+  Dial.prototype.flashPal = function () {
+    var b = this.halo ? this.halo.querySelector('[data-hp]') : null;
+    if (!b) return;
+    b.setAttribute('data-flash', '1');
+    clearTimeout(this._hpT);
+    this._hpT = setTimeout(function () { if (b.isConnected) b.removeAttribute('data-flash'); }, 1600);
+  };
+
   Dial.prototype.palettes = function () {
     var cv = this.getCv(), k = plKind(cv), d = plRead(), P = d[k];
-    return { kind: k, cur: P.cur, lists: P.lists.map(function (l, i) { return { c: l.c, name: plName(k, i, l.c) }; }) };
+    return { kind: k, cur: P.cur, rot: P.rot, ring: plRing(P),
+             lists: P.lists.map(function (l, i) { return { c: l.c, name: plName(k, i, l.c), pin: P.pin.indexOf(i) >= 0 }; }) };
   };
 
   Dial.prototype.setPalette = function (i) {
@@ -2792,6 +2767,26 @@
     d[k].cur = Math.max(0, Math.min(d[k].lists.length - 1, i));
     plWrite(d);
     this.paintHalo();
+    this.paintColors();
+  };
+
+  Dial.prototype.pinPalette = function (i) {
+    var cv = this.getCv(), k = plKind(cv), d = plRead(), P = d[k], at = P.pin.indexOf(i);
+    if (!(i >= 0) || i >= P.lists.length) return;
+    if (at >= 0) P.pin.splice(at, 1); else P.pin.push(i);
+    P.pin.sort(function (a, b) { return a - b; });
+    if (P.rot === 'all') P.rot = 'pin';
+    plWrite(d);
+    this.paintHalo();
+    this.paintColors();
+  };
+
+  Dial.prototype.setPalRot = function (mode) {
+    var cv = this.getCv(), k = plKind(cv), d = plRead();
+    d[k].rot = mode === 'all' ? 'all' : 'pin';
+    plWrite(d);
+    this.paintHalo();
+    this.paintColors();
   };
 
   Dial.prototype.haloPrefs = function () { return haloPrefs(); };
@@ -3160,6 +3155,7 @@
     else if (k.indexOf('w:') === 0) { cv.setWidth(parseFloat(k.slice(2))); }
     else if (k.indexOf('tool:') === 0) { cv.setTool(k.slice(5)); }
     else if (k === 'c:custom') this.pickCustom(btn);
+    else if (k === 'pl:add') { this.plAct('add'); this.paintHalo(); }
     else if (k.indexOf('c:') === 0) { cv.setColor(k.slice(2)); }
     else if (k === 'z:in') cv.setUserZoom(cv.userZ * 1.25);
     else if (k === 'z:out') cv.setUserZoom(cv.userZ / 1.25);
@@ -3182,6 +3178,10 @@
     if (S && S.board) {
       S.board(btn || null, cur, function (v, done) {
         cv.setColor(v);
+        if (done) {
+          noteRecentColor(plKind(cv), v);
+          if (self.panel && self.panel.open) self.panel.render();
+        }
         self.sync();
       });
       return;

@@ -192,15 +192,14 @@
     if (cur === 'shape') h += this.sec(L('الشكل', 'Shape'), this.chipRow(d.subItems('shape')));
     if (cur === 'era') h += this.sec(L('نوعُ الممحاة', 'Eraser'), this.chipRow(d.subItems('era').map(function (x) { x.text = L(x.ar.split(' — ')[0], x.en.split(' — ')[0]); return x; })));
     if (cur !== 'era' && cur !== 'hand' && cur !== 'sel' && cur !== 'lasso') {
-      var cols = d.subItems('color').map(function (x) { if (x.cls === 'ndl-sw') { x.html = '<span class="nip-sw"></span>'; } return x; });
+      var cols = d.subItems('color').map(function (x) { if (x.cls && x.cls.indexOf('ndl-sw') === 0) { x.html = '<span class="nip-sw"></span>'; } return x; });
       h += this.sec(L('اللون', 'Colour'), this.chipRow(cols), 'nip-colors');
-      if (d.palettes) {
+      if (d.palettes && window.GardenSwatch && GardenSwatch.palPanel) {
         var pl = d.palettes(), hexOf = (window.GardenCanvas && (tool === 'hi' ? GardenCanvas.hiHexOf : GardenCanvas.hexOf)) || function (t) { return t; };
         h += this.sec(tool === 'hi' ? L('لوحاتُ التظليل حول اللوحة', 'Highlight palettes around the dial') : L('لوحاتُ الألوان حول اللوحة', 'Colour palettes around the dial'),
-          '<ul class="nip-pals">' + pl.lists.map(function (l, i) {
-            return '<li><button type="button" class="nip-pal" data-pal="' + i + '" aria-pressed="' + (i === pl.cur) + '"><span>' + esc(l.name) + '</span>' +
-              '<span class="nip-pal-dots">' + l.c.slice(0, 6).map(function (c) { return '<i style="--t:' + esc(hexOf(c)) + '"></i>'; }).join('') + '</span></button></li>';
-          }).join('') + '</ul>');
+          (d.setPalRot ? this.seg('palrot', [['pin', 'دوّرِ المثبَّتةَ وحدَها', 'Cycle the pinned only'], ['all', 'دوّرْها كلَّها', 'Cycle them all']], pl.rot === 'all' ? 'all' : 'pin') : '') +
+          GardenSwatch.palPanel(pl.kind, { hexOf: hexOf, pins: !!d.pinPalette }) +
+          '<p class="nip-note">' + esc(L('النقاطُ الثلاث حول اللوحة تنقلك إلى التالية وتعرض رقمَها.', 'The three dots around the dial move to the next palette and show its number.')) + '</p>');
       }
       var ws = d.subItems(tool === 'hi' ? 'hiw' : 'size');
       h += this.sec(L('السماكة', 'Thickness'), this.chipRow(ws.filter(function (x) { return x.k.indexOf('w:') === 0; })));
@@ -352,6 +351,13 @@
       GardenCanvas.setScratch(!GardenCanvas.scratchOn()); this.render(); return;
     }
     if (t.hasAttribute('data-pal') && d.setPalette) { d.setPalette(+t.getAttribute('data-pal')); this.render(); return; }
+    if (t.hasAttribute('data-palpin') && d.pinPalette) { d.pinPalette(+t.getAttribute('data-palpin')); this.render(); return; }
+    if (t.hasAttribute('data-palrot') && d.setPalRot) { d.setPalRot(t.getAttribute('data-palrot')); this.render(); return; }
+    if (window.GardenSwatch && GardenSwatch.palClick) {
+      var selfP = this, cvP = this.cv(), kP = cvP && cvP.tool === 'hi' ? 'hi' : 'pen';
+      var hxP = (window.GardenCanvas && (kP === 'hi' ? GardenCanvas.hiHexOf : GardenCanvas.hexOf)) || null;
+      if (GardenSwatch.palClick(t, kP, { hexOf: hxP, onChange: function () { d.paintHalo(); d.paintColors(); selfP.render(); } })) return;
+    }
     if (t.hasAttribute('data-halo') && d.setHalo) {
       var hp = d.haloPrefs(), k2 = t.getAttribute('data-halo');
       hp[k2] = !hp[k2];

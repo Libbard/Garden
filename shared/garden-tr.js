@@ -70,6 +70,13 @@
     } catch (e) {}
   }
 
+  var AUTO = 'garden_tr_auto';
+  function auto(on) {
+    if (on == null) { try { return localStorage.getItem(AUTO) === '1'; } catch (e) { return false; } }
+    try { localStorage.setItem(AUTO, on ? '1' : '0'); } catch (e2) {}
+    return !!on;
+  }
+
   function fail(code) { var e = new Error(code); e.code = code; return e; }
 
   /*@3.GATJ2.6*/
@@ -228,6 +235,7 @@
       '<div class="gtr-terms" hidden></div>' +
       '<div class="gtr-cut" hidden></div>' +
       '<div class="gtr-acts"></div>' +
+      (opts.autoToggle ? '<label class="gtr-auto"><input type="checkbox"><span></span></label>' : '') +
       '<div class="gtr-foot"></div>';
     var srcEl = el.querySelector('.gtr-src'), outEl = el.querySelector('.gtr-out'), termsEl = el.querySelector('.gtr-terms');
     var cutEl = el.querySelector('.gtr-cut'), acts = el.querySelector('.gtr-acts');
@@ -241,7 +249,13 @@
     bX.setAttribute('data-ar-title', 'إغلاق'); bX.setAttribute('data-en-title', 'Close');
     acts.appendChild(bCopy); acts.appendChild(bSwap); acts.appendChild(bX);
 
-    var to = toFor(src), done = '', gen = 0;
+    var to = opts.to || toFor(src), done = '', gen = 0;
+    var autoEl = el.querySelector('.gtr-auto');
+    if (autoEl) {
+      autoEl.lastChild.textContent = L('ترجمْ تلقائيّاً كلّما حدّدتُ نصّاً إنجليزيّاً', 'Translate automatically whenever I select English text');
+      autoEl.firstChild.checked = auto();
+      autoEl.firstChild.addEventListener('change', function () { auto(autoEl.firstChild.checked); });
+    }
     function swapLabel() {
       bSwap.lastChild.textContent = to === 'ar' ? L('إلى الإنجليزيّة', 'To English') : L('إلى العربيّة', 'To Arabic');
     }
@@ -370,5 +384,5 @@
     } catch (e) { return null; }
   }
 
-  window.GardenTr = { open: open, close: close, text: text, parts: parts, lines: lines, toFor: toFor, selRect: selRect, MAX_Q: MAX_Q };
+  window.GardenTr = { open: open, close: close, auto: auto, text: text, parts: parts, lines: lines, toFor: toFor, selRect: selRect, MAX_Q: MAX_Q };
 })();

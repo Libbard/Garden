@@ -14,6 +14,21 @@
   var LS_CARCH = 'notes_course_arch';
   var LS_UI = 'notes_ui';
 
+  /*@3.NOAJ.516*/
+  var EMBED = (function () {
+    try { return new URLSearchParams(location.search).get('embed') === '1' && window.parent !== window; } catch (e) { return false; }
+  })();
+  if (EMBED) document.documentElement.setAttribute('data-embed', '1');
+  var embDock = EMBED && /[?&]dock=1(&|$)/.test(location.search);
+  if (embDock) document.documentElement.setAttribute('data-dock', '1');
+  var embFrom = '';
+  try { embFrom = EMBED ? String(new URLSearchParams(location.search).get('from') || '').replace(/#.*$/, '') : ''; } catch (eF) {}
+  var embBorn = null;
+  function embPost(t, o) {
+    if (!EMBED) return;
+    try { window.parent.postMessage(Object.assign({ gnote: t }, o || {}), location.origin); } catch (e) {}
+  }
+
   var els = {};
   var ed = null;
   var ribbon = null;
@@ -400,7 +415,8 @@
       case 'remind':  return !n.archived && !!n.remind_at && !cArch(n, am);
       case 'myshares': return n.src === 'rich' && !!sharedMap()[n.id];
       case 'withme':  return false;
-      case 'archive': return !!n.archived;
+      /*@3.NOAJ.521*/
+      case 'archive': return !!n.archived || cArch(n, am);
       case 'general': return !n.archived && !(n.origin && n.origin.course);
       case 'course':  return !n.archived && n.origin && n.origin.course === v.code;
       case 'level':   return !n.archived && n.origin && n.origin.course && !courseArchived(n.origin.course) &&
@@ -2338,6 +2354,7 @@
     St.putDoc(id, body, t).then(function (res) {
       lastSaved[id] = body;
       lastSig[id] = sig;
+      if (mine) snapSoon(id);
       var rec = idxFind(id);
       if (rec) {
         /*@3.NOAJ.172*/
@@ -7741,7 +7758,7 @@
     var doc = { v: 1, blocks: board ? [] : [window.GardenNotesBlocks.blank('p')] };
     if (!board) { pgvSeed(doc); doc.pg = 2; }
     if (board) doc.kind = 'board';
-    var go = function () { reload({ keepOpen: true }); openNote(id, { focus: !board }); };
+    var go = function () { reload({ keepOpen: true }); openNote(id, { focus: !board }); embPost('open', { id: id }); };
     if (St) putBorn(id, doc, now).then(go, go); else go();
   }
 
@@ -8369,6 +8386,8 @@
   }
 
   function fsMode() {
+    /*@3.NOAJ.519*/
+    if (EMBED) return 'auto';
     var v = ui().fs;
     if (v === 'fit' || v === 'auto' || v === 'wide') return v;
     var n = parseFloat(v);
@@ -8394,7 +8413,7 @@
     if (m === 'auto') {
       var f = Math.min(1, fitZoom());
       /*@3.NOAJ.100*/
-      if (f < 0.85 && isPhone()) f = 0.85;
+      if (f < 0.85 && isPhone() && !embDock) f = 0.85;
       return f;
     }
     return m;
@@ -11303,9 +11322,7 @@
     roots.forEach(function (f) { out.push({ v: { k: 'folder', id: f.id }, icon: 'fa-folder', label: f.n || L('مجلّد', 'Folder'), n: C.total[f.id] || 0 }); });
     out.push({ head: '' });
     add({ k: 'space' }, 'fa-hard-drive', 'مساحتي', 'My storage', 0, 1);
-    var ca = courseCounts(true), nca = 0;
-    for (var ck in ca) nca += ca[ck];
-    add({ k: 'archive' }, 'fa-box-archive', 'الأرشيف', 'Archive', inView({ k: 'archive' }).length + nca, 1);
+    add({ k: 'archive' }, 'fa-box-archive', 'الأرشيف', 'Archive', inView({ k: 'archive' }).length, 1);
     add({ k: 'trash' }, 'fa-trash-can', 'السلّة', 'Trash', (S.trash || []).length, 1);
     return out;
   }
@@ -11701,7 +11718,12 @@
       view: function () { return S.view; },
       setView: exSetView,
       crumbs: exCrumbs,
-      items: function () { return inView(S.view); },
+      items: function () {
+        var l = inView(S.view);
+        if (S.view.k !== 'archive') return l;
+        var am = courseArchMap();
+        return l.filter(function (n) { return n.archived || !cArch(n, am); });
+      },
       folders: exFolders,
       canFolder: function () { return S.view.k === 'folder' || S.view.k === 'home'; },
       places: exPlaces,
@@ -11783,6 +11805,12 @@
       archive: function (uids, on) {
         var now = Date.now();
         lessonSkip(uids, recsOf(uids).length);
+        /*@3.NOAJ.522*/
+        if (!on) {
+          var am0 = courseArchMap(), held = recsOf(uids).filter(function (x) { return !x.archived && cArch(x, am0); }).length;
+          if (held) toast(L('هذه في مادّةٍ مؤرشفة — أعِدِ المادّةَ نفسَها من «الأرشيف» لتعود ملاحظاتُها.',
+                            'These belong to an archived course — move the course itself back to bring its notes back.'));
+        }
         recsOf(uids).forEach(function (x) {
           var r = idxFind(x.id);
           if (!r) return;
@@ -12361,6 +12389,7 @@
         overlay: function () { return overlay; }
       });
       els.ribbonHost.hidden = true;
+      if (EMBED) embChrome(els.ribbonHost);
     }
     buildPageDlg();
     bindPageSliders();
@@ -12632,7 +12661,7 @@
     });
 
     var back = document.getElementById('na-back');
-    if (back) back.addEventListener('click', function () { closeNote(); });
+    if (back) back.addEventListener('click', function () { if (EMBED) embFlush(); else closeNote(); });
 
     /*@3.NOAJ.101*/
     els.app.setAttribute('data-bars', '1');
@@ -13021,12 +13050,15 @@
       if (adopt) {
         navHome();
         adoptQuick(adopt);
+      } else if (EMBED && qs.get('mod') === '1') {
+        embBoot(qs);
       } else if (qs.get('slides')) {
         navHome();
         openSlides(qs.get('slides'));
       } else if (wanted && idxFind(wanted)) {
         if (qs.get('p')) wantPage(wanted, qs.get('p'));
         openNote(wanted);
+        embPost('open', { id: wanted });
       }
       /*@3.NOAJ.469*/
       else if (qs.get('view') === 'space') { navHome(); exSetView({ k: 'space' }); }
@@ -13040,6 +13072,377 @@
 
     runReconcile(false);
     setTimeout(scanBlanks, 1500);
+  }
+
+  /*@3.NOAJ.517*/
+  var embSecs = [], embQ = [], embInk = '';
+  function embMain(c, m) {
+    return idxRead().filter(function (r) { return r && r.o && r.o.mm && r.o.c === c && Number(r.o.m) === m && !(r.d > 0); })
+      .sort(function (a, b) { return (a.ca || 0) - (b.ca || 0); })[0] || null;
+  }
+  function embMakeMain(c, m, q) {
+    var id = newId('rn'), now = Date.now(), t = String(q.get('title') || '').slice(0, 120);
+    var rec = { id: id, t: t, k: 'rich', o: { c: c, m: m, mm: 1, p: String(q.get('from') || '').replace(/#.*$/, ''), t: t },
+                g: [], c: null, f: null, p: 0, a: 0, ca: now, updated_at: now, sz: 0, pv: 1 };
+    if (!rec.o.p) delete rec.o.p;
+    if (!rec.o.t) delete rec.o.t;
+    pvClaim(id);
+    idxPut(rec);
+    var doc = { v: 1, blocks: [window.GardenNotesBlocks.blank('p')] };
+    pgvSeed(doc); doc.pg = 2;
+    embBorn = { id: id };
+    var St = window.GardenNotesStore;
+    return St ? putBorn(id, doc, now).then(function () { return id; }, function () { return id; }) : Promise.resolve(id);
+  }
+  function embWhenOpen(id, fn) {
+    if (ed && edId === id && ed.doc) { fn(); return; }
+    var on = function (e) {
+      if (!e.detail || e.detail.id !== id) return;
+      window.removeEventListener('garden:noteDoc', on);
+      setTimeout(function () { if (ed && edId === id) fn(); }, 0);
+    };
+    window.addEventListener('garden:noteDoc', on);
+  }
+  function embReady(id) {
+    embWhenOpen(id, function () {
+      embInk = embInkSig();
+      embPost('open', { id: id, main: !!((idxFind(id) || {}).o || {}).mm });
+      var q = embQ; embQ = [];
+      q.forEach(embAppend);
+    });
+  }
+  function embBoot(q) {
+    var c = String(q.get('course') || ''), m = Number(q.get('module')) || 0, want = q.get('id');
+    if (q.get('new') === '1') { createNote(); return; }
+    navHome();
+    var rec = (want && idxFind(want)) || embMain(c, m);
+    if (rec) { openNote(rec.id); embReady(rec.id); return; }
+    embMakeMain(c, m, q).then(function (id) { reload({ keepOpen: true }); openNote(id, { focus: true }); embReady(id); });
+  }
+  function embInkSig() {
+    var ov = ed && ed.doc && ed.doc.ov;
+    return ov ? String(ov.ink ? String(ov.ink).length : 0) + ':' + (ov.shapes ? ov.shapes.length : 0) : '';
+  }
+  function embBlankP(b) {
+    var B = window.GardenNotesBlocks;
+    return !!(b && !b.fp && b.ty === 'p' && !(B && B.runsToText(b.rt || []).trim()));
+  }
+  function embLegacy(req, B) {
+    var key = 'garden_' + req.c + '_m' + req.m + '_notes', arr = readJSON(key, []), x = null, i;
+    for (i = 0; Array.isArray(arr) && i < arr.length; i++) if (arr[i] && String(arr[i].id) === String(req.nid)) { x = arr[i]; break; }
+    if (!x) return null;
+    var body = String(x.body != null ? x.body : (x.note || '')).replace(/^(\s*)[•·▪◦]\s+/gm, '$1- '), md = null, out = [];
+    var hl = String(x.highlight || '').replace(/\s+/g, ' ').trim(), tt = String(x.title || '').replace(/[…\s]+$/, '').trim();
+    if (x.highlight) out.push(B.blank('quote', { rt: [{ s: String(x.highlight) }] }));
+    if (tt && hl.indexOf(tt) !== 0 && body.indexOf(tt) !== 0) out.push(B.blank('h', { lv: 3, rt: [{ s: tt }] }));
+    try { md = body ? B.fromMarkdown(body) : null; } catch (e) { md = null; }
+    if (md && md.length) out = out.concat(md);
+    else if (body) out.push(B.blank('p', { rt: [{ s: body }] }));
+    return { x: x, key: key, blocks: out };
+  }
+  /*@3.NOAJ.518*/
+  function embAppend(req) {
+    var id = edId, B = window.GardenNotesBlocks;
+    if (!req || !B) return;
+    if (!id || !ed || !ed.doc) { embQ.push(req); return; }
+    var bl = ed.doc.blocks, k;
+    if (req.kind === 'legacy') {
+      var lg = embLegacy(req, B);
+      if (!lg) return;
+      var was = lg.x.mig && lg.x.mig.rn === id && lg.x.mig.b;
+      for (k = 0; was && k < bl.length; k++) if (bl[k].id === was) { ed.flashBlock(was); embPost('appended', { rid: req.rid, b: was }); return; }
+    }
+    try { ed.readAll(); } catch (e0) {}
+    var before = ed.snapshot ? ed.snapshot() : null;
+    var at = bl.length;
+    while (at > 0 && embBlankP(bl[at - 1])) at--;
+    var reuse = at < bl.length ? bl[at] : null, add = [], head = null, hr = null, w = reuse;
+    if (docHasContent({ blocks: bl.slice(0, at) })) { hr = B.blank('hr'); add.push(hr); }
+    var link = req.href ? { s: String(req.label || '').slice(0, 120), lk: req.href } : null;
+    if (req.kind === 'concept') {
+      head = B.blank('h', { lv: 2, rt: [link || { s: String(req.label || '') }] });
+      add.push(head);
+      var md = [];
+      try { md = req.md ? B.fromMarkdown(String(req.md)) : []; } catch (e1) { md = []; }
+      add = add.concat(md);
+    } else if (req.kind === 'legacy') {
+      add = add.concat(lg.blocks);
+      head = lg.blocks[0] || null;
+    } else {
+      var rt = [{ s: String(req.q || '').slice(0, 4000) }];
+      if (link) { rt.push({ s: '\n' }); link.s = '— ' + link.s; rt.push(link); }
+      head = B.blank('quote', { rt: rt });
+      add.push(head);
+    }
+    if (!w) { w = B.blank('p'); add.push(w); }
+    if (!head) return;
+    bl.splice.apply(bl, [at, 0].concat(add));
+    ed.renderInsert(at, add);
+    if (before && ed.pushUndo) ed.pushUndo(before);
+    ed.touch();
+    if (ed.emitState) ed.emitState();
+    embSecs.push({ id: id, kind: req.kind, rid: req.rid, q: head.id, hr: hr ? hr.id : null, w: w.id, wNew: !reuse });
+    if (req.kind === 'legacy') {
+      var a2 = readJSON(lg.key, []);
+      for (k = 0; k < a2.length; k++) if (a2[k] && String(a2[k].id) === String(req.nid)) { a2[k].mig = Object.assign({}, a2[k].mig || {}, { rn: id, b: head.id, t: Date.now() }); break; }
+      writeJSON(lg.key, a2);
+      try { ed.save(); } catch (e2) {}
+    }
+    setTimeout(function () {
+      if (req.kind === 'quote') ed.focusBlock(w.id);
+      ed.flashBlock(head.id);
+    }, 60);
+    embPost('appended', { rid: req.rid, b: head.id });
+  }
+  /*@3.NOAJ.520*/
+  function embTidy() {
+    var kept = [], drop = {}, n = 0, bl = ed.doc.blocks, inked = embInkSig() !== embInk;
+    embSecs.forEach(function (s) {
+      if (s.id !== edId) return;
+      if (s.kind !== 'quote' || inked) { kept.push(s.rid); return; }
+      var qi = -1, j, wrote = false;
+      for (j = 0; j < bl.length; j++) if (bl[j].id === s.q) { qi = j; break; }
+      if (qi < 0) return;
+      for (j = qi + 1; j < bl.length && bl[j].ty !== 'hr'; j++) if (docHasContent({ blocks: [bl[j]] })) { wrote = true; break; }
+      if (wrote) { kept.push(s.rid); return; }
+      drop[s.q] = 1; n++;
+      if (s.hr) drop[s.hr] = 1;
+      if (s.wNew) drop[s.w] = 1;
+    });
+    if (n) {
+      var before = ed.snapshot ? ed.snapshot() : null;
+      ed.doc.blocks = bl.filter(function (b) { return !drop[b.id]; });
+      if (!ed.doc.blocks.length) ed.doc.blocks.push(window.GardenNotesBlocks.blank('p'));
+      if (before && ed.pushUndo) ed.pushUndo(before);
+      ed.render();
+      ed.touch();
+    }
+    embSecs = embSecs.filter(function (s) { return s.id !== edId; });
+    return kept;
+  }
+  function embFlush(keep) {
+    var id = edId, kept = !!id, secs = [];
+    if (id && ed && ed.doc) {
+      try { ed.readAll(); } catch (e0) {}
+      if (!keep) secs = embTidy();
+      var rec = idxFind(id);
+      if (!keep && leaveProvisional(id, ed.doc)) kept = false;
+      else if (!keep && embBorn && embBorn.id === id && rec && !docHasContent(ed.doc)) { dropBlank(id); kept = false; }
+      if (kept) { try { ed.save(); } catch (e) {} }
+    }
+    var tell = function () { embPost('closed', { id: kept ? id : null, kept: kept ? secs : [] }); };
+    if (!kept) { tell(); return; }
+    var wait = snapWrite(id);
+    Promise.race([wait, new Promise(function (r) { setTimeout(r, 2500); })]).then(function () { setTimeout(tell, 120); }, tell);
+  }
+  /*@3.NOAJ.525*/
+  var snapT = 0, snapP = null;
+  function snapLib() {
+    if (window.GardenPeekStore) return Promise.resolve(window.GardenPeekStore);
+    var me = document.querySelector('script[src*="notes-app.js"]'), src = me ? me.src : '';
+    return new Promise(function (ok, no) {
+      var s = document.createElement('script');
+      s.src = src.replace(/notes-app\.js/, 'peek-store.js');
+      s.onload = function () { ok(window.GardenPeekStore); };
+      s.onerror = no;
+      document.head.appendChild(s);
+    });
+  }
+  function snapSoon(id, now) {
+    var rec = idxFind(id);
+    if (!rec || !rec.o || !rec.o.c || !(rec.o.m > 0) || edId !== id || !ed) return;
+    clearTimeout(snapT);
+    snapT = setTimeout(function () {
+      (window.requestIdleCallback || function (f) { return setTimeout(f, 0); })(function () { snapWrite(id); });
+    }, now ? 0 : 1500);
+  }
+  function snapHash(s) {
+    var h = 5381, i;
+    for (i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0;
+    return (h >>> 0).toString(36) + s.length.toString(36);
+  }
+  function snapText(blocks) {
+    var B = window.GardenNotesBlocks, out = [];
+    blocks.forEach(function (b) {
+      if (!b) return;
+      if (b.rt) out.push(B.runsToText(b.rt));
+      if (b.items) b.items.forEach(function (it) { if (it && it.rt) out.push('• ' + B.runsToText(it.rt)); });
+      if (b.ty === 'code' && b.src) out.push(b.src);
+    });
+    return out.join('\n').replace(/\n{3,}/g, '\n\n').trim();
+  }
+  function snapImg(o) {
+    var src = o.currentSrc || o.src || '';
+    if (!/^(blob|data):/.test(src)) return src;
+    try {
+      var k = Math.min(1, 900 / (o.naturalWidth || 900)), c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round((o.naturalWidth || 1) * k)); c.height = Math.max(1, Math.round((o.naturalHeight || 1) * k));
+      c.getContext('2d').drawImage(o, 0, 0, c.width, c.height);
+      return c.toDataURL('image/webp', 0.86);
+    } catch (e) { return ''; }
+  }
+  function snapOne(ids, canv) {
+    var nodes = [], U = null, z = curZoom || 1;
+    ids.forEach(function (k) {
+      var n = ed.root.querySelector(':scope > [data-bid="' + k + '"]');
+      if (!n) return;
+      nodes.push(n);
+      var r = n.getBoundingClientRect();
+      if (!r.width && !r.height) return;
+      U = U ? { l: Math.min(U.l, r.left), t: Math.min(U.t, r.top), r: Math.max(U.r, r.right), b: Math.max(U.b, r.bottom) } : { l: r.left, t: r.top, r: r.right, b: r.bottom };
+    });
+    if (!U) return null;
+    var box = document.createElement('div');
+    nodes.forEach(function (n) {
+      var c = n.cloneNode(true), oi = n.querySelectorAll('img'), ci = c.querySelectorAll('img'), oc = n.querySelectorAll('canvas'), cc = c.querySelectorAll('canvas'), i;
+      for (i = 0; i < ci.length && i < oi.length; i++) { var u = snapImg(oi[i]); if (u) ci[i].src = u; else ci[i].remove(); }
+      for (i = 0; i < cc.length && i < oc.length; i++) {
+        var im = document.createElement('img'), w = oc[i].getBoundingClientRect().width / z;
+        try { im.src = oc[i].toDataURL('image/png'); } catch (e) { continue; }
+        im.className = cc[i].className;
+        im.style.cssText = 'display:block;inline-size:' + Math.round(w) + 'px;max-inline-size:100%;';
+        cc[i].parentNode.replaceChild(im, cc[i]);
+      }
+      [].forEach.call(c.querySelectorAll('[contenteditable]'), function (e) { e.removeAttribute('contenteditable'); });
+      [].forEach.call(c.querySelectorAll('button, input, textarea, select, script, [hidden]'), function (e) { e.remove(); });
+      box.appendChild(c);
+    });
+    var ink = '', V = U;
+    if (canv.length) {
+      var C = canv[0].getBoundingClientRect();
+      if (C.width > 0 && C.height > 0) {
+        var kx = canv[0].width / C.width, ky = canv[0].height / C.height, pad = 28 * z;
+        var by0 = Math.max(0, Math.floor((U.t - pad - C.top) * ky)), by1 = Math.min(canv[0].height, Math.ceil((U.b + pad - C.top) * ky));
+        var bw = canv[0].width, bh = by1 - by0;
+        if (bh > 2) {
+          var band = document.createElement('canvas'), g;
+          band.width = bw; band.height = bh;
+          g = band.getContext('2d');
+          canv.forEach(function (cv) { try { g.drawImage(cv, 0, by0, bw, bh, 0, 0, bw, bh); } catch (e) {} });
+          var px = null, x0 = bw, y0 = bh, x1 = -1, y1 = -1, xx, yy, step = 2;
+          try { px = g.getImageData(0, 0, bw, bh).data; } catch (e2) { px = null; }
+          for (yy = 0; px && yy < bh; yy += step) for (xx = 0; xx < bw; xx += step) if (px[(yy * bw + xx) * 4 + 3] > 8) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (yy < y0) y0 = yy; if (yy > y1) y1 = yy; }
+          if (x1 >= 0) {
+            var m = 6 * kx;
+            x0 = Math.max(0, x0 - m); y0 = Math.max(0, y0 - m); x1 = Math.min(bw, x1 + m); y1 = Math.min(bh, y1 + m);
+            var out = document.createElement('canvas');
+            out.width = Math.round(x1 - x0); out.height = Math.round(y1 - y0);
+            out.getContext('2d').drawImage(band, x0, y0, x1 - x0, y1 - y0, 0, 0, out.width, out.height);
+            var L0 = C.left + x0 / kx, T0 = C.top + (by0 + y0) / ky, R0 = C.left + x1 / kx, B0 = C.top + (by0 + y1) / ky;
+            V = { l: Math.min(U.l, L0), t: Math.min(U.t, T0), r: Math.max(U.r, R0), b: Math.max(U.b, B0) };
+            ink = JSON.stringify({ u: out.toDataURL('image/png'), x: (L0 - V.l) / z, y: (T0 - V.t) / z, w: (R0 - L0) / z, h: (B0 - T0) / z });
+          }
+        }
+      }
+    }
+    return { w: Math.round((V.r - V.l) / z), h: Math.round((V.b - V.t) / z), tx: Math.round((U.l - V.l) / z), ty: Math.round((U.t - V.t) / z), tw: Math.round((U.r - U.l) / z),
+             html: box.innerHTML, ink: ink };
+  }
+  function snapWrite(id) {
+    if (edId !== id || !ed || !ed.root || !ed.doc) return Promise.resolve(false);
+    var rec = idxFind(id);
+    if (!rec || !rec.o || !rec.o.c || !(rec.o.m > 0)) return Promise.resolve(false);
+    clearTimeout(snapT);
+    var bl = ed.doc.blocks || [], secs = [], cur = null, by = {};
+    bl.forEach(function (b) {
+      if (!b || b.fp) return;
+      by[b.id] = b;
+      if (b.ty === 'hr') { cur = null; return; }
+      if (!cur) { cur = { head: b.id, ids: [] }; secs.push(cur); }
+      cur.ids.push(b.id);
+    });
+    var host = overlay && overlay.host, cvo = overlay && overlay.cv, els = (cvo && cvo.els) || [];
+    var canv = host ? [].slice.call(host.querySelectorAll('canvas.nc-hi, canvas.nc-base')) : [];
+    var ovs = embInkSig() + '/' + els.length + ':' + (els.length ? els[els.length - 1].id : '');
+    snapP = snapLib().then(function (P) {
+      return P.get(id).then(function (old) {
+        var prev = (old && old.secs) || {}, out = { __ix: {} };
+        secs.forEach(function (s) {
+          var blocks = s.ids.map(function (k) { return by[k]; });
+          var g = snapHash(JSON.stringify(blocks)) + '|' + ovs + '|' + Math.round((curZoom || 1) * 100);
+          s.ids.forEach(function (k) { out.__ix[k] = s.head; });
+          if (prev[s.head] && prev[s.head].g === g) { out[s.head] = prev[s.head]; return; }
+          var own = s.ids, mine = blocks;
+          if (blocks[0] && blocks[0].ty === 'quote') { own = s.ids.slice(1); mine = blocks.slice(1); }
+          if (!own.length || !docHasContent({ blocks: mine })) return;
+          var one = snapOne(own, canv);
+          if (!one) return;
+          one.g = g; one.x = snapText(mine); one.n = own.length;
+          out[s.head] = one;
+        });
+        return P.put(id, out);
+      });
+    }).catch(function () { return false; });
+    return snapP;
+  }
+  /*@3.NOAJ.526*/
+  function embQuick(bid, text) {
+    var id = edId, B = window.GardenNotesBlocks;
+    if (!id || !ed || !ed.doc || !B) { embPost('quicked', { bid: bid, n: 0 }); return; }
+    var lines = String(text || '').split(/\n/).map(function (l) { return l.replace(/\s+$/, ''); }).filter(function (l) { return l.trim(); });
+    if (!lines.length) { embPost('quicked', { bid: bid, n: 0 }); return; }
+    try { ed.readAll(); } catch (e0) {}
+    var bl = ed.doc.blocks, at = -1, i;
+    for (i = 0; i < bl.length; i++) if (bl[i].id === bid) { at = i; break; }
+    var end = at < 0 ? bl.length : at + 1;
+    while (end < bl.length && bl[end].ty !== 'hr') end++;
+    var k = end;
+    while (k - 1 > at && embBlankP(bl[k - 1])) k--;
+    var before = ed.snapshot ? ed.snapshot() : null;
+    var add = lines.map(function (l) { return B.blank('p', { rt: [{ s: l.slice(0, 4000) }] }); });
+    bl.splice.apply(bl, [k, 0].concat(add));
+    ed.renderInsert(k, add);
+    if (before && ed.pushUndo) ed.pushUndo(before);
+    ed.touch();
+    try { ed.save(); } catch (e1) {}
+    setTimeout(function () { snapWrite(id).then(function () { embPost('quicked', { bid: bid, n: add.length }); }); }, 60);
+  }
+  /*@3.NOAJ.524*/
+  function embChrome(host) {
+    var pen = host.querySelector('.nr-grp--pen');
+    var tip = function (ar, en) { return ' aria-label="' + esc(L(ar, en)) + '" title="' + esc(L(ar, en)) + '" data-ar-title="' + esc(ar) + '" data-en-title="' + esc(en) + '"'; };
+    if (pen) {
+      pen.hidden = false;
+      pen.innerHTML = '<button type="button" class="nr-b nr-b--pen" data-act="draw"' + tip('القلم — ارسمْ فوق الصفحة', 'Pen — draw on the page') + '>' +
+        '<i class="fa-solid fa-pen-nib" aria-hidden="true"></i></button>';
+    }
+    var more = document.createElement('div');
+    more.className = 'nr-grp nr-grp--more';
+    more.innerHTML = '<button type="button" class="nr-b" data-emb="more" aria-expanded="false"' + tip('كلُّ الأدوات', 'All tools') + '>' +
+      '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i></button>';
+    host.appendChild(more);
+    if (embChrome.on) return;
+    embChrome.on = 1;
+    document.addEventListener('click', function (e) {
+      var b = e.target.closest ? e.target.closest('[data-emb="more"]') : null, h = b && b.closest('.nr');
+      if (!h) return;
+      var on = !h.hasAttribute('data-all');
+      h.toggleAttribute('data-all', on);
+      b.setAttribute('aria-expanded', on ? 'true' : 'false');
+      setTimeout(applyFs, 0);
+    });
+  }
+  /*@3.NOAJ.523*/
+  function embGoto(u) {
+    var from = embFrom, x;
+    try { x = new URL(String(u), location.href); } catch (e) { return false; }
+    if (!from || !x.hash) return false;
+    var tail = from.replace(/^.*?\/(L\d+\/|others\/)/, '$1');
+    if (x.pathname.slice(-tail.length) !== tail) return false;
+    embPost('goto', { hash: x.hash });
+    return true;
+  }
+  if (EMBED) {
+    var wOpen = window.open;
+    window.open = function (u) { if (embGoto(u)) return null; return wOpen.apply(window, arguments); };
+    window.addEventListener('message', function (e) {
+      if (e.origin !== location.origin || !e.data || e.source !== window.parent) return;
+      if (e.data.gnote === 'flush') embFlush(!!e.data.keep);
+      else if (e.data.gnote === 'append') embAppend(e.data.req);
+      else if (e.data.gnote === 'quick') embQuick(e.data.bid, e.data.text);
+      else if (e.data.gnote === 'show' && ed && e.data.bid) embWhenOpen(edId, function () { ed.flashBlock(e.data.bid); });
+      else if (e.data.gnote === 'dock') { embDock = !!e.data.on; document.documentElement.toggleAttribute('data-dock', embDock); applyFs(); }
+    });
   }
 
   function docNow() {

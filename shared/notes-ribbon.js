@@ -131,7 +131,7 @@
       btn('redo', 'fa-rotate-right', 'إعادة', 'Redo') +
       '</div>';
 
-    h += '<div class="nr-grp">' +
+    h += '<div class="nr-grp" data-g="style">' +
       '<button type="button" class="nr-sel" data-pop="style" aria-haspopup="true" aria-expanded="false"' +
       ' aria-label="' + esc(L('نمط الفقرة', 'Paragraph style')) + '"' +
       ' data-ar-title="نمط الفقرة" data-en-title="Paragraph style">' +
@@ -155,7 +155,7 @@
       '<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></button>' +
       '</div>';
 
-    h += '<div class="nr-grp">' +
+    h += '<div class="nr-grp" data-g="marks">' +
       btn('bold', 'fa-bold', 'غامق', 'Bold') +
       btn('italic', 'fa-italic', 'مائل', 'Italic') +
       btn('underline', 'fa-underline', 'تسطير', 'Underline') +
@@ -163,7 +163,7 @@
       btn('code', 'fa-terminal', 'رمز سطري', 'Inline code') +
       '</div>';
 
-    h += '<div class="nr-grp">' +
+    h += '<div class="nr-grp" data-g="tone">' +
       '<button type="button" class="nr-b nr-b--tone" data-pop="fg" aria-haspopup="true" aria-expanded="false"' +
       ' aria-label="' + esc(L('لون النص', 'Text colour')) + '"' +
       ' data-ar-title="لون النص" data-en-title="Text colour">' +
@@ -179,7 +179,7 @@
 
     /*@3.NORJ.18*/
     var ar = isAr();
-    h += '<div class="nr-grp">' +
+    h += '<div class="nr-grp" data-g="align">' +
       btn('align:start', ar ? 'fa-align-right' : 'fa-align-left',
           'محاذاة إلى البداية', 'Align to start') +
       btn('align:center', 'fa-align-center', 'توسيط', 'Centre') +
@@ -188,19 +188,19 @@
       btn('align:justify', 'fa-align-justify', 'ضبط', 'Justify') +
       '</div>';
 
-    h += '<div class="nr-grp">' +
+    h += '<div class="nr-grp" data-g="fmt">' +
       btn('painter', 'fa-paintbrush', 'ناسخ التنسيق (ضغطتان للتثبيت)',
           'Format painter (double-click to keep)') +
       btn('dir', 'fa-right-left', 'اتّجاه الكتلة', 'Block direction') +
       '</div>';
 
-    h += '<div class="nr-grp">' +
+    h += '<div class="nr-grp" data-g="list">' +
       btn('list:ul', 'fa-list-ul', 'قائمة نقطية', 'Bullet list') +
       btn('list:ol', 'fa-list-ol', 'قائمة رقمية', 'Numbered list') +
       btn('list:todo', 'fa-square-check', 'مربع مهمة', 'To-do') +
       '</div>';
 
-    h += '<div class="nr-grp">' +
+    h += '<div class="nr-grp" data-g="ins">' +
       btn('link', 'fa-link', 'رابط', 'Link') +
       '<button type="button" class="nr-ins" data-pop="ins" aria-haspopup="true" aria-expanded="false"' +
       ' aria-label="' + esc(L('إدراج كتلة جديدة', 'Insert a new block')) + '"' +
@@ -211,7 +211,7 @@
       '</div>';
 
     /*@3.NORJ.6*/
-    h += '<div class="nr-grp">' +
+    h += '<div class="nr-grp" data-g="sel">' +
       btn('bsel', 'fa-object-ungroup', 'وضع تحديد الكتل', 'Block select mode') +
       btn('copy', 'fa-copy', 'نسخ', 'Copy') +
       btn('cut', 'fa-scissors', 'قصّ', 'Cut') +
@@ -301,6 +301,7 @@
     var q = this.host.querySelectorAll('.nr-b, .nr-sel, .nr-ins');
     for (var i = 0; i < q.length; i++) {
       var b = q[i], act = b.getAttribute('data-act');
+      if (!act && b.hasAttribute('data-emb')) continue;
       var dis = !on;
       if (act === 'undo') dis = !st || !st.canUndo;
       else if (act === 'redo') dis = !st || !st.canRedo;
