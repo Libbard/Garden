@@ -1332,6 +1332,18 @@
       return window.GardenInkCodec.unpack(d.ink);
     }).then(function (st) { return st.map(function (x) { return { c: x.color, u: x.tool !== 'hi' }; }); }, function () { return null; });
   }
+  /*@3.MOIJ.16*/
+  var warmed = false;
+  function warmTools() {
+    if (warmed || window.GardenModTools) return;
+    warmed = true;
+    var go = function () {
+      js('module-tools.js', function () { return !!window.GardenModTools; }).then(function () {
+        return js('menu.js', function () { return !!window.GardenMenu; });
+      }).catch(function () { warmed = false; });
+    };
+    if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 4000 }); else setTimeout(go, 1500);
+  }
   function paintKept() {
     clearTimeout(keptT);
     var seq = ++keptSeq;
@@ -1368,13 +1380,15 @@
       Object.keys(groups).forEach(function (name) {
         try {
           var h = new Highlight();
+          /*@3.MOIJ.15*/
+          h.priority = name.indexOf('gmi-t-') === 0 ? 2 : (name.indexOf('gmi-u-') === 0 ? 1 : 0);
           groups[name].forEach(function (r) { h.add(r); });
           KEPT_H[name] = h;
           if (S.on || !marksOff()) CSS.highlights.set(name, h);
           KEPT.push(name);
         } catch (e) {}
       });
-      if (n) css('module-ink.css');
+      if (n) { css('module-ink.css'); warmTools(); }
       if (linked) js('module-peek.js', function () { return !!window.GardenModPeek; }).catch(function () {});
       return n;
     });
@@ -1427,10 +1441,47 @@
     });
   }
   function fresh(k) { if (!S.on) { delete S.mem[k]; delete S.sig[k]; } return unpackLayer(k); }
+  function styleOf(e) { return e.ta && e.ta.x ? 'text' : ((e.ta && e.ta.u) || e.u ? 'under' : 'fill'); }
+  /*@3.MOIJ.14*/
+  function carve(list, it, st) {
+    var out = [];
+    list.forEach(function (e) {
+      if (!e.ta || e.ta.s !== it.ta.s || styleOf(e) !== st) { out.push(e); return; }
+      var f = null;
+      try { f = findHost(e.ta); } catch (er) { f = null; }
+      if (!f || f.i !== it.ta.i || f.b <= it.ta.a || f.a >= it.ta.b) { out.push(e); return; }
+      var full = textOf(f.ns), kept = 0;
+      [[f.a, it.ta.a], [it.ta.b, f.b]].forEach(function (p) {
+        var a = p[0], b = p[1];
+        while (a < b && /\s/.test(full.charAt(a))) a++;
+        while (b > a && /\s/.test(full.charAt(b - 1))) b--;
+        if (b <= a) return;
+        var q = JSON.parse(JSON.stringify(e));
+        q.ta.i = f.i; q.ta.a = a; q.ta.b = b; q.ta.t = full.slice(a, b);
+        if (kept++) { q.id = nid(); delete q.eid; delete q.ta.n; }
+        out.push(q);
+      });
+      if (!kept && e.ta.n && !it.ta.n) it.ta.n = e.ta.n;
+    });
+    return out;
+  }
+  function stylesIn(range) {
+    var out = {};
+    if (!HL_OK || !range || range.collapsed || marksOff()) return [];
+    KEPT.forEach(function (name) {
+      var h = KEPT_H[name], st = name.indexOf('gmi-t-') === 0 ? 'text' : (name.indexOf('gmi-u-') === 0 ? 'under' : 'fill');
+      if (!h || out[st]) return;
+      h.forEach(function (rg) {
+        if (out[st]) return;
+        try { if (range.compareBoundaryPoints(Range.START_TO_END, rg) > 0 && range.compareBoundaryPoints(Range.END_TO_START, rg) < 0) out[st] = 1; } catch (e) {}
+      });
+    });
+    return Object.keys(out);
+  }
   function addHighlight(range, color, style, opt) {
     var items = anchorsOf(range);
     if (!items.length) return Promise.resolve(0);
-    var u = style === 'under', x = style === 'text', c = color || 'yellow';
+    var u = style === 'under', x = style === 'text', c = color || 'yellow', st = x ? 'text' : (u ? 'under' : 'fill');
     opt = opt || {};
     return editLayers(function () {
       var by = {};
@@ -1447,6 +1498,7 @@
                       ts: (opt.ts > 0 ? opt.ts : Date.now()) + (opt.ts > 0 ? it.j : 0), pts: [{ x: 0, y: 0, p: 0.6 }, { x: 40, y: 0, p: 0.6 }], ta: it.ta };
             /*@3.MOIJ.10*/
             if (opt.eid) e.eid = it.j ? opt.eid + '_' + it.j : opt.eid;
+            list = carve(list, it, st);
             list.push(e);
           });
           S.mem[k] = list.slice(); S.sig[k] = ''; S.dirty[k] = 1;
@@ -1589,6 +1641,7 @@
     addHighlight: addHighlight,
     editHighlight: editHighlight,
     keptAt: keptAt,
+    stylesIn: stylesIn,
     keptList: keptList,
     rangeOf: rangeOf,
     bulk: bulk,

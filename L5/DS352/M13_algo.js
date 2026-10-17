@@ -201,8 +201,8 @@ window.AlgoWidgets[1] = function(container) {
 
             steps.push({
               board: [...board], testQ: { r: row, c: col, status: 'valid' }, states: {...nodeStates},
-              en: `Position is valid. Proceeding to row ${row + 1}.`,
-              ar: `الموضع آمن (لا يوجد تضارب). ننتقل للصف ${row + 1}.`
+              en: row + 1 < N ? `Position is valid. Proceeding to row ${row + 1}.` : `Position is valid. That was the last row.`,
+              ar: row + 1 < N ? `الموضع آمن (لا يوجد تضارب). ننتقل للصف ${row + 1}.` : `الموضع آمن (لا يوجد تضارب). وهذا آخرُ صفّ.`
             });
 
             backtrack(row + 1, id);
@@ -899,8 +899,8 @@ window.AlgoWidgets[3] = function(container) {
 
       steps.push({
         phase: 'intro', eulerPath: [], hamPath: [], currNode: null,
-        en: 'We start with a graph and its <strong>Minimum Spanning Tree (MST)</strong> highlighted.',
-        ar: 'نبدأ برسم بياني تم استخراج <strong>شجرة الامتداد الصغرى (MST)</strong> الخاصة به مسبقاً.'
+        en: 'We start with a graph and its <strong>Minimum Spanning Tree (MST)</strong> highlighted. Every pair of cities is connected by a straight-line distance (only some edges are drawn), so shortcuts always exist and are never longer.',
+        ar: 'نبدأ برسم بيانيّ ظُلّلت فيه <strong>شجرةُ الامتداد الصغرى (MST)</strong>. وكلُّ مدينتين بينهما مسافةٌ مستقيمة (‏رُسم بعضُ الأضلاع فقط)، فالاختصارُ ممكنٌ دائماً ولا يكون أطول.'
       });
 
       let eulerPath = [];

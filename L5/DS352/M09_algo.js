@@ -117,7 +117,7 @@ window.AlgoWidgets[1] = function(container) {
           { w: 'AND', i: 6 },
           { w: 'MONEY', i: 7 },
           { w: 'FOOL', i: 9 },
-          { w: 'HIS', i: 11 },
+          { w: 'HIS', i: 10 },
           { w: 'ARE', i: 11 },
           { w: 'SOON', i: 11 },
           { w: 'PARTED', i: 12 }
@@ -361,8 +361,8 @@ window.AlgoWidgets[2] = function(container) {
           ar: `جميع المفاتيح في الشجرة الفرعية T2 تقع بين ${dynamicKeys[1]} و ${dynamicKeys[2]}.` },
         
         { keys: [2], ptrs: [3], trees: [3], cmp: -1, target: null,
-          en: `Keys in subtree T3 are strictly greater than ${dynamicKeys[2]}.`,
-          ar: `جميع المفاتيح في الشجرة الفرعية T3 أكبر تماماً من ${dynamicKeys[2]}.` },
+          en: `Keys in subtree T3 are greater than or equal to ${dynamicKeys[2]}.`,
+          ar: `جميع المفاتيح في الشجرة الفرعية T3 أكبر من ${dynamicKeys[2]} أو تساويه.` },
         
         { keys: [], ptrs: [], trees: [], cmp: -1, target: searchTarget,
           en: `Now, let's search for the key <strong>${searchTarget}</strong> in this node.`,
@@ -553,7 +553,7 @@ window.AlgoWidgets[2] = function(container) {
         let ptrActive = s.ptrs.includes(i);
         ptrLines[i].style.opacity = (s.ptrs.length > 0 && !ptrActive) ? '0.2' : '1';
         ptrLines[i].setAttribute('stroke', ptrActive ? 'var(--algo-swap)' : 'var(--text-muted)');
-        ptrLines[i].setAttribute('marker-end', ptrActive ? 'url(#w2-arrow-active)' : 'url(#w2-arr-muted)');
+        ptrLines[i].setAttribute('marker-end', ptrActive ? 'url(#w2-arr-active)' : 'url(#w2-arr-muted)');
         
 
         ptrRects[i].setAttribute('fill', ptrActive ? 'var(--algo-swap)' : 'var(--bg-elevated)');

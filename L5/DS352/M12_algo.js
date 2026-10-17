@@ -459,8 +459,8 @@ window.AlgoWidgets[2] = function(container) {
             <text x="450" y="100" text-anchor="middle" fill="var(--algo-text)" font-weight="bold" font-size="20px">NP-Hard</text>
   
             <!-- P Circle -->
-            <circle cx="250" cy="280" r="70" fill="var(--brand-400)" fill-opacity="0.6" stroke="var(--brand-400)" stroke-width="2"/>
-            <text x="250" y="280" text-anchor="middle" dominant-baseline="middle" fill="var(--algo-text)" font-weight="bold" font-size="20px">P</text>
+            <circle cx="200" cy="230" r="60" fill="var(--brand-400)" fill-opacity="0.6" stroke="var(--brand-400)" stroke-width="2"/>
+            <text x="200" y="230" text-anchor="middle" dominant-baseline="middle" fill="var(--algo-text)" font-weight="bold" font-size="20px">P</text>
   
             <!-- NP-Complete (Intersection) -->
             <path d="M 350 133.67 A 120 120 0 0 1 350 266.33 A 120 120 0 0 1 350 133.67 Z"

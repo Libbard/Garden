@@ -86,12 +86,10 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      // حاوية متجاوبة بأبعاد 16:9 
       '<div class="algo-canvas" id="w1-canvas" style="position:relative; width:100%; max-width:800px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:hidden;">' +
         '<svg id="w1-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      // دليل الألوان المتناسق مع الأشكال (معين للمقارنات، مربع للنتيجة)
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span style="display:flex; align-items:center;"><span style="display:inline-block;width:12px;height:12px;background:var(--bg-elevated);border:1px solid var(--text-muted);transform:rotate(45deg);margin-right:6px;"></span><span data-algo-text="w1-unvisited"></span></span>' +
         '<span style="display:flex; align-items:center;"><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:2px;margin-right:4px;"></span><span data-algo-text="w1-path"></span></span>' +
@@ -108,10 +106,8 @@ window.AlgoWidgets[1] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    // ثوابت الهندسة
     const NW = 110, NH = 54; // Node Width, Node Height
 
-    // بناء الشجرة هندسياً (حساب المسافات لتكون متناسقة ومتجاوبة)
     var nodeData = {
       n3:  { type: 'rect', text: 'a < b < c', x: 100, y: 380 },
       n7:  { type: 'rect', text: 'a < c < b', x: 220, y: 380 },
@@ -163,7 +159,6 @@ window.AlgoWidgets[1] = function(container) {
     }
 
     function generateSteps() {
-      // 1. توليد قيم عشوائية مختلفة لـ a, b, c
       let vals = [1,2,3,4,5,6,7,8,9];
       vals.sort(() => Math.random() - 0.5);
       let a = vals[0], b = vals[1], c = vals[2];
@@ -178,7 +173,6 @@ window.AlgoWidgets[1] = function(container) {
         ar: `بدء الفرز. لدينا ثلاث متغيرات عشوائية: <strong>أ = ${a}</strong>، <strong>ب = ${b}</strong>، <strong>ج = ${c}</strong>.`
       });
 
-      // المحاكاة الديناميكية للمسار
       let curr = 'n0';
       pathNodes.push(curr);
 
@@ -186,7 +180,6 @@ window.AlgoWidgets[1] = function(container) {
         let condition = nodeData[curr].text; // e.g., "a < b"
         let isYes = false;
 
-        // التقييم البرمجي للشرط النصي
         if (condition === 'a < b') isYes = a < b;
         else if (condition === 'a < c') isYes = a < c;
         else if (condition === 'b < c') isYes = b < c;
@@ -197,14 +190,12 @@ window.AlgoWidgets[1] = function(container) {
           ar: `تقييم الشرط: هل <strong>${condition.replace('<', '&lt;').replace('a','أ').replace('b','ب').replace('c','ج')}</strong>؟ (النتيجة: <strong>${isYes ? 'نعم' : 'لا'}</strong>).`
         });
 
-        // العثور على الفرع الصحيح للتقدم
         let edge = edgeData.find(e => e.from === curr && e.label === (isYes ? 'Yes' : 'No'));
         pathEdges.push(edge.id);
         curr = edge.to;
         pathNodes.push(curr);
       }
 
-      // مرحلة النتيجة النهائية
       let finalResult = nodeData[curr].text.replace(/</g, '&lt;');
       steps.push({
         a, b, c, pathNodes: [...pathNodes], pathEdges: [...pathEdges], activeNode: curr,
@@ -218,7 +209,6 @@ window.AlgoWidgets[1] = function(container) {
       uiNodes = {};
       uiEdges = {};
 
-      // بناء صندوق المتغيرات (Variables HUD) في الزاوية العلوية
       let hudG = makeSVG('g', { transform: 'translate(20, 20)' });
       let hudRect = makeSVG('rect', { x: 0, y: 0, width: 140, height: 36, rx: 6, fill: 'var(--bg-elevated)', stroke: 'var(--algo-border)', 'stroke-width': 2 });
       let hudTxt = makeSVG('text', { x: 70, y: 18, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--algo-text)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '15px', 'font-weight': 'bold' });
@@ -229,12 +219,10 @@ window.AlgoWidgets[1] = function(container) {
       let edgesG = makeSVG('g', {});
       let nodesG = makeSVG('g', {});
 
-      // 1. رسم الخطوط بشكل دقيق (Perfect Anchors)
       edgeData.forEach(e => {
         let u = nodeData[e.from], v = nodeData[e.to];
         let g = makeSVG('g', {});
 
-        // تنطلق من أسفل المعين، وتتصل بأعلى المعين أو المربع
         let x1 = u.x, y1 = u.y + NH/2;
         let x2 = v.x, y2 = v.y - NH/2;
 
@@ -247,7 +235,6 @@ window.AlgoWidgets[1] = function(container) {
         let rect = makeSVG('rect', { x: mx - pillW/2, y: my - pillH/2, width: pillW, height: pillH, rx: 4, fill: 'var(--bg-elevated)', stroke: 'var(--text-muted)', 'stroke-width': 1.5 });
         let lbl = makeSVG('text', { x: mx, y: my, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--text-secondary)', 'font-family': "'Cairo', 'Inter', sans-serif", 'font-size': '12px', 'font-weight': 'bold' });
         
-        // دعم اللغتين
         lbl.textContent = _AL.lang() === 'ar' ? (e.label === 'Yes' ? 'نعم' : 'لا') : e.label;
 
         g.appendChild(line); g.appendChild(rect); g.appendChild(lbl);
@@ -256,7 +243,6 @@ window.AlgoWidgets[1] = function(container) {
         uiEdges[e.id] = { g, line, rect, lbl };
       });
 
-      // 2. رسم العقد (Diamonds & Rects)
       Object.keys(nodeData).forEach(id => {
         let n = nodeData[id];
         let g = makeSVG('g', { 'transform-origin': `${n.x}px ${n.y}px` });
@@ -269,7 +255,6 @@ window.AlgoWidgets[1] = function(container) {
           shape = makeSVG('rect', { x: n.x - NW/2, y: n.y - NH/2, width: NW, height: NH, rx: 6, fill: 'var(--bg-elevated)', stroke: 'var(--text-muted)', 'stroke-width': 2 });
         }
 
-        // معالجة النص لدعم الرموز والأحرف العربية
         let displayTxt = _AL.lang() === 'ar' ? n.text.replace('a','أ').replace('b','ب').replace('c','ج') : n.text;
         
         let txt = makeSVG('text', { x: n.x, y: n.y, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--algo-text)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '15px', 'font-weight': '700' });
@@ -293,17 +278,15 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-      // تحديث شريط المتغيرات
       valsEl.textContent = `a=${s.a} | b=${s.b} | c=${s.c}`;
 
-      // 1. تحديث مسارات الخطوط (Edges)
       edgeData.forEach(e => {
         let ui = uiEdges[e.id];
         let isInPath = s.pathEdges.includes(e.id);
         
         let color = isInPath ? 'var(--algo-compare)' : 'var(--text-muted)';
         let sw = isInPath ? '4' : '2';
-        let opacity = s.pathNodes.length > 0 && !isInPath ? '0.2' : '1'; // تلاشي الباقي للتركيز البصري
+        let opacity = s.pathNodes.length > 0 && !isInPath ? '0.2' : '1';
 
         ui.g.style.opacity = opacity;
         ui.line.setAttribute('stroke', color);
@@ -312,7 +295,6 @@ window.AlgoWidgets[1] = function(container) {
         ui.lbl.setAttribute('fill', isInPath ? color : 'var(--text-secondary)');
       });
 
-      // 2. تحديث حالات العقد (Nodes)
       Object.keys(nodeData).forEach(id => {
         let ui = uiNodes[id];
         let isInPath = s.pathNodes.includes(id);
@@ -325,13 +307,10 @@ window.AlgoWidgets[1] = function(container) {
         let opacity = s.pathNodes.length > 0 && !isInPath ? '0.3' : '1';
 
         if (isActive && ui.type === 'rect') {
-          // النتيجة النهائية
           fill = 'var(--algo-sorted)'; stroke = '#ffffff'; txtColor = '#ffffff'; scale = 'scale(1.15)'; opacity = '1';
         } else if (isActive) {
-          // جاري التقييم (مقارنة)
           fill = 'var(--algo-active)'; stroke = '#ffffff'; txtColor = '#ffffff'; scale = 'scale(1.15)'; opacity = '1';
         } else if (isInPath) {
-          // جزء من المسار السابق
           fill = 'var(--algo-compare)'; stroke = '#ffffff'; txtColor = '#ffffff'; opacity = '0.9';
         }
 
@@ -358,7 +337,6 @@ window.AlgoWidgets[1] = function(container) {
     container.querySelector('[data-algo-btn="step"]').addEventListener('click', function() { stopPlay(); if (cur < steps.length - 1) { cur++; render(); } });
     container.querySelector('[data-algo-btn="play"]').addEventListener('click', function() { playing ? stopPlay() : startPlay(); });
     
-    // عند الضغط على إعادة الضبط، نكسر التهيئة لتوليد قيم A, B, C جديدة كلياً
     container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function() { 
       stopPlay(); 
       isInitialized = false; 
@@ -459,8 +437,8 @@ window.AlgoWidgets[2] = function(container) {
             <text x="450" y="100" text-anchor="middle" fill="var(--algo-text)" font-weight="bold" font-size="20px">NP-Hard</text>
   
             <!-- P Circle -->
-            <circle cx="250" cy="280" r="70" fill="var(--brand-400)" fill-opacity="0.6" stroke="var(--brand-400)" stroke-width="2"/>
-            <text x="250" y="280" text-anchor="middle" dominant-baseline="middle" fill="var(--algo-text)" font-weight="bold" font-size="20px">P</text>
+            <circle cx="200" cy="230" r="60" fill="var(--brand-400)" fill-opacity="0.6" stroke="var(--brand-400)" stroke-width="2"/>
+            <text x="200" y="230" text-anchor="middle" dominant-baseline="middle" fill="var(--algo-text)" font-weight="bold" font-size="20px">P</text>
   
             <!-- NP-Complete (Intersection) -->
             <path d="M 350 133.67 A 120 120 0 0 1 350 266.33 A 120 120 0 0 1 350 133.67 Z"

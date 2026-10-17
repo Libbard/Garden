@@ -100,6 +100,12 @@
                  text: { i: 'fa-a', ar: 'لونُ النصّ', en: 'Text colour', ok: ['لُوِّن ✓', 'Coloured ✓'] } };
   var ST_ORDER = ['fill', 'under', 'text'];
   function selStyle() { try { var v = localStorage.getItem(STYLE_KEY); return STYLES[v] ? v : 'fill'; } catch (e) { return 'fill'; } }
+  /*@3.MOTJ2.22*/
+  function markedStyle(range) {
+    var I = window.GardenModuleInk, s = I && I.stylesIn ? I.stylesIn(range) : [];
+    return s.length === 1 ? s[0] : '';
+  }
+  function curStyle() { return SEL.st || selStyle(); }
   function dotKind(st) { return st === 'fill' ? false : st; }
   function setSelStyle(v) { try { localStorage.setItem(STYLE_KEY, v); } catch (e) {} }
   /*@3.MOTJ2.10*/
@@ -144,7 +150,7 @@
 
   function buildCompact() {
     if (quiet() && !SEL.wake) return '<button type="button" class="mt-ic mt-wake" data-a="wake" ' + lbl('أدواتُ النصِّ المحدَّد', 'Selected-text tools') + '><i class="fa-solid fa-highlighter" aria-hidden="true"></i></button>';
-    var st = selStyle(), u = dotKind(st), c = barColor(st), x = STYLES[st], verb = VERB[st];
+    var st = curStyle(), u = dotKind(st), c = barColor(st), x = STYLES[st], verb = VERB[st];
     return dotHtml(c, u, '', 'data-c="' + esc(c) + '"') + lbl(verb[0] + nameOf(c, st), verb[1] + nameOf(c, st, 1)) + '></button>' +
       '<button type="button" class="mt-ic mt-cyc" data-a="cyc" ' + lbl('الطريقة: ' + x.ar + ' — اضغطْ للتبديل', 'Style: ' + x.en + ' — tap to switch') + '><i class="fa-solid ' + x.i + '" aria-hidden="true"></i></button>' +
       '<button type="button" class="mt-ic" data-a="note" ' + lbl('ملاحظةٌ على هذا النصّ', 'A note on this text') + '><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i></button>' +
@@ -152,7 +158,7 @@
   }
   function buildBar() {
     if (coarse()) return buildCompact();
-    var st = selStyle(), u = dotKind(st), cur = lastColor();
+    var st = curStyle(), u = dotKind(st), cur = lastColor();
     var verb = VERB[st];
     var dots = palFor(st).map(function (c) {
       return dotHtml(c, u, cur, 'data-c="' + esc(c) + '"') +
@@ -224,7 +230,8 @@
   function act(a, b) {
     var range = SEL.range, text = SEL.text, o = SEL.opts || {};
     if (a === 'st' || a === 'cyc') {
-      setSelStyle(a === 'cyc' ? ST_ORDER[(ST_ORDER.indexOf(selStyle()) + 1) % ST_ORDER.length] : b.getAttribute('data-st'));
+      setSelStyle(a === 'cyc' ? ST_ORDER[(ST_ORDER.indexOf(curStyle()) + 1) % ST_ORDER.length] : b.getAttribute('data-st'));
+      SEL.st = '';
       paintBar();
       place();
       var f = SEL.el.querySelector(a === 'cyc' ? '.mt-cyc' : '.mt-stb[aria-checked="true"]');
@@ -234,7 +241,7 @@
     if (a === 'wake') { SEL.wake = 1; paintBar(); place(); return; }
     if (a === 'hl') {
       hideSel();
-      applyHi(range, b.getAttribute('data-c'));
+      applyHi(range, b.getAttribute('data-c'), curStyle());
       return;
     }
     if (a === 'pal') { hideSel(); palDialog(true); return; }
@@ -253,19 +260,20 @@
     }
   }
 
-  function applyHi(range, c) {
+  function applyHi(range, c, st) {
+    st = STYLES[st] ? st : selStyle();
     try { localStorage.setItem(LAST_KEY, c); } catch (e) {}
     if (document.documentElement.hasAttribute('data-marks-off') && window.GardenMarks) GardenMarks.set(false);
-    return ink().then(function (I) { return I.addHighlight(range, c, selStyle()); }).then(function (n) {
+    return ink().then(function (I) { return I.addHighlight(range, c, st); }).then(function (n) {
       try { window.getSelection().removeAllRanges(); } catch (e) {}
-      toast(n ? L(STYLES[selStyle()].ok[0], STYLES[selStyle()].ok[1])
+      toast(n ? L(STYLES[st].ok[0], STYLES[st].ok[1])
               : L('هذا النصُّ خارجَ ما يُظلَّل', 'This text can’t be highlighted'));
     }, function () { toast(L('تعذّر التظليل', 'Could not highlight')); });
   }
 
   function showSel(range, text, rect, opts) {
     if (coarse() && document.querySelector('.gsf-menu.mt-menu')) return;
-    SEL.range = range; SEL.text = text; SEL.rect = rect; SEL.opts = opts || {}; SEL.wake = 0;
+    SEL.range = range; SEL.text = text; SEL.rect = rect; SEL.opts = opts || {}; SEL.wake = 0; SEL.st = markedStyle(range);
     if (!SEL.el) {
       var el = document.createElement('div');
       el.className = 'mt-sel';
@@ -1225,7 +1233,7 @@
     o = o || {};
     var sec = secOf(range && range.startContainer);
     return menuLib().then(function (M) {
-      var st = selStyle(), tab = curTab();
+      var st = markedStyle(range) || selStyle(), tab = curTab();
       var TABS = [['hl', 'fa-highlighter', 'تظليل', 'Highlight'], ['copy', 'fa-copy', 'نسخٌ وترجمة', 'Copy & translate'],
                   ['note', 'fa-wand-magic-sparkles', 'ملاحظةٌ وذكاء', 'Note & AI'], ['share', 'fa-image', 'مشاركة', 'Share']];
       if (!TABS.some(function (t) { return t[0] === tab; })) tab = 'hl';
@@ -1248,7 +1256,7 @@
           M.item('c-link', 'fa-link', L('انسخْ رابطاً إلى المفهوم', 'Copy a link to the concept')) +
           M.item('c-focus', 'fa-crosshairs', sec.classList.contains('mt-focused') ? L('أنهِ التركيز', 'Stop focusing') : L('ركّزْ على المفهوم وحدَه', 'Focus on the concept alone')) : none);
       var el = sheet(0, 0, h, function (a) {
-        if (a.indexOf('c:') === 0) { applyHi(range, a.slice(2)); return; }
+        if (a.indexOf('c:') === 0) { applyHi(range, a.slice(2), st); return; }
         if (a === 'pal') { palDialog(false); return; }
         if (a === 'quiet') {
           setQuiet(!quiet());
@@ -1273,7 +1281,7 @@
         var sb = e.target.closest ? e.target.closest('[data-mst]') : null;
         if (sb && el.contains(sb)) {
           var s2 = sb.getAttribute('data-mst');
-          setSelStyle(s2);
+          setSelStyle(s2); st = s2;
           [].forEach.call(el.querySelectorAll('[data-mst]'), function (q) { q.setAttribute('aria-checked', String(q === sb)); });
           el.querySelector('.mt-mdots').innerHTML = sheetDots(s2);
         }

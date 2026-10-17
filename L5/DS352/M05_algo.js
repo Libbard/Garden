@@ -465,7 +465,7 @@ window.AlgoWidgets[2] = function(container) {
             arrays: [
               { values: tempLeft, x: leftX, y: ARRAY_START_Y + ROW_GAP, highlights: [i], highlightClass: 'comparing', label: 'Left', class: 'sorted' },
               { values: tempRight, x: rightX, y: ARRAY_START_Y + ROW_GAP, highlights: [j], highlightClass: 'comparing', label: 'Right', class: 'sorted' },
-              { values: finalResult, x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [], label: 'Result', class: '' }
+              { values: finalResult.slice(), x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [], label: 'Result', class: '' }
             ],
             pointers: [
               { x: leftX + i * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2, y: ARRAY_START_Y + ROW_GAP + POINTER_OFFSET_Y, text: 'i' },
@@ -484,7 +484,7 @@ window.AlgoWidgets[2] = function(container) {
               arrays: [
                 { values: tempLeft, x: leftX, y: ARRAY_START_Y + ROW_GAP, highlights: [], label: 'Left', class: 'sorted' },
                 { values: tempRight, x: rightX, y: ARRAY_START_Y + ROW_GAP, highlights: [j], label: 'Right', class: 'sorted' },
-                { values: finalResult, x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [k], highlightClass: 'swapping', label: 'Result', class: '' }
+                { values: finalResult.slice(), x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [k], highlightClass: 'swapping', label: 'Result', class: '' }
               ],
               pointers: [
                 { x: leftX + (i + 1) * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2, y: ARRAY_START_Y + ROW_GAP + POINTER_OFFSET_Y, text: 'i' },
@@ -503,7 +503,7 @@ window.AlgoWidgets[2] = function(container) {
               arrays: [
                 { values: tempLeft, x: leftX, y: ARRAY_START_Y + ROW_GAP, highlights: [i], label: 'Left', class: 'sorted' },
                 { values: tempRight, x: rightX, y: ARRAY_START_Y + ROW_GAP, highlights: [], label: 'Right', class: 'sorted' },
-                { values: finalResult, x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [k], highlightClass: 'swapping', label: 'Result', class: '' }
+                { values: finalResult.slice(), x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [k], highlightClass: 'swapping', label: 'Result', class: '' }
               ],
               pointers: [
                 { x: leftX + i * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2, y: ARRAY_START_Y + ROW_GAP + POINTER_OFFSET_Y, text: 'i' },
@@ -526,7 +526,7 @@ window.AlgoWidgets[2] = function(container) {
             arrays: [
               { values: tempLeft, x: leftX, y: ARRAY_START_Y + ROW_GAP, highlights: [], label: 'Left', class: 'sorted' },
               { values: tempRight, x: rightX, y: ARRAY_START_Y + ROW_GAP, highlights: [], label: 'Right', class: 'sorted' },
-              { values: finalResult, x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [k], highlightClass: 'swapping', label: 'Result', class: '' }
+              { values: finalResult.slice(), x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [k], highlightClass: 'swapping', label: 'Result', class: '' }
             ],
             pointers: [{ x: leftX + (i + 1) * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2, y: ARRAY_START_Y + ROW_GAP + POINTER_OFFSET_Y, text: 'i' }],
             lines: []
@@ -544,7 +544,7 @@ window.AlgoWidgets[2] = function(container) {
             arrays: [
               { values: tempLeft, x: leftX, y: ARRAY_START_Y + ROW_GAP, highlights: [], label: 'Left', class: 'sorted' },
               { values: tempRight, x: rightX, y: ARRAY_START_Y + ROW_GAP, highlights: [], label: 'Right', class: 'sorted' },
-              { values: finalResult, x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [k], highlightClass: 'swapping', label: 'Result', class: '' }
+              { values: finalResult.slice(), x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [k], highlightClass: 'swapping', label: 'Result', class: '' }
             ],
             pointers: [{ x: rightX + (j + 1) * (CELL_WIDTH + CELL_GAP) + CELL_WIDTH / 2, y: ARRAY_START_Y + ROW_GAP + POINTER_OFFSET_Y, text: 'j' }],
             lines: []
@@ -557,7 +557,7 @@ window.AlgoWidgets[2] = function(container) {
         en: 'The array is now fully sorted!', ar: 'تم دمج وترتيب المصفوفة بالكامل بنجاح!',
         visual: {
           arrays: [
-            { values: finalResult, x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [], label: 'Sorted Array', class: 'sorted' }
+            { values: finalResult.slice(), x: resultX, y: ARRAY_START_Y + ROW_GAP * 2, highlights: [], label: 'Sorted Array', class: 'sorted' }
           ],
           pointers: [], lines: []
         }
@@ -815,13 +815,13 @@ window.AlgoWidgets[3] = function(container) {
       
       steps.push({
         array: arr.slice(), pivotIdx: pivotIdx, activeRange: activeRange,
-        i: low - 1, j: high + 1, comparingI: false, comparingJ: false, swapping: false,
+        i: low, j: high + 1, comparingI: false, comparingJ: false, swapping: false,
         sortedRegions: sortedRegions.slice(),
-        en: `Partitioning sub-array [${low}...${high}]. Pivot is <strong>${pivotValue}</strong> (at index ${pivotIdx}).`, 
-        ar: `تقسيم المصفوفة الفرعية [${low}...${high}]. المحور هو <strong>${pivotValue}</strong> (في الفهرس ${pivotIdx}).`
+        en: `Partitioning sub-array [${low}...${high}]. Pivot is the first element <strong>${pivotValue}</strong> (at index ${pivotIdx}).`, 
+        ar: `تقسيم المصفوفة الفرعية [${low}...${high}]. المحور هو العنصر الأوّل <strong>${pivotValue}</strong> (في الفهرس ${pivotIdx}).`
       });
       
-      let i = low - 1;
+      let i = low;
       let j = high + 1;
       
       while (true) {
@@ -831,10 +831,10 @@ window.AlgoWidgets[3] = function(container) {
             array: arr.slice(), pivotIdx: pivotIdx, activeRange: activeRange,
             i: i, j: j, comparingI: true, comparingJ: false, swapping: false,
             sortedRegions: sortedRegions.slice(),
-            en: `Move <strong>i</strong> right while A[i] < pivot (${pivotValue}). Checking A[${i}]=${arr[i]}.`, 
-            ar: `تحريك المؤشر <strong>i</strong> لليمين طالما A[i] < المحور (${pivotValue}). نفحص A[${i}]=${arr[i]}.`
+            en: `Move <strong>i</strong> right until A[i] ≥ pivot (${pivotValue}). Checking A[${i}]=${arr[i]}.`, 
+            ar: `نحرّك المؤشر <strong>i</strong> لليمين حتى A[i] ≥ المحور (${pivotValue}). نفحص A[${i}]=${arr[i]}.`
           });
-        } while (arr[i] < pivotValue);
+        } while (i < high && arr[i] < pivotValue);
       
         do {
           j--;
@@ -842,8 +842,8 @@ window.AlgoWidgets[3] = function(container) {
             array: arr.slice(), pivotIdx: pivotIdx, activeRange: activeRange,
             i: i, j: j, comparingI: false, comparingJ: true, swapping: false,
             sortedRegions: sortedRegions.slice(),
-            en: `Move <strong>j</strong> left while A[j] > pivot (${pivotValue}). Checking A[${j}]=${arr[j]}.`, 
-            ar: `تحريك المؤشر <strong>j</strong> لليسار طالما A[j] > المحور (${pivotValue}). نفحص A[${j}]=${arr[j]}.`
+            en: `Move <strong>j</strong> left until A[j] ≤ pivot (${pivotValue}). Checking A[${j}]=${arr[j]}.`, 
+            ar: `نحرّك المؤشر <strong>j</strong> لليسار حتى A[j] ≤ المحور (${pivotValue}). نفحص A[${j}]=${arr[j]}.`
           });
         } while (arr[j] > pivotValue);
       
@@ -861,8 +861,16 @@ window.AlgoWidgets[3] = function(container) {
             array: arr.slice(), pivotIdx: pivotIdx, activeRange: activeRange,
             i: i, j: j, comparingI: false, comparingJ: false, swapping: false,
             sortedRegions: sortedRegions.slice(),
-            en: `<strong>i</strong> (${i}) has crossed <strong>j</strong> (${j}). Partitioning complete. Split point is ${j}.`, 
-            ar: `المؤشر <strong>i</strong> (${i}) تجاوز <strong>j</strong> (${j}). اكتمل التقسيم. نقطة التقسيم هي ${j}.`
+            en: `<strong>i</strong> (${i}) and <strong>j</strong> (${j}) have met or crossed, so no swap between them.`, 
+            ar: `التقى المؤشر <strong>i</strong> (${i}) بالمؤشر <strong>j</strong> (${j}) أو تجاوزه، فلا تبديلَ بينهما.`
+          });
+          [arr[low], arr[j]] = [arr[j], arr[low]];
+          steps.push({
+            array: arr.slice(), pivotIdx: j, activeRange: activeRange,
+            i: i, j: j, comparingI: false, comparingJ: false, swapping: true,
+            sortedRegions: sortedRegions.slice(),
+            en: `Swap the pivot with A[${j}]. The pivot ${pivotValue} is now in its final position ${j}.`, 
+            ar: `نبدّل المحور مع A[${j}]. المحور ${pivotValue} الآن في موقعه النهائيّ ${j}.`
           });
           return j;
         }
@@ -870,6 +878,17 @@ window.AlgoWidgets[3] = function(container) {
     }
       
     function quickSortIterative(arr, steps, sortedRegions) {
+      function markSorted(lo, hi) {
+        for (let region of sortedRegions) { if (lo >= region[0] && hi <= region[1]) return; }
+        sortedRegions.push([lo, hi]);
+        sortedRegions.sort((a, b) => a[0] - b[0]);
+        for (let k = 0; k < sortedRegions.length - 1; k++) {
+          if (sortedRegions[k][1] + 1 >= sortedRegions[k+1][0]) {
+            sortedRegions[k][1] = Math.max(sortedRegions[k][1], sortedRegions[k+1][1]);
+            sortedRegions.splice(k+1, 1); k--;
+          }
+        }
+      }
       let callStack = [{ low: 0, high: arr.length - 1 }];
       
       steps.push({
@@ -911,8 +930,9 @@ window.AlgoWidgets[3] = function(container) {
         }
       
         let p = partition(arr, low, high, steps, sortedRegions);
-        callStack.push({ low: p + 1, high: high });
-        callStack.push({ low: low, high: p });
+        markSorted(p, p);
+        if (p + 1 <= high) callStack.push({ low: p + 1, high: high });
+        if (low <= p - 1) callStack.push({ low: low, high: p - 1 });
       }
       
       if (sortedRegions.length === 0 || sortedRegions[0][0] !== 0 || sortedRegions[0][1] !== arr.length - 1) {

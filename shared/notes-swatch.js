@@ -191,6 +191,10 @@
       esc(L('طبّق', 'Apply')) + '"><i class="fa-solid fa-check" aria-hidden="true"></i></button>' +
       '</div>';
     host.appendChild(el);
+    /*@3.NOSJ5.9*/
+    if (host !== document.body && el.showPopover) {
+      try { el.setAttribute('popover', 'manual'); el.showPopover(); } catch (eP) {}
+    }
 
     var sv = el.querySelector('[data-sv]');
     var knob = el.querySelector('[data-knob]');

@@ -1042,12 +1042,12 @@ window.AlgoWidgets[4] = function(container) {
         treeAData = layoutTreeNodes(buildTree({
           id: 'A1', value: 30, bf: 0,
           left: {
-            id: 'A2', value: 20, bf: -1,
+            id: 'A2', value: 20, bf: 1,
             left: { id: 'A3', value: 10, bf: 0, left: null, right: null },
             right: null
           },
           right: {
-            id: 'A4', value: 40, bf: 1,
+            id: 'A4', value: 40, bf: 0,
             left: { id: 'A5', value: 35, bf: 0, left: null, right: null },
             right: { id: 'A6', value: 50, bf: 0, left: null, right: null }
           }

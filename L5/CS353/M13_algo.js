@@ -86,12 +86,10 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-      // حاوية متجاوبة بأبعاد 16:9
       '<div class="algo-canvas" id="w1-canvas" style="position:relative; width:100%; max-width:800px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:hidden;">' +
         '<svg id="w1-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-      // دليل الألوان
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-current"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-visited"></span></span>' +
@@ -109,9 +107,8 @@ window.AlgoWidgets[1] = function(container) {
     var isInitialized = false;
 
     const N = 4;
-    const RADIUS = 6; // حجم العقد في الشجرة (61 عقدة إجمالاً)
+    const RADIUS = 6;
     
-    // هياكل البيانات للتوليد والـ SVG
     var nodeMap = {};
     var edges = [];
     var uiNodes = {};
@@ -138,7 +135,6 @@ window.AlgoWidgets[1] = function(container) {
       return true;
     }
 
-    // بناء شجرة مساحة الحالة (State-Space Tree) وتوليد الخطوات
     function generateSteps() {
       steps = [];
       nodeMap = {};
@@ -176,7 +172,6 @@ window.AlgoWidgets[1] = function(container) {
             ar: '<strong>تم العثور على حل!</strong> تم وضع جميع الملكات بأمان.'
           });
 
-          // التراجع بعد إيجاد الحل للاستمرار
           path.forEach(id => nodeStates[id] = 'visited');
           return;
         }
@@ -201,13 +196,12 @@ window.AlgoWidgets[1] = function(container) {
 
             steps.push({
               board: [...board], testQ: { r: row, c: col, status: 'valid' }, states: {...nodeStates},
-              en: `Position is valid. Proceeding to row ${row + 1}.`,
-              ar: `الموضع آمن (لا يوجد تضارب). ننتقل للصف ${row + 1}.`
+              en: row + 1 < N ? `Position is valid. Proceeding to row ${row + 1}.` : `Position is valid. That was the last row.`,
+              ar: row + 1 < N ? `الموضع آمن (لا يوجد تضارب). ننتقل للصف ${row + 1}.` : `الموضع آمن (لا يوجد تضارب). وهذا آخرُ صفّ.`
             });
 
             backtrack(row + 1, id);
 
-            // تراجع (Backtrack)
             board[row] = -1;
           } else {
             nodeStates[id] = 'pruned';
@@ -222,9 +216,8 @@ window.AlgoWidgets[1] = function(container) {
 
       backtrack(0, rootId);
 
-      // الخطوة النهائية: عرض كل الحلول
       let finalStates = {};
-      Object.keys(nodeMap).forEach(k => finalStates[k] = 'faded'); // بهتان للكل
+      Object.keys(nodeMap).forEach(k => finalStates[k] = 'faded');
       finalStates[rootId] = 'solution';
       solutions.forEach(path => path.forEach(id => finalStates[id] = 'solution'));
 
@@ -234,8 +227,6 @@ window.AlgoWidgets[1] = function(container) {
         ar: `اكتمل البحث. تم العثور على <strong>${solutions.length}</strong> حلول مختلفة بنجاح.`
       });
 
-      // --- حساب تخطيط الشجرة (Tree Layout) هندسياً ---
-      // 1. حساب أوزان الفروع (عدد الأوراق) لضمان عدم التداخل
       function calcWeight(nodeId) {
         let n = nodeMap[nodeId];
         if (n.children.length === 0) {
@@ -250,11 +241,10 @@ window.AlgoWidgets[1] = function(container) {
       }
       calcWeight(rootId);
 
-      // 2. توزيع العقد على محور X و Y
       function assignCoords(nodeId, startX, endX) {
         let n = nodeMap[nodeId];
         n.x = (startX + endX) / 2;
-        n.y = 40 + n.level * 80; // 5 مستويات: 40, 120, 200, 280, 360
+        n.y = 40 + n.level * 80;
 
         let currX = startX;
         n.children.forEach(cId => {
@@ -265,7 +255,6 @@ window.AlgoWidgets[1] = function(container) {
           currX += width;
         });
       }
-      // نعطي الشجرة عرض 600 بكسل (نترك 200 بكسل على اليمين للوحة)
       assignCoords(rootId, 20, 580);
     }
 
@@ -283,7 +272,6 @@ window.AlgoWidgets[1] = function(container) {
       uiBoard = [];
       uiQueens = [];
 
-      // 1. بناء الشجرة (خلفية)
       let edgesG = makeSVG('g', {});
       edges.forEach(e => {
         let p1 = nodeMap[e.from];
@@ -316,10 +304,8 @@ window.AlgoWidgets[1] = function(container) {
       svgEl.appendChild(edgesG);
       svgEl.appendChild(nodesG);
 
-      // 2. بناء لوحة الشطرنج المصغرة 4x4 (على اليمين)
       let boardG = makeSVG('g', { transform: 'translate(600, 40)' });
       
-      // إطار اللوحة
       let boardOutline = makeSVG('rect', { x: 0, y: 0, width: 160, height: 160, fill: 'none', stroke: 'var(--algo-border)', 'stroke-width': 2, rx: 4 });
       
       for(let r=0; r<N; r++) {
@@ -331,10 +317,9 @@ window.AlgoWidgets[1] = function(container) {
           
           let cell = makeSVG('rect', { x: c*40, y: r*40, width: 40, height: 40, fill: fill });
           
-          // الملكة (نص Unicode)
           let queen = makeSVG('text', { x: c*40 + 20, y: r*40 + 20, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--brand-500)', 'font-size': '26px' });
           queen.textContent = '♛';
-          queen.style.opacity = '0'; // مخفية البداية
+          queen.style.opacity = '0';
 
           boardG.appendChild(cell);
           boardG.appendChild(queen);
@@ -345,7 +330,6 @@ window.AlgoWidgets[1] = function(container) {
       }
       boardG.appendChild(boardOutline);
       
-      // نص يشرح اللوحة
       let boardLbl = makeSVG('text', { x: 80, y: 190, 'text-anchor': 'middle', fill: 'var(--text-muted)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '14px', 'font-weight': 'bold' });
       boardLbl.textContent = 'Board State';
       boardG.appendChild(boardLbl);
@@ -362,7 +346,6 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-      // 1. تحديث الشجرة (العقد والخطوط)
       Object.keys(nodeMap).forEach(id => {
         let state = s.states[id];
         let circ = uiNodes[id];
@@ -407,7 +390,6 @@ window.AlgoWidgets[1] = function(container) {
         }
       });
 
-      // 2. تحديث لوحة الشطرنج
       for(let r=0; r<N; r++) {
         for(let c=0; c<N; c++) {
           let queen = uiQueens[r][c];
@@ -470,17 +452,14 @@ window.AlgoWidgets[2] = function(container) {
       _AL.toolbar(2) +
       '<div class="algo-explanation" id="w2-exp" style="font-size: 0.95rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px; text-align: center; min-height: 48px;"></div>' +
       
-      // حاوية متجاوبة بأبعاد 16/10 تملأ الشاشة وتستغل المساحات الفارغة بشكل ممتاز
       '<div class="algo-canvas" id="w2-canvas" style="position:relative; width:100%; max-width:850px; margin:0 auto; aspect-ratio: 16/10; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:hidden;">' +
         '<svg id="w2-svg" width="100%" height="100%" viewBox="0 0 800 500" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
         
-        // لوحة الـ Z (Upper Bound) بتصميم "Pill" عصري بارز
         '<div id="w2-z-board" style="position:absolute; top:25px; right:25px; padding: 10px 24px; background:var(--bg-elevated); border:2px solid var(--algo-border); border-radius:24px; font-family:\'JetBrains Mono\', monospace; font-size:17px; font-weight:900; color:var(--text-primary); box-shadow: 0 6px 16px rgba(0,0,0,0.12); transition: all 0.4s cubic-bezier(0.4,0,0.2,1); display:flex; align-items:center; gap:8px; z-index:10;" dir="ltr">' +
           '<span>Z =</span><span id="w2-z-val" style="color:var(--text-muted); font-size:1.2em;">∞</span>' +
         '</div>' +
       '</div>' +
       
-      // دليل الألوان (دائري ليطابق شكل العقد)
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:18px;margin-top:18px;font-size:0.9rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:14px;height:14px;background:var(--bg-elevated);border:2px solid var(--text-muted);border-radius:50%;margin-right:6px;vertical-align:middle;"></span><span data-algo-text="w2-fringe"></span></span>' +
         '<span><span style="display:inline-block;width:14px;height:14px;background:var(--algo-active);border-radius:50%;margin-right:6px;vertical-align:middle;"></span><span data-algo-text="w2-current"></span></span>' +
@@ -500,7 +479,6 @@ window.AlgoWidgets[2] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    // تكبير العقد وتوسيع الإحداثيات لملء الشاشة بجمالية عالية
     const RADIUS = 32;
     var allNodes = [];
     var allEdges = [];
@@ -517,7 +495,6 @@ window.AlgoWidgets[2] = function(container) {
       container.querySelector('[data-algo-text="w2-solution"]').textContent = _AL.exp('Solution Found', 'الحل الأمثل');
     }
 
-    // حساب نقاط الخطوط لتلامس حواف الدوائر بدقة تامة (Vector Math)
     function getEdgeCoords(p1, p2, r) {
       let dx = p2.x - p1.x;
       let dy = p2.y - p1.y;
@@ -533,11 +510,10 @@ window.AlgoWidgets[2] = function(container) {
     function makeSVG(tag, attrs) {
       let el = document.createElementNS('http://www.w3.org/2000/svg', tag);
       for (let k in attrs) el.setAttribute(k, attrs[k]);
-      el.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)'; // تأثير Elastic جميل
+      el.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
       return el;
     }
 
-    // هندسة الشجرة بقيم عشوائية وتوزيع إحداثيات مثالي لملء 800x500
     function setupTreeData() {
       let base = Math.floor(Math.random() * 15) + 10;
       
@@ -546,7 +522,7 @@ window.AlgoWidgets[2] = function(container) {
         { id: 'n1', p: 'n0', lb: base + 4,   x: 180, y: 240 },
         { id: 'n2', p: 'n0', lb: base + 2,   x: 400, y: 240 },
         { id: 'n3', p: 'n0', lb: base + 8,   x: 620, y: 240 },
-        { id: 'n6', p: 'n1', lb: base + 4,   x: 90,  y: 420, isLeaf: true }, // الحل
+        { id: 'n6', p: 'n1', lb: base + 4,   x: 90,  y: 420, isLeaf: true },
         { id: 'n7', p: 'n1', lb: base + 6,   x: 270, y: 420 },
         { id: 'n4', p: 'n2', lb: base + 5,   x: 350, y: 420 },
         { id: 'n5', p: 'n2', lb: base + 7,   x: 500, y: 420 }
@@ -655,7 +631,6 @@ window.AlgoWidgets[2] = function(container) {
       let edgesG = makeSVG('g', {});
       let nodesG = makeSVG('g', {});
 
-      // 1. بناء الخطوط
       allEdges.forEach(e => {
         let coords = getEdgeCoords(e.u, e.v, RADIUS);
         let line = makeSVG('line', { x1: coords.x1, y1: coords.y1, x2: coords.x2, y2: coords.y2, stroke: 'var(--text-muted)', 'stroke-width': 2.5 });
@@ -663,7 +638,6 @@ window.AlgoWidgets[2] = function(container) {
         uiEdges[e.id] = line;
       });
 
-      // 2. بناء العقد بحجم أكبر وتفاصيل أوضح
       allNodes.forEach(n => {
         let g = makeSVG('g', { 'transform-origin': `${n.x}px ${n.y}px` });
         
@@ -672,7 +646,6 @@ window.AlgoWidgets[2] = function(container) {
         let txt = makeSVG('text', { x: n.x, y: n.y, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--algo-text)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '16px', 'font-weight': '800' });
         txt.textContent = `lb=${n.lb}`;
 
-        // علامة (X) سميكة للتقليم
         let crossG = makeSVG('g', { opacity: '0' });
         let offset = RADIUS * 0.55;
         let l1 = makeSVG('line', { x1: n.x - offset, y1: n.y - offset, x2: n.x + offset, y2: n.y + offset, stroke: '#ffffff', 'stroke-width': 4, 'stroke-linecap': 'round' });
@@ -699,19 +672,17 @@ window.AlgoWidgets[2] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-      // تحديث لوحة Z بتأثير لوني جميل عند إيجاد الحل
       zValEl.textContent = s.Z;
       if (s.Z !== '∞') {
         zValEl.style.color = 'var(--algo-sorted)';
         zBoard.style.borderColor = 'var(--algo-sorted)';
-        zBoard.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.2)'; // توهج أخضر خفيف
+        zBoard.style.boxShadow = '0 0 15px rgba(16, 185, 129, 0.2)';
       } else {
         zValEl.style.color = 'var(--text-muted)';
         zBoard.style.borderColor = 'var(--algo-border)';
         zBoard.style.boxShadow = '0 6px 16px rgba(0,0,0,0.12)';
       }
 
-      // 1. تحديث الخطوط
       allEdges.forEach(e => {
         let line = uiEdges[e.id];
         let toState = s.states[e.v.id];
@@ -739,7 +710,6 @@ window.AlgoWidgets[2] = function(container) {
         }
       });
 
-      // 2. تحديث العقد (Pure State Mapping)
       allNodes.forEach(n => {
         let state = s.states[n.id];
         let ui = uiNodes[n.id];
@@ -758,7 +728,7 @@ window.AlgoWidgets[2] = function(container) {
         let showCross = false;
 
         if (state === 'fringe') {
-          stroke = 'var(--algo-text)'; // إبراز الحواف غير المستكشفة قليلاً
+          stroke = 'var(--algo-text)';
         } else if (state === 'current') {
           fill = 'var(--algo-active)'; stroke = '#ffffff'; txtColor = '#ffffff'; scale = 'scale(1.15)';
         } else if (state === 'expanded') {
@@ -818,16 +788,13 @@ window.AlgoWidgets[3] = function(container) {
       _AL.toolbar(3) +
       '<div class="algo-explanation" id="w3-exp" style="font-size: 0.95rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px; text-align: center; min-height: 48px;"></div>' +
       
-      // حاوية CSS Grid الذكية: تتراص أفقياً على الشاشات الكبيرة وعمودياً على الجوال!
       '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; width: 100%; max-width: 1000px; margin: 0 auto; margin-top: 15px;">' +
-        // اللوحة الأولى: MST
         '<div style="display: flex; flex-direction: column; align-items: center; min-width: 0;">' +
           '<h5 data-algo-text="w3-mst-title" style="font-size: 0.95rem; margin-bottom: 10px; font-weight: 800; color: var(--text-primary); text-align: center;"></h5>' +
           '<div class="algo-canvas" style="width: 100%; aspect-ratio: 4/3; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow: visible; display:flex; align-items:center; justify-content:center;">' +
             '<svg id="w3-mst-svg" width="100%" height="100%" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid meet" style="overflow: visible;"></svg>' +
           '</div>' +
         '</div>' +
-        // اللوحة الثانية: Tour
         '<div style="display: flex; flex-direction: column; align-items: center; min-width: 0;">' +
           '<h5 data-algo-text="w3-tour-title" style="font-size: 0.95rem; margin-bottom: 10px; font-weight: 800; color: var(--text-primary); text-align: center;"></h5>' +
           '<div class="algo-canvas" style="width: 100%; aspect-ratio: 4/3; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow: visible; display:flex; align-items:center; justify-content:center;">' +
@@ -836,7 +803,6 @@ window.AlgoWidgets[3] = function(container) {
         '</div>' +
       '</div>' +
       
-      // دليل الألوان
       '<div class="algo-legend" style="display:flex; justify-content:center; gap:15px; margin-top:20px; font-size:0.85rem; flex-wrap:wrap; color: var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:4px;margin-right:4px;"></span><span data-algo-text="w3-mst-edge"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-swap);border-radius:4px;margin-right:4px;"></span><span data-algo-text="w3-tour-edge"></span></span>' +
@@ -854,7 +820,6 @@ window.AlgoWidgets[3] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-    // تكبير العقد وتوسيع الإحداثيات لملء الـ 400x300 بشكل مثالي
     const RADIUS = 22; 
     var initialNodes = [
       { id: 0, x: 70,  y: 150 },
@@ -899,8 +864,8 @@ window.AlgoWidgets[3] = function(container) {
 
       steps.push({
         phase: 'intro', eulerPath: [], hamPath: [], currNode: null,
-        en: 'We start with a graph and its <strong>Minimum Spanning Tree (MST)</strong> highlighted.',
-        ar: 'نبدأ برسم بياني تم استخراج <strong>شجرة الامتداد الصغرى (MST)</strong> الخاصة به مسبقاً.'
+        en: 'We start with a graph and its <strong>Minimum Spanning Tree (MST)</strong> highlighted. Every pair of cities is connected by a straight-line distance (only some edges are drawn), so shortcuts always exist and are never longer.',
+        ar: 'نبدأ برسم بيانيّ ظُلّلت فيه <strong>شجرةُ الامتداد الصغرى (MST)</strong>. وكلُّ مدينتين بينهما مسافةٌ مستقيمة (‏رُسم بعضُ الأضلاع فقط)، فالاختصارُ ممكنٌ دائماً ولا يكون أطول.'
       });
 
       let eulerPath = [];
@@ -980,7 +945,6 @@ window.AlgoWidgets[3] = function(container) {
       return el;
     }
 
-    // دالة احترافية لرسم المسارات (مستقيمة أو منحنية للعودة)
     function getArrowPath(uId, vId, isCurve, curveOffset) {
       let n1 = initialNodes.find(n => n.id === uId);
       let n2 = initialNodes.find(n => n.id === vId);
@@ -990,7 +954,7 @@ window.AlgoWidgets[3] = function(container) {
       if (dist === 0) return null;
 
       let r1 = RADIUS;
-      let r2 = RADIUS + 6; // مسافة لرأس السهم
+      let r2 = RADIUS + 6;
 
       let x1 = n1.x + (dx/dist) * r1;
       let y1 = n1.y + (dy/dist) * r1;
@@ -1000,7 +964,6 @@ window.AlgoWidgets[3] = function(container) {
       if (isCurve) {
         let mx = (x1 + x2) / 2;
         let my = (y1 + y2) / 2;
-        // المتجه العمودي (Normal Vector)
         let nx = -dy / dist;
         let ny = dx / dist;
         return `M ${x1} ${y1} Q ${mx + nx * curveOffset} ${my + ny * curveOffset} ${x2} ${y2}`;
@@ -1014,7 +977,6 @@ window.AlgoWidgets[3] = function(container) {
       tourUiNodes = {};
       tourUiLines = [];
 
-      // تعريف الأسهم
       let defs = makeSVG('defs', {});
       defs.innerHTML = `
         <marker id="arr-tour" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--algo-swap)"/></marker>
@@ -1022,7 +984,6 @@ window.AlgoWidgets[3] = function(container) {
       `;
       tourSvg.appendChild(defs);
 
-      // 1. لوحة MST (اليسار)
       let mstEdgesG = makeSVG('g', {});
       allEdges.forEach(e => {
         let uPos = initialNodes.find(n => n.id === e.u);
@@ -1048,7 +1009,6 @@ window.AlgoWidgets[3] = function(container) {
       });
       mstSvg.appendChild(mstNodesG);
 
-      // 2. لوحة Tour (اليمين) - استخدام paths لدعم الانحناء
       let edgesGroup = makeSVG('g', {});
       for(let i = 0; i < 20; i++) {
         let path = makeSVG('path', { opacity: 0, fill: 'none' });
@@ -1093,11 +1053,10 @@ window.AlgoWidgets[3] = function(container) {
         let key = `${e.u}-${e.v}`;
         let revKey = `${e.v}-${e.u}`;
         
-        // إذا كنا رسمنا الخط المعاكس سابقاً، نجعل هذا الخط منحنياً
         let isCurve = drawn.has(revKey) && e.type === 'euler';
         drawn.add(key);
 
-        let pathStr = getArrowPath(e.u, e.v, isCurve, 20); // 20px انحناء
+        let pathStr = getArrowPath(e.u, e.v, isCurve, 20);
         if(!pathStr) return;
         
         let pathEl = tourUiLines[idx];

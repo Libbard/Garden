@@ -211,7 +211,7 @@ window.AlgoWidgets[1] = function(container) {
           edges: currentEdges.map(e => ({ ...e })),
           removedOrder: [...removedOrder],
           en: 'Node <strong>' + sourceToRemove + '</strong> and its outgoing edges are removed. Updating in-degrees of neighbors.',
-          ar: 'تم بهتان وإزالة <strong dir="ltr">' + sourceToRemove + '</strong> مع أسهمها الخارجة. وتحديث حالة العقد المجاورة.'
+          ar: 'أُزيلت العقدة <strong dir="ltr">' + sourceToRemove + '</strong> مع أسهمها الخارجة، وحُدّثت درجاتُ الدخول لجيرانها.'
         });
       }
  
@@ -687,8 +687,8 @@ window.AlgoWidgets[3] = function(container) {
               pivotIdx: high,
               swapped: [i, j],
               finalPivotIdx: -1,
-              en: '`arr[' + j + ']` (' + arr[j] + ') is <= pivot. Swapping `arr[' + i + ']` (' + arr[j] + ') and `arr[' + j + ']` (' + temp + '). `i` is now at ' + i + '.',
-              ar: '`arr[' + j + ']` (' + arr[j] + ') أقل من أو يساوي المحور. تبديل `arr[' + i + ']` (' + arr[j] + ') و`arr[' + j + ']` (' + temp + '). `i` الآن عند ' + i + '.'
+              en: '`arr[' + j + ']` (' + arr[i] + ') is <= pivot. Swapping `arr[' + i + ']` (' + temp + ') and `arr[' + j + ']` (' + arr[i] + '). `i` is now at ' + i + '.',
+              ar: '`arr[' + j + ']` (' + arr[i] + ') أقل من أو يساوي المحور. تبديل `arr[' + i + ']` (' + temp + ') و`arr[' + j + ']` (' + arr[i] + '). `i` الآن عند ' + i + '.'
             });
           } else {
             steps.push({

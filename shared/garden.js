@@ -6202,6 +6202,35 @@ ${baseRules}`) + regenSuffix;
       .catch(() => null);
   }
 
+  const AI_OWNER_KEY = 'garden_owner_ai';
+  function aiOwnerMap() {
+    try { const m = JSON.parse(localStorage.getItem(AI_OWNER_KEY) || 'null'); return m && typeof m === 'object' ? m : null; }
+    catch (e) { return null; }
+  }
+  (function aiOwnerFromHash() {
+    const P = '#garden-owner-ai=';
+    if ((location.hash || '').indexOf(P) !== 0) return;
+    const v = location.hash.slice(P.length);
+    try {
+      if (v === 'off') localStorage.removeItem(AI_OWNER_KEY);
+      else {
+        const m = JSON.parse(atob(v.replace(/-/g, '+').replace(/_/g, '/')));
+        if (m && typeof m === 'object') localStorage.setItem(AI_OWNER_KEY, JSON.stringify(m));
+      }
+    } catch (e) { }
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { }
+  })();
+  /*@3.GARJ.701*/
+  function aiOwnerTag(tag) {
+    const map = aiOwnerMap();
+    if (!map || !tag) return '';
+    const raw = String(tag.model || '');
+    const label = raw.indexOf('m:') === 0 ? (map[raw.slice(2)] || raw.slice(2)) : raw;
+    if (!label) return '';
+    const src = { remote: 'library', local: 'this device', live: 'live' }[tag.src] || '';
+    return '<div class="ai-owner-tag" dir="ltr">' + escHtml(label + (src ? ' · ' + src : '')) + '</div>';
+  }
+
   /*@3.GARJ.582*/
   function aiIdentity(cardEl, scope, style) {
     const raw = extractCardContent(cardEl);
@@ -6269,7 +6298,7 @@ ${baseRules}`) + regenSuffix;
 
       /*@3.GARJ.608*/
       const tag = {
-        model: res.headers.get('X-Garden-Model') || '',
+        model: res.headers.get('X-Garden-Model') || (res.headers.get('X-Garden-M') ? 'm:' + res.headers.get('X-Garden-M') : ''),
         provider: res.headers.get('X-Garden-Provider') || '',
         tier: res.headers.get('X-Garden-Tier') || '',
         escalated: res.headers.get('X-Garden-Escalated') === '1'
@@ -6294,7 +6323,7 @@ ${baseRules}`) + regenSuffix;
             if (payload === '[DONE]') continue;
             try {
               const j = JSON.parse(payload);
-              if (j.garden) { Object.assign(tag, j.garden); continue; }
+              if (j.garden) { Object.assign(tag, j.garden); if (j.garden.m && !j.garden.model) tag.model = 'm:' + j.garden.m; continue; }
               const delta = j.choices?.[0]?.delta || {};
               /*@3.GARJ.356*/
               if (delta.reasoning_content && !full && !thinkingNotified) {
@@ -6310,8 +6339,8 @@ ${baseRules}`) + regenSuffix;
       }
 
       const data = await res.json();
-      if (data.model) Object.assign(tag, {
-        model: data.model, provider: data.provider || '',
+      if (data.model || data.m) Object.assign(tag, {
+        model: data.model || 'm:' + data.m, provider: data.provider || '',
         tier: data.tier || '', escalated: !!data.escalated
       });
       return Object.assign({ error: false, text: data.text || '' }, tag);
@@ -6627,7 +6656,7 @@ ${baseRules}`) + regenSuffix;
           setFailState(true);
         } else {
           setFailState(false);
-          holder.innerHTML = (opts.badge || '') + `<div class="ai-result">${formatAiText(result.text)}</div>`;
+          holder.innerHTML = (opts.badge || '') + aiOwnerTag(lastTag) + `<div class="ai-result">${formatAiText(result.text)}</div>`;
           typesetIn(holder);
           onOk(result.text);
         }
@@ -6717,7 +6746,7 @@ ${baseRules}`) + regenSuffix;
             escalated: false, src: 'local',
           };
           /*@3.GARJ.604*/
-          playText(holder, local.text, { badge: badge, loadingMsg: loadingMsg },
+          playText(holder, local.text, { badge: badge + aiOwnerTag(lastTag), loadingMsg: loadingMsg },
             () => { busy = false; settle(local.text); });
           return HANDLED;
         }
@@ -6729,10 +6758,10 @@ ${baseRules}`) + regenSuffix;
         if (hit2 === HANDLED) return;
         if (!hit2) { live(); return; }
         lastTag = {
-          model: hit2.model || '', provider: hit2.provider || '',
+          model: hit2.model || (hit2.m ? 'm:' + hit2.m : ''), provider: hit2.provider || '',
           tier: hit2.tier || 'base', escalated: false, src: 'remote'
         };
-        playText(holder, hit2.text, { badge: badge, loadingMsg: loadingMsg },
+        playText(holder, hit2.text, { badge: badge + aiOwnerTag(lastTag), loadingMsg: loadingMsg },
           () => { busy = false; settle(hit2.text); });
       });
     }

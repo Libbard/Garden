@@ -1146,8 +1146,8 @@ window.AlgoWidgets[5] = function(container) {
             tourLength += getEdgeWeight(tourPath[i], tourPath[i + 1]);
           }
   
+          currentTours.push({ path: tourString, length: tourLength });
           var newTours = currentTours.slice();
-          newTours.push({ path: tourString, length: tourLength });
   
           var currentOptimalIdx = -1;
           var minLength = Infinity;
