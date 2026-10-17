@@ -1188,6 +1188,7 @@
       push({ src: 'intensive', id: ss.id, kind: 'intensive', code: ss.course || '',
              label: '', module: ss.module || '', part: ss.part || 1,
              total_parts: ss.total_parts || 1, sub: ss.kind || 'study',
+             title: ss.title || '', title_en: ss.title_en || ss.title || '', key: !!ss.key,
              time: ss.start_time || '', start: a, end: a + (ss.minutes || 60), allDay: false });
     });
 

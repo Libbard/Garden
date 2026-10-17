@@ -442,14 +442,22 @@
       if (!when) return;
       var fireAt = when.ms - (s.lead.study || 0) * 60000;
       if (fireAt > horizon) return;
+      var mn = parseInt(String(ss.module || '').replace(/^M/i, ''), 10) || 0;
+      var what = ss.kind === 'buffer' ? tx('مراجعة ما قبل الاختبار', 'Pre-exam review')
+        : ss.kind === 'spaced' ? tx('مراجعة الوحدة ' + mn, 'Review of module ' + mn)
+        : tx('الوحدة ' + mn, 'Module ' + mn) + (ss.total_parts > 1 ? ' (' + ss.part + '/' + ss.total_parts + ')' : '');
+      var mt = tx(ss.title || '', ss.title_en || ss.title || '');
+      var tip = tx(ss.tip || '', ss.tip_en || ss.tip || '');
+      var body = (mt && ss.kind !== 'buffer' ? mt + ' — ' : '') +
+        (tip ? tx('ابدأ بـ: ', 'Start with: ') + tip + ' · ' : '') + tx('تبدأ ', 'Starts ') + fmtWhen(when.ms);
       out.push({
         id: 'stu:plan:' + ss.id + ':' + stamp(when.ms),
         kind: 'study',
-        title: tx('جلسة خطّة · ', 'Plan session · ') + (courseName(ss.course) || ''),
-        body: tx('تبدأ ', 'Starts ') + fmtWhen(when.ms),
+        title: (ss.key ? '★ ' : '') + tx('مذاكرة · ', 'Study · ') + (ss.course || courseName(ss.course) || '') + ' · ' + what,
+        body: body.length > 236 ? body.slice(0, 233) + '…' : body,
         fireAt: applyQuiet(fireAt),
         eventAt: when.ms,
-        url: 'hub/schedule.html',
+        url: 'hub/schedule.html#ip-' + ss.id,
         course: ss.course || null
       });
     });

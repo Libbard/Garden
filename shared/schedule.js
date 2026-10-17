@@ -2684,8 +2684,9 @@
     var sheet = ov.querySelector('.sch-sheet');
     sheet.style.setProperty('--event-color', ev.color);
     sheet.style.setProperty('--kind-color', ({
-      lecture:'#a78bfa', study:'#10b981', exam:'#ef4444', general:'#f59e0b', intensive:'#7c3aed'
-    })[ev.kind] || '#a78bfa');
+      lecture:'var(--sch-k-lecture, #a78bfa)', study:'var(--sch-k-study, #10b981)', exam:'var(--sch-k-exam, #ef4444)',
+      general:'var(--sch-k-task, #f59e0b)', intensive:'var(--sch-k-intensive, #38bdf8)'
+    })[ev.kind] || 'var(--st-accent, #a78bfa)');
 
     document.getElementById('sheet-kind').innerHTML =
       '<i class="fa-solid ' + kindIcon(ev) + '"></i> ' + escapeH(subLabel(ev));
@@ -2728,6 +2729,7 @@
       }
     }
     body.innerHTML = rows;
+    if (ev.kind === 'intensive' && window.GardenSchedulePlan && GardenSchedulePlan.sheetBrief) GardenSchedulePlan.sheetBrief(ev, body);
 
     /*@3.SCHJ.147*/
     var acts = document.getElementById('sheet-actions');
@@ -2744,10 +2746,8 @@
     }
     if (ev.kind === 'intensive') {
       /*@3.SCHJ.148*/
-      if (ev.module) {
-        btns += '<button class="sch-btn sch-btn-secondary" id="sheet-details">' +
-          '<i class="fa-solid fa-circle-info"></i> ' + (isAr() ? 'التفاصيل' : 'Details') + '</button>';
-      }
+      btns += '<button class="sch-btn sch-btn-secondary" id="sheet-details">' +
+        '<i class="fa-solid fa-table-cells"></i> ' + (isAr() ? 'في الخطة' : 'In the plan') + '</button>';
       btns += '<button class="sch-btn sch-btn-secondary" id="sheet-module">' +
         '<i class="fa-solid fa-book-open-reader"></i> ' + (isAr() ? 'ادرس' : 'Study') + '</button>';
     }
@@ -2784,7 +2784,7 @@
     });
     bindSheetBtn('sheet-details', function () {
       closeSheet();
-      if (window.GardenSchedulePlan && window.GardenSchedulePlan.openDetails) window.GardenSchedulePlan.openDetails(ev.course_code, ev.module);
+      if (window.GardenSchedulePlan && window.GardenSchedulePlan.openSession) window.GardenSchedulePlan.openSession(ev.id);
     });
 
     ov.style.display = '';

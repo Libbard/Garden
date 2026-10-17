@@ -13,15 +13,14 @@
   var wizard = null;            /*@3.SCPJ.6*/
   var activeTab = 'midterm';    /*@3.SCPJ.7*/
 
-  var SPACING_TIERS = ['full', 'lite', 'off'];
-  var SPACING_OFFSETS = { full: [3, 7], lite: [3], off: [] };
-
   var GAP_MIN = 15;             /*@3.SCPJ.8*/
   var DEFAULT_START = '10:00';  /*@3.SCPJ.9*/
+  var MAX_SPD = 10;
 
   function isAr() { return S.isAr(); }
   function esc(s) { return S.escapeH(s); }
   function T(ar, en) { return isAr() ? ar : en; }
+  function ENG() { return window.GardenPlanEngine || null; }
 
   /*@3.SCPJ.10*/
   function loadIndex() {
@@ -47,7 +46,7 @@
     if (!e || !Array.isArray(e.modules) || !e.modules.length) return null;
     return e.modules.map(function (m, i) {
       return {
-        id: m.id || ('m' + (i + 1)),
+        id: m.id || ('M' + (i < 9 ? '0' : '') + (i + 1)),
         title: m.title || ('الوحدة ' + (i + 1)),
         title_en: m.title_en || m.title || ('Module ' + (i + 1)),
         difficulty: Number(m.difficulty) || 5,
@@ -96,20 +95,51 @@
 
   function modTitle(m) { return isAr() ? m.title : (m.title_en || m.title); }
   function modNum(id) { return parseInt(String(id).replace(/^M/i, ''), 10) || 0; }
+  function modOf(code, mid) { return (modulesCache[code] || []).filter(function (m) { return m.id === mid; })[0] || null; }
 
   /*@3.SCPJ.12*/
   function store() {
     var d = S.data();
-    if (!d.intensive) d.intensive = { active: null, plans: {}, module_status: {}, updated_at: null };
+    if (!d.intensive || typeof d.intensive !== 'object') d.intensive = { active: null, plans: {}, module_status: {}, updated_at: null };
+    if (!d.intensive.plans || typeof d.intensive.plans !== 'object') d.intensive.plans = {};
+    if (!d.intensive.module_status || typeof d.intensive.module_status !== 'object') d.intensive.module_status = {};
     return d.intensive;
   }
-  function planOf(tab) { return store().plans[tab] || null; }
-  function statusKey(code, mid) { return code + '_' + mid; }
-  function moduleStatus(code, mid) { return store().module_status[statusKey(code, mid)] || 'new'; }
+  function numKey(code, mid) { return code + '_' + modNum(mid); }
+  function oldKey(code, mid) { return code + '_' + mid; }
+  function moduleStatus(code, mid) {
+    var ms = store().module_status;
+    var v = ms[numKey(code, mid)];
+    if (v === 'mastered' || v === 'unmastered') return v;
+    return ms[oldKey(code, mid)] === 'mastered' ? 'mastered' : 'new';
+  }
+  function isMastered(code, mid) { return moduleStatus(code, mid) === 'mastered'; }
   function setModuleStatus(code, mid, st) {
     var ms = store().module_status;
-    if (st === 'new') delete ms[statusKey(code, mid)];
-    else ms[statusKey(code, mid)] = st;
+    if (String(mid) !== String(modNum(mid))) delete ms[oldKey(code, mid)];
+    ms[numKey(code, mid)] = st === 'mastered' ? 'mastered' : 'auto';
+    try { if (window.GardenData && GardenData.dropProgressCache) GardenData.dropProgressCache(); } catch (e) {}
+  }
+  function migrateMastery() {
+    var ms = store().module_status, n = 0;
+    Object.keys(ms).forEach(function (k) {
+      var m = /^(.+)_M(\d+)$/i.exec(k);
+      if (!m) return;
+      var nk = m[1] + '_' + parseInt(m[2], 10);
+      if (ms[k] === 'mastered' && ms[nk] !== 'mastered' && ms[nk] !== 'unmastered') ms[nk] = 'mastered';
+      delete ms[k];
+      n++;
+    });
+    return n;
+  }
+  function knownOf(code, mid) {
+    if (moduleStatus(code, mid) === 'unmastered') return 0;
+    try {
+      if (!window.GardenData || !GardenData.courseProgress) return null;
+      var p = GardenData.courseProgress(code);
+      var sig = p && p.perModule ? p.perModule[modNum(mid) - 1] : null;
+      return (sig && typeof sig.score === 'number' && p.known) ? sig.score : null;
+    } catch (e) { return null; }
   }
   function persist() {
     store().updated_at = new Date().toISOString();
@@ -123,16 +153,12 @@
   function dayName(dstr) { return S.DAYS_ORDER[s2d(dstr).getDay()]; }
   function diffDays(a, b) { return Math.round((s2d(b) - s2d(a)) / 86400000); }
   function todayStr() { return d2s(new Date()); }
-
-  /*@3.SCPJ.14*/
-  function dayWindow(cfg) {
-    var s = S.parseHM((cfg.window && cfg.window.start_time) || DEFAULT_START);
-    if (s === null) s = 10 * 60;
-    var st = S.data().settings || {};
-    var e = (st.day_end_hour || 23) * 60;
-    if (e <= s + 90) e = Math.min(24 * 60, s + 8 * 60);
-    return { start: s, end: e };
+  function nowMin() { var d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+  function shortDate(dstr) {
+    var d = s2d(dstr);
+    return d.getDate() + ' ' + S.MONTH_NAMES[isAr() ? 'ar' : 'en'][d.getMonth()];
   }
+  function dayShort(dstr) { return S.DAY_SHORT[isAr() ? 'ar' : 'en'][dayName(dstr)]; }
 
   /*@3.SCPJ.15*/
   var busyCache = {};
@@ -152,471 +178,64 @@
   }
   function clearBusy() { busyCache = {}; }
 
-  function busyMinutes(dstr, win) {
-    var n = 0;
-    busyOn(dstr).forEach(function (b) {
-      var s = Math.max(b.s, win.start), e = Math.min(b.e, win.end);
-      if (e > s) n += e - s;
-    });
-    return n;
-  }
-
-  /*@3.SCPJ.17*/
-  function dayCapacity(cfg, dstr) {
-    var win = dayWindow(cfg);
-    var free = (win.end - win.start) - busyMinutes(dstr, win);
-    return Math.max(0, Math.floor(free / (cfg.session_minutes + GAP_MIN)));
-  }
-
-  /*@3.SCPJ.18*/
-  function firstFreeAt(busy, from, len, hardEnd) {
-    var t = from, guard = 0;
-    while (guard++ < 200) {
-      var hit = null;
-      for (var i = 0; i < busy.length; i++) {
-        if (busy[i].e > t && busy[i].s < t + len) { hit = busy[i]; break; }
-      }
-      if (!hit) return (t + len <= hardEnd) ? t : null;
-      t = hit.e;
-      if (t + len > hardEnd) return null;
-    }
-    return null;
-  }
-
-  /*@3.SCPJ.19*/
-
-  /*@3.SCPJ.20*/
-  function partsFor(mod, cfg, onePerModule) {
-    if (onePerModule) return 1;
-    var m = cfg.parts_mode;
-    if (m === 1 || m === 2 || m === 3) return m;
-    var need = Math.ceil((mod.hours * 60) / cfg.session_minutes);
-    return Math.max(1, Math.min(3, need));
-  }
-
-  function buildUnits(cfg, mods, onePerModule) {
-    var units = [];
-    cfg.courses.forEach(function (code) {
-      var selected = (cfg.modules[code] || []);
-      var list = (mods[code] || []).filter(function (m) { return selected.indexOf(m.id) !== -1; });
-      list.sort(function (a, b) { return modNum(a.id) - modNum(b.id); });
-      list.forEach(function (m) {
-        var p = partsFor(m, cfg, onePerModule);
-        for (var i = 1; i <= p; i++) {
-          units.push({
-            course: code, module: m.id, part: i, total_parts: p,
-            difficulty: m.difficulty, kind: 'study'
-          });
-        }
-      });
-    });
-    return units;
-  }
-
-  /*@3.SCPJ.21*/
-  function buildSlots(cfg) {
-    var lastExam = '';
-    cfg.courses.forEach(function (c) {
-      var d = cfg.exam_dates[c];
-      if (d && d > lastExam) lastExam = d;
-    });
-    if (!lastExam) return [];
-    var slots = [], d = cfg.start_date, guard = 0;
-    while (d <= lastExam && guard++ < 400) {
-      if (cfg.rest_days.indexOf(dayName(d)) === -1) {
-        /*@3.SCPJ.22*/
-        var n = Math.min(cfg.sessions_per_day, dayCapacity(cfg, d));
-        for (var i = 0; i < n; i++) slots.push({ date: d, order: i, taken: null });
-      }
-      d = addDays(d, 1);
-    }
-    return slots;
-  }
-
-  /*@3.SCPJ.23*/
-  function capacityBreakdown(cfg) {
-    var lastExam = '';
-    cfg.courses.forEach(function (c) {
-      var d = cfg.exam_dates[c];
-      if (d && d > lastExam) lastExam = d;
-    });
-    var out = { days_total: 0, days_rest: 0, days_full: 0, days_partial: 0, last_exam: lastExam, window: dayWindow(cfg) };
-    if (!lastExam) return out;
-    if (cfg.start_date > lastExam) { out.past = true; return out; }
-    var d = cfg.start_date, guard = 0;
-    while (d <= lastExam && guard++ < 400) {
-      out.days_total++;
-      if (cfg.rest_days.indexOf(dayName(d)) !== -1) out.days_rest++;
-      else {
-        var cap = dayCapacity(cfg, d);
-        if (cap === 0) out.days_full++;
-        else if (cap < cfg.sessions_per_day) out.days_partial++;
-      }
-      d = addDays(d, 1);
-    }
-    return out;
-  }
-
-  /*@3.SCPJ.24*/
-  function slotAllowed(slot, course, cfg) {
-    var ex = cfg.exam_dates[course];
-    if (!ex) return true;
-    return slot.date < ex;
-  }
-
-  function capacityFor(cfg, slots, course) {
-    var n = 0;
-    slots.forEach(function (s) { if (!s.taken && slotAllowed(s, course, cfg)) n++; });
-    return n;
-  }
-
-  /*@3.SCPJ.25*/
-  function reserveBuffers(cfg, slots) {
-    var buffers = [];
-    cfg.courses.forEach(function (code) {
-      var ex = cfg.exam_dates[code];
-      if (!ex) return;
-      var candidates = slots.filter(function (s) { return !s.taken && s.date < ex; });
-      if (!candidates.length) return;
-      var lastDate = candidates[candidates.length - 1].date;
-      var onLast = candidates.filter(function (s) { return s.date === lastDate; });
-      var slot = onLast[0];
-      slot.taken = { course: code, kind: 'buffer' };
-      buffers.push(slot);
-    });
-    return buffers;
-  }
-
-  /*@3.SCPJ.26*/
-  function distribute(cfg, slots, units) {
-    var remaining = {};
-    units.forEach(function (u) { remaining[u.course] = (remaining[u.course] || 0) + 1; });
-
-    var placed = {};                  /*@3.SCPJ.27*/
-    var pending = units.slice();
-    var dayLog = {};                  /*@3.SCPJ.28*/
-
-    for (var i = 0; i < slots.length && pending.length; i++) {
-      var slot = slots[i];
-      if (slot.taken) continue;
-      var log = dayLog[slot.date] = dayLog[slot.date] || [];
-      var prev = log.length ? log[log.length - 1] : null;
-
-      var best = null, bestScore = -Infinity, bestIdx = -1;
-      for (var j = 0; j < pending.length; j++) {
-        var u = pending[j];
-        if (!slotAllowed(slot, u.course, cfg)) continue;
-        var key = u.course + '/' + u.module;
-        var st = placed[key];
-        /*@3.SCPJ.29*/
-        if (u.part > 1) {
-          if (!st || st.part !== u.part - 1) continue;
-          if (st.date === slot.date) continue;
-        }
-        /*@3.SCPJ.30*/
-        if (st && st.date === slot.date) continue;
-
-        var daysLeft = Math.max(1, diffDays(slot.date, cfg.exam_dates[u.course] || slot.date));
-        var slack = daysLeft / Math.max(1, remaining[u.course]);
-        var score = -slack * 10;                       /*@3.SCPJ.31*/
-        if (prev && prev.course === u.course) score -= 6;          /*@3.SCPJ.32*/
-        if (prev && prev.difficulty >= 7 && u.difficulty >= 7) score -= 14;  /*@3.SCPJ.33*/
-        if (prev && prev.difficulty >= 7 && u.difficulty < 5) score += 4;    /*@3.SCPJ.34*/
-        if (u.part > 1) score += 8;                    /*@3.SCPJ.35*/
-        if (score > bestScore) { bestScore = score; best = u; bestIdx = j; }
-      }
-      if (!best) continue;
-
-      pending.splice(bestIdx, 1);
-      remaining[best.course]--;
-      placed[best.course + '/' + best.module] = { part: best.part, date: slot.date, total: best.total_parts };
-      slot.taken = best;
-      log.push({ course: best.course, difficulty: best.difficulty });
-    }
-    return { unplaced: pending, placed: placed };
-  }
-
-  /*@3.SCPJ.36*/
-  function applySpacing(cfg, slots, placed, tier) {
-    var offsets = SPACING_OFFSETS[tier] || [];
-    if (!offsets.length) return { ok: true, added: [] };
-    var keys = Object.keys(placed).filter(function (k) { return placed[k].part === placed[k].total; });
-    var added = [];
-    for (var i = 0; i < keys.length; i++) {
-      var key = keys[i];
-      var parts = key.split('/');
-      var course = parts[0], mid = parts[1];
-      for (var o = 0; o < offsets.length; o++) {
-        var target = addDays(placed[key].date, offsets[o]);
-        var slot = null;
-        for (var s = 0; s < slots.length; s++) {
-          if (slots[s].taken) continue;
-          if (slots[s].date < target) continue;
-          if (!slotAllowed(slots[s], course, cfg)) continue;
-          slot = slots[s]; break;
-        }
-        if (!slot) {
-          /*@3.SCPJ.37*/
-          added.forEach(function (x) { x.taken = null; });
-          return { ok: false, added: [] };
-        }
-        slot.taken = { course: course, module: mid, part: 1, total_parts: 1, kind: 'spaced' };
-        added.push(slot);
-      }
-    }
-    return { ok: true, added: added };
-  }
-
-  /*@3.SCPJ.38*/
-  function computePlan(cfg, mods, opts) {
-    opts = opts || {};
-    var slots = buildSlots(cfg);
-    var units = buildUnits(cfg, mods, !!opts.onePerModule);
-    var capacity = slots.length;
-    var buffers = cfg.courses.filter(function (c) { return cfg.exam_dates[c]; }).length;
-    var demand = units.length + buffers;
-
-    var diag = {
-      feasible: demand <= capacity,
-      demand: demand, capacity: capacity, units: units.length, buffers: buffers,
-      advice: [], spacing_advice: null, per_course: {},
-      breakdown: capacityBreakdown(cfg)
+  function dayEndHour() { var st = S.data().settings || {}; return st.day_end_hour || 23; }
+  function engineCtx(extra) {
+    var c = {
+      today: todayStr(), nowMin: nowMin(), dayEndHour: dayEndHour(),
+      busyOn: busyOn, known: knownOf, mastered: isMastered
     };
-
-    /*@3.SCPJ.39*/
-    cfg.courses.forEach(function (code) {
-      var need = units.filter(function (u) { return u.course === code; }).length + (cfg.exam_dates[code] ? 1 : 0);
-      var cap = slots.filter(function (s) { return slotAllowed(s, code, cfg); }).length;
-      diag.per_course[code] = { need: need, cap: cap, ok: need <= cap };
-      if (need > cap) diag.feasible = false;
-    });
-
-    /*@3.SCPJ.40*/
-    if (!diag.feasible && !opts.force) {
-      diag.reason = (demand > capacity) ? 'capacity' : 'course_deadline';
-      diag.advice = opts.noAdvice ? [] : buildAdvice(cfg, mods, diag, opts);
-      return { ok: false, diagnostics: diag };
-    }
-
-    reserveBuffers(cfg, slots);
-    var res = distribute(cfg, slots, units);
-    if (res.unplaced.length && opts.force) {
-      diag.forced = true;
-      diag.unplaced = res.unplaced.length;
-      diag.unplaced_list = res.unplaced.map(function (u) {
-        return { course: u.course, module: u.module, part: u.part, total: u.total_parts };
-      });
-    } else if (res.unplaced.length) {
-      /*@3.SCPJ.41*/
-      diag.feasible = false;
-      diag.reason = 'conflict';
-      diag.unplaced = res.unplaced.length;
-      diag.advice = opts.noAdvice ? [] : buildAdvice(cfg, mods, diag, opts);
-      return { ok: false, diagnostics: diag };
-    }
-
-    /*@3.SCPJ.42*/
-    var wanted = cfg.spacing || 'full';
-    var tierIdx = SPACING_TIERS.indexOf(wanted);
-    if (tierIdx === -1) tierIdx = 0;
-    var chosen = 'off';
-    for (var t = tierIdx; t < SPACING_TIERS.length; t++) {
-      var r = applySpacing(cfg, slots, res.placed, SPACING_TIERS[t]);
-      if (r.ok) { chosen = SPACING_TIERS[t]; break; }
-    }
-    diag.spacing_applied = chosen;
-    if (chosen !== wanted) diag.spacing_advice = spacingAdvice(cfg, res.placed, wanted, chosen);
-
-    /*@3.SCPJ.43*/
-    var exRes = applyExtraReviews(cfg, slots);
-    diag.extra_reviews_placed = exRes.placed;
-    diag.extra_reviews_failed = exRes.failed;
-
-    /*@3.SCPJ.44*/
-    var sessions = [];
-    slots.forEach(function (s) {
-      if (!s.taken) return;
-      var u = s.taken;
-      sessions.push({
-        id: 'ip_' + s.date.replace(/-/g, '') + '_' + s.order + '_' + Math.random().toString(36).slice(2, 6),
-        date: s.date, order: s.order, course: u.course, module: u.module || null,
-        part: u.part || 1, total_parts: u.total_parts || 1, kind: u.kind || 'study',
-        start_time: '', minutes: cfg.session_minutes, done: false, note: ''
-      });
-    });
-    sessions.sort(function (a, b) { return a.date.localeCompare(b.date) || a.order - b.order; });
-    diag.moved = layTimes(cfg, sessions);
-
-    return { ok: true, sessions: sessions, diagnostics: diag, spacing: chosen };
+    if (extra) Object.keys(extra).forEach(function (k) { c[k] = extra[k]; });
+    return c;
   }
 
-  /*@3.SCPJ.45*/
-  function layTimes(cfg, sessions) {
-    var win = dayWindow(cfg);
-    var byDate = {};
-    sessions.forEach(function (s) { (byDate[s.date] = byDate[s.date] || []).push(s); });
-    var moved = 0;
-    Object.keys(byDate).forEach(function (d) {
-      var list = byDate[d].sort(function (a, b) { return a.order - b.order; });
-      var busy = cfg.avoid_conflicts === false ? [] : busyOn(d).slice();
-      var cursor = win.start;
-      list.forEach(function (s) {
-        var want = cursor;
-        var at = cfg.avoid_conflicts === false ? want : firstFreeAt(busy, want, s.minutes, win.end);
-        if (at === null) at = want;                       /*@3.SCPJ.46*/
-        if (at !== want) moved++;
-        s.start_time = S.minToHM24(at);
-        busy.push({ s: at, e: at + s.minutes });
-        busy.sort(function (a, b) { return a.s - b.s; });
-        cursor = at + s.minutes + GAP_MIN;
-      });
-    });
-    return moved;
-  }
-
-  /*@3.SCPJ.47*/
-  function applyExtraReviews(cfg, slots) {
-    var list = cfg.extra_reviews || [];
-    var placed = 0, failed = 0;
-    if (!list.length) return { placed: 0, failed: 0 };
-
-    var used = {};
-    slots.forEach(function (s) { if (s.taken) used[s.date] = (used[s.date] || 0) + 1; });
-
-    list.forEach(function (r) {
-      var mods = r.modules || [];
-      if (!mods.length || !r.from || !r.to) return;
-      var days = [];
-      var d = r.from, guard = 0;
-      while (d <= r.to && guard++ < 200) {
-        if (cfg.rest_days.indexOf(dayName(d)) === -1) days.push(d);
-        d = addDays(d, 1);
-      }
-      if (!days.length) { failed += mods.length; return; }
-      mods.forEach(function (mid, i) {
-        /*@3.SCPJ.48*/
-        var start = Math.floor(i * days.length / mods.length);
-        var slot = null;
-        for (var k = 0; k < days.length; k++) {
-          var dd = days[(start + k) % days.length];
-          var n = used[dd] || 0;
-          if (n >= dayCapacity(cfg, dd)) continue;
-          var free = null;
-          for (var j = 0; j < slots.length; j++) {
-            if (slots[j].date === dd && !slots[j].taken) { free = slots[j]; break; }
-          }
-          if (!free) { free = { date: dd, order: n, taken: null }; slots.push(free); }
-          slot = free; used[dd] = n + 1; break;
-        }
-        if (!slot) { failed++; return; }
-        slot.taken = { course: r.course, module: mid, part: 1, total_parts: 1, kind: 'spaced' };
-        placed++;
-      });
-    });
-    slots.sort(function (a, b) { return a.date.localeCompare(b.date) || a.order - b.order; });
-    return { placed: placed, failed: failed };
-  }
-
-  /*@3.SCPJ.49*/
-  function buildAdvice(cfg, mods, diag, opts) {
-    var cands = [];
-
-    /*@3.SCPJ.50*/
-    cfg.rest_days.forEach(function (rd) {
-      cands.push({
-        id: 'open:' + rd,
-        text: T('افتح ' + S.DAY_NAMES.ar[rd], 'Open ' + S.DAY_NAMES.en[rd]),
-        onePerModule: false,
-        apply: function (c) { c.rest_days = c.rest_days.filter(function (x) { return x !== rd; }); }
-      });
-    });
-    /*@3.SCPJ.51*/
-    if (!opts.onePerModule) {
-      cands.push({
-        id: 'one', text: T('اجعل كل وحدة جلسة واحدة', 'One session per module'),
-        onePerModule: true, apply: function () {}
-      });
+  /*@3.SCPJ.102*/
+  function fieldList(topic, key) {
+    var v = isAr() ? topic[key] : (topic[key + '_en'] || topic[key]);
+    if (!v) return [];
+    if (typeof v === 'string' && v.charAt(0) === '[') {
+      try { var j = JSON.parse(v.replace(/'/g, '"')); if (Array.isArray(j)) return j; } catch (e) {}
     }
-    /*@3.SCPJ.52*/
-    if (cfg.sessions_per_day < 4) {
-      var next = cfg.sessions_per_day + 1;
-      cands.push({
-        id: 'spd', text: T('ارفع إلى ' + next + ' جلسات يومياً', 'Raise to ' + next + ' sessions/day'),
-        onePerModule: false, apply: function (c) { c.sessions_per_day = next; }
-      });
-    }
-    /*@3.SCPJ.53*/
-    var byCourse = cfg.courses.map(function (code) {
-      var one = { courses: [code], modules: cfg.modules, session_minutes: cfg.session_minutes, parts_mode: cfg.parts_mode };
-      return { code: code, n: buildUnits(one, mods, !!opts.onePerModule).length + 1 };
-    }).sort(function (a, b) { return b.n - a.n; });
-    byCourse.slice(0, 2).forEach(function (c) {
-      cands.push({
-        id: 'drop:' + c.code,
-        text: T('أخرِج ' + c.code + ' من الخطة', 'Drop ' + c.code + ' from the plan'),
-        onePerModule: false,
-        apply: function (cf) {
-          cf.courses = cf.courses.filter(function (x) { return x !== c.code; });
-          delete cf.exam_dates[c.code];
-        }
-      });
+    return Array.isArray(v) ? v : [String(v)];
+  }
+  function firstPoint(mod, en) {
+    var out = '';
+    (mod && mod.topics || []).some(function (t) {
+      var v = en ? (t.must_know_en || t.must_know) : t.must_know;
+      if (typeof v === 'string' && v.charAt(0) === '[') { try { v = JSON.parse(v.replace(/'/g, '"')); } catch (e) {} }
+      var x = Array.isArray(v) ? v[0] : v;
+      if (x) { out = String(x); return true; }
+      return false;
     });
-    /*@3.SCPJ.54*/
-    if (cfg.start_date > todayStr()) {
-      cands.push({
-        id: 'earlier', text: T('ابدأ اليوم بدل ' + cfg.start_date, 'Start today instead of ' + cfg.start_date),
-        onePerModule: false, apply: function (c) { c.start_date = todayStr(); }
-      });
-    }
-
-    /*@3.SCPJ.55*/
-    var out = [];
-    cands.forEach(function (a) {
-      var c2 = clone(cfg);
-      a.apply(c2);
-      var trial = computePlan(c2, mods, { onePerModule: opts.onePerModule || a.onePerModule, noAdvice: true });
-      var td = trial.diagnostics;
-      var dCap = td.capacity - diag.capacity;
-      var dDem = td.demand - diag.demand;
-      var parts = [];
-      if (dCap) parts.push((dCap > 0 ? '+' : '−') + Math.abs(dCap) + ' ' + T('سعة', 'capacity'));
-      if (dDem) parts.push((dDem > 0 ? '+' : '−') + Math.abs(dDem) + ' ' + T('طلب', 'demand'));
-      if (!parts.length) parts.push(T('بلا أثر عددي', 'no numeric change'));
-      out.push({
-        id: a.id, text: a.text, delta: parts.join(' · '),
-        enough: !!trial.ok, onePerModule: a.onePerModule, apply: a.apply
-      });
-    });
-    /*@3.SCPJ.56*/
-    out.sort(function (x, y) { return (y.enough ? 1 : 0) - (x.enough ? 1 : 0); });
-    return out;
+    return out.length > 110 ? out.slice(0, 107) + '…' : out;
   }
 
-  function spacingAdvice(cfg, placed, wanted, got) {
-    var n = Object.keys(placed).filter(function (k) { return placed[k].part === placed[k].total; }).length;
-    var wantSlots = n * SPACING_OFFSETS[wanted].length;
-    var gotSlots = n * SPACING_OFFSETS[got].length;
-    var need = wantSlots - gotSlots;
-    var label = wanted === 'full' ? T('الحزمة الكاملة (بعد 3 و7 أيام)', 'the full package (after 3 and 7 days)')
-                                  : T('الحزمة المصغّرة (بعد 3 أيام)', 'the lite package (after 3 days)');
-    return T(
-      'لتفعيل المراجعة المتباعدة — ' + label + ' — لكلّ الوحدات (' + n + ' وحدة) تحتاج ' + need +
-      ' جلسة إضافية. لا تُفعَّل جزئياً: إمّا لكل الوحدات أو لا شيء.',
-      'To enable spaced review — ' + label + ' — for all ' + n + ' modules you need ' + need +
-      ' more sessions. It is never enabled partially: all modules or none.'
-    );
+  /*@3.SCPJ.123*/
+  function decorate(sessions) {
+    sessions.forEach(function (s) {
+      if (!s.module) return;
+      var m = modOf(s.course, s.module);
+      if (!m) return;
+      s.title = m.title; s.title_en = m.title_en;
+      var a = firstPoint(m, false), b = firstPoint(m, true);
+      if (a) s.tip = a; else delete s.tip;
+      if (b) s.tip_en = b; else delete s.tip_en;
+    });
+    return sessions;
   }
-
-  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function sessTitle(s) {
+    var m = s.module ? modOf(s.course, s.module) : null;
+    if (m) return modTitle(m);
+    return isAr() ? (s.title || '') : (s.title_en || s.title || '');
+  }
 
   /*@3.SCPJ.57*/
   function openWizard(tab, editExisting) {
-    var d = S.data();
     var courses = S.semesterCourses().map(function (c) { return c.code; });
     if (!courses.length) {
       alert(T('أضِف مواد فصلك أولاً من صفحة الفصل.', 'Add your semester courses first.'));
       return;
     }
+    if (!ENG()) { alert(T('تعذّر تحميل محرّك الخطة — أعد تحميل الصفحة.', 'The plan engine did not load — reload the page.')); return; }
     clearBusy();
     wizard = {
       step: 1,
@@ -633,12 +252,15 @@
         parts_mode: 1,
         rest_days: ['friday', 'saturday'],
         spacing: 'off',                     /*@3.SCPJ.59*/
+        review_mode: 'auto',
+        pace: 'auto',
+        max_course_day: 0,
         avoid_conflicts: true,              /*@3.SCPJ.60*/
-        window: { start_time: DEFAULT_START },   /*@3.SCPJ.61*/
-        extra_reviews: []
+        window: { start_time: DEFAULT_START, end_time: pad2(dayEndHour()) + ':00' },   /*@3.SCPJ.61*/
+        extra_reviews: [],
+        day_caps: {}
       },
       mods: {},
-      onePerModule: false,
       editing: false,
       result: null
     };
@@ -657,15 +279,15 @@
       });
       wizard.cfg.courses = p.courses.filter(function (c) { return courses.indexOf(c) !== -1; });
       if (!wizard.cfg.courses.length) wizard.cfg.courses = courses.slice();
-      wizard.cfg.modules = clone(p.modules);
-      wizard.cfg.sessions_per_day = p.sessions_per_day;
-      wizard.cfg.session_minutes = p.session_minutes;
-      wizard.cfg.parts_mode = p.parts_mode;
+      ['modules', 'extra_reviews', 'window', 'day_caps'].forEach(function (k) { wizard.cfg[k] = clone(p[k]); });
+      ['sessions_per_day', 'session_minutes', 'parts_mode', 'spacing', 'review_mode', 'pace', 'max_course_day'].forEach(function (k) {
+        if (p[k] !== undefined) wizard.cfg[k] = p[k];
+      });
       wizard.cfg.rest_days = p.rest_days.slice();
-      wizard.cfg.spacing = p.spacing || 'off';
       wizard.cfg.avoid_conflicts = p.avoid_conflicts !== false;
-      wizard.cfg.extra_reviews = clone(p.extra_reviews);
-      wizard.cfg.window = clone(p.window);
+      if (!wizard.cfg.window.end_time) wizard.cfg.window.end_time = pad2(dayEndHour()) + ':00';
+      wizard.keep = p.sessions.filter(function (s) { return s.done || (s.locked && s.date >= todayStr()); });
+      wizard.skip = p.unplaced.filter(function (u) { return u.reason === 'manual'; });
     }
     /*@3.SCPJ.116*/
     wizard.shown = clone(wizard.cfg.exam_dates);
@@ -677,6 +299,7 @@
       renderWizard();
     });
   }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
 
   /*@3.SCPJ.63*/
   function focusOf(tab) {
@@ -725,33 +348,21 @@
     var sel = [];
     list.forEach(function (m) {
       var n = modNum(m.id);
-      if (wizard.tab === 'midterm') {
-        if (n <= 6) sel.push(m.id);
-      } else {
-        if (n <= 6) setModuleStatus(code, m.id, 'mastered');
-        else sel.push(m.id);
-      }
+      if (wizard.tab === 'midterm' ? n <= 6 : n > 6) sel.push(m.id);
     });
     /*@3.SCPJ.66*/
-    wizard.cfg.modules[code] = sel.filter(function (id) { return moduleStatus(code, id) !== 'mastered'; });
+    wizard.cfg.modules[code] = sel.filter(function (id) { return !isMastered(code, id); });
   }
-  function applyDefaultSelection() {
-    wizard.all.forEach(defaultSelectFor);
-    persist();
-  }
+  function applyDefaultSelection() { wizard.all.forEach(defaultSelectFor); }
 
   function resetSelection() {
-    wizard.cfg.courses.forEach(function (code) {
-      (wizard.mods[code] || []).forEach(function (m) { setModuleStatus(code, m.id, 'new'); });
-      wizard.cfg.modules[code] = [];
-    });
-    persist();
+    wizard.cfg.courses.forEach(function (code) { wizard.cfg.modules[code] = []; });
+    wizard.result = null;
     renderWizard();
   }
 
   function showWizard() {
-    var ov = document.getElementById('modal-plan');
-    ov.style.display = '';
+    document.getElementById('modal-plan').style.display = '';
     renderWizard();
   }
   function closeWizard() {
@@ -763,10 +374,10 @@
     var box = document.getElementById('plan-wizard');
     if (!box || !wizard) return;
     var steps = [
-      T('النوع والتواريخ', 'Type & dates'),
-      T('المواد والوحدات', 'Courses & modules'),
+      T('الاختبارات', 'Exams'),
+      T('الوحدات', 'Modules'),
       T('الإيقاع', 'Rhythm'),
-      T('الجدوى والتوزيع', 'Feasibility & layout')
+      T('الخطة', 'The plan')
     ];
     var head = '<div class="ip-steps">' + steps.map(function (s, i) {
       var n = i + 1;
@@ -780,12 +391,13 @@
     else if (wizard.step === 3) body = stepRhythm();
     else body = stepResult();
 
-    var nav = '<div class="sch-modal-actions">';
-    if (wizard.step > 1) nav += '<button class="sch-btn sch-btn-secondary" id="ip-back">' + T('رجوع', 'Back') + '</button>';
+    var nav = '<div class="sch-modal-actions ip-wiz-nav">';
     if (wizard.step < 4) nav += '<button class="sch-btn sch-btn-primary" id="ip-next">' + T('التالي', 'Next') + '</button>';
     if (wizard.step === 4 && wizard.result && wizard.result.ok) {
-      nav += '<button class="sch-btn sch-btn-primary" id="ip-save">' + T('اعتماد الخطة', 'Save plan') + '</button>';
+      nav += '<button class="sch-btn sch-btn-primary" id="ip-save">' +
+        (wizard.editing ? T('اعتمد التعديل', 'Save changes') : T('اعتمد الخطة', 'Save plan')) + '</button>';
     }
+    if (wizard.step > 1) nav += '<button class="sch-btn sch-btn-secondary" id="ip-back">' + T('رجوع', 'Back') + '</button>';
     nav += '<button class="sch-btn sch-btn-secondary" id="ip-close">' + T('إغلاق', 'Close') + '</button></div>';
 
     box.innerHTML = head + '<div class="ip-body">' + body + '</div>' + nav;
@@ -796,73 +408,80 @@
     /*@3.SCPJ.67*/
     var h = wizard.editing
       ? '<div class="ip-note">' + esc(T('تُعدّل الآن خطة ' + (wizard.tab === 'midterm' ? 'الميدتيرم' : 'الفاينل') +
-          ' — تُحفظ فوق نفسها ولا تُمسّ الخطة الأخرى.',
-          'Editing the ' + wizard.tab + ' plan — it saves over itself and the other plan is untouched.')) + '</div>'
+          ' — ما أتممتَه وما نقلتَه بيدك يبقى في مكانه، والباقي يُعاد توزيعه من اليوم.',
+          'Editing the ' + wizard.tab + ' plan — what you finished or moved by hand stays put; the rest is laid out again from today.')) + '</div>'
       : '<div class="ip-tabs">' +
-        ['midterm','final'].map(function (t) {
+        ['midterm', 'final'].map(function (t) {
           return '<button class="ip-tab' + (wizard.tab === t ? ' active' : '') + '" data-ptab="' + t + '">' +
             (t === 'midterm' ? T('ميدتيرم', 'Midterm') : T('فاينل', 'Final')) + '</button>';
         }).join('') + '</div>';
-    h += '<p class="sch-editor-hint">' + T(
-      'الخطتان تتعايشان: لكلٍّ تواريخها ووحداتها وحالة إتقانها.',
-      'Both plans coexist: each keeps its own dates, modules and mastery state.') + '</p>';
 
     /*@3.SCPJ.68*/
     var fp = focusOf(wizard.tab);
-    var auto = autoTab();
-    h += '<div class="ip-note">' + esc(
-      fp.start
-        ? T('من إعدادات الجدول: فترة ' + (wizard.tab === 'midterm' ? 'الميدتيرم' : 'الفاينل') +
-            ' تبدأ ' + fp.start + (fp.end ? ' وتنتهي ' + fp.end : '') + '. أُخذت بداية الفترة تاريخاً مبدئياً لكل اختبار.',
-            'From schedule settings: the ' + wizard.tab + ' window starts ' + fp.start +
-            (fp.end ? ' and ends ' + fp.end : '') + '. Its start was used as the initial exam date for every course.')
-        : T('لم تُضبط فترات التركيز في إعدادات الجدول، فالتواريخ أدناه فارغة — اضبطها هناك مرة واحدة ولن تُسأل عنها ثانية.',
-            'Focus periods are not set in schedule settings, so the dates below are empty — set them once there.')
-    ) + (auto === wizard.tab ? '' : ' ' + esc(T('(التاريخ اليوم يرجّح خطة ' + (auto === 'final' ? 'الفاينل' : 'الميدتيرم') + '.)',
-      '(Today\'s date suggests the ' + auto + ' plan.)'))) + '</div>';
+    if (!fp.start) {
+      h += '<p class="sch-editor-hint">' + esc(T('لم تُضبط فترةُ ' + (wizard.tab === 'midterm' ? 'الميدتيرم' : 'الفاينل') +
+        ' في إعدادات الجدول — اكتب تاريخ كلِّ اختبارٍ أدناه.',
+        'The ' + wizard.tab + ' window is not set in schedule settings — enter each exam date below.')) + '</p>';
+    }
 
-    h += '<label class="sch-label">' + T('تاريخ بدء الخطة', 'Plan start date') + '</label>' +
-      '<input type="date" class="sch-input" id="ip-start" value="' + wizard.cfg.start_date + '">';
-    h += '<div class="sch-editor-subhead"><span>' + T('مواد الخطة وتواريخ اختباراتها', 'Plan courses & exam dates') +
+    h += '<div class="ip-grid2"><div><label class="sch-label" for="ip-start">' + T('أبدأ المذاكرة من', 'Start studying on') + '</label>' +
+      '<input type="date" class="sch-input" id="ip-start" value="' + wizard.cfg.start_date + '"></div></div>';
+    h += '<div class="sch-editor-subhead"><span>' + T('المواد وتواريخ اختباراتها', 'Courses & exam dates') +
       '</span><span class="ip-course-count">' +
-      T(wizard.cfg.courses.length + ' من ' + wizard.all.length,
-        wizard.cfg.courses.length + ' of ' + wizard.all.length) + '</span></div>';
-    h += '<p class="sch-editor-hint">' + T(
-      'أزِل علامة أي مادة لا تريدها في هذه الخطة. والتاريخ يُضاف إلى الجدول وإلى صفحة المادة حدثاً لكامل اليوم حتى تحدّد ساعته، وقابل للتعديل لاحقاً من لوحة الخطة.',
-      'Untick any course you do not want in this plan. Each date is added to the schedule and to the course page as an all-day event until you set its hour, and stays editable from the plan panel.') + '</p>';
+      T(wizard.cfg.courses.length + ' من ' + wizard.all.length, wizard.cfg.courses.length + ' of ' + wizard.all.length) + '</span></div>';
+    var today = todayStr();
     wizard.all.forEach(function (c) {
       var on = wizard.cfg.courses.indexOf(c) !== -1;
+      var ex = wizard.cfg.exam_dates[c] || '';
+      var left = ex ? diffDays(today, ex) : null;
+      var tag = left == null ? '' : left < 0 ? T('مضى', 'passed') : left === 0 ? T('اليوم', 'today') :
+        left === 1 ? T('غداً', 'tomorrow') : T('بعد ' + nDays(left), 'in ' + left + ' days');
       h += '<div class="ip-row ip-row-c' + (on ? '' : ' is-out') + '">' +
         '<button type="button" class="ip-inc' + (on ? ' is-on' : '') + '" data-ipinc="' + esc(c) + '"' +
           ' aria-pressed="' + (on ? 'true' : 'false') + '"' +
-          ' title="' + esc(on ? T('استبعاد من الخطة', 'Exclude from plan') : T('إدراج في الخطة', 'Include in plan')) + '">' +
+          ' aria-label="' + esc((on ? T('استبعد ', 'Exclude ') : T('أدرج ', 'Include ')) + S.courseShort(c)) + '">' +
           '<i class="fa-solid fa-check" aria-hidden="true"></i></button>' +
         '<span class="ip-row-label"><span class="ip-dot" style="background:' +
-        S.courseColor(c) + '"></span>' + esc(S.courseShort(c)) + '</span>' +
-        '<input type="date" class="sch-input ip-exam" data-code="' + esc(c) + '" value="' +
-        (wizard.cfg.exam_dates[c] || '') + '"' + (on ? '' : ' disabled') + '></div>';
+        S.courseColor(c) + '"></span><span class="ip-code">' + esc(S.courseShort(c)) + '</span></span>' +
+        '<input type="date" class="sch-input ip-exam" data-code="' + esc(c) + '" value="' + ex + '"' + (on ? '' : ' disabled') +
+        ' aria-label="' + esc(T('تاريخ اختبار ', 'Exam date for ') + S.courseShort(c)) + '">' +
+        '<span class="ip-left' + (left != null && left <= 3 ? ' is-near' : '') + '">' + esc(tag) + '</span></div>';
     });
+    h += '<p class="sch-editor-hint">' + T(
+      'التاريخ يُضاف إلى الجدول وصفحة المادة حدثاً لكامل اليوم حتى تحدّد ساعته. ومادّةٌ مضى اختبارُها تخرج من الخطة وحدَها.',
+      'Each date is added to the schedule and the course page as an all-day event until you set its hour. A course whose exam has passed leaves the plan on its own.') + '</p>';
     return h;
+  }
+
+  function weightOf(code, m) {
+    var E = ENG();
+    return E ? E.moduleWeight(m, knownOf(code, m.id)).prio : 0.5;
   }
 
   function stepModules() {
     if (!Object.keys(wizard.mods).length) {
       return '<p class="sch-editor-hint">' + T('جارٍ تحميل الوحدات…', 'Loading modules…') + '</p>';
     }
-    var h = '<div class="sch-editor-subhead"><span>' + T('اختر وحدات كل مادة', 'Pick modules per course') + '</span>' +
+    var h = '<div class="sch-editor-subhead"><span>' + T('ما يدخل الخطة', 'What goes in the plan') + '</span>' +
       '<button class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-reset">' +
-      T('إلغاء كل التحديدات والتقييم التلقائي', 'Clear all selections & auto-rating') + '</button></div>';
+      T('ألغِ كلَّ التحديدات', 'Clear all selections') + '</button></div>';
     h += '<p class="sch-editor-hint">' + T(
-      'المربّع الأخضر = متقنة (لا تُوزَّع) · المحدَّد = يدخل الخطة · الباهت = خارجها. اضغط المربّع لتدوير حالته.',
-      'Green = mastered (never scheduled) · selected = in the plan · faded = out. Click a square to cycle its state.') + '</p>';
+      'اضغط الوحدة لتدوير حالتها: داخل الخطة ← خارجها ← أتقنتُها (لا تُوزَّع، وهو الوسمُ نفسُه في صفحة المادة). ونجمةُ ★ للوحدات الأثقل وزناً في الاختبار وما يُبنى عليها — تُقدَّم إن ضاق الوقت.',
+      'Tap a module to cycle it: in the plan → out → mastered (never scheduled; the same mark as on the course page). ★ marks the modules that weigh most in the exam and that later modules build on — they come first when time is short.') + '</p>';
 
     wizard.cfg.courses.forEach(function (code) {
       var list = wizard.mods[code] || [];
       var sel = wizard.cfg.modules[code] || [];
+      var ws = list.map(function (m) { return weightOf(code, m); }).sort(function (a, b) { return b - a; });
+      var cut = ws.length >= 3 ? ws[Math.max(0, Math.floor(ws.length / 3) - 1)] : 2;
+      var hrs = 0;
+      list.forEach(function (m) { if (sel.indexOf(m.id) !== -1) hrs += m.hours; });
       h += '<div class="ip-course"><div class="ip-course-head">' +
         '<span class="ip-dot" style="background:' + S.courseColor(code) + '"></span>' +
-        '<b>' + esc(S.courseShort(code)) + '</b>' +
-        '<span class="ip-course-count">' + sel.length + '/' + list.length + '</span></div>';
+        '<b class="ip-code">' + esc(S.courseShort(code)) + '</b>' +
+        '<span class="ip-course-count">' + sel.length + '/' + list.length + ' · ' + hrs + T(' س', 'h') + '</span>' +
+        '<span class="ip-course-acts"><button class="ip-tiny" data-allc="' + esc(code) + '">' + T('الكلّ', 'All') + '</button>' +
+        '<button class="ip-tiny" data-nonec="' + esc(code) + '">' + T('لا شيء', 'None') + '</button></span></div>';
       if (!list.length) {
         h += '<p class="sch-editor-hint">' + T('لا بيانات وحدات لهذه المادة.', 'No module data for this course.') + '</p></div>';
         return;
@@ -872,13 +491,15 @@
         var st = moduleStatus(code, m.id);
         var on = sel.indexOf(m.id) !== -1;
         var cls = st === 'mastered' ? 'is-mastered' : (on ? 'is-on' : 'is-off');
-        var hrs = m.hours + (isAr() ? ' س' : 'h');
+        var key = weightOf(code, m) >= cut && cut <= 1;
+        var hrs1 = m.hours + (isAr() ? ' س' : 'h');
         h += '<button class="ip-mod ' + cls + '" data-code="' + esc(code) + '" data-mid="' + esc(m.id) + '" ' +
-          'title="' + esc(modTitle(m) + ' · ' + T('صعوبة', 'difficulty') + ' ' + m.difficulty + '/10 · ' + hrs) + '">' +
-          '<span class="ip-mod-n">' + modNum(m.id) + '</span>' +
+          'aria-label="' + esc(modNum(m.id) + ' · ' + modTitle(m) + ' · ' + (st === 'mastered' ? T('أتقنتُها', 'mastered') : on ? T('في الخطة', 'in the plan') : T('خارجها', 'out'))) + '" ' +
+          'title="' + esc(modTitle(m) + ' · ' + T('صعوبة', 'difficulty') + ' ' + m.difficulty + '/10 · ' + hrs1) + '">' +
+          '<span class="ip-mod-n">' + modNum(m.id) + (key ? ' <span class="ip-star" aria-hidden="true">★</span>' : '') + '</span>' +
           '<span class="ip-mod-t">' + esc(modTitle(m)) + '</span>' +
           '<span class="ip-mod-meta"><span class="ip-diff d' + Math.min(3, Math.ceil(m.difficulty / 3.5)) + '">' +
-            m.difficulty + '</span><span class="ip-hours">' + esc(hrs) + '</span></span>' +
+            m.difficulty + '</span><span class="ip-hours">' + esc(hrs1) + '</span></span>' +
           '</button>';
       });
       h += '</div></div>';
@@ -886,86 +507,93 @@
     return h;
   }
 
+  function pills(group, list, cur) {
+    return '<div class="ip-pills" role="group">' + list.map(function (p) {
+      var on = String(cur) === String(p[0]);
+      return '<button type="button" class="ip-pill' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-' + group + '="' + p[0] + '">' +
+        esc(String(p[1])) + '</button>';
+    }).join('') + '</div>';
+  }
+  function timePick(id, val, title) {
+    return '<div class="sch-timepick" title="' + esc(title) + '"><select class="tp-h" data-title-ar="الساعة" data-title-en="Hour"></select><span class="tp-colon">:</span>' +
+      '<select class="tp-m" data-title-ar="الدقيقة" data-title-en="Minute"></select>' +
+      '<select class="tp-mer" data-title-ar="صباحاً أو مساءً" data-title-en="AM or PM"></select>' +
+      '<input type="hidden" id="' + id + '" value="' + esc(val) + '"></div>';
+  }
+
   function stepRhythm() {
     var c = wizard.cfg;
     var h = '';
-    h += '<label class="sch-label">' + T('جلسات في اليوم', 'Sessions per day') + '</label><div class="ip-pills" data-group="spd">' +
-      [1,2,3,4].map(function (n) {
-        return '<button class="ip-pill' + (c.sessions_per_day === n ? ' active' : '') + '" data-spd="' + n + '">' + n + '</button>';
-      }).join('') + '</div>';
-    h += '<label class="sch-label">' + T('طول الجلسة (دقيقة)', 'Session length (min)') + '</label><div class="ip-pills">' +
-      [45,60,90,120].map(function (n) {
-        return '<button class="ip-pill' + (c.session_minutes === n ? ' active' : '') + '" data-smin="' + n + '">' + n + '</button>';
-      }).join('') + '</div>';
-    h += '<label class="sch-label">' + T('وقت أول جلسة', 'First session time') + '</label>' +
-      '<div class="sch-timepick"><select class="tp-h" data-title-ar="الساعة" data-title-en="Hour"></select><span class="tp-colon">:</span>' +
-      '<select class="tp-m" data-title-ar="الدقيقة" data-title-en="Minute"></select>' +
-      '<select class="tp-mer" data-title-ar="صباحاً أو مساءً" data-title-en="AM or PM"></select>' +
-      '<input type="hidden" id="ip-start-time" value="' + c.window.start_time + '"></div>';
+    h += '<div class="ip-card-grp"><div class="ip-grp-h"><i class="fa-solid fa-clock" aria-hidden="true"></i>' + T('يومُك', 'Your day') + '</div>';
+    h += '<div class="ip-grid2"><div><label class="sch-label">' + T('جلساتٌ في اليوم (حدٌّ أعلى)', 'Sessions per day (max)') + '</label>' +
+      '<div class="ip-stepper"><button type="button" class="ip-tiny" data-spdd="-1" aria-label="' + T('أقلّ', 'Fewer') + '">−</button>' +
+      '<b id="ip-spd-v">' + c.sessions_per_day + '</b>' +
+      '<button type="button" class="ip-tiny" data-spdd="1" aria-label="' + T('أكثر', 'More') + '">+</button></div></div>' +
+      '<div><label class="sch-label">' + T('طول الجلسة (دقيقة)', 'Session length (min)') + '</label>' +
+      pills('smin', [[30, 30], [45, 45], [60, 60], [90, 90], [120, 120]], c.session_minutes) + '</div></div>';
+    h += '<div class="ip-grid2"><div><label class="sch-label">' + T('يبدأ يومي', 'My day starts') + '</label>' + timePick('ip-start-time', c.window.start_time, T('بداية اليوم', 'Day start')) + '</div>' +
+      '<div><label class="sch-label">' + T('ينتهي يومي', 'My day ends') + '</label>' + timePick('ip-end-time', c.window.end_time || '23:00', T('نهاية اليوم', 'Day end')) + '</div></div>';
     h += '<label class="sch-label">' + T('أيام الراحة', 'Rest days') + '</label>' +
-      '<p class="sch-editor-hint">' + T('الجمعة والسبت مغلقتان افتراضياً — افتحهما لو احتجت سعةً أكبر.',
-        'Friday and Saturday are closed by default — open them if you need more capacity.') + '</p>' +
       '<div class="ip-pills">' + S.DAYS_ORDER.map(function (d) {
-        return '<button class="ip-pill' + (c.rest_days.indexOf(d) !== -1 ? ' active' : '') + '" data-rest="' + d + '">' +
+        var on = c.rest_days.indexOf(d) !== -1;
+        return '<button type="button" class="ip-pill' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-rest="' + d + '">' +
           esc(S.DAY_SHORT[isAr() ? 'ar' : 'en'][d]) + '</button>';
       }).join('') + '</div>';
-
-    /*@3.SCPJ.69*/
-    h += '<label class="sch-label">' + T('جلسات لكل وحدة', 'Sessions per module') + '</label>' +
-      '<p class="sch-editor-hint">' + T(
-        'الأصل جلسة واحدة لكل وحدة. و«تلقائي» يقسم ساعات الوحدة التقديرية على طول الجلسة (بين 1 و3) — فيضاعف الطلب على المواد الثقيلة.',
-        'One session per module by default. "Auto" divides each module\'s estimated hours by the session length (1–3), which multiplies demand for heavy courses.') + '</p>' +
-      '<div class="ip-pills">' +
-      [[1, '1'], [2, '2'], [3, '3'], ['auto', T('تلقائي', 'Auto')]].map(function (p) {
-        return '<button class="ip-pill' + (String(c.parts_mode) === String(p[0]) ? ' active' : '') +
-          '" data-parts="' + p[0] + '">' + esc(String(p[1])) + '</button>';
-      }).join('') + '</div>';
-
     /*@3.SCPJ.70*/
-    h += '<label class="sch-label">' + T('التعارض مع المحاضرات', 'Lecture conflicts') + '</label>' +
-      '<div class="ip-pills">' +
-      [[true, T('انقل الجلسة لأقرب وقت بعد المحاضرة', 'Move the session after the lecture')],
-       [false, T('اترك الجلسة في وقتها ولو تعارضت', 'Keep its time even if it clashes')]].map(function (p) {
-        return '<button class="ip-pill' + ((c.avoid_conflicts !== false) === p[0] ? ' active' : '') +
-          '" data-avoid="' + (p[0] ? '1' : '0') + '">' + esc(p[1]) + '</button>';
-      }).join('') + '</div>';
+    h += '<label class="sch-label">' + T('إن تعارضت جلسةٌ مع محاضرة', 'If a session clashes with a lecture') + '</label>' +
+      pills('avoid', [['1', T('انقلها لأقرب وقتٍ حرّ', 'Move it to the next free time')], ['0', T('اتركها في وقتها', 'Keep its time')]], c.avoid_conflicts !== false ? '1' : '0');
+    h += '</div>';
 
+    h += '<div class="ip-card-grp"><div class="ip-grp-h"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>' + T('التوزيع', 'Layout') + '</div>';
+    /*@3.SCPJ.69*/
+    h += '<label class="sch-label">' + T('جلساتٌ لكلِّ وحدة', 'Sessions per module') + '</label>' +
+      pills('parts', [[1, '1'], [2, '2'], [3, '3'], ['auto', T('حسب ساعاتها', 'By its hours')]], c.parts_mode);
+    h += '<label class="sch-label">' + T('حدُّ المادّة الواحدة في اليوم', 'Max sessions of one course per day') + '</label>' +
+      pills('mcd', [[0, T('تلقائيّ', 'Auto')], [1, '1'], [2, '2'], [3, '3']], c.max_course_day || 0);
+    h += '<label class="sch-label">' + T('إيقاع التوزيع', 'Pace') + '</label>' +
+      pills('pace', [['auto', T('تلقائيّ', 'Auto')], ['even', T('على المدّة كلِّها', 'Across the whole span')], ['early', T('أنهِ مبكّراً وراجع', 'Finish early, then review')]], c.pace);
+    h += '</div>';
+
+    h += '<div class="ip-card-grp"><div class="ip-grp-h"><i class="fa-solid fa-rotate" aria-hidden="true"></i>' + T('المراجعة', 'Review') + '</div>';
+    h += '<label class="sch-label">' + T('مراجعةُ ما قبل الاختبار', 'Pre-exam review') + '</label>' +
+      pills('revmode', [['auto', T('بعد الوحدات إن بقي وقت', 'After the modules, if time is left')], ['always', T('احجزها دائماً', 'Always reserve it')], ['off', T('بلا مراجعة', 'None')]], c.review_mode);
     /*@3.SCPJ.71*/
-    h += '<label class="sch-label">' + T('المراجعة المتباعدة', 'Spaced review') + '</label>' +
-      '<p class="sch-editor-hint">' + T(
-        'الحزمة الشاملة تُطبَّق على كل الوحدات أو لا تُطبَّق. وللاختيار وحدةً وحدة استعمل «مراجعات مخصّصة» أدناه — وهي الأصحّ، فالوحدات ليست سواءً.',
-        'The blanket package applies to every module or none. To pick module by module use "custom reviews" below — the sounder path, since modules differ.') + '</p>' +
-      '<div class="ip-pills">' +
-      [['off',  T('بلا مراجعة متباعدة', 'No spaced review')],
-       ['lite', T('حزمة مصغّرة (3 أيام)', 'Lite (3 days)')],
-       ['full', T('حزمة كاملة (3 و7 أيام)', 'Full (3 & 7 days)')]].map(function (p) {
-        return '<button class="ip-pill' + (c.spacing === p[0] ? ' active' : '') + '" data-spacing="' + p[0] + '">' + esc(p[1]) + '</button>';
-      }).join('') + '</div>';
-
+    h += '<label class="sch-label">' + T('المراجعة المتباعدة لكلِّ الوحدات', 'Spaced review for every module') + '</label>' +
+      pills('spacing', [['off', T('بلا', 'None')], ['lite', T('بعد 3 أيام', 'After 3 days')], ['full', T('بعد 3 و7 أيام', 'After 3 and 7 days')]], c.spacing);
     h += extraReviewsHtml(c);
+    h += '</div>';
+    h += '<div class="ip-live" id="ip-live">' + liveLine() + '</div>';
     return h;
+  }
+
+  function liveLine() {
+    var E = ENG();
+    if (!E || !wizard) return '';
+    var r = E.compute(wizard.cfg, wizard.mods, engineCtx({ keep: wizard.keep, skip: wizard.skip }), { noAdvice: true });
+    if (!r.ok) return '';
+    var d = r.diagnostics;
+    var placed = r.sessions.filter(function (s) { return s.kind === 'study'; }).length;
+    return '<span class="ip-mode m-' + d.mode + '">' + esc(modeLabel(d.mode)) + '</span> ' +
+      esc(T('سعتك ' + d.capacity + ' جلسة ووحداتُك ' + d.demand + ' — يتّسع منها ' + placed + '.',
+            'Room for ' + d.capacity + ' sessions; your modules need ' + d.demand + ' — ' + placed + ' fit.'));
   }
 
   /*@3.SCPJ.72*/
   function extraReviewsHtml(c) {
-    var h = '<div class="sch-editor-subhead" style="margin-block-start:.7rem"><span>' +
-      T('مراجعات مخصّصة', 'Custom reviews') + '</span>' +
+    var h = '<div class="sch-editor-subhead ip-xr-headrow"><span>' +
+      T('مراجعاتٌ تختار وحداتِها', 'Reviews you pick') + '</span>' +
       '<button class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-xr-add">＋ ' +
       T('أضف مراجعة', 'Add review') + '</button></div>';
     var list = c.extra_reviews || [];
-    if (!list.length) {
-      return h + '<p class="sch-editor-hint">' + T(
-        'لا مراجعات مخصّصة. أضِف واحدة لتختار وحداتٍ بعينها ونافذة تواريخها.',
-        'None yet. Add one to pick specific modules and their date window.') + '</p>';
-    }
+    if (!list.length) return h;
     list.forEach(function (r, i) {
       var mods = (wizard.mods[r.course] || []);
       h += '<div class="ip-xr" data-xr="' + i + '">' +
         '<div class="ip-xr-head">' +
           '<span class="ip-dot" style="background:' + S.courseColor(r.course) + '"></span>' +
-          '<b>' + esc(S.courseShort(r.course)) + '</b>' +
+          '<b class="ip-code" role="button" tabindex="0" title="' + esc(T('بدّل المادة', 'Switch course')) + '">' + esc(S.courseShort(r.course)) + '</b>' +
           '<span class="ip-xr-count">' + (r.modules || []).length + ' ' + T('وحدة', 'modules') + '</span>' +
-          '<button class="ip-xr-del" data-xrdel="' + i + '" title="' + T('حذف', 'Remove') + '"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' +
+          '<button class="ip-xr-del" data-xrdel="' + i + '" aria-label="' + T('حذف', 'Remove') + '"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' +
         '</div>' +
         '<div class="ip-xr-dates">' +
           '<label class="sch-label">' + T('من', 'From') + '</label>' +
@@ -982,110 +610,99 @@
     return h;
   }
 
+  function modeLabel(m) {
+    return m === 'relaxed' ? T('وقتُك واسع', 'Plenty of time')
+      : m === 'balanced' ? T('متوازن', 'Balanced')
+      : m === 'tight' ? T('ضيّق', 'Tight')
+      : T('لا يتّسع لكلِّ شيء', 'Not enough time for everything');
+  }
+  function modeText(d) {
+    if (d.mode === 'relaxed') return T('وُزّعت الوحداتُ على المدّة وبقي آخرُها للمراجعة.', 'Modules are spread out and the last days are left for review.');
+    if (d.mode === 'balanced') return T('الوحداتُ موزّعةٌ واليومُ السابق للاختبار للمراجعة.', 'Modules are spread out; the day before each exam is for review.');
+    if (d.mode === 'tight') return T('قُدّمت الوحداتُ على المراجعة، فالمراجعةُ في ما بقي من وقت.', 'Modules come first; review only takes the time that is left.');
+    return T('اختيرت الوحداتُ الأهمّ — وزنُها في الاختبار وما يُبنى عليها وما لم تتقنه — والباقي في «لم تتّسع» لتقرّر بنفسك.',
+      'The most important modules were picked — exam weight, what builds on them, what you have not mastered — the rest wait in "Did not fit" for you to decide.');
+  }
+  function reasonText(r) {
+    return r === 'manual' ? T('أخرجتَها بيدك', 'you took it out')
+      : r === 'conflict' ? T('تزاحمت الأيام', 'days were full')
+      : T('لا وقت', 'no time');
+  }
+
   function stepResult() {
-    if (!wizard.result) {
-      wizard.result = computePlan(wizard.cfg, wizard.mods, { onePerModule: wizard.onePerModule });
-    }
+    var E = ENG();
+    if (!wizard.result) wizard.result = E.compute(wizard.cfg, wizard.mods, engineCtx({ keep: wizard.keep, skip: wizard.skip }));
     var r = wizard.result, d = r.diagnostics;
-    var h = '';
     if (!r.ok) {
-      /*@3.SCPJ.73*/
-      var headline;
-      if (d.reason === 'conflict') {
-        headline = T('السعة تكفي عدداً (' + d.demand + ' من ' + d.capacity + ') لكن ' + d.unplaced +
-                     ' جلسة لا تجد يوماً متاحاً قبل موعد اختبار مادتها — المواد تتزاحم على الأيام نفسها.',
-                     'Capacity is enough numerically (' + d.demand + ' of ' + d.capacity + ') but ' + d.unplaced +
-                     ' sessions cannot find a day before their course exam — the courses compete for the same days.');
-      } else if (d.reason === 'course_deadline') {
-        headline = T('السعة الكلية تكفي، لكن مادةً أو أكثر لا يتّسع وقتها قبل اختبارها.',
-                     'Total capacity is enough, but one or more courses have no room before their exam.');
-      } else {
-        headline = T('تحتاج ' + d.demand + ' جلسة ولديك ' + d.capacity + '.',
-                     'You need ' + d.demand + ' sessions but have ' + d.capacity + '.');
-      }
-      h += '<div class="ip-infeasible"><b><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> ' + esc(headline) + '</b></div>';
-      h += capacityHtml(d.breakdown);
-      var bad = Object.keys(d.per_course).filter(function (c) { return !d.per_course[c].ok; });
-      if (bad.length) {
-        h += '<p class="sch-editor-hint">' + T('المواد التي لا يتّسع وقتها قبل اختبارها: ', 'Courses without room before their exam: ') +
-          bad.map(function (c) {
-            return esc(S.courseShort(c)) + ' (' + d.per_course[c].need + '/' + d.per_course[c].cap + ')';
-          }).join(' · ') + '</p>';
-      }
-      var anyEnough = d.advice.some(function (a) { return a.enough; });
-      h += '<p class="sch-editor-hint">' + T('اختر حلاً — كل خيار جُرِّب فعلاً، و«يكفي وحده» تعني أن تطبيقه ينتج خطةً كاملة:',
-        'Pick a remedy — each was actually simulated, and "enough alone" means applying it yields a complete plan:') +
-        (anyEnough ? '' : ' <b>' + T('لا خيار يكفي وحده هنا — طبّق واحداً ثم أعد النظر في القائمة، فهي تُحسب من جديد بعد كل خطوة.',
-          'No single option is enough here — apply one and look again; the list is recomputed after each step.') + '</b>') + '</p>';
-      h += '<div class="ip-advice">' + d.advice.map(function (a, i) {
-        return '<button class="ip-advice-item' + (a.enough ? ' is-enough' : '') + '" data-advice="' + i + '">' +
-          '<span class="ip-advice-n">' + (i + 1) + '</span>' +
-          '<span class="ip-advice-t">' + esc(a.text) + '</span>' +
-          '<span class="ip-advice-d">' + esc(a.delta) + '</span>' +
-          (a.enough ? '<span class="ip-advice-ok">' + T('يكفي وحده', 'enough alone') + '</span>' : '') +
-          '</button>';
-      }).join('') + '</div>';
-      /*@3.SCPJ.74*/
-      h += '<div class="ip-force-wrap">' +
-        '<button class="sch-btn sch-btn-secondary sch-btn-block" id="ip-force">' +
-        T('أدرج الخطة كما هي ودعني أُكملها يدوياً', 'Lay it out anyway and let me finish manually') + '</button>' +
-        '<p class="sch-editor-hint">' + T(
-          'يُوزَّع ما يتّسع له الوقت، وتُعرض الجلسات التي لم تجد مكاناً في لوحة الخطة لتضعها بنفسك.',
-          'Whatever fits is laid out; the sessions that found no room are listed in the plan panel for you to place.') + '</p></div>';
-      return h;
+      return '<div class="ip-infeasible"><b>' + esc(T('لا تاريخَ اختبارٍ قادم لأيِّ مادّةٍ في الخطة — ارجع إلى الخطوة الأولى.',
+        'No upcoming exam date for any course in the plan — go back to step one.')) + '</b></div>';
     }
-
-    if (d.forced && d.unplaced) {
-      h += '<div class="ip-note"><b>' + esc(T(
-        d.unplaced + ' جلسة لم تجد مكاناً وأُبقيت خارج التوزيع.',
-        d.unplaced + ' sessions found no room and were left out.')) + '</b> ' + esc(T(
-        'ستجدها مسرودةً في لوحة الخطة لتضعها يدوياً.',
-        'They are listed in the plan panel so you can place them by hand.')) + '</div>';
+    var h = '';
+    h += '<div class="ip-verdict m-' + d.mode + '"><span class="ip-mode m-' + d.mode + '">' + esc(modeLabel(d.mode)) + '</span>' +
+      '<p>' + esc(modeText(d)) + '</p></div>';
+    var study = r.sessions.filter(function (s) { return s.kind === 'study'; }).length;
+    var revs = r.sessions.length - study;
+    h += '<div class="ip-stats">' +
+      stat(r.sessions.length, T('جلسة', 'sessions')) + stat(study, T('وحدة', 'module sessions')) +
+      stat(revs, T('مراجعة', 'reviews')) + stat(countDays(r.sessions), T('يوم مذاكرة', 'study days')) +
+      (r.unplaced.length ? stat(r.unplaced.length, T('لم تتّسع', 'did not fit'), 'warn') : '') + '</div>';
+    if (d.passed.length) {
+      h += '<p class="sch-editor-hint">' + esc(T('خرجت من الخطة لأن اختبارها مضى: ', 'Left out because their exam has passed: ') +
+        d.passed.map(function (c) { return S.courseShort(c); }).join(' · ')) + '</p>';
     }
-
-    var byCourse = {};
-    r.sessions.forEach(function (s) { byCourse[s.course] = (byCourse[s.course] || 0) + 1; });
-    h += '<div class="ip-ok"><b><i class="fa-solid fa-circle-check" aria-hidden="true"></i> ' + T('الخطة جاهزة', 'Plan ready') + '</b> — ' +
-      T(r.sessions.length + ' جلسة على ' + countDays(r.sessions) + ' يوماً.',
-        r.sessions.length + ' sessions across ' + countDays(r.sessions) + ' days.') + '</div>';
-    h += '<div class="ip-summary">' + Object.keys(byCourse).map(function (c) {
-      return '<span class="sch-chip" style="--chip-color:' + S.courseColor(c) + '">' +
-        '<span class="sch-chip-dot"></span>' + esc(S.courseShort(c)) + ' · ' + byCourse[c] + '</span>';
+    h += '<div class="ip-pc">' + Object.keys(d.per_course).map(function (c) {
+      var pc = d.per_course[c];
+      return '<div class="ip-pc-row"><span class="ip-dot" style="background:' + S.courseColor(c) + '"></span>' +
+        '<b class="ip-code">' + esc(S.courseShort(c)) + '</b>' +
+        '<span>' + esc(T(pc.placed + ' وحدة', pc.placed + ' modules')) + '</span>' +
+        (pc.dropped ? '<span class="ip-warn">' + esc(T(pc.dropped + ' لم تتّسع', pc.dropped + ' left out')) + '</span>' : '') +
+        '<span class="ip-pc-r">' + (pc.buffer ? '<i class="fa-solid fa-rotate" aria-hidden="true"></i> ' + esc(T('مراجعة قبل الاختبار', 'pre-exam review')) : '') +
+        ' · ' + esc(shortDate(pc.exam)) + '</span></div>';
     }).join('') + '</div>';
-    var sp = r.spacing;
-    h += '<p class="sch-editor-hint">' + T('المراجعة المتباعدة: ', 'Spaced review: ') +
-      (sp === 'full' ? T('حزمة كاملة لكل الوحدات', 'full package for every module')
-       : sp === 'lite' ? T('حزمة مصغّرة لكل الوحدات', 'lite package for every module')
-       : T('غير مفعّلة', 'not enabled')) + '</p>';
-    if (d.spacing_advice) h += '<div class="ip-note">' + esc(d.spacing_advice) + '</div>';
+    if (r.unplaced.length) {
+      h += '<div class="sch-editor-subhead"><span>' + T('لم تتّسع', 'Did not fit') + '</span></div>' +
+        '<p class="sch-editor-hint">' + T('تبقى في لوحة الخطة لتضعها في أيِّ يومٍ بالسحب أو بالتحديد ثمّ «انقل».',
+          'They stay on the plan board so you can drop them on any day — drag them, or select and "Move".') + '</p>' +
+        '<div class="ip-unplaced">' + r.unplaced.map(function (u) {
+          return '<span class="sch-chip" style="--chip-color:' + S.courseColor(u.course) + '"><span class="sch-chip-dot"></span>' +
+            esc(S.courseShort(u.course)) + ' · ' + esc(T('وحدة ', 'M') + modNum(u.module)) +
+            ' <small>' + esc(reasonText(u.reason)) + '</small></span>';
+        }).join('') + '</div>';
+      if (d.advice && d.advice.length) {
+        h += '<p class="sch-editor-hint">' + T('أو جرّب واحداً — كلٌّ جُرّب فعلاً وهذا أثره:', 'Or try one — each was actually run, with its effect:') + '</p>';
+        h += '<div class="ip-advice">' + d.advice.map(function (a, i) {
+          return '<button class="ip-advice-item' + (a.enough ? ' is-enough' : '') + '" data-advice="' + i + '">' +
+            '<span class="ip-advice-t">' + esc(adviceText(a)) + '</span>' +
+            '<span class="ip-advice-d">' + esc(a.enough ? T('يكفي وحده', 'enough alone') : T('+' + a.gain + ' وحدة', '+' + a.gain + ' modules')) + '</span>' +
+            '</button>';
+        }).join('') + '</div>';
+      }
+    }
+    if (d.spacing_wanted !== 'off' && d.spacing_applied !== d.spacing_wanted) {
+      h += '<div class="ip-note">' + esc(T('المراجعة المتباعدة لا تتّسع لكلِّ الوحدات، فطُبّق ' +
+        (d.spacing_applied === 'lite' ? 'الأخفُّ منها (بعد 3 أيام).' : 'لا شيء منها — لا تُطبَّق على بعض الوحدات دون بعض.'),
+        'Spaced review does not fit every module, so ' +
+        (d.spacing_applied === 'lite' ? 'the lighter one (after 3 days) was applied.' : 'none was applied — it is never applied to some modules only.'))) + '</div>';
+    }
+    if (d.buffers && d.buffers.missed && d.buffers.missed.length && wizard.cfg.review_mode === 'auto') {
+      h += '<p class="sch-editor-hint">' + esc(T('لم يبقَ وقتٌ لمراجعة ما قبل الاختبار في: ', 'No time was left for a pre-exam review in: ') +
+        d.buffers.missed.map(function (c) { return S.courseShort(c); }).join(' · ')) + '</p>';
+    }
     h += '<div class="ip-preview">' + previewHtml(r.sessions) + '</div>';
     return h;
   }
-
-  /*@3.SCPJ.75*/
-  function capacityHtml(b) {
-    if (!b) return '';
-    var rows = [];
-    if (b.past) {
-      return '<div class="ip-note">' + esc(T(
-        'تاريخ البدء بعد آخر اختبار — لا يوم واحد بين الاثنين. قدّم البدء أو أخّر تواريخ الاختبارات.',
-        'The start date is after the last exam — not a single day lies between them. Move the start earlier or the exams later.')) + '</div>';
-    }
-    if (!b.last_exam) {
-      return '<div class="ip-note">' + esc(T('لا تاريخ اختبار واحد محدَّد — لا سقف للخطة فلا شرائح.',
-        'No exam date set at all — the plan has no ceiling, hence no slots.')) + '</div>';
-    }
-    var win = b.window;
-    rows.push(T('المدى: ' + b.days_total + ' يوماً حتى ' + b.last_exam,
-                'Range: ' + b.days_total + ' days until ' + b.last_exam));
-    rows.push(T('أيام راحة مغلقة: ' + b.days_rest, 'Closed rest days: ' + b.days_rest));
-    rows.push(T('نافذة اليوم: ' + S.fmtMin12(win.start) + ' – ' + S.fmtMin12(win.end),
-                'Day window: ' + S.fmtMin12(win.start) + ' – ' + S.fmtMin12(win.end)));
-    if (b.days_full) rows.push(T('أيام لم يبقَ فيها متّسع لجلسة واحدة: ' + b.days_full,
-                                 'Days with no room for even one session: ' + b.days_full));
-    if (b.days_partial) rows.push(T('أيام يتّسع بعضها فقط: ' + b.days_partial,
-                                    'Days that fit only part of the request: ' + b.days_partial));
-    return '<ul class="ip-caplist">' + rows.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>';
+  function stat(n, label, tone) {
+    return '<span class="ip-stat' + (tone ? ' is-' + tone : '') + '"><b>' + n + '</b>' + esc(label) + '</span>';
+  }
+  function adviceText(a) {
+    if (a.k === 'open') return T('افتح يوم ' + S.DAY_NAMES.ar[a.day], 'Open ' + S.DAY_NAMES.en[a.day]);
+    if (a.k === 'one') return T('جلسةٌ واحدة لكلِّ وحدة', 'One session per module');
+    if (a.k === 'spd') return T(a.n + ' جلسات في اليوم', a.n + ' sessions a day');
+    if (a.k === 'min') return T('جلسةٌ من ' + a.n + ' دقيقة', a.n + '-minute sessions');
+    if (a.k === 'late') return T('مدّ يومك إلى 11:30م', 'Extend your day to 11:30 pm');
+    if (a.k === 'early') return T('ابدأ يومك 8 صباحاً', 'Start your day at 8 am');
+    if (a.k === 'revauto') return T('المراجعةُ بعد الوحدات لا قبلها', 'Review after the modules, not before');
+    return a.id;
   }
 
   function countDays(sessions) {
@@ -1098,26 +715,21 @@
     var byDate = {};
     sessions.forEach(function (s) { (byDate[s.date] = byDate[s.date] || []).push(s); });
     return Object.keys(byDate).sort().map(function (d) {
-      var dd = s2d(d);
-      return '<div class="ip-prev-day"><div class="ip-prev-date">' +
-        esc(S.DAY_SHORT[isAr() ? 'ar' : 'en'][S.DAYS_ORDER[dd.getDay()]] + ' ' + dd.getDate() + ' ' +
-            S.MONTH_NAMES[isAr() ? 'ar' : 'en'][dd.getMonth()]) + '</div>' +
+      return '<div class="ip-prev-day"><div class="ip-prev-date">' + esc(dayShort(d) + ' ' + shortDate(d)) + '</div>' +
         byDate[d].map(function (s) {
           return '<div class="ip-prev-item" style="--event-color:' + S.courseColor(s.course) + '">' +
             '<span class="ip-prev-time">' + esc(S.fmtTime12(s.start_time)) + '</span>' +
             '<span class="ip-prev-course">' + esc(S.courseShort(s.course)) + '</span>' +
-            '<span class="ip-prev-mod">' + esc(sessionLabel(s)) + '</span></div>';
+            '<span class="ip-prev-mod">' + (s.key ? '<span class="ip-star" aria-hidden="true">★</span> ' : '') + esc(sessionLabel(s)) + '</span></div>';
         }).join('') + '</div>';
     }).join('');
   }
 
   function sessionLabel(s) {
     if (s.kind === 'buffer') return T('مراجعة ما قبل الاختبار', 'Pre-exam review');
-    if (s.kind === 'spaced') return T('مراجعة متباعدة · وحدة ' + modNum(s.module), 'Spaced review · module ' + modNum(s.module));
+    if (s.kind === 'spaced') return T('مراجعة · وحدة ' + modNum(s.module), 'Review · module ' + modNum(s.module));
     var base = T('الوحدة ' + modNum(s.module), 'Module ' + modNum(s.module));
-    if (s.total_parts > 1) {
-      base += ' · ' + T('الجلسة ' + s.part + ' من ' + s.total_parts, 'session ' + s.part + ' of ' + s.total_parts);
-    }
+    if (s.total_parts > 1) base += ' · ' + T('الجلسة ' + s.part + ' من ' + s.total_parts, 'session ' + s.part + ' of ' + s.total_parts);
     return base;
   }
 
@@ -1132,14 +744,23 @@
       else delete wizard.cfg.exam_dates[c];
     });
   }
+  function keepTimes() {
+    if (!wizard) return;
+    var a = document.getElementById('ip-start-time'), b = document.getElementById('ip-end-time');
+    if (a && a.value) wizard.cfg.window.start_time = a.value;
+    if (b && b.value) wizard.cfg.window.end_time = b.value;
+  }
 
   function bindWizard() {
     var box = document.getElementById('plan-wizard');
     if (!box) return;
     S.TP.build(box);
 
+    function bind(id, fn) { var e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
+    function redraw() { keepTimes(); wizard.result = null; renderWizard(); }
+
     bind('ip-close', closeWizard);
-    bind('ip-back', function () { wizard.step--; wizard.result = null; renderWizard(); });
+    bind('ip-back', function () { keepTimes(); wizard.step--; wizard.result = null; renderWizard(); });
     bind('ip-next', function () {
       if (wizard.step === 1) {
         captureStepDates();
@@ -1156,10 +777,7 @@
             T('\nأو استبعدها من الخطة.', '\nor exclude them from the plan.'));
           return;
         }
-      } else if (wizard.step === 3) {
-        var st = document.getElementById('ip-start-time');
-        if (st) wizard.cfg.window.start_time = st.value;
-      }
+      } else if (wizard.step === 3) keepTimes();
       wizard.step++;
       wizard.result = null;
       renderWizard();
@@ -1172,17 +790,17 @@
         captureStepDates();
         var c = this.getAttribute('data-ipinc');
         if (wizard.cfg.courses.indexOf(c) === -1) {
-          wizard.cfg.courses = wizard.all.filter(function (x) {
-            return x === c || wizard.cfg.courses.indexOf(x) !== -1;
-          });
-          if (!wizard.cfg.modules[c]) { defaultSelectFor(c); persist(); }
+          wizard.cfg.courses = wizard.all.filter(function (x) { return x === c || wizard.cfg.courses.indexOf(x) !== -1; });
+          if (!wizard.cfg.modules[c]) defaultSelectFor(c);
         } else {
           wizard.cfg.courses = wizard.cfg.courses.filter(function (x) { return x !== c; });
         }
         renderWizard();
       });
     });
-
+    box.querySelectorAll('.ip-exam').forEach(function (i) {
+      i.addEventListener('change', function () { captureStepDates(); renderWizard(); });
+    });
     box.querySelectorAll('[data-ptab]').forEach(function (b) {
       b.addEventListener('click', function () {
         wizard.tab = this.getAttribute('data-ptab');
@@ -1193,33 +811,41 @@
     });
     box.querySelectorAll('.ip-mod').forEach(function (b) {
       b.addEventListener('click', function () {
-        var code = this.getAttribute('data-code'), mid = this.getAttribute('data-mid');
-        cycleModule(code, mid);
+        cycleModule(this.getAttribute('data-code'), this.getAttribute('data-mid'));
         renderWizard();
       });
     });
-    /*@3.SCPJ.77*/
-    function keepTime() {
-      var st = document.getElementById('ip-start-time');
-      if (st && st.value) wizard.cfg.window.start_time = st.value;
-    }
-    function redraw() { keepTime(); renderWizard(); }
-
-    box.querySelectorAll('[data-spd]').forEach(function (b) {
-      b.addEventListener('click', function () { wizard.cfg.sessions_per_day = parseInt(this.getAttribute('data-spd'), 10); redraw(); });
-    });
-    box.querySelectorAll('[data-smin]').forEach(function (b) {
-      b.addEventListener('click', function () { wizard.cfg.session_minutes = parseInt(this.getAttribute('data-smin'), 10); redraw(); });
-    });
-    box.querySelectorAll('[data-parts]').forEach(function (b) {
+    box.querySelectorAll('[data-allc]').forEach(function (b) {
       b.addEventListener('click', function () {
-        var v = this.getAttribute('data-parts');
-        wizard.cfg.parts_mode = (v === 'auto') ? 'auto' : parseInt(v, 10);
+        var c = this.getAttribute('data-allc');
+        wizard.cfg.modules[c] = (wizard.mods[c] || []).filter(function (m) { return !isMastered(c, m.id); }).map(function (m) { return m.id; });
+        renderWizard();
+      });
+    });
+    box.querySelectorAll('[data-nonec]').forEach(function (b) {
+      b.addEventListener('click', function () { wizard.cfg.modules[this.getAttribute('data-nonec')] = []; renderWizard(); });
+    });
+
+    box.querySelectorAll('[data-spdd]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var n = wizard.cfg.sessions_per_day + parseInt(this.getAttribute('data-spdd'), 10);
+        wizard.cfg.sessions_per_day = Math.max(1, Math.min(MAX_SPD, n));
         redraw();
       });
     });
-    box.querySelectorAll('[data-avoid]').forEach(function (b) {
-      b.addEventListener('click', function () { wizard.cfg.avoid_conflicts = this.getAttribute('data-avoid') === '1'; redraw(); });
+    var groups = {
+      smin: function (v) { wizard.cfg.session_minutes = parseInt(v, 10); },
+      parts: function (v) { wizard.cfg.parts_mode = v === 'auto' ? 'auto' : parseInt(v, 10); },
+      mcd: function (v) { wizard.cfg.max_course_day = parseInt(v, 10) || 0; },
+      pace: function (v) { wizard.cfg.pace = v; },
+      revmode: function (v) { wizard.cfg.review_mode = v; },
+      avoid: function (v) { wizard.cfg.avoid_conflicts = v === '1'; },
+      spacing: function (v) { wizard.cfg.spacing = v; }
+    };
+    Object.keys(groups).forEach(function (g) {
+      box.querySelectorAll('[data-' + g + ']').forEach(function (b) {
+        b.addEventListener('click', function () { groups[g](this.getAttribute('data-' + g)); redraw(); });
+      });
     });
     box.querySelectorAll('[data-rest]').forEach(function (b) {
       b.addEventListener('click', function () {
@@ -1229,34 +855,32 @@
         redraw();
       });
     });
-    box.querySelectorAll('[data-spacing]').forEach(function (b) {
-      b.addEventListener('click', function () { wizard.cfg.spacing = this.getAttribute('data-spacing'); redraw(); });
+    box.querySelectorAll('.sch-timepick select').forEach(function (sel) {
+      sel.addEventListener('change', function () {
+        setTimeout(function () { keepTimes(); var l = document.getElementById('ip-live'); if (l) l.innerHTML = liveLine(); }, 0);
+      });
     });
 
     /*@3.SCPJ.78*/
     bind('ip-xr-add', function () {
-      keepTime();
+      keepTimes();
       var c = wizard.cfg.courses[0];
       if (!c) return;
-      var from = wizard.cfg.start_date;
       var to = '';
-      wizard.cfg.courses.forEach(function (x) {
-        var d = wizard.cfg.exam_dates[x];
-        if (d && (!to || d > to)) to = d;
-      });
-      wizard.cfg.extra_reviews.push({ course: c, modules: [], from: from, to: to || from });
+      wizard.cfg.courses.forEach(function (x) { var d = wizard.cfg.exam_dates[x]; if (d && (!to || d > to)) to = d; });
+      wizard.cfg.extra_reviews.push({ course: c, modules: [], from: wizard.cfg.start_date, to: to ? addDays(to, -1) : wizard.cfg.start_date });
       renderWizard();
     });
     box.querySelectorAll('[data-xrdel]').forEach(function (b) {
       b.addEventListener('click', function () {
-        keepTime();
+        keepTimes();
         wizard.cfg.extra_reviews.splice(parseInt(this.getAttribute('data-xrdel'), 10), 1);
         renderWizard();
       });
     });
     box.querySelectorAll('.ip-xr-mod').forEach(function (b) {
       b.addEventListener('click', function () {
-        keepTime();
+        keepTimes();
         var r = wizard.cfg.extra_reviews[parseInt(this.getAttribute('data-xr'), 10)];
         if (!r) return;
         var mid = this.getAttribute('data-mid');
@@ -1268,80 +892,81 @@
     box.querySelectorAll('.ip-xr-from, .ip-xr-to').forEach(function (i) {
       i.addEventListener('change', function () {
         var r = wizard.cfg.extra_reviews[parseInt(this.getAttribute('data-xr'), 10)];
-        if (!r) return;
-        r[this.classList.contains('ip-xr-from') ? 'from' : 'to'] = this.value;
+        if (r) r[this.classList.contains('ip-xr-from') ? 'from' : 'to'] = this.value;
       });
     });
     box.querySelectorAll('.ip-xr-head b').forEach(function (b) {
-      b.style.cursor = 'pointer';
-      b.addEventListener('click', function () {
-        keepTime();
-        var wrap = this.closest('.ip-xr');
-        var r = wizard.cfg.extra_reviews[parseInt(wrap.getAttribute('data-xr'), 10)];
+      function cycle() {
+        keepTimes();
+        var r = wizard.cfg.extra_reviews[parseInt(b.closest('.ip-xr').getAttribute('data-xr'), 10)];
         if (!r) return;
         var i = wizard.cfg.courses.indexOf(r.course);
         r.course = wizard.cfg.courses[(i + 1) % wizard.cfg.courses.length];
         r.modules = [];
         renderWizard();
-      });
+      }
+      b.addEventListener('click', cycle);
+      b.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cycle(); } });
     });
 
     /*@3.SCPJ.79*/
-    bind('ip-force', function () {
-      wizard.result = computePlan(wizard.cfg, wizard.mods, { onePerModule: wizard.onePerModule, force: true });
-      renderWizard();
-    });
     box.querySelectorAll('[data-advice]').forEach(function (b) {
       b.addEventListener('click', function () {
         var a = wizard.result.diagnostics.advice[parseInt(this.getAttribute('data-advice'), 10)];
         if (!a) return;
-        if (a.onePerModule) wizard.onePerModule = true;
         a.apply(wizard.cfg);
         wizard.result = null;
         renderWizard();
       });
     });
-
-    function bind(id, fn) { var e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
   }
 
   /*@3.SCPJ.80*/
   function cycleModule(code, mid) {
     var sel = wizard.cfg.modules[code] || (wizard.cfg.modules[code] = []);
-    var st = moduleStatus(code, mid);
     var i = sel.indexOf(mid);
-    if (st === 'mastered') { setModuleStatus(code, mid, 'new'); if (i === -1) sel.push(mid); }
+    if (isMastered(code, mid)) { setModuleStatus(code, mid, 'new'); if (i === -1) sel.push(mid); }
     else if (i !== -1) sel.splice(i, 1);
-    else { setModuleStatus(code, mid, 'mastered'); }
+    else setModuleStatus(code, mid, 'mastered');
+    wizard.result = null;
     persist();
+  }
+
+  function planFromCfg(cfg, r, prev) {
+    return {
+      created_at: prev && prev.created_at ? prev.created_at : new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      start_date: cfg.start_date,
+      exam_dates: clone(cfg.exam_dates),
+      courses: cfg.courses.slice(),
+      modules: clone(cfg.modules),
+      sessions_per_day: cfg.sessions_per_day,
+      session_minutes: cfg.session_minutes,
+      parts_mode: cfg.parts_mode,
+      rest_days: cfg.rest_days.slice(),
+      spacing: r.spacing,
+      spacing_wanted: cfg.spacing,
+      review_mode: cfg.review_mode,
+      pace: cfg.pace,
+      max_course_day: cfg.max_course_day || 0,
+      avoid_conflicts: cfg.avoid_conflicts !== false,
+      extra_reviews: clone(cfg.extra_reviews || []),
+      window: clone(cfg.window),
+      day_caps: clone(cfg.day_caps || {}),
+      sessions: decorate(r.sessions),
+      unplaced: r.unplaced.map(function (u) {
+        return { course: u.course, module: u.module, part: u.part || 1, total: u.total || 1, reason: u.reason, prio: u.prio };
+      }),
+      diagnostics: { mode: r.diagnostics.mode, demand: r.diagnostics.demand, capacity: r.diagnostics.capacity,
+                     moved: r.diagnostics.moved || 0 }
+    };
   }
 
   function commitPlan() {
     var r = wizard.result;
     if (!r || !r.ok) return;
     var st = store();
-    st.plans[wizard.tab] = {
-      created_at: new Date().toISOString(),
-      start_date: wizard.cfg.start_date,
-      exam_dates: clone(wizard.cfg.exam_dates),
-      courses: wizard.cfg.courses.slice(),
-      modules: clone(wizard.cfg.modules),
-      sessions_per_day: wizard.cfg.sessions_per_day,
-      session_minutes: wizard.cfg.session_minutes,
-      parts_mode: wizard.cfg.parts_mode,
-      rest_days: wizard.cfg.rest_days.slice(),
-      spacing: r.spacing,
-      avoid_conflicts: wizard.cfg.avoid_conflicts !== false,
-      extra_reviews: clone(wizard.cfg.extra_reviews || []),
-      window: clone(wizard.cfg.window),
-      sessions: r.sessions,
-      unplaced: r.diagnostics.unplaced_list || [],
-      diagnostics: {
-        feasible: !r.diagnostics.forced, demand: r.diagnostics.demand, capacity: r.diagnostics.capacity,
-        advice: [], spacing_advice: r.diagnostics.spacing_advice || null,
-        moved: r.diagnostics.moved || 0
-      }
-    };
+    st.plans[wizard.tab] = planFromCfg(wizard.cfg, r, st.plans[wizard.tab]);
     /*@3.SCPJ.81*/
     syncExamEvents(wizard.tab, wizard.cfg.exam_dates);
     st.active = wizard.tab;
@@ -1349,6 +974,7 @@
     persist();
     closeWizard();
     S.render();
+    undoStack = [];
     openPanel();
   }
 
@@ -1399,10 +1025,7 @@
     d.exams = out;
     return removed;
   }
-  function richerExam(a, b) {
-    var wa = examWeight(a), wb = examWeight(b);
-    return wb > wa ? b : a;
-  }
+  function richerExam(a, b) { return examWeight(b) > examWeight(a) ? b : a; }
   function examWeight(x) {
     var w = 0;
     if (x.start_time) w += 4;          /*@3.SCPJ.86*/
@@ -1437,66 +1060,117 @@
     if (!Array.isArray(p.unplaced)) p.unplaced = [];
     if (!Array.isArray(p.extra_reviews)) p.extra_reviews = [];
     if (!p.window || typeof p.window !== 'object') p.window = { start_time: DEFAULT_START };
+    if (!p.day_caps || typeof p.day_caps !== 'object') p.day_caps = {};
     if (!p.session_minutes) p.session_minutes = 60;
     if (!p.sessions_per_day) p.sessions_per_day = 2;
     if (p.parts_mode === undefined) p.parts_mode = 1;
+    if (!p.review_mode) p.review_mode = 'auto';
+    if (!p.pace) p.pace = 'auto';
 
     /*@3.SCPJ.90*/
     var end = planEndDate(p);
-    var seen = {};
+    var seen2 = {};
     p.sessions = p.sessions.filter(function (s) {
       if (!s || !s.date) return false;
       if (end && s.date > end) return false;
-      if (seen[s.id]) return false;
-      seen[s.id] = 1;
+      if (seen2[s.id]) return false;
+      seen2[s.id] = 1;
       return true;
     });
     return p;
   }
+  function cfgOfPlan(p) {
+    return {
+      start_date: p.start_date, exam_dates: p.exam_dates, courses: p.courses, modules: p.modules,
+      sessions_per_day: p.sessions_per_day, session_minutes: p.session_minutes, parts_mode: p.parts_mode,
+      rest_days: p.rest_days, spacing: p.spacing_wanted || p.spacing || 'off', review_mode: p.review_mode,
+      pace: p.pace, max_course_day: p.max_course_day || 0, avoid_conflicts: p.avoid_conflicts !== false,
+      window: p.window, extra_reviews: p.extra_reviews, day_caps: p.day_caps
+    };
+  }
+  function curPlan() { return normalizePlan(store().plans[activeTab]); }
 
   /*@3.SCPJ.91*/
-  function openPanel() {
+  var panelView = 'main';       /*@3.SCPJ.92*/
+  var panelTab = 'board';
+  var editingSession = null;
+  var cardFor = null;
+  var sel = {};
+  var selectMode = false;
+  var moving = false;
+  var undoStack = [];
+  var toastT = null;
+
+  function openPanel(opts) {
     var ov = document.getElementById('modal-plan-panel');
     if (!ov) return;
     activeTab = store().active || activeTab;
-    panelView = 'main'; editingSession = null;
+    panelView = 'main'; editingSession = null; cardFor = null;
+    sel = {}; selectMode = false; moving = false;
+    if (opts && opts.tab) panelTab = opts.tab;
     clearBusy();
-    renderPanel();
+    var codes = [];
+    Object.keys(store().plans).forEach(function (t) {
+      (store().plans[t].courses || []).forEach(function (c) { if (codes.indexOf(c) === -1) codes.push(c); });
+    });
     ov.style.display = '';
+    renderPanel();
+    if (codes.length) loadModulesFor(codes).then(function () { if (ov.style.display !== 'none') renderPanel(); });
   }
-  function closePanel() { document.getElementById('modal-plan-panel').style.display = 'none'; }
-
-  /*@3.SCPJ.92*/
-  var panelView = 'main';
-  var editingSession = null;
+  function closePanel() {
+    document.getElementById('modal-plan-panel').style.display = 'none';
+    sel = {}; moving = false; selectMode = false;
+  }
 
   function seriesKey(s) { return s.course + '|' + s.order; }
   function orderLabel(n) {
-    var ar = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة'];
+    var ar = ['الأولى', 'الثانية', 'الثالثة', 'الرابعة', 'الخامسة', 'السادسة'];
     return T('الجلسة ' + (ar[n] || (n + 1)), 'Session ' + (n + 1));
   }
   /*@3.SCPJ.93*/
+  function nDays(n) {
+    if (window.Garden && window.Garden.smartCount) return window.Garden.smartCount(n, ['يوم', 'يومان', 'أيام'], ['day', 'days']);
+    return n + ' ' + T('يوماً', 'days');
+  }
   function nSessions(n) {
     if (window.Garden && window.Garden.smartCount) {
       return window.Garden.smartCount(n, ['جلسة', 'جلستان', 'جلسات'], ['session', 'sessions']);
     }
     return n + ' ' + T('جلسة', 'sessions');
   }
-  function backToMain() { panelView = 'main'; editingSession = null; renderPanel(); }
+  function backToMain() { panelView = 'main'; editingSession = null; cardFor = null; renderPanel(); }
 
-  function openTimesEditor() { panelView = 'times'; renderPanel(); }
-  function openSessionEditor(id) {
+  function findPlanOf(id) {
     var plans = store().plans || {};
+    var hit = null;
     Object.keys(plans).forEach(function (t) {
       var q = plans[t];
-      if (q && (q.sessions || []).some(function (x) { return x.id === id; })) activeTab = t;
+      if (q && (q.sessions || []).some(function (x) { return x.id === id; })) hit = t;
     });
-    var p = normalizePlan(store().plans[activeTab]);
+    return hit;
+  }
+  function openSessionEditor(id) {
+    var t = findPlanOf(id);
+    if (t) activeTab = t;
+    var p = curPlan();
     var s = p && p.sessions.filter(function (x) { return x.id === id; })[0];
     if (!s) return;
     editingSession = id;
     panelView = 'session';
     openPanelRaw();
+  }
+  function openSessionCard(id) {
+    var t = findPlanOf(id);
+    if (!t) return false;
+    activeTab = t;
+    var p = curPlan();
+    var s = p.sessions.filter(function (x) { return x.id === id; })[0];
+    if (!s) return false;
+    cardFor = id;
+    panelView = 'card';
+    openPanelRaw();
+    loadModules(s.course).then(function () { if (panelView === 'card') renderPanel(); });
+    return true;
   }
   function openPanelRaw() {
     var ov = document.getElementById('modal-plan-panel');
@@ -1519,15 +1193,26 @@
     { key: 'must_memorize',   icon: 'fa-pen-to-square',       ar: 'يجب أن تحفظ',  en: 'Must memorize' },
     { key: 'common_mistakes', icon: 'fa-triangle-exclamation', ar: 'انتبه لهذه',  en: 'Watch out' }
   ];
+  function groupsOf(mod) {
+    return DETAIL_GROUPS.map(function (g) {
+      var items = [];
+      (mod && mod.topics || []).forEach(function (t) { items = items.concat(fieldList(t, g.key)); });
+      return { g: g, items: items };
+    }).filter(function (x) { return x.items.length; });
+  }
+
+  function subnav(title) {
+    return '<div class="ip-subnav"><button class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-back-main">' +
+      '<i class="fa-solid ' + (isAr() ? 'fa-arrow-right' : 'fa-arrow-left') + '" aria-hidden="true"></i> ' + T('رجوع', 'Back') + '</button><b>' + esc(title) + '</b></div>';
+  }
 
   function renderDetails(box) {
     var code = detailsFor.code, mid = detailsFor.mid;
-    var mod = (modulesCache[code] || []).filter(function (m) { return m.id === mid; })[0];
-    var h = '<div class="ip-subnav"><button class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-back-main">← ' +
-      T('رجوع', 'Back') + '</button><b>' + T('تفاصيل الوحدة', 'Module details') + '</b></div>';
+    var mod = modOf(code, mid);
+    var h = subnav(T('تفاصيل الوحدة', 'Module details'));
     if (!mod) {
-      h += '<p class="sch-editor-hint">' + T('جارٍ التحميل…', 'Loading…') + '</p>';
-      box.innerHTML = h; bindPanel(); return;
+      box.innerHTML = h + '<p class="sch-editor-hint">' + T('جارٍ التحميل…', 'Loading…') + '</p>';
+      bindPanel(); return;
     }
     h += '<div class="ip-det-head">' +
       '<span class="ip-dot" style="background:' + S.courseColor(code) + '"></span>' +
@@ -1535,25 +1220,16 @@
       '<b class="ip-det-title">' + esc(modTitle(mod)) + '</b>' +
       '<span class="ip-diff d' + Math.min(3, Math.ceil(mod.difficulty / 3.5)) + '">' + mod.difficulty + '</span>' +
       '</div>';
-
-    var any = false;
-    DETAIL_GROUPS.forEach(function (g) {
-      var items = [];
-      (mod.topics || []).forEach(function (t) { items = items.concat(fieldList(t, g.key)); });
-      if (!items.length) return;
-      any = true;
+    var gs = groupsOf(mod);
+    gs.forEach(function (x) {
       h += '<div class="ip-det-group"><div class="ip-det-glabel">' +
-        '<i class="fa-solid ' + g.icon + '"></i> ' + esc(isAr() ? g.ar : g.en) +
-        '<span class="ip-det-count">' + items.length + '</span></div>' +
-        '<ul class="ip-det-list">' + items.map(function (x) {
-          return '<li>' + esc(x) + '</li>';
-        }).join('') + '</ul></div>';
+        '<i class="fa-solid ' + x.g.icon + '" aria-hidden="true"></i> ' + esc(isAr() ? x.g.ar : x.g.en) +
+        '<span class="ip-det-count">' + x.items.length + '</span></div>' +
+        '<ul class="ip-det-list">' + x.items.map(function (it) { return '<li>' + esc(it) + '</li>'; }).join('') + '</ul></div>';
     });
-    if (!any) h += '<p class="sch-editor-hint">' + T('لا تفاصيل محفوظة لهذه الوحدة.', 'No stored details for this module.') + '</p>';
-
+    if (!gs.length) h += '<p class="sch-editor-hint">' + T('لا تفاصيل محفوظة لهذه الوحدة.', 'No stored details for this module.') + '</p>';
     h += '<div class="sch-modal-actions">' +
-      '<button class="sch-btn sch-btn-primary" id="ip-det-page">' + T('صفحة الوحدة', 'Module page') + '</button>' +
-      '<button class="sch-btn sch-btn-secondary" id="ip-panel-close">' + T('إغلاق', 'Close') + '</button></div>';
+      '<button class="sch-btn sch-btn-primary" id="ip-det-page">' + T('افتح الوحدة', 'Open the module') + '</button></div>';
     box.innerHTML = h;
     bindPanel();
     var pg = document.getElementById('ip-det-page');
@@ -1564,29 +1240,28 @@
     var groups = {};
     p.sessions.forEach(function (s) { (groups[seriesKey(s)] = groups[seriesKey(s)] || []).push(s); });
     var keys = Object.keys(groups).sort();
-    var h = '<div class="ip-subnav"><button class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-back-main">← ' +
-      T('رجوع', 'Back') + '</button><b>' + T('أوقات الجلسات', 'Session times') + '</b></div>';
+    var h = subnav(T('أوقات الجلسات', 'Session times'));
     if (!keys.length) {
-      h += '<p class="sch-editor-hint">' + T('لا جلسات في هذه الخطة.', 'No sessions in this plan.') + '</p>';
-      box.innerHTML = h; bindPanel(); return;
+      box.innerHTML = h + '<p class="sch-editor-hint">' + T('لا جلسات في هذه الخطة.', 'No sessions in this plan.') + '</p>';
+      bindPanel(); return;
     }
     h += '<p class="sch-editor-hint">' + T(
-      'كل سطر سلسلةٌ مستقلّة: المادة مع رتبة جلستها في اليوم. تغيير الوقت هنا يسري على كل جلسات السلسلة؛ ولتعديل يومٍ واحد افتح جلسته من الجدول.',
-      'Each row is its own series: a course plus its slot rank in the day. Changing the time here applies to the whole series; to change a single day open that session from the schedule.') + '</p>';
+      'كلُّ سطرٍ سلسلة: المادة مع رتبة جلستها في اليوم. الوقتُ هنا يسري على جلسات السلسلة كلِّها ويُثبَّت فلا تغيّره إعادةُ التوزيع.',
+      'Each row is a series: a course plus its slot rank in the day. The time here applies to the whole series and is pinned, so a re-layout keeps it.') + '</p>';
     keys.forEach(function (k) {
       var list = groups[k], s0 = list[0];
       h += '<div class="ip-series" data-series="' + esc(k) + '">' +
         '<div class="ip-series-head">' +
           '<span class="ip-dot" style="background:' + S.courseColor(s0.course) + '"></span>' +
-          '<b>' + esc(S.courseShort(s0.course)) + '</b>' +
+          '<b class="ip-code">' + esc(S.courseShort(s0.course)) + '</b>' +
           '<span class="ip-series-meta">' + esc(orderLabel(s0.order)) + ' · ' + esc(nSessions(list.length)) + '</span>' +
         '</div>' +
         '<div class="ip-series-fields">' +
           '<div class="sch-timepick"><select class="tp-h" data-title-ar="الساعة" data-title-en="Hour"></select><span class="tp-colon">:</span>' +
           '<select class="tp-m" data-title-ar="الدقيقة" data-title-en="Minute"></select>' +
-      '<select class="tp-mer" data-title-ar="صباحاً أو مساءً" data-title-en="AM or PM"></select>' +
+          '<select class="tp-mer" data-title-ar="صباحاً أو مساءً" data-title-en="AM or PM"></select>' +
           '<input type="hidden" class="ip-series-time" value="' + esc(s0.start_time || DEFAULT_START) + '"></div>' +
-          '<input type="number" class="sch-input ip-series-min" min="15" max="240" step="5" value="' + (s0.minutes || 60) + '">' +
+          '<input type="number" class="sch-input ip-series-min" min="15" max="240" step="5" value="' + (s0.minutes || 60) + '" aria-label="' + T('المدّة بالدقائق', 'Minutes') + '">' +
           '<button class="sch-btn sch-btn-primary sch-btn-xs ip-series-apply">' + T('طبّق', 'Apply') + '</button>' +
         '</div></div>';
     });
@@ -1599,8 +1274,7 @@
     var s = p.sessions.filter(function (x) { return x.id === editingSession; })[0];
     if (!s) { backToMain(); return; }
     var n = p.sessions.filter(function (x) { return seriesKey(x) === seriesKey(s); }).length;
-    var h = '<div class="ip-subnav"><button class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-back-main">← ' +
-      T('رجوع', 'Back') + '</button><b>' + T('تعديل الجلسة', 'Edit session') + '</b></div>';
+    var h = subnav(T('اليوم والوقت', 'Day & time'));
     h += '<div class="ip-note">' +
       '<span class="ip-dot" style="background:' + S.courseColor(s.course) + '"></span> ' +
       esc(S.courseShort(s.course)) + ' · ' + esc(sessionLabel(s)) + '</div>';
@@ -1614,13 +1288,13 @@
       '<select class="tp-m" data-title-ar="الدقيقة" data-title-en="Minute"></select>' +
       '<select class="tp-mer" data-title-ar="صباحاً أو مساءً" data-title-en="AM or PM"></select>' +
       '<input type="hidden" id="ip-se-time" value="' + esc(s.start_time || DEFAULT_START) + '"></div>';
-    h += '<label class="sch-label">' + T('المدّة (دقيقة)', 'Duration (min)') + '</label>' +
+    h += '<label class="sch-label" for="ip-se-min">' + T('المدّة (دقيقة)', 'Duration (min)') + '</label>' +
       '<input type="number" class="sch-input" id="ip-se-min" min="15" max="240" step="5" value="' + (s.minutes || 60) + '">';
     h += '<p class="sch-editor-hint">' + T(
       'سلسلة هذه الجلسة: ' + S.courseShort(s.course) + ' · ' + orderLabel(s.order) + ' (' + nSessions(n) + '). ' +
-      'التعديل على السلسلة يمسّ وقتَها ومدّتَها كلَّها ولا يمسّ جلسة المادة الأخرى في اليوم نفسه، واليومُ يتغيّر لهذه الجلسة وحدَها.',
+      'التعديل على السلسلة يمسّ وقتَها ومدّتَها كلَّها، واليومُ يتغيّر لهذه الجلسة وحدَها.',
       'This session\'s series: ' + S.courseShort(s.course) + ' · ' + orderLabel(s.order) + ' (' + nSessions(n) + '). ' +
-      'Applying to the series changes the time and duration of them all and leaves the course\'s other daily slot alone; the day changes for this session only.') + '</p>';
+      'Applying to the series changes the time and duration of them all; the day changes for this session only.') + '</p>';
     h += '<div class="sch-modal-actions">' +
       '<button class="sch-btn sch-btn-primary" id="ip-se-one">' + T('هذه الجلسة فقط', 'This session only') + '</button>' +
       '<button class="sch-btn sch-btn-secondary" id="ip-se-all">' + T('كل جلسات السلسلة', 'The whole series') + '</button>' +
@@ -1632,7 +1306,7 @@
   }
 
   function applySessionEdit(all) {
-    var p = normalizePlan(store().plans[activeTab]);
+    var p = curPlan();
     var s = p && p.sessions.filter(function (x) { return x.id === editingSession; })[0];
     if (!s) return;
     var t = document.getElementById('ip-se-time').value || s.start_time;
@@ -1649,91 +1323,21 @@
       }
       return;
     }
+    snapshot(p);
     var key = seriesKey(s);
     p.sessions.forEach(function (x) {
-      if (all ? seriesKey(x) === key : x.id === s.id) { x.start_time = t; x.minutes = m; }
+      if (all ? seriesKey(x) === key : x.id === s.id) {
+        if (x.start_time !== t || x.minutes !== m) x.time_locked = true;
+        x.start_time = t; x.minutes = m;
+      }
     });
-    s.date = nd;
+    if (nd !== s.date) { s.date = nd; s.locked = true; }
     persist(); backToMain(); S.render();
   }
 
   function sessionDateMax(p, s) {
     var ex = (p.exam_dates || {})[s.course];
     return ex ? addDays(ex, -1) : planEndDate(p);
-  }
-
-  function renderPanel() {
-    var box = document.getElementById('plan-panel');
-    var st = store();
-    if (panelView === 'details' && detailsFor) return renderDetails(box);
-    if (panelView !== 'main') {
-      var pv = normalizePlan(st.plans[activeTab]);
-      if (!pv) { panelView = 'main'; }
-      else if (panelView === 'times') return renderTimesEditor(box, pv);
-      else if (panelView === 'session') return renderSessionEditor(box, pv);
-    }
-    var h = '<div class="ip-tabs">' + ['midterm','final'].map(function (t) {
-      var has = !!st.plans[t];
-      return '<button class="ip-tab' + (activeTab === t ? ' active' : '') + '" data-paneltab="' + t + '">' +
-        (t === 'midterm' ? T('ميدتيرم', 'Midterm') : T('فاينل', 'Final')) +
-        (has ? '' : ' <span class="ip-tab-empty">•</span>') + '</button>';
-    }).join('') + '</div>';
-
-    var p = normalizePlan(st.plans[activeTab]);
-    if (!p) {
-      h += '<p class="sch-editor-hint">' + T('لا خطة لهذا التبويب بعد.', 'No plan for this tab yet.') + '</p>' +
-        '<button class="sch-btn sch-btn-primary sch-btn-block" id="ip-new">' +
-        T('أنشئ خطة ' + (activeTab === 'midterm' ? 'الميدتيرم' : 'الفاينل'),
-          'Create the ' + activeTab + ' plan') + '</button>';
-      box.innerHTML = h;
-      bindPanel();
-      return;
-    }
-
-    h += '<div class="ip-state">' + esc(stateText(p)) + '</div>';
-    h += '<div class="ip-progress-wrap">' + trackerHtml(p) + '</div>';
-    h += '<div class="sch-editor-subhead"><span>' + T('تواريخ الاختبارات', 'Exam dates') + '</span></div>';
-    p.courses.forEach(function (c) {
-      h += '<div class="ip-row"><span class="ip-row-label"><span class="ip-dot" style="background:' +
-        S.courseColor(c) + '"></span>' + esc(S.courseShort(c)) + '</span>' +
-        '<input type="date" class="sch-input ip-panel-exam" data-code="' + esc(c) + '" value="' + (p.exam_dates[c] || '') + '"></div>';
-    });
-
-    /*@3.SCPJ.95*/
-    if (p.unplaced.length) {
-      h += '<div class="sch-editor-subhead"><span>' + T('لم تُوزَّع', 'Not scheduled') + '</span></div>' +
-        '<p class="sch-editor-hint">' + T(
-          'هذه الجلسات لم تجد يوماً متاحاً قبل موعد اختبار مادتها. أضِفها يدوياً من زر ＋ في الجدول، أو أعد التوزيع بعد فتح يوم راحة أو تقليل جلسات الوحدة.',
-          'These found no day before their course exam. Add them by hand from ＋ in the schedule, or rebuild after opening a rest day or lowering sessions per module.') + '</p>' +
-        '<div class="ip-unplaced">' + p.unplaced.map(function (u) {
-          return '<span class="sch-chip" style="--chip-color:' + S.courseColor(u.course) + '">' +
-            '<span class="sch-chip-dot"></span>' + esc(S.courseShort(u.course)) + ' · ' +
-            esc(T('وحدة ', 'M') + modNum(u.module)) + (u.total > 1 ? ' (' + u.part + '/' + u.total + ')' : '') + '</span>';
-        }).join('') + '</div>';
-    }
-
-    h += '<div class="sch-editor-subhead"><span>' + T('جلسات اليوم', "Today's sessions") + '</span>' +
-      '<button class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-times">' +
-      T('تعديل الأوقات', 'Edit times') + '</button></div>';
-    h += '<div id="ip-today-cards">' + T('…', '…') + '</div>';
-
-    /*@3.SCPJ.96*/
-    var isOn = st.active === activeTab;
-    h += '<div class="sch-modal-actions">' +
-      '<button class="sch-btn ' + (isOn ? 'sch-btn-secondary' : 'sch-btn-primary') + '" id="ip-activate">' +
-        (isOn ? T('<i class="fa-solid fa-pause" aria-hidden="true"></i> أوقفها مؤقتاً', '<i class="fa-solid fa-pause" aria-hidden="true"></i> Pause') : T('<i class="fa-solid fa-play" aria-hidden="true"></i> فعّلها', '<i class="fa-solid fa-play" aria-hidden="true"></i> Activate')) + '</button>' +
-      '<button class="sch-btn sch-btn-secondary" id="ip-rebuild">' + T('تعديل وإعادة التوزيع', 'Edit & rebuild') + '</button>' +
-      '<button class="sch-btn sch-btn-danger" id="ip-delete">' + T('حذف الخطة', 'Delete plan') + '</button>' +
-      '<button class="sch-btn sch-btn-secondary" id="ip-panel-close">' + T('إغلاق', 'Close') + '</button></div>';
-    if (!isOn) {
-      h += '<p class="sch-editor-hint">' + T(
-        'الخطة موقوفة: جلساتها لا تظهر في الجدول، وكل بياناتها محفوظة كما هي.',
-        'Paused: its sessions are hidden from the schedule and all its data is kept intact.') + '</p>';
-    }
-
-    box.innerHTML = h;
-    bindPanel();
-    renderTodayCards(document.getElementById('ip-today-cards'), p);
   }
 
   /*@3.SCPJ.97*/
@@ -1746,6 +1350,7 @@
     });
     var doneN = p.sessions.filter(function (s) { return s.done; }).length;
     var total = p.sessions.length;
+    var missed = p.sessions.filter(function (s) { return !s.done && s.date < today; }).length;
 
     if (nextExam && nextExam.date === today) {
       return T('اليوم اختبار ' + S.courseShort(nextExam.course) + '. لا وحدات جديدة — راجع رؤوس الأقلام وثِق بما بنيته.',
@@ -1757,55 +1362,471 @@
     }
     var left = diffDays(today, nextExam.date);
     if (p.start_date > today) {
-      return T('تبدأ الخطة في ' + p.start_date + ' — ' + total + ' جلسة بانتظارك، وأقرب اختبار بعد ' + left + ' يوماً.',
-               'The plan starts on ' + p.start_date + ' — ' + total + ' sessions ahead, nearest exam in ' + left + ' days.');
+      return T('تبدأ الخطة في ' + shortDate(p.start_date) + ' — ' + nSessions(total) + ' بانتظارك، وأقرب اختبار بعد ' + nDays(left) + '.',
+               'The plan starts on ' + shortDate(p.start_date) + ' — ' + nSessions(total) + ' ahead, nearest exam in ' + left + ' days.');
     }
+    var miss = missed ? T(' · فاتتك ' + nSessions(missed) + ' — «أعد توزيع ما بقي» يضعها من جديد.',
+                          ' · ' + nSessions(missed) + ' missed — "Re-lay what\'s left" places them again.') : '';
     if (left <= 1) {
       return T('اختبار ' + S.courseShort(nextExam.course) + ' غداً. الليلة للمراجعة والنوم، لا لفتح وحدة جديدة.',
-               S.courseShort(nextExam.course) + ' exam tomorrow. Tonight is for review and sleep, not a new module.');
+               S.courseShort(nextExam.course) + ' exam tomorrow. Tonight is for review and sleep, not a new module.') + miss;
     }
     var pct = total ? Math.round(doneN / total * 100) : 0;
-    return T('أنجزت ' + doneN + ' من ' + total + ' جلسة (' + pct + '٪) وأمامك ' + left + ' يوماً حتى ' + S.courseShort(nextExam.course) + '.',
-             doneN + ' of ' + total + ' sessions done (' + pct + '%), ' + left + ' days until ' + S.courseShort(nextExam.course) + '.');
+    return T('أنجزت ' + doneN + ' من ' + total + ' (' + pct + '٪) وأمامك ' + nDays(left) + ' حتى ' + S.courseShort(nextExam.course) + '.',
+             doneN + ' of ' + total + ' done (' + pct + '%), ' + left + ' days until ' + S.courseShort(nextExam.course) + '.') + miss;
   }
 
   /*@3.SCPJ.98*/
   function trackerHtml(p) {
     return p.courses.map(function (code) {
       var all = modulesCache[code] || [];
-      var sel = p.modules[code] || [];
       var scheduled = {};
-      p.sessions.forEach(function (s) { if (s.course === code && s.module) scheduled[s.module] = 1; });
+      p.sessions.forEach(function (s) { if (s.course === code && s.module && s.kind === 'study') scheduled[s.module] = 1; });
       var nM = 0, nD = 0, nN = 0;
       var squares = all.map(function (m) {
-        var st = moduleStatus(code, m.id);
         var cls, lab;
-        if (st === 'mastered') { cls = 'is-mastered'; nM++; lab = T('متقنة', 'mastered'); }
+        if (isMastered(code, m.id)) { cls = 'is-mastered'; nM++; lab = T('أتقنتُها', 'mastered'); }
         else if (scheduled[m.id]) { cls = 'is-scheduled'; nD++; lab = T('موزّعة', 'scheduled'); }
         else { cls = 'is-none'; nN++; lab = T('لم تُوزَّع', 'not scheduled'); }
         return '<button class="ip-sq ' + cls + '" data-code="' + esc(code) + '" data-mid="' + esc(m.id) + '" ' +
-          'style="--chip-color:' + S.courseColor(code) + '" title="' +
+          'style="--chip-color:' + S.courseColor(code) + '" aria-label="' + esc(modNum(m.id) + ' · ' + modTitle(m) + ' — ' + lab) + '" title="' +
           esc(modNum(m.id) + ' · ' + modTitle(m) + ' — ' + lab) + '">' + modNum(m.id) + '</button>';
       }).join('');
       return '<div class="ip-track"><div class="ip-track-head">' +
         '<span class="ip-dot" style="background:' + S.courseColor(code) + '"></span>' +
-        '<b>' + esc(S.courseShort(code)) + '</b>' +
-        '<span class="ip-track-count">' + nD + '/' + all.length + ' ' + T('موزّعة', 'scheduled') +
-        ' · ' + nM + ' ' + T('متقنة', 'mastered') + ' · ' + nN + ' ' + T('متبقّية', 'left') + '</span></div>' +
+        '<b class="ip-code">' + esc(S.courseShort(code)) + '</b>' +
+        '<span class="ip-track-count">' + nD + ' ' + T('موزّعة', 'scheduled') +
+        ' · ' + nM + ' ' + T('متقنة', 'mastered') + ' · ' + nN + ' ' + T('خارجها', 'out') + '</span>' +
+        '<input type="date" class="sch-input ip-panel-exam" data-code="' + esc(code) + '" value="' + esc(p.exam_dates[code] || '') + '" aria-label="' +
+          esc(T('تاريخ اختبار ', 'Exam date for ') + S.courseShort(code)) + '"></div>' +
         '<div class="ip-squares">' + squares + '</div></div>';
     }).join('');
   }
 
+  /*@3.SCPJ.117*/
+  function capOf(p, d) {
+    var o = p.day_caps[d];
+    if (o != null && o !== '') return parseInt(o, 10) || 0;
+    return p.rest_days.indexOf(dayName(d)) !== -1 ? 0 : p.sessions_per_day;
+  }
+  function examsOn(p, d) { return p.courses.filter(function (c) { return p.exam_dates[c] === d; }); }
+
+  function chipHtml(s, p) {
+    var ex = p.exam_dates[s.course];
+    var late = ex && s.date >= ex;
+    var cls = 'ip-chip k-' + (s.kind || 'study') + (s.done ? ' is-done' : '') + (sel[s.id] ? ' is-sel' : '') +
+      (late ? ' is-late' : '') + (s.locked ? ' is-locked' : '');
+    var t = s.kind === 'buffer' ? T('مراجعة قبل الاختبار', 'Pre-exam review') : (sessTitle(s) || sessionLabel(s));
+    var lab = S.courseShort(s.course) + ' · ' + sessionLabel(s) + (t ? ' · ' + t : '') + (s.start_time ? ' · ' + S.fmtTime12(s.start_time) : '');
+    return '<button type="button" class="' + cls + '" data-sid="' + esc(s.id) + '" style="--chip-color:' + S.courseColor(s.course) + '"' +
+      ' aria-pressed="' + (sel[s.id] ? 'true' : 'false') + '" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' +
+      '<span class="ip-chip-c">' + esc(S.courseShort(s.course)) + '</span>' +
+      '<span class="ip-chip-n">' + (s.kind === 'buffer' ? '<i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>'
+        : s.kind === 'spaced' ? '<i class="fa-solid fa-rotate" aria-hidden="true"></i>' + modNum(s.module) : 'M' + modNum(s.module)) + '</span>' +
+      '<span class="ip-chip-t">' + esc(t) + '</span>' +
+      (s.key ? '<span class="ip-star" aria-hidden="true">★</span>' : '') +
+      (s.done ? '<i class="fa-solid fa-check ip-chip-ok" aria-hidden="true"></i>' : '') +
+      '</button>';
+  }
+  function trayChip(u, i) {
+    var id = 'u' + i;
+    var cls = 'ip-chip k-study is-tray' + (sel[id] ? ' is-sel' : '');
+    var m = modOf(u.course, u.module);
+    var t = m ? modTitle(m) : '';
+    var lab = S.courseShort(u.course) + ' · ' + T('الوحدة ', 'Module ') + modNum(u.module) + (t ? ' · ' + t : '') + ' · ' + reasonText(u.reason);
+    return '<button type="button" class="' + cls + '" data-uid="' + id + '" style="--chip-color:' + S.courseColor(u.course) + '"' +
+      ' aria-pressed="' + (sel[id] ? 'true' : 'false') + '" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' +
+      '<span class="ip-chip-c">' + esc(S.courseShort(u.course)) + '</span>' +
+      '<span class="ip-chip-n">M' + modNum(u.module) + '</span><span class="ip-chip-t">' + esc(t) + '</span></button>';
+  }
+
+  function boardRange(p) {
+    var today = todayStr();
+    var from = p.start_date || today;
+    p.sessions.forEach(function (s) { if (s.date < from) from = s.date; });
+    if (from < addDays(today, -14) && p.sessions.some(function (s) { return s.date >= today; })) from = addDays(today, -7);
+    var to = planEndDate(p) || from;
+    var f = s2d(from); f.setDate(f.getDate() - f.getDay());
+    var t = s2d(to); t.setDate(t.getDate() + (6 - t.getDay()));
+    return { from: d2s(f), to: d2s(t), first: from, last: to };
+  }
+
+  function boardHtml(p) {
+    var r = boardRange(p);
+    var byDate = {};
+    p.sessions.forEach(function (s) { (byDate[s.date] = byDate[s.date] || []).push(s); });
+    Object.keys(byDate).forEach(function (d) { byDate[d].sort(function (a, b) { return (a.start_time || '').localeCompare(b.start_time || '') || a.order - b.order; }); });
+    var today = todayStr();
+    var h = '<div class="ip-board' + (moving ? ' is-moving' : '') + '" role="grid" aria-label="' + esc(T('لوحة الخطة', 'Plan board')) + '">';
+    h += '<div class="ip-wk ip-wk-head" role="row">' + S.DAYS_ORDER.map(function (d) {
+      return '<div class="ip-dh" role="columnheader">' + esc(S.DAY_SHORT[isAr() ? 'ar' : 'en'][d]) + '</div>';
+    }).join('') + '</div>';
+    var d = r.from, guard = 0;
+    while (d <= r.to && guard++ < 70) {
+      h += '<div class="ip-wk" role="row">';
+      for (var i = 0; i < 7; i++) {
+        var inRange = d >= r.first && d <= r.last;
+        var list = byDate[d] || [];
+        var cap = capOf(p, d);
+        var exs = examsOn(p, d);
+        var cls = 'ip-cell' + (inRange ? '' : ' is-out') + (d === today ? ' is-today' : '') + (d < today ? ' is-past' : '') +
+          (cap === 0 && !list.length ? ' is-rest' : '') + (exs.length ? ' has-exam' : '') + (list.length > cap && cap ? ' is-over' : '');
+        h += '<div class="' + cls + '" data-date="' + d + '" role="gridcell"' + (inRange ? ' tabindex="-1"' : '') + '>';
+        if (inRange) {
+          h += '<div class="ip-cell-h"><span class="ip-cell-d"><span class="ip-cell-wd">' + esc(dayShort(d)) + ' </span>' +
+            esc(s2d(d).getDate() === 1 || d === r.first ? shortDate(d) : String(s2d(d).getDate())) + '</span>' +
+            '<button type="button" class="ip-cell-load" data-act="daycap" data-date="' + d + '"' +
+              ' aria-label="' + esc(T('سعة ' + dayShort(d) + ' ' + shortDate(d) + ': ' + list.length + ' من ' + cap + ' — غيّرها', dayShort(d) + ' ' + shortDate(d) + ' capacity: ' + list.length + ' of ' + cap + ' — change it')) + '">' +
+              (cap === 0 && !list.length ? esc(T('راحة', 'rest')) : list.length + '/' + cap) +
+              (p.day_caps[d] != null ? ' <i class="fa-solid fa-lock" aria-hidden="true"></i>' : '') + '</button></div>';
+          exs.forEach(function (c) {
+            h += '<div class="ip-exam-tag" style="--chip-color:' + S.courseColor(c) + '"><i class="fa-solid fa-file-pen" aria-hidden="true"></i> ' +
+              esc(T('اختبار ', 'Exam · ') + S.courseShort(c)) + '</div>';
+          });
+          h += list.map(function (s) { return chipHtml(s, p); }).join('');
+          if (moving) h += '<span class="ip-drop-here">' + esc(T('ضعها هنا', 'Drop here')) + '</span>';
+        }
+        h += '</div>';
+        d = addDays(d, 1);
+      }
+      h += '</div>';
+    }
+    return h + '</div>';
+  }
+
+  function selIds() { return Object.keys(sel).filter(function (k) { return sel[k]; }); }
+
+  function selBarHtml(p) {
+    var ids = selIds();
+    if (!ids.length && !moving) return '';
+    var trayN = ids.filter(function (k) { return k.charAt(0) === 'u'; }).length;
+    var sessN = ids.length - trayN;
+    var h = '<div class="ip-selbar" role="toolbar" aria-label="' + esc(T('أفعال المحدّد', 'Selection actions')) + '">';
+    if (moving) {
+      h += '<b>' + esc(T('اضغط اليومَ الذي تريده', 'Tap the day you want')) + '</b>' +
+        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="cancel-move">' + T('إلغاء', 'Cancel') + '</button></div>';
+      return h;
+    }
+    h += '<b>' + esc(T(ids.length + ' محدّدة', ids.length + ' selected')) + '</b>' +
+      '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="move"><i class="fa-solid fa-arrows-up-down-left-right" aria-hidden="true"></i> ' + T('انقل إلى…', 'Move to…') + '</button>';
+    if (sessN) {
+      h += '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="shift" data-n="-1">' + T('يوم −1', 'Day −1') + '</button>' +
+        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="shift" data-n="1">' + T('يوم +1', 'Day +1') + '</button>' +
+        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="tray">' + T('إلى «لم تتّسع»', 'To "Did not fit"') + '</button>' +
+        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="done">' + T('أتممتُها', 'Done') + '</button>';
+    }
+    h += '<button class="sch-btn sch-btn-danger sch-btn-xs" data-act="remove">' + T('احذف', 'Delete') + '</button>' +
+      '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="clear">' + T('إلغاء التحديد', 'Clear') + '</button></div>';
+    return h;
+  }
+
+  function renderPanel() {
+    var box = document.getElementById('plan-panel');
+    if (!box) return;
+    var ov = document.getElementById('modal-plan-panel');
+    var st = store();
+    var modal = ov && ov.querySelector('.sch-modal');
+    if (panelView === 'details' && detailsFor) { if (modal) modal.classList.remove('is-board'); return renderDetails(box); }
+    var p = curPlan();
+    if (panelView !== 'main' && p) {
+      if (modal) modal.classList.remove('is-board');
+      if (panelView === 'times') return renderTimesEditor(box, p);
+      if (panelView === 'session') return renderSessionEditor(box, p);
+      if (panelView === 'card') return renderCardView(box, p);
+    }
+    panelView = 'main';
+    if (modal) modal.classList.toggle('is-board', !!p && panelTab === 'board');
+
+    var h = '<div class="ip-top"><div class="ip-tabs">' + ['midterm', 'final'].map(function (t) {
+      var has = !!st.plans[t];
+      return '<button class="ip-tab' + (activeTab === t ? ' active' : '') + '" data-paneltab="' + t + '" aria-pressed="' + (activeTab === t) + '">' +
+        (t === 'midterm' ? T('ميدتيرم', 'Midterm') : T('فاينل', 'Final')) +
+        (has ? (st.active === t ? ' <span class="ip-live-dot" aria-label="' + esc(T('مفعّلة', 'active')) + '"></span>' : '') : ' <span class="ip-tab-empty">＋</span>') + '</button>';
+    }).join('') + '</div>';
+    if (p) {
+      h += '<div class="ip-tabs ip-views">' + [['board', T('اللوحة', 'Board')], ['today', T('اليوم', 'Today')], ['mods', T('الوحدات والاختبارات', 'Modules & exams')]].map(function (v) {
+        return '<button class="ip-tab' + (panelTab === v[0] ? ' active' : '') + '" data-pview="' + v[0] + '" aria-pressed="' + (panelTab === v[0]) + '">' + esc(v[1]) + '</button>';
+      }).join('') + '</div>';
+    }
+    h += '</div>';
+
+    if (!p) {
+      h += '<div class="ip-empty"><p>' + T('لا خطة ' + (activeTab === 'midterm' ? 'للميدتيرم' : 'للفاينل') + ' بعد. أخبرني بتواريخ اختباراتك والوحدات، وأوزّعها على أيّامك — ثمّ تحرّكها كما تشاء.',
+        'No ' + activeTab + ' plan yet. Give me your exam dates and modules and I will lay them across your days — then move them as you like.') + '</p>' +
+        '<button class="sch-btn sch-btn-primary" id="ip-new">' + T('أنشئ الخطة', 'Create the plan') + '</button></div>';
+      box.innerHTML = h;
+      bindPanel();
+      return;
+    }
+
+    var mode = (p.diagnostics && p.diagnostics.mode) || '';
+    var lateN = p.sessions.filter(function (s) { var ex = p.exam_dates[s.course]; return ex && s.date >= ex; }).length;
+    h += '<div class="ip-state">' + (mode ? '<span class="ip-mode m-' + mode + '">' + esc(modeLabel(mode)) + '</span> ' : '') + esc(stateText(p)) +
+      (lateN ? ' <span class="ip-warn">' + esc(T(nSessions(lateN) + ' بعد اختبار مادّتها', nSessions(lateN) + ' after their exam')) + '</span>' : '') + '</div>';
+
+    h += '<div class="ip-toolbar">' +
+      '<button class="sch-btn sch-btn-secondary sch-btn-xs' + (selectMode ? ' is-on' : '') + '" data-act="select" aria-pressed="' + selectMode + '"><i class="fa-regular fa-square-check" aria-hidden="true"></i> ' + T('تحديد', 'Select') + '</button>' +
+      '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="undo"' + (undoStack.length ? '' : ' disabled') + '><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> ' + T('تراجع', 'Undo') + '</button>' +
+      '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="relay"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i> ' + T('أعد توزيع ما بقي', 'Re-lay what\'s left') + '</button>' +
+      '<button class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-times"><i class="fa-solid fa-clock" aria-hidden="true"></i> ' + T('الأوقات', 'Times') + '</button>' +
+      '<button class="sch-btn sch-btn-primary sch-btn-xs" id="ip-rebuild"><i class="fa-solid fa-sliders" aria-hidden="true"></i> ' + T('إعدادات الخطة', 'Plan settings') + '</button>' +
+      '</div>';
+
+    if (panelTab === 'board') {
+      if (p.unplaced.length) {
+        h += '<div class="ip-tray" data-tray="1"><span class="ip-tray-l">' + esc(T('لم تتّسع (' + p.unplaced.length + ') — اسحبها إلى يوم، أو حدّدها ثمّ «انقل»',
+          'Did not fit (' + p.unplaced.length + ') — drag one to a day, or select then "Move"')) + '</span>' +
+          p.unplaced.map(trayChip).join('') + '</div>';
+      } else if (moving || dragging) {
+        h += '<div class="ip-tray is-empty" data-tray="1"><span class="ip-tray-l">' + esc(T('أفلتها هنا لتخرجها من الأيام', 'Drop here to take it off the days')) + '</span></div>';
+      }
+      h += boardHtml(p);
+      h += '<p class="sch-editor-hint ip-board-hint">' + T(
+        'اضغط الجلسة لتفتح بطاقتها · Ctrl أو Shift مع الضغط لتحديد عدّة · اسحبها بالفأرة إلى يومٍ آخر · وباللمس اضغط مطوّلاً لتبدأ التحديد.',
+        'Tap a session to open its card · Ctrl or Shift-click to select several · drag with the mouse to another day · on touch, long-press to start selecting.') + '</p>';
+    } else if (panelTab === 'today') {
+      h += '<div id="ip-today-cards"></div>';
+    } else {
+      h += '<div class="ip-progress-wrap">' + trackerHtml(p) + '</div>' +
+        '<p class="sch-editor-hint">' + T('المربّع يبدّل «أتقنتُها» — وهو الوسمُ نفسُه في صفحة المادة. والتاريخ بجانب المادة يعدّل اختبارها في الجدول.',
+          'A square toggles "mastered" — the same mark as on the course page. The date beside each course edits its exam in the schedule.') + '</p>';
+    }
+
+    /*@3.SCPJ.96*/
+    var isOn = st.active === activeTab;
+    h += '<div class="sch-modal-actions ip-foot">' +
+      '<button class="sch-btn sch-btn-secondary" id="ip-activate">' +
+        (isOn ? '<i class="fa-solid fa-pause" aria-hidden="true"></i> ' + T('أوقفها مؤقتاً', 'Pause') : '<i class="fa-solid fa-play" aria-hidden="true"></i> ' + T('فعّلها', 'Activate')) + '</button>' +
+      '<button class="sch-btn sch-btn-danger" id="ip-delete">' + T('احذف الخطة', 'Delete plan') + '</button>' +
+      '<button class="sch-btn sch-btn-secondary" id="ip-panel-close">' + T('إغلاق', 'Close') + '</button></div>';
+    if (!isOn) {
+      h += '<p class="sch-editor-hint">' + T('الخطة موقوفة: جلساتها لا تظهر في الجدول ولا تنبّهك، وكل بياناتها محفوظة.',
+        'Paused: its sessions are hidden from the schedule and send no reminders; all its data is kept.') + '</p>';
+    }
+    h += selBarHtml(p) + '<div class="ip-toast" id="ip-toast" role="status" aria-live="polite"></div>';
+
+    var scroller = modal;
+    var keepScroll = scroller ? scroller.scrollTop : 0;
+    box.innerHTML = h;
+    if (scroller) scroller.scrollTop = keepScroll;
+    bindPanel();
+    if (panelTab === 'today') renderTodayCards(document.getElementById('ip-today-cards'), p);
+  }
+
+  function renderCardView(box, p) {
+    var s = p.sessions.filter(function (x) { return x.id === cardFor; })[0];
+    if (!s) { backToMain(); return; }
+    var mod = s.module ? modOf(s.course, s.module) : null;
+    box.innerHTML = subnav(T('جلسة المذاكرة', 'Study session')) + '<div class="ip-cards ip-cards-one">' + sessionCard(s, mod, true) + '</div>';
+    bindPanel();
+    bindCards(box);
+  }
+
+  /*@3.SCPJ.118*/
+  function snapshot(p) {
+    undoStack.push({ tab: activeTab, sessions: clone(p.sessions), unplaced: clone(p.unplaced) });
+    if (undoStack.length > 25) undoStack.shift();
+  }
+  function undo() {
+    var u = undoStack.pop();
+    if (!u) return;
+    var p = normalizePlan(store().plans[u.tab]);
+    if (!p) return;
+    p.sessions = u.sessions; p.unplaced = u.unplaced;
+    activeTab = u.tab;
+    sel = {};
+    persist(); S.render(); renderPanel();
+    toast(T('رجعتُ خطوة.', 'Undone.'));
+  }
+  function toast(msg, withUndo) {
+    var t = document.getElementById('ip-toast');
+    if (!t) return;
+    t.innerHTML = '<span>' + esc(msg) + '</span>' + (withUndo ? '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="undo">' + T('تراجع', 'Undo') + '</button>' : '');
+    t.classList.add('is-on');
+    var b = t.querySelector('[data-act="undo"]');
+    if (b) b.addEventListener('click', function () { undo(); });
+    clearTimeout(toastT);
+    toastT = setTimeout(function () { var x = document.getElementById('ip-toast'); if (x) x.classList.remove('is-on'); }, 5000);
+  }
+  function relayDays(p, dates) {
+    var E = ENG();
+    if (!E) return;
+    clearBusy();
+    var seen = {};
+    dates.forEach(function (d) {
+      if (seen[d]) return;
+      seen[d] = 1;
+      E.relayDay(cfgOfPlan(p), engineCtx(), p.sessions, d);
+    });
+  }
+  function commitOp(p, msg) {
+    sel = {};
+    moving = false;
+    persist(); S.render(); renderPanel();
+    if (msg) toast(msg, true);
+  }
+
+  function makeSession(u, date, p) {
+    var s = {
+      id: 'ip_' + date.replace(/-/g, '') + '_m_' + Math.random().toString(36).slice(2, 7),
+      date: date, order: 99, course: u.course, module: u.module, part: u.part || 1, total_parts: u.total || 1,
+      kind: 'study', start_time: '', minutes: p.session_minutes, done: false, note: '', prio: u.prio, locked: true
+    };
+    decorate([s]);
+    return s;
+  }
+
+  function moveTo(ids, date) {
+    var p = curPlan();
+    if (!p) return;
+    snapshot(p);
+    var touched = [date], moved = 0, blocked = 0;
+    var trayIdx = [];
+    ids.forEach(function (id) {
+      if (id.charAt(0) === 'u') {
+        var u = p.unplaced[parseInt(id.slice(1), 10)];
+        if (!u) return;
+        var ex = p.exam_dates[u.course];
+        if (ex && date >= ex) { blocked++; return; }
+        p.sessions.push(makeSession(u, date, p));
+        trayIdx.push(parseInt(id.slice(1), 10));
+        moved++;
+        return;
+      }
+      var s = p.sessions.filter(function (x) { return x.id === id; })[0];
+      if (!s) return;
+      var ex2 = p.exam_dates[s.course];
+      if (ex2 && date >= ex2) { blocked++; return; }
+      if (s.date === date) return;
+      touched.push(s.date);
+      s.date = date; s.locked = true; s.order = 99;
+      if (s.time_locked) delete s.time_locked;
+      moved++;
+    });
+    p.unplaced = p.unplaced.filter(function (u, i) { return trayIdx.indexOf(i) === -1; });
+    relayDays(p, touched);
+    if (!moved) {
+      undoStack.pop(); sel = {}; moving = false; renderPanel();
+      if (blocked) toast(T('لم تُنقل: ' + dayShort(date) + ' ' + shortDate(date) + ' يومُ اختبار مادّتها أو بعده.', 'Not moved: ' + dayShort(date) + ' ' + shortDate(date) + ' is on or after its exam.'));
+      return;
+    }
+    commitOp(p, T('نُقلت ' + nSessions(moved) + ' إلى ' + dayShort(date) + ' ' + shortDate(date) + '.', 'Moved ' + nSessions(moved) + ' to ' + dayShort(date) + ' ' + shortDate(date) + '.') +
+      (blocked ? ' ' + T(blocked + ' لم تُنقل: اليومُ بعد اختبار مادّتها.', blocked + ' not moved: that day is after their exam.') : ''));
+  }
+
+  function shiftBy(ids, n) {
+    var p = curPlan();
+    if (!p) return;
+    snapshot(p);
+    var touched = [], moved = 0, blocked = 0;
+    ids.forEach(function (id) {
+      var s = p.sessions.filter(function (x) { return x.id === id; })[0];
+      if (!s) return;
+      var nd = addDays(s.date, n);
+      var ex = p.exam_dates[s.course];
+      if ((ex && nd >= ex) || nd < todayStr()) { blocked++; return; }
+      touched.push(s.date, nd);
+      s.date = nd; s.locked = true; s.order = 99;
+      if (s.time_locked) delete s.time_locked;
+      moved++;
+    });
+    if (!moved) {
+      undoStack.pop(); sel = {}; renderPanel();
+      toast(T('لم تتحرّك: اليومُ المجاور قبل اليوم أو يومَ اختبار مادّتها.', 'Not moved: the next day is in the past or on its exam.'));
+      return;
+    }
+    relayDays(p, touched);
+    commitOp(p, T('حُرّكت ' + nSessions(moved) + (n > 0 ? ' يوماً للأمام.' : ' يوماً للخلف.'), 'Shifted ' + nSessions(moved) + (n > 0 ? ' a day later.' : ' a day earlier.')) +
+      (blocked ? ' ' + T(blocked + ' بقيت: لا يومَ متاحاً.', blocked + ' stayed: no day available.') : ''));
+  }
+
+  function toTray(ids) {
+    var p = curPlan();
+    if (!p) return;
+    snapshot(p);
+    var touched = [], n = 0;
+    p.sessions = p.sessions.filter(function (s) {
+      if (ids.indexOf(s.id) === -1) return true;
+      touched.push(s.date);
+      if (s.kind === 'study' && s.module) {
+        p.unplaced.push({ course: s.course, module: s.module, part: s.part || 1, total: s.total_parts || 1, reason: 'manual', prio: s.prio });
+      }
+      n++;
+      return false;
+    });
+    relayDays(p, touched);
+    commitOp(p, T('أُخرجت ' + nSessions(n) + ' من الأيام — تجدها في «لم تتّسع».', nSessions(n) + ' taken off the days — find them in "Did not fit".'));
+  }
+
+  function setDoneIds(ids) {
+    var p = curPlan();
+    if (!p) return;
+    snapshot(p);
+    var all = true;
+    ids.forEach(function (id) { var s = p.sessions.filter(function (x) { return x.id === id; })[0]; if (s && !s.done) all = false; });
+    ids.forEach(function (id) { var s = p.sessions.filter(function (x) { return x.id === id; })[0]; if (s) s.done = !all; });
+    commitOp(p, all ? T('أعدتُها غيرَ مكتملة.', 'Marked not done.') : T('أحسنت — عُلّمت مكتملة.', 'Nice — marked done.'));
+  }
+
+  function removeIds(ids) {
+    var p = curPlan();
+    if (!p) return;
+    snapshot(p);
+    var touched = [], n = 0;
+    p.sessions = p.sessions.filter(function (s) {
+      if (ids.indexOf(s.id) === -1) return true;
+      touched.push(s.date); n++; return false;
+    });
+    var drop = ids.filter(function (k) { return k.charAt(0) === 'u'; }).map(function (k) { return parseInt(k.slice(1), 10); });
+    p.unplaced = p.unplaced.filter(function (u, i) { if (drop.indexOf(i) !== -1) { n++; return false; } return true; });
+    relayDays(p, touched);
+    commitOp(p, T('حُذفت ' + nSessions(n) + '.', nSessions(n) + ' deleted.'));
+  }
+
+  /*@3.SCPJ.122*/
+  function relayRest() {
+    var E = ENG();
+    var p = curPlan();
+    if (!E || !p) return;
+    clearBusy();
+    var today = todayStr();
+    loadModulesFor(p.courses).then(function (mods) {
+      snapshot(p);
+      var keep = p.sessions.filter(function (s) { return s.done || (s.locked && s.date >= today); });
+      var skip = p.unplaced.filter(function (u) { return u.reason === 'manual'; });
+      var cfg = cfgOfPlan(p);
+      cfg.start_date = today > p.start_date ? today : p.start_date;
+      var r = E.compute(cfg, mods, engineCtx({ keep: keep, skip: skip }), { noAdvice: true });
+      if (!r.ok) { undoStack.pop(); toast(T('لا اختبارَ قادم في هذه الخطة.', 'No upcoming exam in this plan.')); return; }
+      var past = p.sessions.filter(function (s) { return s.done && s.date < cfg.start_date && keep.indexOf(s) === -1; });
+      p.sessions = decorate(r.sessions.concat(past));
+      p.unplaced = r.unplaced.map(function (u) { return { course: u.course, module: u.module, part: u.part || 1, total: u.total || 1, reason: u.reason, prio: u.prio }; });
+      p.spacing = r.spacing;
+      p.diagnostics = { mode: r.diagnostics.mode, demand: r.diagnostics.demand, capacity: r.diagnostics.capacity, moved: r.diagnostics.moved || 0 };
+      commitOp(p, T('أُعيد توزيعُ ما بقي من اليوم — وما أتممتَه أو نقلتَه بيدك في مكانه.', 'What was left is laid out again from today — finished and hand-moved sessions stayed put.'));
+    });
+  }
+
+  /*@3.SCPJ.119*/
+  var dragging = null;
+  var hold = null;
+  var ateClick = false;
+
   function bindPanel() {
     var box = document.getElementById('plan-panel');
+    if (!box) return;
+    function bind(id, fn) { var e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
     bind('ip-back-main', backToMain);
     bind('ip-se-one', function () { applySessionEdit(false); });
     bind('ip-se-all', function () { applySessionEdit(true); });
     bind('ip-se-del', function () {
-      if (!confirm(T('حذف هذه الجلسة من الخطة؟', 'Delete this session from the plan?'))) return;
-      var p = normalizePlan(store().plans[activeTab]);
+      var p = curPlan();
+      snapshot(p);
+      var s = p.sessions.filter(function (x) { return x.id === editingSession; })[0];
       p.sessions = p.sessions.filter(function (x) { return x.id !== editingSession; });
+      if (s) relayDays(p, [s.date]);
       persist(); backToMain(); S.render();
+      toast(T('حُذفت الجلسة.', 'Session deleted.'), true);
     });
     box.querySelectorAll('.ip-series-apply').forEach(function (b) {
       b.addEventListener('click', function () {
@@ -1813,18 +1834,22 @@
         var key = wrap.getAttribute('data-series');
         var t = wrap.querySelector('.ip-series-time').value;
         var m = parseInt(wrap.querySelector('.ip-series-min').value, 10) || 60;
-        var p = normalizePlan(store().plans[activeTab]);
-        p.sessions.forEach(function (x) { if (seriesKey(x) === key) { x.start_time = t; x.minutes = m; } });
+        var p = curPlan();
+        snapshot(p);
+        p.sessions.forEach(function (x) { if (seriesKey(x) === key) { x.start_time = t; x.minutes = m; x.time_locked = true; } });
         persist(); renderPanel(); S.render();
       });
     });
     box.querySelectorAll('[data-paneltab]').forEach(function (b) {
-      b.addEventListener('click', function () { activeTab = this.getAttribute('data-paneltab'); renderPanel(); });
+      b.addEventListener('click', function () { activeTab = this.getAttribute('data-paneltab'); sel = {}; moving = false; renderPanel(); });
+    });
+    box.querySelectorAll('[data-pview]').forEach(function (b) {
+      b.addEventListener('click', function () { panelTab = this.getAttribute('data-pview'); sel = {}; moving = false; renderPanel(); });
     });
     bind('ip-panel-close', closePanel);
     bind('ip-new', function () { closePanel(); openWizard(activeTab); });
     bind('ip-rebuild', function () { closePanel(); openWizard(activeTab, store().plans[activeTab]); });
-    bind('ip-times', function () { openTimesEditor(); });
+    bind('ip-times', function () { panelView = 'times'; renderPanel(); });
     bind('ip-activate', function () {
       var st = store();
       st.active = (st.active === activeTab) ? null : activeTab;   /*@3.SCPJ.99*/
@@ -1837,100 +1862,263 @@
       var keys = Object.keys(st.plans).filter(function (k) { return k === kin || k.indexOf(kin) === 0; });
       var n = keys.reduce(function (a, k) { return a + ((st.plans[k] && st.plans[k].sessions) || []).length; }, 0);
       if (!confirm(T(
-        'حذف كل خطط ' + (kin === 'midterm' ? 'الميدتيرم' : 'الفاينل') + ' (' + keys.length + ') و' + n +
-        ' جلسة، ومعها اختبارات هذه الخطط من الجدول؟ حالة إتقان الوحدات تبقى كما هي.',
-        'Delete all ' + kin + ' plans (' + keys.length + ') with ' + n +
-        ' sessions, plus the exams they created? Module mastery is kept.'))) return;
+        'حذف خطة ' + (kin === 'midterm' ? 'الميدتيرم' : 'الفاينل') + ' و' + n +
+        ' جلسة، ومعها اختبارات هذه الخطة من الجدول؟ حالة إتقان الوحدات تبقى كما هي.',
+        'Delete the ' + kin + ' plan with ' + n + ' sessions, plus the exams it created? Module mastery is kept.'))) return;
       keys.forEach(function (k) { delete st.plans[k]; });
       var d = S.data();
-      if (Array.isArray(d.exams)) {
-        d.exams = d.exams.filter(function (x) { return !(x && x.plan_tab === kin); });
-      }
+      if (Array.isArray(d.exams)) d.exams = d.exams.filter(function (x) { return !(x && x.plan_tab === kin); });
       if (st.active === activeTab || keys.indexOf(st.active) !== -1) st.active = Object.keys(st.plans)[0] || null;
+      undoStack = [];
       persist(); renderPanel(); S.render();
     });
     box.querySelectorAll('.ip-panel-exam').forEach(function (i) {
       i.addEventListener('change', function () {
         var p = store().plans[activeTab];
-        if (!p) return;
+        if (!p || !this.value) return;
         p.exam_dates[this.getAttribute('data-code')] = this.value;
         var m = {}; m[this.getAttribute('data-code')] = this.value;
         syncExamEvents(activeTab, m);              /*@3.SCPJ.101*/
-        persist();
-        renderPanel();
-        S.render();
+        persist(); renderPanel(); S.render();
       });
     });
     box.querySelectorAll('.ip-sq').forEach(function (b) {
       b.addEventListener('click', function () {
         var code = this.getAttribute('data-code'), mid = this.getAttribute('data-mid');
-        var st = moduleStatus(code, mid);
-        setModuleStatus(code, mid, st === 'mastered' ? 'new' : 'mastered');
+        setModuleStatus(code, mid, isMastered(code, mid) ? 'new' : 'mastered');
         persist(); renderPanel(); S.render();
       });
     });
-    function bind(id, fn) { var e = document.getElementById(id); if (e) e.addEventListener('click', fn); }
+    box.querySelectorAll('[data-act]').forEach(function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); act(this.getAttribute('data-act'), this); });
+    });
+    bindBoard(box);
   }
 
-  /*@3.SCPJ.102*/
-  function fieldList(topic, key) {
-    var v = isAr() ? topic[key] : (topic[key + '_en'] || topic[key]);
-    if (!v) return [];
-    return Array.isArray(v) ? v : [String(v)];
+  function act(a, el) {
+    var ids = selIds();
+    if (a === 'select') { selectMode = !selectMode; if (!selectMode) sel = {}; renderPanel(); return; }
+    if (a === 'undo') { undo(); return; }
+    if (a === 'relay') { relayRest(); return; }
+    if (a === 'clear') { sel = {}; selectMode = false; renderPanel(); return; }
+    if (a === 'cancel-move') { moving = false; renderPanel(); return; }
+    if (a === 'daycap') { capMenu(el); return; }
+    if (!ids.length) return;
+    if (a === 'move') { moving = true; renderPanel(); return; }
+    if (a === 'shift') { shiftBy(ids.filter(function (k) { return k.charAt(0) !== 'u'; }), parseInt(el.getAttribute('data-n'), 10)); return; }
+    if (a === 'tray') { toTray(ids.filter(function (k) { return k.charAt(0) !== 'u'; })); return; }
+    if (a === 'done') { setDoneIds(ids.filter(function (k) { return k.charAt(0) !== 'u'; })); return; }
+    if (a === 'remove') { removeIds(ids); return; }
   }
 
-  function sessionCard(s, mod) {
-    var color = S.courseColor(s.course);
-    var title = mod ? modTitle(mod) : sessionLabel(s);
-    var diff = mod ? mod.difficulty : null;
-    /*@3.SCPJ.103*/
-    var counts = 0;
-    if (mod && mod.topics) {
-      DETAIL_GROUPS.forEach(function (g) {
-        mod.topics.forEach(function (t) { counts += fieldList(t, g.key).length; });
+  function capMenu(btn) {
+    var cell = btn.closest('.ip-cell');
+    var old = document.querySelector('.ip-capmenu');
+    if (old) { var same = old.parentNode === cell; old.parentNode.removeChild(old); if (same) return; }
+    var p = curPlan();
+    if (!p || !cell) return;
+    var d = btn.getAttribute('data-date');
+    var cur = p.day_caps[d];
+    var opts = [['0', T('راحة', 'Rest')], ['1', '1'], ['2', '2'], ['3', '3'], ['4', '4'], ['6', '6'], ['', T('كالمعتاد', 'Default')]];
+    var m = document.createElement('div');
+    m.className = 'ip-capmenu';
+    m.setAttribute('role', 'group');
+    m.setAttribute('aria-label', T('جلساتُ هذا اليوم', 'Sessions this day'));
+    m.innerHTML = '<span>' + esc(T('جلساتُ هذا اليوم', 'Sessions this day')) + '</span>' + opts.map(function (o) {
+      var on = o[0] === '' ? cur == null : String(cur) === o[0];
+      return '<button type="button" class="ip-pill' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-cap="' + o[0] + '">' + esc(o[1]) + '</button>';
+    }).join('');
+    cell.appendChild(m);
+    m.querySelectorAll('[data-cap]').forEach(function (b) {
+      b.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var v = this.getAttribute('data-cap');
+        var q = curPlan();
+        snapshot(q);
+        if (v === '') delete q.day_caps[d]; else q.day_caps[d] = parseInt(v, 10);
+        var over = q.sessions.filter(function (x) { return x.date === d; }).length - capOf(q, d);
+        persist(); renderPanel();
+        toast(over > 0
+          ? T('صار لهذا اليوم ' + (v === '0' ? 'راحة' : capOf(q, d) + ' جلسات') + '، وفيه ' + nSessions(over) + ' زيادة — «أعد توزيع ما بقي» ينقلها.', 'This day now holds ' + capOf(q, d) + '; ' + over + ' extra — "Re-lay what\'s left" moves them.')
+          : T('حُفظت سعةُ اليوم، وتحترمها إعادةُ التوزيع.', 'Saved — re-laying respects it.'), true);
       });
-    }
-    var body = counts
-      ? '<button class="ip-card-details" data-ipdet="' + esc(s.course) + '|' + esc(s.module) + '">' +
-          '<i class="fa-solid fa-circle-info"></i><span>' +
-          esc(T('ماذا تعرف وتحفظ وتنتبه له', 'What to know, memorize and watch')) + '</span>' +
-          '<span class="ip-card-detcount">' + counts + '</span></button>'
-      : '<p class="sch-editor-hint">' + T('لا تفاصيل محفوظة لهذه الوحدة.', 'No stored details for this module.') + '</p>';
+    });
+    var first = m.querySelector('.ip-pill.active') || m.querySelector('.ip-pill');
+    if (first) first.focus();
+  }
+  function chipId(el) { return el.getAttribute('data-sid') || el.getAttribute('data-uid'); }
+  function toggleSel(id) { if (sel[id]) delete sel[id]; else sel[id] = true; renderPanel(); }
 
-    return '<div class="ip-card' + (s.done ? ' is-done' : '') + '" style="--event-color:' + color + '">' +
+  function bindBoard(box) {
+    if (box._ipBoard) return;
+    box._ipBoard = true;
+
+    box.addEventListener('click', function (e) {
+      if (ateClick) { ateClick = false; e.preventDefault(); e.stopPropagation(); return; }
+      var chip = e.target.closest && e.target.closest('.ip-chip');
+      if (moving) {
+        var cell = e.target.closest && e.target.closest('.ip-cell:not(.is-out)');
+        if (cell) { moveTo(selIds(), cell.getAttribute('data-date')); return; }
+        var tray = e.target.closest && e.target.closest('[data-tray]');
+        if (tray) { toTray(selIds().filter(function (k) { return k.charAt(0) !== 'u'; })); return; }
+        return;
+      }
+      if (!chip) return;
+      var id = chipId(chip);
+      if (selectMode || e.ctrlKey || e.metaKey || e.shiftKey || id.charAt(0) === 'u' || selIds().length) {
+        if (!selectMode && (e.ctrlKey || e.metaKey || e.shiftKey)) selectMode = true;
+        toggleSel(id);
+        return;
+      }
+      openSessionCard(id);
+    });
+
+    box.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && (moving || selIds().length)) {
+        e.preventDefault(); e.stopPropagation();
+        moving = false; sel = {}; selectMode = false; renderPanel();
+      }
+    });
+
+    box.addEventListener('pointerdown', function (e) {
+      var chip = e.target.closest && e.target.closest('.ip-chip');
+      if (!chip || moving) return;
+      if (e.button != null && e.button !== 0) return;
+      var id = chipId(chip);
+      if (e.pointerType === 'mouse') {
+        dragging = { id: id, x: e.clientX, y: e.clientY, on: false, el: chip, ghost: null, over: null, pid: e.pointerId };
+        return;
+      }
+      hold = { id: id, x: e.clientX, y: e.clientY, t: setTimeout(function () {
+        if (!hold) return;
+        hold.fired = true;
+        selectMode = true;
+        sel[hold.id] = true;
+        if (navigator.vibrate) { try { navigator.vibrate(8); } catch (er) {} }
+        renderPanel();
+      }, 420) };
+    });
+    box.addEventListener('pointermove', function (e) {
+      if (hold && Math.abs(e.clientX - hold.x) + Math.abs(e.clientY - hold.y) > 8) { clearTimeout(hold.t); hold = null; }
+      if (!dragging) return;
+      var dx = e.clientX - dragging.x, dy = e.clientY - dragging.y;
+      if (!dragging.on) {
+        if (Math.abs(dx) + Math.abs(dy) < 6) return;
+        dragging.on = true;
+        if (!sel[dragging.id]) { sel = {}; sel[dragging.id] = true; }
+        var n = selIds().length;
+        dragging.ghost = document.createElement('div');
+        dragging.ghost.className = 'ip-ghost';
+        dragging.ghost.textContent = n > 1 ? T(n + ' جلسات', n + ' sessions') : (dragging.el.getAttribute('aria-label') || '');
+        document.body.appendChild(dragging.ghost);
+        document.documentElement.classList.add('ip-dragging');
+        try { box.setPointerCapture(dragging.pid); } catch (er) {}
+      }
+      e.preventDefault();
+      dragging.ghost.style.transform = 'translate(' + (e.clientX + 12) + 'px,' + (e.clientY + 12) + 'px)';
+      var under = document.elementFromPoint(e.clientX, e.clientY);
+      var tgt = under && under.closest ? (under.closest('.ip-cell:not(.is-out)') || under.closest('[data-tray]')) : null;
+      if (dragging.over !== tgt) {
+        if (dragging.over) dragging.over.classList.remove('is-drop');
+        dragging.over = tgt;
+        if (tgt) tgt.classList.add('is-drop');
+      }
+    });
+    function endDrag(e) {
+      if (hold) {
+        clearTimeout(hold.t);
+        if (hold.fired) { ateClick = true; setTimeout(function () { ateClick = false; }, 450); }
+        hold = null;
+      }
+      if (!dragging) return;
+      var d = dragging;
+      dragging = null;
+      document.documentElement.classList.remove('ip-dragging');
+      if (d.ghost && d.ghost.parentNode) d.ghost.parentNode.removeChild(d.ghost);
+      if (d.over) d.over.classList.remove('is-drop');
+      if (!d.on) return;
+      ateClick = true;
+      setTimeout(function () { ateClick = false; }, 0);
+      var ids = selIds();
+      if (!d.over || e.type === 'pointercancel') { renderPanel(); return; }
+      if (d.over.hasAttribute('data-tray')) toTray(ids.filter(function (k) { return k.charAt(0) !== 'u'; }));
+      else moveTo(ids, d.over.getAttribute('data-date'));
+    }
+    box.addEventListener('pointerup', endDrag);
+    box.addEventListener('pointercancel', endDrag);
+    box.addEventListener('contextmenu', function (e) {
+      var chip = e.target.closest && e.target.closest('.ip-chip');
+      if (!chip) return;
+      e.preventDefault();
+      selectMode = true;
+      sel[chipId(chip)] = true;
+      renderPanel();
+    });
+  }
+
+  /*@3.SCPJ.120*/
+  function briefHtml(mod, max) {
+    var gs = groupsOf(mod);
+    if (!gs.length) return '';
+    return '<div class="ip-brief">' + gs.map(function (x) {
+      var items = x.items.slice(0, max || 99);
+      return '<div class="ip-brief-g g-' + x.g.key + '"><div class="ip-brief-h"><i class="fa-solid ' + x.g.icon + '" aria-hidden="true"></i> ' +
+        esc(isAr() ? x.g.ar : x.g.en) + '<span class="ip-det-count">' + x.items.length + '</span></div>' +
+        '<ul>' + items.map(function (it) { return '<li>' + esc(it) + '</li>'; }).join('') + '</ul></div>';
+    }).join('') + '</div>';
+  }
+
+  function sessionCard(s, mod, full) {
+    var color = S.courseColor(s.course);
+    var title = s.kind === 'buffer' ? T('مراجعة ما قبل الاختبار', 'Pre-exam review') : (mod ? modTitle(mod) : (sessTitle(s) || sessionLabel(s)));
+    var diff = mod ? mod.difficulty : null;
+    var body = mod ? briefHtml(mod, full ? 99 : 4) : '';
+    if (!body) {
+      body = s.kind === 'buffer'
+        ? '<p class="sch-editor-hint">' + T('مرّ على وحدات المادة كلِّها: رؤوسُ الأقلام، وما أخطأتَ فيه، وأسئلةُ الاختبارات السابقة. لا وحدةَ جديدة اليوم.',
+            'Go over every module of the course: headlines, what you got wrong, past exam questions. No new module today.') + '</p>'
+        : '<p class="sch-editor-hint">' + T('لا تفاصيل محفوظة لهذه الوحدة — افتحها وابدأ بأهدافها.', 'No stored details for this module — open it and start from its objectives.') + '</p>';
+    }
+    return '<article class="ip-card' + (s.done ? ' is-done' : '') + (full ? ' is-full' : '') + '" style="--event-color:' + color + '">' +
       '<div class="ip-card-head">' +
-        '<span class="ip-card-time">' + esc(S.fmtTime12(s.start_time)) + '</span>' +
-        '<span class="ip-card-course">' + esc(S.courseShort(s.course)) + '</span>' +
-        (diff ? '<span class="ip-diff d' + Math.min(3, Math.ceil(diff / 3.5)) + '">' + diff + '</span>' : '') +
+        '<span class="ip-card-time">' + esc(s.start_time ? S.fmtTime12(s.start_time) : '') + '</span>' +
+        '<span class="ip-card-course ip-code"><span class="ip-dot" aria-hidden="true"></span>' + esc(S.courseShort(s.course)) + '</span>' +
+        (s.key ? '<span class="ip-key"><span aria-hidden="true">★</span> ' + T('أساسيّة', 'Core') + '</span>' : '') +
+        (diff ? '<span class="ip-diff d' + Math.min(3, Math.ceil(diff / 3.5)) + '" title="' + esc(T('الصعوبة', 'Difficulty')) + '">' + diff + '</span>' : '') +
         '<span class="ip-card-mins">' + s.minutes + T(' د', 'm') + '</span>' +
       '</div>' +
       '<div class="ip-card-title">' +
         (s.module ? '<span class="ip-card-modn">' + modNum(s.module) + '</span>' : '') +
         esc(title) + '</div>' +
-      '<div class="ip-card-sub">' + esc(sessionLabel(s)) + '</div>' +
+      '<div class="ip-card-sub">' + esc(sessionLabel(s) + ' · ' + dayShort(s.date) + ' ' + shortDate(s.date)) + '</div>' +
       '<div class="ip-card-body">' + body + '</div>' +
       '<div class="ip-card-actions">' +
-        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-ipedit="' + esc(s.id) + '">' +
-          T('اليوم والوقت', 'Day & time') + '</button>' +
-        (s.module ? '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-ipmod="' + esc(s.course) + '|' + esc(s.module) + '">' +
-          T('صفحة الوحدة', 'Module page') + '</button>' : '') +
-        '<button class="sch-btn ' + (s.done ? 'sch-btn-secondary' : 'sch-btn-primary') + ' sch-btn-xs" data-ipdone="' + esc(s.id) + '">' +
-          (s.done ? T('تراجع', 'Undo') : T('أتممتها', 'Done')) + '</button>' +
-      '</div></div>';
+        (s.module ? '<button class="sch-btn sch-btn-primary sch-btn-xs" data-ipmod="' + esc(s.course) + '|' + esc(s.module) + '">' +
+          '<i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> ' + T('ادرس الوحدة', 'Study the module') + '</button>' : '') +
+        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-ipdone="' + esc(s.id) + '">' +
+          (s.done ? T('تراجع', 'Undo') : '<i class="fa-solid fa-check" aria-hidden="true"></i> ' + T('أتممتُها', 'Done')) + '</button>' +
+        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-ipedit="' + esc(s.id) + '">' + T('اليوم والوقت', 'Day & time') + '</button>' +
+      '</div></article>';
   }
 
   function renderTodayCards(box, p) {
     if (!box) return;
     var today = todayStr();
     var list = p.sessions.filter(function (s) { return s.date === today; });
+    var head = '';
     if (!list.length) {
-      box.innerHTML = '<p class="sch-editor-hint">' + T('لا جلسات مكثّفة اليوم.', 'No intensive sessions today.') + '</p>';
-      return;
+      var next = p.sessions.filter(function (s) { return s.date > today && !s.done; })
+        .sort(function (a, b) { return a.date.localeCompare(b.date) || (a.start_time || '').localeCompare(b.start_time || ''); });
+      if (!next.length) { box.innerHTML = '<p class="sch-editor-hint">' + T('لا جلسات اليوم ولا بعده.', 'No sessions today or later.') + '</p>'; return; }
+      var nd = next[0].date;
+      list = next.filter(function (s) { return s.date === nd; });
+      head = '<p class="sch-editor-hint">' + esc(T('لا جلسات اليوم. القادمة: ' + dayShort(nd) + ' ' + shortDate(nd), 'Nothing today. Next: ' + dayShort(nd) + ' ' + shortDate(nd))) + '</p>';
     }
+    list.sort(function (a, b) { return (a.start_time || '').localeCompare(b.start_time || ''); });
     var codes = {};
     list.forEach(function (s) { codes[s.course] = 1; });
     loadModulesFor(Object.keys(codes)).then(function (mods) {
-      box.innerHTML = '<div class="ip-cards">' + list.map(function (s) {
+      box.innerHTML = head + '<div class="ip-cards">' + list.map(function (s) {
         var mod = (mods[s.course] || []).filter(function (m) { return m.id === s.module; })[0];
         return sessionCard(s, mod);
       }).join('') + '</div>';
@@ -1942,26 +2130,44 @@
     box.querySelectorAll('[data-ipdone]').forEach(function (b) {
       b.addEventListener('click', function () {
         var id = this.getAttribute('data-ipdone');
-        var p = store().plans[activeTab];
+        var t = findPlanOf(id);
+        var p = t ? normalizePlan(store().plans[t]) : null;
         if (!p) return;
         var s = p.sessions.filter(function (x) { return x.id === id; })[0];
         if (s) { s.done = !s.done; persist(); renderPanel(); S.render(); }
       });
     });
     box.querySelectorAll('[data-ipmod]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var p = this.getAttribute('data-ipmod').split('|');
-        openModule(p[0], p[1]);
-      });
+      b.addEventListener('click', function () { var q = this.getAttribute('data-ipmod').split('|'); openModule(q[0], q[1]); });
     });
     box.querySelectorAll('[data-ipdet]').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var p = this.getAttribute('data-ipdet').split('|');
-        openModuleDetails(p[0], p[1]);
-      });
+      b.addEventListener('click', function () { var q = this.getAttribute('data-ipdet').split('|'); openModuleDetails(q[0], q[1]); });
     });
     box.querySelectorAll('[data-ipedit]').forEach(function (b) {
       b.addEventListener('click', function () { openSessionEditor(this.getAttribute('data-ipedit')); });
+    });
+  }
+
+  /*@3.SCPJ.121*/
+  function sheetBrief(ev, body) {
+    if (!ev || !body || !ev.course_code) return;
+    var id = ev.id;
+    var t = findPlanOf(id);
+    var s = t ? (store().plans[t].sessions || []).filter(function (x) { return x.id === id; })[0] : null;
+    var slot = document.createElement('div');
+    slot.className = 'ip-sheet-brief';
+    body.appendChild(slot);
+    if (s && s.kind === 'buffer') {
+      slot.innerHTML = '<p class="sch-editor-hint">' + T('مرّ على وحدات المادة كلِّها: رؤوسُ الأقلام، وما أخطأتَ فيه، وأسئلةُ الاختبارات السابقة.',
+        'Go over every module of the course: headlines, what you got wrong, past exam questions.') + '</p>';
+      return;
+    }
+    if (!ev.module) return;
+    loadModules(ev.course_code).then(function () {
+      var mod = modOf(ev.course_code, ev.module);
+      if (!mod || !slot.isConnected) return;
+      slot.innerHTML = briefHtml(mod, 3) + (s && s.key ? '<p class="ip-key-note"><span aria-hidden="true">★</span> ' +
+        esc(T('وحدةٌ أساسيّة: ثقيلةُ الوزن في الاختبار أو تُبنى عليها وحداتٌ بعدها.', 'A core module: it weighs heavily in the exam or later modules build on it.')) + '</p>' : '');
     });
   }
 
@@ -1978,30 +2184,41 @@
   function renderSettingsSection(box) {
     if (!box) return;
     var st = store();
-    var lines = ['midterm','final'].map(function (t) {
+    var lines = ['midterm', 'final'].map(function (t) {
       var p = st.plans[t];
       var label = t === 'midterm' ? T('ميدتيرم', 'Midterm') : T('فاينل', 'Final');
       if (!p) return '<div class="ip-row"><span class="ip-row-label">' + label + '</span><span class="sch-editor-hint">' +
         T('لا خطة', 'No plan') + '</span></div>';
-      var done = p.sessions.filter(function (s) { return s.done; }).length;
+      var done = (p.sessions || []).filter(function (s) { return s.done; }).length;
       return '<div class="ip-row"><span class="ip-row-label">' + label +
-        (st.active === t ? ' <span class="ip-tab-empty">●</span>' : '') + '</span>' +
-        '<span class="sch-editor-hint">' + done + '/' + p.sessions.length + ' ' + T('جلسة', 'sessions') + '</span></div>';
+        (st.active === t ? ' <span class="ip-live-dot" aria-label="' + esc(T('مفعّلة', 'active')) + '"></span>' : '') + '</span>' +
+        '<span class="sch-editor-hint">' + done + '/' + (p.sessions || []).length + ' ' + T('جلسة', 'sessions') + '</span></div>';
     }).join('');
 
-    box.innerHTML = '<div class="sch-editor-subhead"><span>' + T('الخطط المكثّفة', 'Intensive plans') + '</span></div>' +
-      '<p class="sch-editor-hint">' + T(
-        'خطتان متعايشتان لكلٍّ تواريخها ووحداتها. جلساتها تُعرض في الجدول ولا تُنسخ إلى أوقات المذاكرة العادية.',
-        'Two coexisting plans, each with its own dates and modules. Their sessions appear in the schedule and are never copied into regular study blocks.') + '</p>' +
+    box.innerHTML = '<p class="sch-editor-hint">' + T(
+        'خطتان متعايشتان لكلٍّ تواريخها ووحداتها. جلساتها تُعرض في الجدول وتنبّهك، وتحرّكها من لوحة الخطة.',
+        'Two coexisting plans, each with its own dates and modules. Their sessions show in the schedule and remind you; move them from the plan board.') + '</p>' +
       lines +
       '<button class="sch-btn sch-btn-primary sch-btn-block" id="ip-open-panel" style="margin-top:.5rem">' +
-      T('إدارة الخطط المكثّفة', 'Manage intensive plans') + '</button>';
+      T('افتح لوحة الخطة', 'Open the plan board') + '</button>';
 
     var b = document.getElementById('ip-open-panel');
     if (b) b.addEventListener('click', function () {
       document.getElementById('modal-editor').style.display = 'none';
       openPanel();
     });
+  }
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+
+  function fromHash() {
+    var m = /^#ip-([A-Za-z0-9_\-]+)$/.exec(location.hash || '');
+    if (!m) return;
+    var id = m[1];
+    var t = findPlanOf(id);
+    if (!t) return;
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {}
+    openSessionCard(id);
   }
 
   /*@3.SCPJ.106*/
@@ -2019,14 +2236,15 @@
       if (p && p.sessions.length !== n) dirty += n - p.sessions.length;
     });
     dirty += dedupeExams();
-    if (dirty) { persist(); }
+    dirty += migrateMastery();
+    if (dirty) persist();
     /*@3.SCPJ.108*/
     var codes = [];
     Object.keys(store().plans).forEach(function (t) {
       (store().plans[t].courses || []).forEach(function (c) { if (codes.indexOf(c) === -1) codes.push(c); });
     });
     /*@3.SCPJ.109*/
-    if (codes.length) loadModulesFor(codes).then(function () { S.render(); });
+    if (codes.length) loadModulesFor(codes).then(function () { S.render(); fromHash(); });
 
     var closeBtn = document.getElementById('plan-panel-x');
     if (closeBtn) closeBtn.addEventListener('click', closePanel);
@@ -2034,20 +2252,22 @@
     if (wizX) wizX.addEventListener('click', closeWizard);
     document.addEventListener('garden:languageChanged', function () {
       if (wizard) renderWizard();
-      if (document.getElementById('modal-plan-panel').style.display !== 'none') renderPanel();
+      var ov = document.getElementById('modal-plan-panel');
+      if (ov && ov.style.display !== 'none') renderPanel();
     });
+    if (window.addEventListener) window.addEventListener('hashchange', fromHash);
   }
 
   window.GardenSchedulePlan = {
     init: init,
     openWizard: function (tab) { if (S) openWizard(tab); },
-    openPanel: function () { if (S) openPanel(); },
+    openPanel: function (o) { if (S) openPanel(o); },
     renderSettingsSection: renderSettingsSection,
     openModule: function (code, mid) { if (S) openModule(code, mid); },
     /*@3.SCPJ.110*/
     moduleTitle: function (code, mid) {
       if (!S || !code || !mid) return '';
-      var m = (modulesCache[code] || []).filter(function (x) { return x.id === mid; })[0];
+      var m = modOf(code, mid);
       return m ? modTitle(m) : '';
     },
     moduleNum: function (mid) { return modNum(mid); },
@@ -2058,6 +2278,8 @@
     },
     openDetails: function (code, mid) { if (S) openModuleDetails(code, mid); },
     editSession: function (id) { if (S) openSessionEditor(id); },
+    openSession: function (id) { return S ? openSessionCard(id) : false; },
+    sheetBrief: function (ev, body) { if (S) sheetBrief(ev, body); },
     /*@3.SCPJ.111*/
     todaySessions: function () {
       var s = window.GardenSchedule;
@@ -2067,7 +2289,7 @@
       var p = (it && it.active && it.plans) ? it.plans[it.active] : null;
       if (!p) return [];
       var t = s.fmtLocalDate(new Date());
-      return p.sessions.filter(function (x) { return x.date === t; });
+      return (p.sessions || []).filter(function (x) { return x.date === t; });
     },
     sessionCardHtml: function (s, mod) { return sessionCard(s, mod); },
     loadModules: function (code) { return loadModules(code); },

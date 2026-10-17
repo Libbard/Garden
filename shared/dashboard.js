@@ -405,6 +405,8 @@
                : e.sub === 'spaced' ? tx('مراجعة متباعدة', 'Spaced review')
                : (tx('الوحدة ', 'Module ') + (num || '—') +
                   (e.total_parts > 1 ? ' (' + e.part + '/' + e.total_parts + ')' : ''));
+      var mt = tx(e.title || '', e.title_en || e.title || '');
+      if (mt && e.sub !== 'buffer') what += ': ' + mt;
       return code + ' · ' + what;
     }
     var t = e.label || tx('حدث', 'Event');
@@ -421,7 +423,7 @@
     var from = e.spill
       ? (tx('بدأ أمسِ ', 'Started yesterday ') + minToHM(e.spill_start) + ' — ') : '';
     return '<div class="widget-item widget-item--act' + (e.spill ? ' is-spill' : '') + '">' +
-      '<a class="widget-item-go" href="hub/schedule.html"' +
+      '<a class="widget-item-go" href="hub/schedule.html' + (e.src === 'intensive' && e.id ? '#ip-' + esc(e.id) : '') + '"' +
         (e.spill ? ' title="' + esc(from + name) + '"' : '') + '>' +
         '<span class="widget-item-dot" style="background:' + (TODAY_COLOUR[e.kind] || 'var(--st-accent)') + '"></span>' +
         '<span class="widget-item-time">' + esc(when) + '</span>' +
