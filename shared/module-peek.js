@@ -38,6 +38,9 @@
     document.body.appendChild(t);
     setTimeout(function () { t.remove(); }, 2600);
   }
+  function doneBtn() {
+    return '<button type="submit" class="mp-go" title="' + esc(L('احفظْ الآن — وتُحفظ وحدَها حين تغلق', 'Save now — it also saves itself when you close')) + '"><i class="fa-solid fa-check" aria-hidden="true"></i> <span data-ar="تمّ" data-en="Done">' + esc(L('تمّ', 'Done')) + '</span></button>';
+  }
   function btn(act, ic, ar, en) {
     var t = L(ar, en);
     return '<button type="button" class="mp-b" data-mp="' + act + '" aria-label="' + esc(t) + '" title="' + esc(t) + '" data-ar-title="' + esc(ar) + '" data-en-title="' + esc(en) + '"><i class="fa-solid ' + ic + '" aria-hidden="true"></i></button>';
@@ -146,14 +149,15 @@
         btn('copy', 'fa-copy', 'انسخْ ما فيها', 'Copy its content') +
         btn('open', 'fa-up-right-and-down-left-from-center', moved ? 'افتحْها في ملاحظات الوحدة' : 'انقلْها إلى ملاحظات الوحدة', moved ? 'Open it in the module notes' : 'Move it into the module notes') +
         (hit.ta.k && window.GardenModuleInk && GardenModuleInk.noteLine && GardenModuleInk.noteLine() && !hit.ta.q ? btn('line', 'fa-eraser', 'أزِلِ الخطَّ تحت هذا النصّ', 'Remove the line under this text') : '') +
+        (moved ? btn('del', 'fa-trash', 'احذفْ هذه الملاحظة', 'Delete this note') : '') +
         btn('eye', 'fa-eye-slash', 'أخفِ نوافذَ الملاحظات (تُعاد من «ملاحظاتي»)', 'Hide note windows (bring them back from My notes)') +
         btn('x', 'fa-xmark', 'أغلقْ', 'Close') +
         '</span></header>' +
       '<div class="mp-sv" tabindex="-1"><p class="mp-wait">…</p></div>' +
       (moved
-        ? '<form class="mp-in"><textarea rows="1" dir="' + pdir() + '" maxlength="4000" aria-label="' + esc(L('ملاحظةٌ سريعة', 'Quick note')) + '" placeholder="' + esc(L('أضِفْ سطراً… (Enter للحفظ)', 'Add a line… (Enter to save)')) +
-            '" data-ar-placeholder="أضِفْ سطراً… (Enter للحفظ)" data-en-placeholder="Add a line… (Enter to save)"></textarea>' +
-            '<button type="submit" class="mp-b mp-go" aria-label="' + esc(L('احفظْ', 'Save')) + '" title="' + esc(L('احفظْ', 'Save')) + '"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>' +
+        ? '<form class="mp-in"><textarea rows="1" dir="' + pdir() + '" maxlength="4000" aria-label="' + esc(L('ملاحظةٌ سريعة', 'Quick note')) + '" placeholder="' + esc(L('أضِفْ سطراً — يُحفظ وحدَه', 'Add a line — it saves itself')) +
+            '" data-ar-placeholder="أضِفْ سطراً — يُحفظ وحدَه" data-en-placeholder="Add a line — it saves itself"></textarea>' +
+            doneBtn() +
             '<span class="mp-st" aria-live="polite"></span></form>'
         : '<div class="mp-in mp-in--old"><button type="button" class="mp-mv" data-mp="open"><i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i> ' + esc(L('انقلْها إلى ملاحظات الوحدة لتكملَ عليها', 'Move it into the module notes to keep writing')) + '</button></div>');
     if (o.hold) card.__hold = 1;
@@ -163,10 +167,15 @@
     card.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && card === HOV && !card.__hold) hideSoon(); });
     var ta = card.querySelector('textarea'), form = card.querySelector('form');
     if (ta) {
-      ta.addEventListener('input', function () { ta.dir = ta.value ? 'auto' : pdir(); card.classList.toggle('mp-has', !!ta.value.trim()); ta.style.blockSize = 'auto'; ta.style.blockSize = Math.min(140, ta.scrollHeight) + 'px'; });
+      card.__dk = 'q' + Date.now().toString(36);
+      card.__autosave = function () { if (ta.value.trim() && !card.__saving) save(card, true); };
+      ta.addEventListener('input', function () {
+        ta.dir = ta.value ? 'auto' : pdir(); card.classList.toggle('mp-has', !!ta.value.trim()); ta.style.blockSize = 'auto'; ta.style.blockSize = Math.min(140, ta.scrollHeight) + 'px';
+        keepDraft({ k: card.__dk, id: card.__ref.id, bid: card.__head || card.__ref.bid, text: ta.value });
+      });
       ta.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); save(card); }
-        if (e.key === 'Escape') { ta.blur(); if (!card.classList.contains('mp-pin') && !ta.value.trim()) hide(card); }
+        if (e.key === 'Escape') { ta.blur(); if (!card.classList.contains('mp-pin')) close(card); }
       });
       form.addEventListener('submit', function (e) { e.preventDefault(); save(card); });
     }
@@ -221,6 +230,18 @@
     if (r) place(c, r);
   }
   function flash(c) { c.classList.remove('mp-flash'); void c.offsetWidth; c.classList.add('mp-flash'); }
+  var draftT = 0;
+  function keepDraft(o) {
+    clearTimeout(draftT);
+    draftT = setTimeout(function () { noteLib().then(function (M) { if (M.draft) M.draft(o); }); }, 250);
+  }
+  /*@3.MOPJ.8*/
+  function close(card) {
+    if (!card) return;
+    clearTimeout(draftT);
+    if (card.__autosave) card.__autosave();
+    hide(card);
+  }
   function hide(card) {
     if (!card) return;
     if (card === HOV) HOV = null;
@@ -300,7 +321,8 @@
       return;
     }
     var act = b.getAttribute('data-mp');
-    if (act === 'x') hide(card);
+    if (act === 'x') close(card);
+    else if (act === 'del') askDel(card);
     else if (act === 'pin') pin(card, !card.classList.contains('mp-pin'));
     else if (act === 'copy') copy(card);
     else if (act === 'open') openIt(card);
@@ -339,9 +361,43 @@
       : cb.writeText(t);
     Promise.race([p, new Promise(function (r, no) { setTimeout(function () { no(new Error('slow')); }, 1500); })]).then(ok, old);
   }
-  function save(card) {
+  /*@3.MOPJ.9*/
+  function askDel(card) {
+    if (card.querySelector('.mp-ask')) return;
+    var ref = card.__ref, head = card.__head || (ref && ref.bid);
+    if (!ref || !head) return;
+    var box = document.createElement('div');
+    box.className = 'mp-ask';
+    box.innerHTML = '<span>' + esc(L('تُحذف الملاحظةُ من ملاحظات الوحدة، ويبقى نصُّ الدرس كما هو.', 'The note is removed from the module notes; the lesson text stays as it is.')) + '</span>' +
+      '<button type="button" class="mp-ask-b mp-ask-b--dz" data-ask="yes"><i class="fa-solid fa-trash" aria-hidden="true"></i> ' + esc(L('احذفْها', 'Delete it')) + '</button>' +
+      '<button type="button" class="mp-ask-b" data-ask="no">' + esc(L('تراجعْ', 'Cancel')) + '</button>';
+    card.__hold = 1;
+    card.insertBefore(box, card.querySelector('.mp-in'));
+    box.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-ask]');
+      if (!b) return;
+      e.stopPropagation();
+      if (b.getAttribute('data-ask') === 'no') { box.remove(); return; }
+      [].forEach.call(box.querySelectorAll('button'), function (x) { x.disabled = true; });
+      box.querySelector('span').textContent = L('تُحذف…', 'Deleting…');
+      noteLib().then(function (M) { return M.drop(ref.id, head); }).then(function (ok) {
+        if (ok) { hide(card); toast(L('حُذفت الملاحظة ✓', 'Note deleted ✓')); }
+        else box.querySelector('span').textContent = L('تعذّر الحذف — افتحْها في ملاحظات الوحدة', 'Could not delete — open it in the module notes');
+      }, function () { box.querySelector('span').textContent = L('تعذّر الحذف', 'Could not delete'); });
+    });
+    try { box.querySelector('[data-ask="yes"]').focus({ preventScroll: true }); } catch (e2) {}
+  }
+  function save(card, bg) {
     var ta = card.querySelector('textarea'), st = card.querySelector('.mp-st'), txt = ta.value;
     if (!txt.trim() || card.__saving || !card.__ref) return;
+    if (bg) {
+      card.__saving = 1;
+      noteLib().then(function (M) { return M.addLine(card.__ref.id, card.__head || card.__ref.bid, txt, card.__dk); }).then(function (ok) {
+        card.__saving = 0;
+        toast(ok ? L('حُفظ ما كتبتَه ✓', 'What you wrote is saved ✓') : L('سيُحفظ ما كتبتَه في زيارتك التالية', 'What you wrote will be saved on your next visit'));
+      }, function () { card.__saving = 0; });
+      return;
+    }
     card.__saving = 1;
     ta.disabled = true; st.textContent = L('يُحفظ…', 'Saving…');
     var root = card.querySelector('.mp-sv .ne-root') || card.querySelector('.mp-sv');
@@ -352,7 +408,9 @@
     txt.split(/\n/).filter(function (l) { return l.trim(); }).forEach(function (l) { var p = document.createElement('p'); p.dir = 'auto'; p.textContent = l; tmp.appendChild(p); });
     root.appendChild(tmp);
     repos(card);
-    noteLib().then(function (M) { return M.quick(card.__ref.id, card.__head || card.__ref.bid, txt); }).then(function (ok) {
+    var dk = card.__dk;
+    card.__dk = 'q' + Date.now().toString(36);
+    noteLib().then(function (M) { return M.addLine(card.__ref.id, card.__head || card.__ref.bid, txt, dk); }).then(function (ok) {
       card.__saving = 0; ta.disabled = false;
       if (ok) { ta.value = ''; ta.dir = pdir(); card.classList.remove('mp-has'); ta.style.blockSize = ''; st.textContent = L('حُفظ ✓', 'Saved ✓'); body(card, card.__hit).then(function () { repos(card); }); }
       else { tmp.remove(); st.textContent = L('تعذّر الحفظ — حاولْ ثانيةً', 'Could not save — try again'); }
@@ -377,7 +435,7 @@
     card.setAttribute('aria-label', L('ملاحظةٌ جديدة على هذا النصّ', 'A new note on this text'));
     card.style.setProperty('--mp-t', 'var(--gmi-p-sky, #5ab8ff)');
     skin(card, rg);
-    var ph = L('اكتبْ ملاحظتَك… (Enter للحفظ)', 'Write your note… (Enter to save)');
+    var ph = L('اكتبْ ملاحظتَك — تُحفظ وحدَها', 'Write your note — it saves itself');
     card.innerHTML =
       '<header class="mp-h"><span class="mp-tt"><i class="mp-mk" data-st="note" aria-hidden="true"></i><b data-ar="ملاحظةٌ جديدة" data-en="New note">' + esc(L('ملاحظةٌ جديدة', 'New note')) + '</b></span>' +
         '<span class="mp-acts">' +
@@ -385,12 +443,24 @@
         btn('x', 'fa-xmark', 'أغلقْ', 'Close') +
         '</span></header>' +
       '<form class="mp-in"><textarea rows="2" dir="' + pdir() + '" maxlength="4000" aria-label="' + esc(L('ملاحظةٌ سريعة', 'Quick note')) + '" placeholder="' + esc(ph) +
-        '" data-ar-placeholder="اكتبْ ملاحظتَك… (Enter للحفظ)" data-en-placeholder="Write your note… (Enter to save)"></textarea>' +
-        '<button type="submit" class="mp-b mp-go" aria-label="' + esc(L('احفظْ', 'Save')) + '" title="' + esc(L('احفظْ', 'Save')) + '"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>' +
+        '" data-ar-placeholder="اكتبْ ملاحظتَك — تُحفظ وحدَها" data-en-placeholder="Write your note — it saves itself"></textarea>' +
+        doneBtn() +
         '<span class="mp-st" aria-live="polite"></span></form>';
     var ta = card.querySelector('textarea'), st = card.querySelector('.mp-st');
+    card.__dk = 'c' + Date.now().toString(36);
+    card.__autosave = function () {
+      var txt = ta.value;
+      if (!txt.trim() || card.__saving) return;
+      card.__saving = 1;
+      noteLib().then(function (M) { return M.create({ k: card.__dk, quote: o.quote, range: rg, sec: o.sec, text: txt }); }).then(function (r) {
+        card.__saving = 0;
+        toast(r ? L('حُفظت ملاحظتُك ✓', 'Your note is saved ✓') : L('ستُحفظ ملاحظتُك في زيارتك التالية', 'Your note will be saved on your next visit'));
+      }, function () { card.__saving = 0; });
+    };
     var grow = function () {
       var txt = ta.value;
+      clearTimeout(draftT);
+      noteLib().then(function (M) { if (M.draft) M.draft({ k: card.__dk, text: '' }); });
       hide(card);
       noteLib().then(function (M) { M.open({ quote: o.quote, range: rg, sec: o.sec, text: txt }); });
     };
@@ -398,7 +468,8 @@
       var txt = ta.value;
       if (!txt.trim() || card.__saving) return;
       card.__saving = 1; ta.readOnly = true; st.textContent = L('يُحفظ…', 'Saving…');
-      noteLib().then(function (M) { return M.create({ quote: o.quote, range: rg, sec: o.sec, text: txt }); }).then(function (r) {
+      clearTimeout(draftT);
+      noteLib().then(function (M) { return M.create({ k: card.__dk, quote: o.quote, range: rg, sec: o.sec, text: txt }); }).then(function (r) {
         card.__saving = 0; ta.readOnly = false;
         if (!r) { st.textContent = L('تعذّر الحفظ — حاولْ ثانيةً', 'Could not save — try again'); return; }
         ta.value = '';
@@ -412,13 +483,16 @@
       var b = e.target.closest('[data-mp]');
       if (!b) { if (!e.target.closest('textarea')) ta.focus(); return; }
       var a = b.getAttribute('data-mp');
-      if (a === 'x') hide(card);
+      if (a === 'x') close(card);
       else if (a === 'grow') grow();
     });
-    ta.addEventListener('input', function () { ta.dir = ta.value ? 'auto' : pdir(); card.classList.toggle('mp-has', !!ta.value.trim()); ta.style.blockSize = 'auto'; ta.style.blockSize = Math.min(140, ta.scrollHeight) + 'px'; });
+    ta.addEventListener('input', function () {
+      ta.dir = ta.value ? 'auto' : pdir(); card.classList.toggle('mp-has', !!ta.value.trim()); ta.style.blockSize = 'auto'; ta.style.blockSize = Math.min(140, ta.scrollHeight) + 'px';
+      keepDraft({ k: card.__dk, quote: o.quote, sec: o.sec, text: ta.value });
+    });
     ta.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); save(); }
-      if (e.key === 'Escape' && !ta.value.trim()) { e.stopPropagation(); hide(card); }
+      if (e.key === 'Escape') { e.stopPropagation(); close(card); }
     });
     card.querySelector('form').addEventListener('submit', function (e) { e.preventDefault(); save(); });
     drag(card);
@@ -468,11 +542,12 @@
     if (!t || t === document.documentElement || (t.closest && t.closest('.mp, .gsf-menu, .mt-sel, .mp-toast'))) return;
     var at = hitAt(e), key = at ? keyOf(at) : '';
     [HOV].concat(PINS).forEach(function (c) {
-      if (!c || !c.isConnected || c.classList.contains('mp-pin') || typed(c) || (key && c.__key === key)) return;
-      hide(c);
+      if (!c || !c.isConnected || c.classList.contains('mp-pin') || c.__saving || c.querySelector('.mp-ask') || (key && c.__key === key)) return;
+      close(c);
     });
   }, true);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && HOV && !typed(HOV) && !HOV.classList.contains('mp-pin')) hide(HOV); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && HOV && !HOV.classList.contains('mp-pin')) close(HOV); });
+  window.addEventListener('pagehide', function () { [HOV].concat(PINS).forEach(function (c) { if (c && c.__autosave) c.__autosave(); }); });
   window.addEventListener('scroll', function () { if (HOV && !busy(HOV)) hide(HOV); }, { passive: true });
   window.addEventListener('storage', function (e) {
     if (e.key !== 'garden_peek_t' || !e.newValue) return;
@@ -492,6 +567,7 @@
   document.addEventListener('garden:peekToggle', function (e) { if (e.detail && !e.detail.on) hideAll(); });
   document.addEventListener('garden:moduleThemeChanged', function () { [HOV].concat(PINS).forEach(function (c) { if (c && c.__hit) skin(c, c.__hit.rg); }); });
 
-  window.GardenModPeek = { show: show, compose: compose, hideAll: hideAll, off: off, on: function () { try { localStorage.removeItem(OFF); } catch (e) {} },
+  window.GardenModPeek = { show: show, compose: compose, hideAll: hideAll,
+                           ask: function (hit) { return show(hit, { hold: 1 }).then(function (c) { if (c) askDel(c); return c; }); }, off: off, on: function () { try { localStorage.removeItem(OFF); } catch (e) {} },
                            tapFirst: function () { return coarse(); } };
 })();

@@ -1570,6 +1570,26 @@
       })).then(function () { return items.length; });
     });
   }
+  function dropNote(n) {
+    if (!n) return Promise.resolve(0);
+    return editLayers(function (keys) {
+      var c = 0;
+      return Promise.all(keys.map(function (k) {
+        var d = S.store.L[k];
+        if (!d || !Array.isArray(d.ta) || !d.ta.some(function (t) { return t && t.n === n; })) return null;
+        return fresh(k).then(function (list) {
+          var out = [];
+          list.forEach(function (e) {
+            if (!e.ta || e.ta.n !== n) { out.push(e); return; }
+            c++;
+            if (e.ta.k) return;
+            delete e.ta.n; out.push(e);
+          });
+          S.mem[k] = out; S.sig[k] = ''; S.dirty[k] = 1;
+        });
+      })).then(function () { return c; });
+    });
+  }
   function noteNs() {
     var st = readStore(), out = {};
     Object.keys(st.L).forEach(function (k) {
@@ -1774,6 +1794,7 @@
   noteLine();
   window.GardenModuleInk.noteLine = noteLine;
   window.GardenModuleInk.noteNs = noteNs;
+  window.GardenModuleInk.dropNote = dropNote;
   window.GardenModuleInk.migrateNotes = migrateNotes;
   if (hasInk()) {
     keptSoon(document.readyState === 'complete' ? 0 : 300);

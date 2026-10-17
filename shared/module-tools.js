@@ -1110,62 +1110,67 @@
   }
 
   function slidesHref() { var a = document.getElementById('sidebar-slides-btn'); return a ? a.href : ''; }
+  /*@3.MOTJ2.26*/
   function smart(x, y, ctx) {
     ctx = ctx || {};
     return Promise.all([menuLib(), ink().catch(function () { return null; })]).then(function (r) {
-      var M = r[0], I = r[1], sec = ctx.sec, h = '';
-      var hit = ctx.hit || null, word = ctx.word || null;
+      var M = r[0], I = r[1], sec = ctx.sec, hit = ctx.hit || null, word = ctx.word || null;
+      var head = null, quick = [], items = [];
+      var cut = function (t) { t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > 60 ? t.slice(0, 58) + '…' : t; };
+      var isNote = !!(hit && hit.ta && hit.ta.k), hasNote = !!(hit && hit.ta && hit.ta.n);
+      var hitSt = !hit ? '' : isNote ? 'note' : (hit.ta && hit.ta.x) ? 'text' : ((hit.ta && hit.ta.u) ? 'under' : 'fill'), hs = hitSt;
+      var hr = hit && hit.rg && hit.rg.cloneRange ? hit.rg.cloneRange() : null;
+      var lay = (hit && I && I.layersAt && hr) ? I.layersAt(hr) : {};
       if (hit) {
-        var isNote = !!(hit.ta && hit.ta.k);
-        var hitSt = isNote ? 'note' : (hit.ta && hit.ta.x) ? 'text' : ((hit.ta && hit.ta.u) ? 'under' : 'fill'), hs = hitSt;
-        var hr = hit.rg && hit.rg.cloneRange ? hit.rg.cloneRange() : null;
-        var lay = (I && I.layersAt && hr) ? I.layersAt(hr) : {};
-        if (isNote) {
-          hs = lay.fill ? 'fill' : (lay.under ? 'under' : (lay.text ? 'text' : 'fill'));
-          h += M.head(L('ملاحظتُك على هذا النصّ', 'Your note on this text'));
-          h += M.item('hl-peek', 'fa-note-sticky', L('اعرضْ ملاحظتَك', 'Show your note'));
-          if (I && I.noteLine && I.noteLine()) h += M.item('n-quiet', hit.ta.q ? 'fa-eye' : 'fa-eye-slash', hit.ta.q ? L('أظهِرِ الخطَّ تحته', 'Show the line under it') : L('أزِلِ الخطَّ تحته', 'Remove the line under it'));
-          h += M.sep();
-        } else lay[hitSt] = (hit.ta && hit.ta.c) || lay[hitSt] || 'yellow';
-        h += M.head(L('تنسيقُ النصّ', 'Text formatting'));
-        h += '<div class="mt-mrow">' + stTabs(hs, 'data-mst') + '</div><div class="mt-mdots" role="group">' + hitDots(hs, lay[hs] || '') + '</div>';
-        h += M.item('hl-rm', 'fa-eraser', L(RM[hs][0], RM[hs][1]), { off: !lay[hs] });
-        h += M.item('hl-rmall', 'fa-broom', L('أزِلْ كلَّ التنسيق', 'Remove all formatting'), { danger: true });
-        h += M.item('pal', 'fa-palette', L('لوحاتُ الألوان…', 'Colour palettes…'));
-        if (hit.ta && hit.ta.n && !isNote) h += M.item('hl-peek', 'fa-note-sticky', L('اعرضْ ملاحظتَك عليه', 'Show your note on it'));
-        h += M.item('hl-copy', 'fa-copy', L('انسخِ النصّ', 'Copy the text'));
-        h += M.sep();
+        if (isNote) hs = lay.fill ? 'fill' : (lay.under ? 'under' : (lay.text ? 'text' : 'fill'));
+        else lay[hitSt] = (hit.ta && hit.ta.c) || lay[hitSt] || 'yellow';
+        head = { ico: hasNote ? 'fa-note-sticky' : STYLES[hitSt].i, t: hasNote ? L('ملاحظتُك على هذا النصّ', 'Your note on this text') : L('نصٌّ معلَّم', 'Marked text'), s: cut(hit.ta && hit.ta.t) };
+        quick.push({ a: 'hl-copy', i: 'fa-copy', t: L('انسخْ', 'Copy') });
+        if (hasNote) {
+          quick.push({ a: 'hl-peek', i: 'fa-note-sticky', t: L('اعرضْها', 'Show it') });
+          quick.push({ a: 'n-del', i: 'fa-trash', t: L('احذفْها', 'Delete it'), dz: 1 });
+        }
+        quick.push({ a: 'hl-rmall', i: 'fa-broom', t: L('بلا تنسيق', 'Unformat'), off: !lay.fill && !lay.under && !lay.text });
+        items.push({ a: 'g:fmt', i: 'fa-palette', t: L('تنسيقُ النصّ', 'Text formatting'), sub: [
+          { raw: '<div class="mt-mrow">' + stTabs(hs, 'data-mst') + '</div><div class="mt-mdots" role="group">' + hitDots(hs, lay[hs] || '') + '</div>' },
+          { a: 'hl-rm', i: 'fa-eraser', t: L(RM[hs][0], RM[hs][1]), off: !lay[hs] },
+          { sep: 1 },
+          { a: 'pal', i: 'fa-swatchbook', t: L('لوحاتُ الألوان…', 'Colour palettes…') }] });
+        if (isNote && I && I.noteLine && I.noteLine()) items.push({ a: 'n-quiet', i: hit.ta.q ? 'fa-eye' : 'fa-eye-slash', t: hit.ta.q ? L('أظهِرِ الخطَّ تحته', 'Show the line under it') : L('أزِلِ الخطَّ تحته', 'Remove the line under it') });
+      } else if (ctx.text) {
+        head = { ico: 'fa-i-cursor', t: L('النصُّ المحدَّد', 'Selected text'), s: cut(ctx.text) };
+        quick.push({ a: 'sel-copy', i: 'fa-copy', t: L('انسخْ', 'Copy') });
+        if (ctx.onNote) quick.push({ a: 'sel-note', i: 'fa-pen-to-square', t: L('ملاحظة', 'Note') });
+        if (hasLatin(ctx.text)) quick.push({ a: 'sel-tr', i: 'fa-language', t: L('ترجمْ', 'Translate') });
+        if (sec) quick.push({ a: 'c-ai', i: 'fa-wand-magic-sparkles', t: L('سؤالٌ للذكاء', 'AI prompt') });
+        if (ctx.range && I && I.stylesIn && I.stylesIn(ctx.range).length) items.push({ a: 'sel-clear', i: 'fa-broom', t: L('أزِلْ كلَّ التنسيق عن المحدَّد', 'Remove all formatting from the selection') });
+      } else if (sec) {
+        head = { ico: 'fa-book-open', t: cut(titleOf(sec)) || L('هذا المفهوم', 'This concept'), s: L('المفهومُ تحت المؤشّر', 'The concept under the pointer') };
+        quick.push({ a: 'c-text', i: 'fa-file-lines', t: L('انسخْه', 'Copy it') }, { a: 'c-note', i: 'fa-note-sticky', t: L('إلى ملاحظاتي', 'To my notes') },
+                   { a: 'c-img', i: 'fa-image', t: L('صورة', 'Image') }, { a: 'c-link', i: 'fa-link', t: L('رابط', 'Link') });
+      } else {
+        head = { ico: 'fa-layer-group', t: L('هذه الوحدة', 'This module') };
       }
-      if (ctx.text && !hit) {
-        h += M.head(L('النصُّ المحدَّد', 'Selected text'));
-        h += M.item('sel-copy', 'fa-copy', L('انسخْه', 'Copy it'));
-        if (ctx.range && I && I.stylesIn && I.stylesIn(ctx.range).length) h += M.item('sel-clear', 'fa-broom', L('أزِلْ كلَّ التنسيق عن المحدَّد', 'Remove all formatting from the selection'));
-        if (ctx.onNote) h += M.item('sel-note', 'fa-pen-to-square', L('ملاحظةٌ عليه', 'A note on it'));
-        if (hasLatin(ctx.text)) h += M.item('sel-tr', 'fa-language', L('ترجمْه', 'Translate it'));
-        h += M.sep();
-      } else if (word) {
-        h += M.item('word-tr', 'fa-language', L('ترجمْ «', 'Translate “') + word.text + L('»', '”'));
-        h += M.sep();
-      }
-      if (sec) {
-        h += M.head(titleOf(sec).slice(0, 48) || L('هذا المفهوم', 'This concept'));
-        h += M.item('c-text', 'fa-file-lines', L('انسخِ المفهومَ نصّاً', 'Copy the concept as text'));
-        h += M.item('c-img', 'fa-image', L('شاركْه صورةً جميلة', 'Share it as an image'));
-        h += M.item('c-ai', 'fa-wand-magic-sparkles', ctx.text && !hit ? L('انسخْ سؤالاً للذكاء عن النصِّ المحدَّد', 'Copy an AI prompt about the selected text') : L('انسخْه مع سؤالٍ للذكاء الاصطناعيّ', 'Copy it with a prompt for an AI'));
-        h += M.item('c-note', 'fa-note-sticky', L('أضِفْه إلى ملاحظات الوحدة', 'Add it to the module notes'));
-        h += M.item('c-link', 'fa-link', L('انسخْ رابطاً إليه', 'Copy a link to it'));
-        h += M.item('c-focus', 'fa-crosshairs', sec.classList.contains('mt-focused') ? L('أنهِ التركيز', 'Stop focusing') : L('ركّزْ عليه وحدَه', 'Focus on it alone'));
-        h += M.sep();
-      }
-      h += M.head(L('هذه الوحدة', 'This module'));
-      if (I) h += M.item('m-ink', 'fa-pen-nib', I.isOn() ? L('أغلقِ الدفتر', 'Close the notebook') : L('افتحِ الدفترَ للرسم والتظليل', 'Open the notebook to draw and highlight'));
-      if (I && I.noteLine && !I.noteLine()) h += M.item('m-nline', 'fa-note-sticky', L('أظهِرِ الخطَّ تحت النصوص التي عليها ملاحظات', 'Show the line under text with notes'));
-      if (peekHidden()) h += M.item('m-peek', 'fa-eye', L('أظهِرْ نوافذَ الملاحظات على النصّ', 'Show note windows on the text'));
-      if (slidesHref()) h += M.item('m-slides', 'fa-chalkboard', L('ادرسِ السلايداتِ الأصليّة', 'Study the original slides'));
-      h += M.item('m-quiz', 'fa-clipboard-question', L('اختبرْ نفسك', 'Test yourself'));
-      if (I && I.keep && window.CSS && CSS.highlights) h += M.item('m-keep', I.keep() ? 'fa-square-check' : 'fa-square', L('أبقِ التظليلَ ظاهراً خارجَ الدفتر', 'Keep highlights showing outside the notebook'));
-      if (!coarse()) h += '<div class="mt-mfoot">' + esc(L('Shift + الزرُّ الأيمن: قائمةُ المتصفّح', 'Shift + right-click: the browser menu')) + '</div>';
-      var mel = (coarse() ? sheet : M.open)(x, y, h, function (a) {
+      if (word && !hit && !ctx.text) items.push({ a: 'word-tr', i: 'fa-language', t: L('ترجمْ «', 'Translate “') + word.text + L('»', '”') });
+      if (sec) items.push({ a: 'g:sec', i: 'fa-book-open', t: L('هذا المفهوم', 'This concept'), sub: [
+        { a: 'c-text', i: 'fa-file-lines', t: L('انسخِ المفهومَ نصّاً', 'Copy the concept as text') },
+        { a: 'c-img', i: 'fa-image', t: L('شاركْه صورةً جميلة', 'Share it as an image') },
+        { a: 'c-ai', i: 'fa-wand-magic-sparkles', t: ctx.text && !hit ? L('انسخْ سؤالاً للذكاء عن المحدَّد', 'Copy an AI prompt about the selection') : L('انسخْه مع سؤالٍ للذكاء', 'Copy it with an AI prompt') },
+        { a: 'c-note', i: 'fa-note-sticky', t: L('أضِفْه إلى ملاحظات الوحدة', 'Add it to the module notes') },
+        { a: 'c-link', i: 'fa-link', t: L('انسخْ رابطاً إليه', 'Copy a link to it') },
+        { a: 'c-focus', i: 'fa-crosshairs', t: sec.classList.contains('mt-focused') ? L('أنهِ التركيز', 'Stop focusing') : L('ركّزْ عليه وحدَه', 'Focus on it alone'), ok: sec.classList.contains('mt-focused') }] });
+      var mod = [];
+      if (I) mod.push({ a: 'm-ink', i: 'fa-pen-nib', t: I.isOn() ? L('أغلقِ الدفتر', 'Close the notebook') : L('افتحِ الدفترَ للرسم والتظليل', 'Open the notebook to draw and highlight') });
+      mod.push({ a: 'm-quiz', i: 'fa-clipboard-question', t: L('اختبرْ نفسك', 'Test yourself') });
+      if (slidesHref()) mod.push({ a: 'm-slides', i: 'fa-chalkboard', t: L('ادرسِ السلايداتِ الأصليّة', 'Study the original slides') });
+      var show = [];
+      if (I && I.keep && window.CSS && CSS.highlights) show.push({ a: 'm-keep', i: 'fa-highlighter', t: L('التظليلُ ظاهرٌ خارجَ الدفتر', 'Highlights show outside the notebook'), ok: I.keep() });
+      if (I && I.noteLine) show.push({ a: 'm-nline', i: 'fa-note-sticky', t: L('خطٌّ تحت النصوص التي عليها ملاحظات', 'A line under text with notes'), ok: I.noteLine() });
+      show.push({ a: 'm-peek', i: 'fa-window-restore', t: L('نوافذُ الملاحظات على النصّ', 'Note windows on the text'), ok: !peekHidden() });
+      mod.push({ sep: 1 }, { h: L('الإظهار', 'Show') });
+      items.push({ sep: 1 }, { a: 'g:mod', i: 'fa-layer-group', t: L('هذه الوحدة', 'This module'), sub: mod.concat(show) });
+      if (!coarse()) items.push({ raw: '<div class="mt-mfoot">' + esc(L('Shift + الزرُّ الأيمن: قائمةُ المتصفّح', 'Shift + right-click: the browser menu')) + '</div>' });
+      var mel = M.rich(x, y, { head: head, quick: quick, items: items }, function (a) {
         if (a.indexOf('c:') === 0 && hit) {
           if (hs === hitSt) I.editHighlight(hit.ta, 'color', a.slice(2));
           else if (hr) I.addHighlight(hr, a.slice(2), hs);
@@ -1175,17 +1180,31 @@
         if (a === 'hl-rmall' && hr) { I.clearStyles(hr).then(function (n) { if (n) toast(L('أُزيل التنسيق ✓', 'Formatting removed ✓')); }); return; }
         if (a === 'sel-clear' && ctx.range) { I.clearStyles(ctx.range).then(function (n) { if (n) toast(L('أُزيل التنسيق ✓', 'Formatting removed ✓')); }); return; }
         if (a === 'pal') { palDialog(false); return; }
-        if (a === 'hl-peek' && hit) { js('module-peek.js', function () { return !!window.GardenModPeek; }).then(function () { window.GardenModPeek.on(); window.GardenModPeek.show(hit, { hold: 1 }); }); return; }
+        if ((a === 'hl-peek' || a === 'n-del') && hit) {
+          js('module-peek.js', function () { return !!window.GardenModPeek; }).then(function () {
+            window.GardenModPeek.on();
+            if (a === 'n-del') window.GardenModPeek.ask(hit); else window.GardenModPeek.show(hit, { hold: 1 });
+          });
+          return;
+        }
         if (a === 'hl-copy' && hit) { copyText(hit.ta.t); return; }
         if (a === 'n-quiet' && hit) { noteQuiet(I, hit.ta, !hit.ta.q); return; }
-        if (a === 'm-nline' && I) { I.noteLine(true); I.paintKept(); toast(L('عاد الخطُّ تحت النصوص التي عليها ملاحظات ✓', 'The line under noted text is back ✓')); return; }
+        if (a === 'm-nline' && I) {
+          var on = !I.noteLine(); I.noteLine(on); I.paintKept();
+          toast(on ? L('عاد الخطُّ تحت النصوص التي عليها ملاحظات ✓', 'The line under noted text is back ✓') : L('أُخفي الخطُّ تحت النصوص — والملاحظاتُ باقية', 'Lines hidden — your notes stay'));
+          return;
+        }
         if (a === 'sel-copy') { copyText(ctx.text); return; }
         if (a === 'sel-note' && ctx.onNote) { ctx.onNote(); return; }
         if (a === 'sel-tr') { translate(ctx.text, ctx.range ? ctx.range.getBoundingClientRect() : null); return; }
         if (a === 'word-tr' && word) { translate(word.text, word.rect); return; }
         if (sec && secAct(a, sec, ctx.text && !hit ? ctx.text : '')) return;
         if (a === 'm-ink' && I) { var b = document.querySelector('[data-gh-ink]'); if (b) I.bind(b); I.toggle(); return; }
-        if (a === 'm-peek') { try { localStorage.removeItem('garden_peek_off'); } catch (eP) {} toast(L('عادت نوافذُ الملاحظات ✓', 'Note windows are back ✓')); return; }
+        if (a === 'm-peek') {
+          if (peekHidden()) { try { localStorage.removeItem('garden_peek_off'); } catch (eP) {} toast(L('عادت نوافذُ الملاحظات ✓', 'Note windows are back ✓')); }
+          else { try { localStorage.setItem('garden_peek_off', '1'); } catch (eP2) {} if (window.GardenModPeek) GardenModPeek.hideAll(); toast(L('أُخفيت نوافذُ الملاحظات', 'Note windows hidden')); }
+          return;
+        }
         if (a === 'm-slides') { location.href = slidesHref(); return; }
         if (a === 'm-quiz') {
           var html = document.documentElement;
@@ -1193,20 +1212,37 @@
           return;
         }
         if (a === 'm-keep' && I) { I.keep(!I.keep()); }
-      }, { label: L('خياراتٌ ذكيّة', 'Smart options'), cls: 'mt-menu', M: M });
-      if (hit && mel) mel.addEventListener('click', function (e) {
+      }, { label: L('خياراتٌ ذكيّة', 'Smart options'), cls: 'mt-menu', focus: !coarse() });
+      if (!mel) return;
+      backCloses(mel, M);
+      if (hit) mel.addEventListener('click', function (e) {
         var t = e.target.closest ? e.target.closest('[data-mst]') : null;
         if (!t || !mel.contains(t)) return;
         var k = t.getAttribute('data-mst');
         if (k === hs) return;
         hs = k;
-        [].forEach.call(mel.querySelectorAll('[data-mst]'), function (q) { q.setAttribute('aria-checked', q.getAttribute('data-mst') === k ? 'true' : 'false'); });
-        var dd = mel.querySelector('.mt-mdots');
+        var pn = t.closest('.gsf-rm-sub, .gsf-rm-p') || mel;
+        [].forEach.call(pn.querySelectorAll('[data-mst]'), function (q) { q.setAttribute('aria-checked', q.getAttribute('data-mst') === k ? 'true' : 'false'); });
+        var dd = pn.querySelector('.mt-mdots');
         if (dd) dd.innerHTML = hitDots(k, lay[k] || '');
-        var rb = mel.querySelector('[data-act="hl-rm"]');
+        var rb = pn.querySelector('[data-act="hl-rm"]');
         if (rb) { rb.disabled = !lay[k]; rb.querySelector('span').textContent = L(RM[k][0], RM[k][1]); }
       });
     });
+  }
+  /*@3.MOTJ2.25*/
+  function backCloses(el, M) {
+    if (!el.classList.contains('gsf-rmenu--sheet')) return;
+    var pushed = false;
+    function pop() { pushed = false; if (el.isConnected) M.close(true); }
+    try { history.pushState({ mtSheet: 1 }, ''); pushed = true; window.addEventListener('popstate', pop); } catch (e) {}
+    var mo = new MutationObserver(function () {
+      if (el.isConnected) return;
+      mo.disconnect();
+      window.removeEventListener('popstate', pop);
+      if (pushed && history.state && history.state.mtSheet) { pushed = false; try { history.back(); } catch (e2) {} }
+    });
+    mo.observe(el.parentNode || document.body, { childList: true });
   }
   /*@3.MOTJ2.24*/
   function noteQuiet(I, ta, on) {
@@ -1351,5 +1387,6 @@
   function hlMenu(hit, x, y) { return smart(x, y, { hit: hit, sec: secOf(hit.rg.startContainer) }); }
 
   window.GardenModTools = { sel: showSel, hideSel: hideSel, moving: moving, selSheet: selSheet, smart: smart, onContext: onContext, hlMenu: hlMenu,
-                            shareCard: shareCard, shareImage: shareImage, aiPrompt: aiPrompt, shotDom: function (sec) { return exportLib().then(function (X) { return shotDom(sec, X); }); }, _fit: fitShot, md: mdOf, focus: focusOn, noteQuiet: noteQuiet };
+                            shareCard: shareCard, shareImage: shareImage, aiPrompt: aiPrompt, shotDom: function (sec) { return exportLib().then(function (X) { return shotDom(sec, X); }); }, _fit: fitShot, md: mdOf, focus: focusOn, noteQuiet: noteQuiet,
+                            warm: function () { menuLib().catch(function () {}); ink().catch(function () {}); } };
 })();

@@ -379,6 +379,10 @@
   function quick(id, bid, text) {
     if (!id || !String(text || '').trim()) return Promise.resolve(false);
     css();
+    if (!(S.el && S.ready && S.id === id && !S.closing)) return serial(function () { return quickVia(id, bid, text); });
+    return quickVia(id, bid, text);
+  }
+  function quickVia(id, bid, text) {
     if (S.el && S.ready && S.id === id && !S.closing) {
       return new Promise(function (ok) {
         quickR[bid] = ok;
@@ -443,40 +447,117 @@
       });
     });
   }
-  /*@3.MONJ.10*/
-  function create(o) {
-    o = o || {};
-    if (!o.quote || !String(o.text || '').trim()) return Promise.resolve(null);
-    css();
-    var req = { rid: ++S.rid, kind: 'quote', q: String(o.quote).slice(0, 4000), sec: o.sec || '', href: hrefOf(o.sec || ''), label: secTitle(o.sec || '') || moduleTitle() };
+  /*@3.MONJ.14*/
+  var chain = Promise.resolve(), busy = {};
+  function serial(fn) { var p = chain.then(fn, fn); chain = p.then(function () {}, function () {}); return p; }
+  function courier(steps, ms) {
     return new Promise(function (ok) {
-      var f = document.createElement('iframe'), done = false, b = '', id = null, step = 0;
+      var f = document.createElement('iframe'), done = false, st = { id: null };
       f.className = 'mn-courier';
       f.setAttribute('aria-hidden', 'true');
       f.tabIndex = -1;
-      f.src = frameUrl({});
+      f.src = frameUrl(steps.open || {});
       var end = function (v) {
         if (done) return; done = true;
         window.removeEventListener('message', on);
         setTimeout(function () { f.remove(); }, 50);
         ok(v);
       };
-      var tell = function (m) { f.contentWindow.postMessage(m, location.origin); };
+      st.tell = function (m) { f.contentWindow.postMessage(m, location.origin); };
+      st.end = end;
       var on = function (e) {
         if (e.source !== f.contentWindow || e.origin !== location.origin || !e.data) return;
-        var t = e.data.gnote;
-        if (t === 'open' && !step) { step = 1; id = e.data.id || null; tell({ gnote: 'append', req: req }); }
-        else if (t === 'appended' && step === 1 && e.data.rid === req.rid) { step = 2; b = e.data.b; tell({ gnote: 'quick', bid: b, text: String(o.text) }); }
-        else if (t === 'quicked' && step === 2) { step = 3; if (!(e.data.n > 0)) { end(null); return; } tell({ gnote: 'flush', keep: 1 }); setTimeout(function () { end(id && b ? { id: id, b: b } : null); }, 5000); }
-        else if (t === 'closed' && step === 3) end((e.data.id || id) && b ? { id: e.data.id || id, b: b } : null);
+        if (e.data.gnote === 'open' && !st.opened) { st.opened = 1; st.id = e.data.id || null; }
+        steps.on(e.data, st);
       };
       window.addEventListener('message', on);
       document.body.appendChild(f);
-      setTimeout(function () { end(null); }, 25000);
+      setTimeout(function () { end(null); }, ms || 25000);
+    });
+  }
+  function saveFlush(st, v) {
+    st.tell({ gnote: 'flush', keep: 1 });
+    st.after = v;
+    setTimeout(function () { st.end(v); }, 5000);
+  }
+
+  /*@3.MONJ.15*/
+  var PK = 'garden_mn_pend';
+  function pendAll() { try { var a = JSON.parse(localStorage.getItem(PK) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; } }
+  function pendSet(a) { try { if (a.length) localStorage.setItem(PK, JSON.stringify(a)); else localStorage.removeItem(PK); } catch (e) {} }
+  function pendDrop(k) { pendSet(pendAll().filter(function (x) { return x.k !== k; })); }
+  function draft(o) {
+    if (!o || !o.k) return;
+    var a = pendAll().filter(function (x) { return x.k !== o.k; });
+    if (String(o.text || '').trim()) {
+      var w = where();
+      a.push({ k: o.k, p: rel(location.pathname), c: w.c, m: w.m, quote: o.quote ? String(o.quote).slice(0, 4000) : '', sec: o.sec || '',
+               id: o.id || '', bid: o.bid || '', text: String(o.text).slice(0, 4000), t: Date.now() });
+    }
+    pendSet(a);
+  }
+
+  /*@3.MONJ.10*/
+  function create(o) {
+    o = o || {};
+    if (!o.quote || !String(o.text || '').trim()) return Promise.resolve(null);
+    css();
+    var k = o.k || ('c' + Date.now().toString(36));
+    draft({ k: k, quote: o.quote, sec: o.sec, text: o.text });
+    busy[k] = 1;
+    var req = { rid: ++S.rid, kind: 'quote', q: String(o.quote).slice(0, 4000), sec: o.sec || '', href: hrefOf(o.sec || ''), label: secTitle(o.sec || '') || moduleTitle() };
+    return serial(function () {
+      return courier({ on: function (d, st) {
+        var t = d.gnote;
+        if (t === 'open' && !st.step) { st.step = 1; st.tell({ gnote: 'append', req: req }); }
+        else if (t === 'appended' && st.step === 1 && d.rid === req.rid) { st.step = 2; st.b = d.b; st.tell({ gnote: 'quick', bid: d.b, text: String(o.text) }); }
+        else if (t === 'quicked' && st.step === 2) { st.step = 3; if (!(d.n > 0)) { st.end(null); return; } saveFlush(st, st.id && st.b ? { id: st.id, b: st.b } : null); }
+        else if (t === 'closed' && st.step === 3) st.end((d.id || st.id) && st.b ? { id: d.id || st.id, b: st.b } : null);
+      } });
     }).then(function (r) {
-      if (!r || !o.range) return r;
+      delete busy[k];
+      if (!r) return null;
+      pendDrop(k);
+      if (!o.range) return r;
       return inkLib().then(function (I) { return I.addHighlight(o.range, 'sky', 'note', { n: r.id + '#' + r.b }); }).then(function () { return r; }, function () { return r; });
     });
+  }
+  /*@3.MONJ.12*/
+  function addLine(id, bid, text, k) {
+    if (!id || !String(text || '').trim()) return Promise.resolve(false);
+    k = k || ('q' + Date.now().toString(36));
+    draft({ k: k, id: id, bid: bid, text: text });
+    busy[k] = 1;
+    return quick(id, bid, text).then(function (v) { delete busy[k]; if (v) pendDrop(k); return v; });
+  }
+  /*@3.MONJ.16*/
+  function drop(id, bid) {
+    if (!id || !bid) return Promise.resolve(false);
+    css();
+    return serial(function () {
+      return courier({ open: { id: id }, on: function (d, st) {
+        var t = d.gnote;
+        if (t === 'open' && !st.step) { st.step = 1; st.tell({ gnote: 'dropsec', bid: bid }); }
+        else if (t === 'dropped' && st.step === 1) { st.step = 2; if (!(d.n > 0)) { st.end(false); return; } saveFlush(st, true); }
+        else if (t === 'closed' && st.step === 2) st.end(true);
+      } });
+    }).then(function (v) {
+      if (!v) return false;
+      return inkLib().then(function (I) { return I.dropNote ? I.dropNote(id + '#' + bid) : 0; }).then(function () { return true; }, function () { return true; });
+    });
+  }
+  /*@3.MONJ.13*/
+  function retry() {
+    var here = rel(location.pathname), old = Date.now() - 4000;
+    var mine = pendAll().filter(function (x) { return x.p === here && !busy[x.k] && x.t < old; });
+    if (!mine.length) return Promise.resolve(0);
+    var n = 0;
+    return mine.reduce(function (p, x) {
+      return p.then(function () {
+        var go = x.id ? addLine(x.id, x.bid, x.text, x.k) : create({ k: x.k, quote: x.quote, sec: x.sec, text: x.text });
+        return go.then(function (v) { if (v) n++; });
+      });
+    }, Promise.resolve()).then(function () { return n; });
   }
 
   function rel(p) { return String(p || '').replace(/^.*?\/(L\d+\/|others\/)/, '$1'); }
@@ -564,6 +645,6 @@
     try { document.dispatchEvent(new CustomEvent('garden:peekToggle', { detail: { on: true } })); } catch (e2) {}
   }
 
-  window.GardenModNote = { open: open, close: close, quick: quick, create: create, relink: relink, adoptAll: adoptAll, peekOn: peekOn, peekOff: peekOff,
+  window.GardenModNote = { open: open, close: close, quick: quick, create: create, relink: relink, addLine: addLine, drop: drop, draft: draft, retry: retry, adoptAll: adoptAll, peekOn: peekOn, peekOff: peekOff,
                            isOpen: function () { return !!S.el; }, id: function () { return S.id; } };
 })();

@@ -13420,6 +13420,28 @@
     return snapP;
   }
   /*@3.NOAJ.526*/
+  /*@3.NOAJ.530*/
+  function embDrop(bid) {
+    var id = edId;
+    if (!id || !ed || !ed.doc) { embPost('dropped', { bid: bid, n: 0 }); return; }
+    try { ed.readAll(); } catch (e0) {}
+    var bl = ed.doc.blocks, at = -1, i;
+    for (i = 0; i < bl.length; i++) if (bl[i].id === bid) { at = i; break; }
+    while (at > 0 && bl[at - 1].ty !== 'hr') at--;
+    if (at < 0) { embPost('dropped', { bid: bid, n: 0 }); return; }
+    var end = at;
+    while (end < bl.length && bl[end].ty !== 'hr') end++;
+    var a = at, z = end;
+    if (a > 0 && bl[a - 1].ty === 'hr') a--; else if (z < bl.length) z++;
+    var before = ed.snapshot ? ed.snapshot() : null;
+    bl.splice(a, z - a);
+    if (!bl.length) bl.push(window.GardenNotesBlocks.blank('p'));
+    if (before && ed.pushUndo) ed.pushUndo(before);
+    ed.render();
+    ed.touch();
+    try { ed.save(); } catch (e1) {}
+    setTimeout(function () { snapWrite(id).then(function () { embPost('dropped', { bid: bid, n: end - at }); }); }, 60);
+  }
   function embQuick(bid, text) {
     var id = edId, B = window.GardenNotesBlocks;
     if (!id || !ed || !ed.doc || !B) { embPost('quicked', { bid: bid, n: 0 }); return; }
@@ -13484,6 +13506,7 @@
       if (e.data.gnote === 'flush') embFlush(!!e.data.keep);
       else if (e.data.gnote === 'append') embAppend(e.data.req);
       else if (e.data.gnote === 'quick') embQuick(e.data.bid, e.data.text);
+      else if (e.data.gnote === 'dropsec') embDrop(e.data.bid);
       else if (e.data.gnote === 'show' && ed && e.data.bid) embWhenOpen(edId, function () { ed.flashBlock(e.data.bid); });
       else if (e.data.gnote === 'dock') { embDock = !!e.data.on; document.documentElement.toggleAttribute('data-dock', embDock); applyFs(); }
     });

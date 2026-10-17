@@ -3545,8 +3545,10 @@
     _modInk().then((I) => _linkAdopted(I)).then((n) => { if (n) restoreHighlights(); }).catch(() => {});
   });
   function _relinkSoon() {
-    if (!_isModPage() || !moduleRich().length) return;
-    const go = () => _modNoteLib().then((M) => (M.relink ? M.relink() : 0)).catch(() => 0);
+    let pend = false;
+    try { pend = !!localStorage.getItem('garden_mn_pend'); } catch (e) {}
+    if (!_isModPage() || (!pend && !moduleRich().length)) return;
+    const go = () => _modNoteLib().then((M) => Promise.resolve(M.retry ? M.retry() : 0).then(() => (M.relink ? M.relink() : 0))).catch(() => 0);
     if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 5000 }); else setTimeout(go, 2500);
   }
   if (document.readyState === 'complete') setTimeout(_relinkSoon, 1500); else window.addEventListener('load', () => setTimeout(_relinkSoon, 1500), { once: true });
@@ -3618,6 +3620,13 @@
     }
     return false;
   }
+  let _warmed = false;
+  /*@3.GARJ.705*/
+  function _warmMod() {
+    if (_warmed || !_isModPage()) return;
+    _warmed = true;
+    _modTools().then((T) => { if (T && T.warm) T.warm(); _modPeek().catch(() => {}); _modNoteLib().catch(() => {}); }, () => { _warmed = false; });
+  }
   function _modSel(rect, text) {
     hideNotesTooltip();
     hideMobileNoteSaveBar();
@@ -3660,6 +3669,11 @@
     const notesOff = document.body.hasAttribute('data-no-notes');
     if (notesOff) return;
 
+    if (_isModPage() && mainContent) {
+      ['selectstart', 'contextmenu', 'touchstart', 'pointerdown'].forEach((k) => mainContent.addEventListener(k, _warmMod, { passive: true, once: true }));
+      const idle = () => { if (navigator.connection && navigator.connection.saveData) return; (window.requestIdleCallback || ((f) => setTimeout(f, 1500)))(_warmMod, { timeout: 8000 }); };
+      if (document.readyState === 'complete') setTimeout(idle, 2500); else window.addEventListener('load', () => setTimeout(idle, 2500), { once: true });
+    }
     mainContent?.addEventListener('mouseup', (e) => {
       clearTimeout(selectionTimeout);
       selectionTimeout = setTimeout(() => {
@@ -3672,7 +3686,7 @@
           if (_isModPage()) { _modSel(rect, text); return; }
           showNotesTooltip(rect, text);
         } else { hideNotesTooltip(); if (window.GardenModTools) GardenModTools.hideSel(); }
-      }, 200);
+      }, e.detail > 1 ? 200 : 60);
     });
 
     let mobileSelTimeout;
