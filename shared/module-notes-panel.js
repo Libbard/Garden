@@ -137,7 +137,7 @@
   function kindOf(r) { return r.ta ? r.st : 'note'; }
   function counts() {
     var c = { all: 0, note: 0, fill: 0, under: 0, text: 0 };
-    S.items.forEach(function (r) { c.all++; c[r.st] = (c[r.st] || 0) + 1; if (r.hasNote) c.note++; });
+    S.items.forEach(function (r) { c.all++; if (r.st !== 'note') c[r.st] = (c[r.st] || 0) + 1; if (r.hasNote) c.note++; });
     c.all += S.pages.length + S.legacy.length;
     c.marks = S.items.length;
     c.note += S.pages.length + S.legacy.length;

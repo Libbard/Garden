@@ -8513,8 +8513,9 @@
     }
     var oi = document.getElementById('na-zoom-in');
     var oo = document.getElementById('na-zoom-out');
-    if (oi) oi.disabled = v >= FS_STEPS[FS_STEPS.length - 1] - 0.001;
-    if (oo) oo.disabled = v <= FS_STEPS[0] + 0.001;
+    var lo = pdfOn() ? FS_STEPS[0] : PINCH_MIN, hi = pdfOn() ? FS_STEPS[FS_STEPS.length - 1] : PINCH_MAX;
+    if (oi) oi.disabled = v >= hi - 0.001;
+    if (oo) oo.disabled = v <= lo + 0.001;
   }
 
   function applyFs() {
@@ -8549,9 +8550,13 @@
       applyFs();
       return FS_STEPS[j2];
     }
-    for (k = 0; k < FS_STEPS.length; k++) if (FS_STEPS[k] <= cur + 0.001) i = k;
-    if (dir > 0 && FS_STEPS[i] < cur - 0.001) i = Math.min(FS_STEPS.length - 1, i + 1);
-    var j = Math.max(0, Math.min(FS_STEPS.length - 1, i + dir));
+    var to = dir > 0 ? Math.ceil(cur * 1.1 * 20 - 0.001) / 20 : Math.floor(cur / 1.1 * 20 + 0.001) / 20;
+    if (at && at.f > 0) to = cur * at.f;
+    return zoomTo(to, at);
+  }
+  /*@3.NOAJ.528*/
+  function zoomTo(to, at) {
+    to = Math.max(PINCH_MIN, Math.min(PINCH_MAX, Math.round(to * 10000) / 10000));
     /*@3.NOAJ.314*/
     var anc = null, bodyA = els.docBody, tfA = tfEl();
     if (bodyA && tfA) {
@@ -8560,7 +8565,7 @@
       var cyA = (at && at.cy != null) ? at.cy : bA.top + bA.height / 2;
       anc = { cx: cxA, cy: cyA, ux: (cxA - rA.left) / z0, uy: (cyA - rA.top) / z0 };
     }
-    uiSet('fs', FS_STEPS[j]);
+    uiSet('fs', to);
     applyFs();
     if (anc) {
       var z1 = stageZoom() || 1, r1 = tfA.getBoundingClientRect();
@@ -8568,12 +8573,12 @@
       bodyA.scrollTop += (r1.top + anc.uy * z1) - anc.cy;
       updatePgNav();
     }
-    return FS_STEPS[j];
+    return to;
   }
 
   /*@3.NOAJ.123*/
   /*@3.NOAJ.129*/
-  var PINCH_MIN = 0.35, PINCH_MAX = 3;
+  var PINCH_MIN = 0.25, PINCH_MAX = 6;
   var pz = null;
   var pzQ = 0, pzEndT = 0;
 
@@ -8706,6 +8711,26 @@
 
   var FS_MODES = ['auto', 'fit', 1];
 
+  /*@3.NOAJ.529*/
+  function zoomMenu(btn) {
+    var M = window.GardenMenu, r = btn.getBoundingClientRect(), v = Math.round(fsNow() * 100);
+    var t = L('حجمُ الصفحة', 'Page size'), h = M.head(t) +
+      '<div class="na-zm"><input type="range" class="na-zm-r" min="' + Math.round(PINCH_MIN * 100) + '" max="' + Math.round(PINCH_MAX * 100) + '" step="5" value="' + v + '" aria-label="' + esc(t) + '">' +
+      '<output class="na-zm-v">' + v + '%</output></div>' +
+      '<div class="na-zm-p">' + [50, 75, 100, 150, 200, 300, 400, 600].map(function (p) {
+        return '<button type="button" class="na-zm-c" data-act="z:' + p + '"' + (p === v ? ' aria-pressed="true"' : '') + '>' + p + '%</button>';
+      }).join('') + '</div>' + M.sep() +
+      M.item('m:auto', 'fa-wand-magic-sparkles', L(ZOOM_LABEL.auto[0], ZOOM_LABEL.auto[1])) +
+      M.item('m:fit', 'fa-arrows-left-right-to-line', L(ZOOM_LABEL.fit[0], ZOOM_LABEL.fit[1]));
+    var el = M.open(r.left, r.bottom + 6, h, function (a) {
+      if (a.indexOf('z:') === 0) zoomTo(Number(a.slice(2)) / 100);
+      else if (a.indexOf('m:') === 0) { uiSet('fs', a.slice(2)); applyFs(); }
+    }, { label: t, cls: 'na-zm-menu', keys: false });
+    if (!el) return;
+    var sl = el.querySelector('.na-zm-r'), out = el.querySelector('.na-zm-v');
+    sl.addEventListener('input', function () { out.textContent = sl.value + '%'; zoomTo(Number(sl.value) / 100); });
+    try { sl.focus({ preventScroll: true }); } catch (e) {}
+  }
   function resetFs() {
     if (pdfOn()) { pdfUi.refit('page'); applyFs(); return 1; }
     var m = fsMode();
@@ -12372,13 +12397,15 @@
     var zo = document.getElementById('na-zoom-out');
     if (zo) zo.addEventListener('click', function () { stepFs(-1); });
     var zl = document.getElementById('na-zoom-lbl');
-    if (zl) zl.addEventListener('click', resetFs);
+    if (zl) zl.addEventListener('click', function () { if (pdfOn() || !window.GardenMenu) resetFs(); else zoomMenu(zl); });
     document.addEventListener('wheel', function (e) {
       if (!edId || !(e.ctrlKey || e.metaKey)) return;
       if (!ed && !pdfOn()) return;
       if (!e.target.closest || !e.target.closest('.na-doc-body')) return;
       e.preventDefault();
-      stepFs(e.deltaY < 0 ? 1 : -1, { cx: e.clientX, cy: e.clientY });
+      if (pdfOn()) { stepFs(e.deltaY < 0 ? 1 : -1, { cx: e.clientX, cy: e.clientY }); return; }
+      var dy = Math.max(-60, Math.min(60, e.deltaMode === 1 ? e.deltaY * 20 : e.deltaY));
+      stepFs(0, { cx: e.clientX, cy: e.clientY, f: Math.exp(-dy * 0.004) });
     }, { passive: false });
     if (els.ribbonHost && window.GardenNotesRibbon) {
       ribbon = GardenNotesRibbon.mount(els.ribbonHost, {

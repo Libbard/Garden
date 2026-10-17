@@ -1049,12 +1049,14 @@
       if (!tr) return;
       e.preventDefault();
 
-      var raw = self.points(e), out = [];
+      var raw = self.points(e), out = [], vv = window.visualViewport;
+      /*@3.NOIJ2.38*/
+      var tol = 0.35 / ((vv && vv.scale > 1) ? vv.scale : 1);
       for (var i = 0; i < raw.length; i++) {
         var p = self.local(raw[i]);
         p.cx = raw[i].clientX; p.cy = raw[i].clientY;
         var last = tr.pts[tr.pts.length - 1];
-        if (last && Math.abs(p.x - last.x) < 0.35 && Math.abs(p.y - last.y) < 0.35) continue;
+        if (last && Math.abs(p.x - last.x) < tol && Math.abs(p.y - last.y) < tol) continue;
         p.p = self.effP(tr, p, raw[i]);
         self.effTilt(tr, p, raw[i]);
         tr.pts.push(p);

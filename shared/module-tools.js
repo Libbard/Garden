@@ -1116,16 +1116,23 @@
       var M = r[0], I = r[1], sec = ctx.sec, h = '';
       var hit = ctx.hit || null, word = ctx.word || null;
       if (hit) {
-        var hitSt = (hit.ta && hit.ta.x) ? 'text' : ((hit.ta && hit.ta.u) ? 'under' : 'fill'), hs = hitSt;
+        var isNote = !!(hit.ta && hit.ta.k);
+        var hitSt = isNote ? 'note' : (hit.ta && hit.ta.x) ? 'text' : ((hit.ta && hit.ta.u) ? 'under' : 'fill'), hs = hitSt;
         var hr = hit.rg && hit.rg.cloneRange ? hit.rg.cloneRange() : null;
         var lay = (I && I.layersAt && hr) ? I.layersAt(hr) : {};
-        lay[hitSt] = (hit.ta && hit.ta.c) || lay[hitSt] || 'yellow';
+        if (isNote) {
+          hs = lay.fill ? 'fill' : (lay.under ? 'under' : (lay.text ? 'text' : 'fill'));
+          h += M.head(L('ملاحظتُك على هذا النصّ', 'Your note on this text'));
+          h += M.item('hl-peek', 'fa-note-sticky', L('اعرضْ ملاحظتَك', 'Show your note'));
+          if (I && I.noteLine && I.noteLine()) h += M.item('n-quiet', hit.ta.q ? 'fa-eye' : 'fa-eye-slash', hit.ta.q ? L('أظهِرِ الخطَّ تحته', 'Show the line under it') : L('أزِلِ الخطَّ تحته', 'Remove the line under it'));
+          h += M.sep();
+        } else lay[hitSt] = (hit.ta && hit.ta.c) || lay[hitSt] || 'yellow';
         h += M.head(L('تنسيقُ النصّ', 'Text formatting'));
         h += '<div class="mt-mrow">' + stTabs(hs, 'data-mst') + '</div><div class="mt-mdots" role="group">' + hitDots(hs, lay[hs] || '') + '</div>';
         h += M.item('hl-rm', 'fa-eraser', L(RM[hs][0], RM[hs][1]), { off: !lay[hs] });
         h += M.item('hl-rmall', 'fa-broom', L('أزِلْ كلَّ التنسيق', 'Remove all formatting'), { danger: true });
         h += M.item('pal', 'fa-palette', L('لوحاتُ الألوان…', 'Colour palettes…'));
-        if (hit.ta && hit.ta.n) h += M.item('hl-peek', 'fa-note-sticky', L('اعرضْ ملاحظتَك عليه', 'Show your note on it'));
+        if (hit.ta && hit.ta.n && !isNote) h += M.item('hl-peek', 'fa-note-sticky', L('اعرضْ ملاحظتَك عليه', 'Show your note on it'));
         h += M.item('hl-copy', 'fa-copy', L('انسخِ النصّ', 'Copy the text'));
         h += M.sep();
       }
@@ -1152,6 +1159,7 @@
       }
       h += M.head(L('هذه الوحدة', 'This module'));
       if (I) h += M.item('m-ink', 'fa-pen-nib', I.isOn() ? L('أغلقِ الدفتر', 'Close the notebook') : L('افتحِ الدفترَ للرسم والتظليل', 'Open the notebook to draw and highlight'));
+      if (I && I.noteLine && !I.noteLine()) h += M.item('m-nline', 'fa-note-sticky', L('أظهِرِ الخطَّ تحت النصوص التي عليها ملاحظات', 'Show the line under text with notes'));
       if (peekHidden()) h += M.item('m-peek', 'fa-eye', L('أظهِرْ نوافذَ الملاحظات على النصّ', 'Show note windows on the text'));
       if (slidesHref()) h += M.item('m-slides', 'fa-chalkboard', L('ادرسِ السلايداتِ الأصليّة', 'Study the original slides'));
       h += M.item('m-quiz', 'fa-clipboard-question', L('اختبرْ نفسك', 'Test yourself'));
@@ -1169,6 +1177,8 @@
         if (a === 'pal') { palDialog(false); return; }
         if (a === 'hl-peek' && hit) { js('module-peek.js', function () { return !!window.GardenModPeek; }).then(function () { window.GardenModPeek.on(); window.GardenModPeek.show(hit, { hold: 1 }); }); return; }
         if (a === 'hl-copy' && hit) { copyText(hit.ta.t); return; }
+        if (a === 'n-quiet' && hit) { noteQuiet(I, hit.ta, !hit.ta.q); return; }
+        if (a === 'm-nline' && I) { I.noteLine(true); I.paintKept(); toast(L('عاد الخطُّ تحت النصوص التي عليها ملاحظات ✓', 'The line under noted text is back ✓')); return; }
         if (a === 'sel-copy') { copyText(ctx.text); return; }
         if (a === 'sel-note' && ctx.onNote) { ctx.onNote(); return; }
         if (a === 'sel-tr') { translate(ctx.text, ctx.range ? ctx.range.getBoundingClientRect() : null); return; }
@@ -1198,6 +1208,17 @@
       });
     });
   }
+  /*@3.MOTJ2.24*/
+  function noteQuiet(I, ta, on) {
+    I.editHighlight(ta, 'quiet', on ? 1 : 0).then(function () {
+      if (!on) { toast(L('عاد الخطُّ تحته ✓', 'The line is back ✓')); return; }
+      actToast(L('أُزيل الخطّ — أتريد إخفاءه تحت كلِّ نصٍّ عليه ملاحظة؟', 'Line removed — hide it under every noted text?'), [
+        { icon: 'fa-eye-slash', label: L('أخفِه دائماً', 'Always hide'), run: function () {
+          I.noteLine(false); I.paintKept();
+          toast(L('لن يظهر خطٌّ تحت النصوص — تعيده من الزرّ الأيمن', 'No more lines — bring them back from the right-click menu'));
+        } }]);
+    });
+  }
   function secAct(a, sec, sel) {
     if (a === 'c-text') copyText(mdOf(sec));
     else if (a === 'c-img') shareImage(sec);
@@ -1209,7 +1230,7 @@
     return true;
   }
 
-  var KEEP_HIST = /^(c:|sel-copy|sel-tr|sel-clear|word-tr|c-text|c-link|c-focus|c-img|c-ai|quiet|m-keep|m-peek|hl-copy|hl-rm)/;
+  var KEEP_HIST = /^(c:|sel-copy|sel-tr|sel-clear|word-tr|c-text|c-link|c-focus|c-img|c-ai|quiet|m-keep|m-peek|m-nline|n-quiet|hl-copy|hl-rm)/;
   /*@3.MOTJ2.12*/
   function sheet(x, y, h, onAct, o) {
     var M = o.M, downIn = false, acted = '', pushed = false;
@@ -1330,5 +1351,5 @@
   function hlMenu(hit, x, y) { return smart(x, y, { hit: hit, sec: secOf(hit.rg.startContainer) }); }
 
   window.GardenModTools = { sel: showSel, hideSel: hideSel, moving: moving, selSheet: selSheet, smart: smart, onContext: onContext, hlMenu: hlMenu,
-                            shareCard: shareCard, shareImage: shareImage, aiPrompt: aiPrompt, shotDom: function (sec) { return exportLib().then(function (X) { return shotDom(sec, X); }); }, _fit: fitShot, md: mdOf, focus: focusOn };
+                            shareCard: shareCard, shareImage: shareImage, aiPrompt: aiPrompt, shotDom: function (sec) { return exportLib().then(function (X) { return shotDom(sec, X); }); }, _fit: fitShot, md: mdOf, focus: focusOn, noteQuiet: noteQuiet };
 })();

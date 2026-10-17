@@ -3544,6 +3544,12 @@
     if (!_isModPage() || !loadNotes().some(n => !n.highlightOnly && n.mig && n.mig.rn && n.mig.b && !n.mig.e)) return;
     _modInk().then((I) => _linkAdopted(I)).then((n) => { if (n) restoreHighlights(); }).catch(() => {});
   });
+  function _relinkSoon() {
+    if (!_isModPage() || !moduleRich().length) return;
+    const go = () => _modNoteLib().then((M) => (M.relink ? M.relink() : 0)).catch(() => 0);
+    if (window.requestIdleCallback) requestIdleCallback(go, { timeout: 5000 }); else setTimeout(go, 2500);
+  }
+  if (document.readyState === 'complete') setTimeout(_relinkSoon, 1500); else window.addEventListener('load', () => setTimeout(_relinkSoon, 1500), { once: true });
   let _mnP = null;
   /*@3.GARJ.687*/
   function _modNoteLib() {
@@ -3568,9 +3574,12 @@
       const n = range.startContainer.nodeType === 3 ? range.startContainer.parentNode : range.startContainer;
       sec = n && n.closest ? n.closest('.main-content > section[id]') : null;
     }
+    const rect = range ? range.getBoundingClientRect() : null;
     window.getSelection()?.removeAllRanges();
-    _modNoteLib().then((M) => M.open({ quote: text, range: range, sec: sec && sec.id }),
+    const full = () => _modNoteLib().then((M) => M.open({ quote: text, range: range, sec: sec && sec.id }),
       () => openNoteEditor({ free: false, highlightText: text, anchor: anchor }));
+    if (window.GardenModNote && GardenModNote.isOpen && GardenModNote.isOpen()) { full(); return; }
+    _modPeek().then((P) => { if (!P.compose({ quote: text, range: range, sec: sec && sec.id, rect: rect })) full(); }, full);
   }
   /*@3.GARJ.688*/
   function _richIdx() {
@@ -6120,9 +6129,9 @@ ${baseRules}`) + regenSuffix;
     }
 
     /*@3.GARJ.651*/
-    systemPrompt = systemPrompt
+    systemPrompt = aiAdvise(systemPrompt
       .split('{{ANALOGY}}').join(analogySrc)
-      .split('{{EXAMPLE}}').join(exampleKind);
+      .split('{{EXAMPLE}}').join(exampleKind));
 
     /*@3.GARJ.345*/
     if (opts.question) {
@@ -6157,8 +6166,27 @@ ${baseRules}`) + regenSuffix;
   /*@3.GARJ.587*/
   /*@3.GARJ.591*/
   /*@3.GARJ.581*/
+  /*@3.GARJ.704*/
+  const AI_ADVICE = {
+    '🧮 المثال:': '⟡ إن لم يناسب هذا النوعُ من الأمثلة موضوعَ البطاقة، فابنِ مثالاً محسوساً من مادّتها نفسِها ولا تنتقل إلى موضوعٍ آخر.',
+    '🧮 The Example:': "⟡ If this kind of example does not fit the card's topic, build a concrete example from the card's own material instead; never switch to another topic.",
+    '🪄 التشبيه:': '⟡ إن لم يطابق تشبيهٌ من هذا الحقل الفكرةَ بدقّة، فاختر تشبيهاً أقربَ إليها.',
+    '🪄 The Analogy:': '⟡ If no analogy from this field mirrors the idea precisely, choose a closer one.',
+  };
+  function aiAdvise(sp) {
+    if (!sp || sp.indexOf('⟡') !== -1) return sp;
+    const lines = sp.split('\n');
+    for (const sign of Object.keys(AI_ADVICE)) {
+      const i = lines.findIndex(l => l.indexOf(sign) === 0);
+      if (i !== -1) { lines.splice(i + 1, 0, AI_ADVICE[sign]); return lines.join('\n'); }
+    }
+    return sp;
+  }
+  function aiStripAdvice(s) {
+    return String(s == null ? '' : s).split('\n').filter(l => l.charAt(0) !== '⟡').join('\n');
+  }
   function aiIdentityString(p) {
-    return 'gai1' + AI_ID_SEP + aiNormalize(p.systemPrompt) + AI_ID_SEP + aiNormalize(p.userMsg);
+    return 'gai1' + AI_ID_SEP + aiNormalize(aiStripAdvice(p.systemPrompt)) + AI_ID_SEP + aiNormalize(p.userMsg);
   }
 
   /*@3.GARJ.580*/

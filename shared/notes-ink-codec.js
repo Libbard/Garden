@@ -8,7 +8,7 @@
   var NIBS = ['round', 'fine', 'marker', 'flat', 'pencil', 'chalk'];
   var Q = 8;
   var P_MAX = 63;
-  var RDP_EPS = 0.4;
+  var RDP_EPS = 0.2;
 
   function rdp(pts, eps) {
     if (pts.length < 3) return pts.slice();

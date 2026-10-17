@@ -138,13 +138,14 @@
     card.setAttribute('aria-label', L('ملاحظتُك على هذا النصّ', 'Your note on this text'));
     card.style.setProperty('--mp-t', /^#/.test(hit.ta.c || '') ? hit.ta.c : 'var(--gmi-p-' + (hit.ta.c || 'sky') + ', #5ab8ff)');
     skin(card, hit.rg);
-    var st = hit.ta.x ? 'text' : (hit.ta.u ? 'under' : 'fill');
+    var st = hit.ta.k ? 'note' : (hit.ta.x ? 'text' : (hit.ta.u ? 'under' : 'fill'));
     card.innerHTML =
       '<header class="mp-h"><span class="mp-tt"><i class="mp-mk" data-st="' + st + '" aria-hidden="true"></i><b data-ar="ملاحظتُك" data-en="Your note">' + esc(L('ملاحظتُك', 'Your note')) + '</b></span>' +
         '<span class="mp-acts">' +
         btn('pin', 'fa-thumbtack', 'ثبِّتْها عائمةً — واسحبْها من رأسها إلى أيِّ موضع', 'Float it — drag it by its header anywhere') +
         btn('copy', 'fa-copy', 'انسخْ ما فيها', 'Copy its content') +
         btn('open', 'fa-up-right-and-down-left-from-center', moved ? 'افتحْها في ملاحظات الوحدة' : 'انقلْها إلى ملاحظات الوحدة', moved ? 'Open it in the module notes' : 'Move it into the module notes') +
+        (hit.ta.k && window.GardenModuleInk && GardenModuleInk.noteLine && GardenModuleInk.noteLine() && !hit.ta.q ? btn('line', 'fa-eraser', 'أزِلِ الخطَّ تحت هذا النصّ', 'Remove the line under this text') : '') +
         btn('eye', 'fa-eye-slash', 'أخفِ نوافذَ الملاحظات (تُعاد من «ملاحظاتي»)', 'Hide note windows (bring them back from My notes)') +
         btn('x', 'fa-xmark', 'أغلقْ', 'Close') +
         '</span></header>' +
@@ -303,6 +304,10 @@
     else if (act === 'pin') pin(card, !card.classList.contains('mp-pin'));
     else if (act === 'copy') copy(card);
     else if (act === 'open') openIt(card);
+    else if (act === 'line') {
+      hide(card);
+      js('module-tools.js', function () { return !!window.GardenModTools; }).then(function () { window.GardenModTools.noteQuiet(window.GardenModuleInk, card.__hit.ta, true); });
+    }
     else if (act === 'eye') {
       try { localStorage.setItem(OFF, '1'); } catch (er2) {}
       hideAll();
@@ -356,6 +361,74 @@
     }, function () { card.__saving = 0; ta.disabled = false; tmp.remove(); st.textContent = L('تعذّر الحفظ', 'Could not save'); });
   }
   function hideAll() { if (HOV) hide(HOV); PINS.slice().forEach(hide); }
+
+  /*@3.MOPJ.7*/
+  function compose(o) {
+    o = o || {};
+    if (!o.quote) return null;
+    css('notes.css'); css('module-peek.css');
+    if (HOV) hide(HOV);
+    var card = document.createElement('section'), rg = o.range || null;
+    card.className = 'mp mp-compose';
+    card.__key = 'new:' + Date.now(); card.__hold = 1;
+    card.__hit = { ta: { k: 1, c: 'sky', t: String(o.quote) }, rg: rg };
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('dir', pdir());
+    card.setAttribute('aria-label', L('ملاحظةٌ جديدة على هذا النصّ', 'A new note on this text'));
+    card.style.setProperty('--mp-t', 'var(--gmi-p-sky, #5ab8ff)');
+    skin(card, rg);
+    var ph = L('اكتبْ ملاحظتَك… (Enter للحفظ)', 'Write your note… (Enter to save)');
+    card.innerHTML =
+      '<header class="mp-h"><span class="mp-tt"><i class="mp-mk" data-st="note" aria-hidden="true"></i><b data-ar="ملاحظةٌ جديدة" data-en="New note">' + esc(L('ملاحظةٌ جديدة', 'New note')) + '</b></span>' +
+        '<span class="mp-acts">' +
+        btn('grow', 'fa-up-right-and-down-left-from-center', 'وسِّعْها في ملاحظات الوحدة', 'Expand it in the module notes') +
+        btn('x', 'fa-xmark', 'أغلقْ', 'Close') +
+        '</span></header>' +
+      '<form class="mp-in"><textarea rows="2" dir="' + pdir() + '" maxlength="4000" aria-label="' + esc(L('ملاحظةٌ سريعة', 'Quick note')) + '" placeholder="' + esc(ph) +
+        '" data-ar-placeholder="اكتبْ ملاحظتَك… (Enter للحفظ)" data-en-placeholder="Write your note… (Enter to save)"></textarea>' +
+        '<button type="submit" class="mp-b mp-go" aria-label="' + esc(L('احفظْ', 'Save')) + '" title="' + esc(L('احفظْ', 'Save')) + '"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i></button>' +
+        '<span class="mp-st" aria-live="polite"></span></form>';
+    var ta = card.querySelector('textarea'), st = card.querySelector('.mp-st');
+    var grow = function () {
+      var txt = ta.value;
+      hide(card);
+      noteLib().then(function (M) { M.open({ quote: o.quote, range: rg, sec: o.sec, text: txt }); });
+    };
+    var save = function () {
+      var txt = ta.value;
+      if (!txt.trim() || card.__saving) return;
+      card.__saving = 1; ta.readOnly = true; st.textContent = L('يُحفظ…', 'Saving…');
+      noteLib().then(function (M) { return M.create({ quote: o.quote, range: rg, sec: o.sec, text: txt }); }).then(function (r) {
+        card.__saving = 0; ta.readOnly = false;
+        if (!r) { st.textContent = L('تعذّر الحفظ — حاولْ ثانيةً', 'Could not save — try again'); return; }
+        ta.value = '';
+        hide(card);
+        var hit = { ta: { n: r.id + '#' + r.b, k: 1, c: 'sky', t: String(o.quote) }, rg: rg };
+        var p = (rg && !off()) ? show(hit, { hold: 1 }) : Promise.resolve(null);
+        p.then(function (c) { if (c) say(c, L('حُفظت ✓', 'Saved ✓')); else toast(L('حُفظت ملاحظتُك ✓', 'Your note is saved ✓')); });
+      }, function () { card.__saving = 0; ta.readOnly = false; st.textContent = L('تعذّر الحفظ', 'Could not save'); });
+    };
+    card.addEventListener('click', function (e) {
+      var b = e.target.closest('[data-mp]');
+      if (!b) { if (!e.target.closest('textarea')) ta.focus(); return; }
+      var a = b.getAttribute('data-mp');
+      if (a === 'x') hide(card);
+      else if (a === 'grow') grow();
+    });
+    ta.addEventListener('input', function () { ta.dir = ta.value ? 'auto' : pdir(); card.classList.toggle('mp-has', !!ta.value.trim()); ta.style.blockSize = 'auto'; ta.style.blockSize = Math.min(140, ta.scrollHeight) + 'px'; });
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); save(); }
+      if (e.key === 'Escape' && !ta.value.trim()) { e.stopPropagation(); hide(card); }
+    });
+    card.querySelector('form').addEventListener('submit', function (e) { e.preventDefault(); save(); });
+    drag(card);
+    document.body.appendChild(card);
+    HOV = card;
+    place(card, o.rect || rectOf(rg) || { left: innerWidth / 2, right: innerWidth / 2, top: innerHeight / 3, bottom: innerHeight / 3 });
+    card.classList.add('mp-on');
+    try { ta.focus({ preventScroll: true }); } catch (e3) { ta.focus(); }
+    return card;
+  }
 
   /*@3.MOPJ.4*/
   var rafP = 0, lastE = null, want = null;
@@ -419,6 +492,6 @@
   document.addEventListener('garden:peekToggle', function (e) { if (e.detail && !e.detail.on) hideAll(); });
   document.addEventListener('garden:moduleThemeChanged', function () { [HOV].concat(PINS).forEach(function (c) { if (c && c.__hit) skin(c, c.__hit.rg); }); });
 
-  window.GardenModPeek = { show: show, hideAll: hideAll, off: off, on: function () { try { localStorage.removeItem(OFF); } catch (e) {} },
+  window.GardenModPeek = { show: show, compose: compose, hideAll: hideAll, off: off, on: function () { try { localStorage.removeItem(OFF); } catch (e) {} },
                            tapFirst: function () { return coarse(); } };
 })();

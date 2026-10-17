@@ -853,9 +853,15 @@
     } catch (e) { return true; }
   }
 
+  /*@3.NOCJ.147*/
+  Canvas.prototype.scrZ = function () {
+    var vv = window.visualViewport, vs = (vv && vv.scale > 0.05 && isFinite(vv.scale)) ? vv.scale : 1;
+    return vs * this.vz() * (this.cam.z || 1);
+  };
+
   Canvas.prototype.dpr = function (w, h) {
     var vv = window.visualViewport, vs = (vv && vv.scale > 0.05 && isFinite(vv.scale)) ? vv.scale : 1;
-    var d = Math.min(vs > 1.05 ? 6 : 4, Math.max(vs < 0.95 ? 0.75 : 1, (window.devicePixelRatio || 1) * this.vz() * vs));
+    var d = Math.min((vs > 1.05 || this.vz() > 1.05) ? 6 : 4, Math.max(vs < 0.95 ? 0.75 : 1, (window.devicePixelRatio || 1) * this.vz() * vs));
     /*@3.NOCJ.53*/
     if (w > 0 && h > 0 && w * h * d * d > 24000000) {
       d = Math.max(0.75, Math.sqrt(24000000 / (w * h)));
@@ -1039,27 +1045,27 @@
   var CORNER_COS = 0.25;
   var CORNER_MIN_SEG = 0.8;
 
-  function cornerFlags(pts) {
-    var out = new Array(pts.length);
+  function cornerFlags(pts, zs) {
+    var out = new Array(pts.length), seg = CORNER_MIN_SEG / (zs > 1 ? zs : 1);
     for (var i = 1; i < pts.length - 1; i++) {
       var ax = pts[i].x - pts[i - 1].x, ay = pts[i].y - pts[i - 1].y;
       var bx = pts[i + 1].x - pts[i].x, by = pts[i + 1].y - pts[i].y;
       var la = Math.sqrt(ax * ax + ay * ay), lb = Math.sqrt(bx * bx + by * by);
-      if (la < CORNER_MIN_SEG || lb < CORNER_MIN_SEG) continue;
+      if (la < seg || lb < seg) continue;
       if ((ax * bx + ay * by) / (la * lb) < CORNER_COS) out[i] = 1;
     }
     return out;
   }
 
   /*@3.NOCJ.12*/
-  function smoothPts(pts) {
-    var once = smoothOnce(pts);
-    return (once.length > 5) ? smoothOnce(once) : once;
+  function smoothPts(pts, zs) {
+    var once = smoothOnce(pts, zs);
+    return (once.length > 5) ? smoothOnce(once, zs) : once;
   }
 
-  function smoothOnce(pts) {
+  function smoothOnce(pts, zs) {
     if (pts.length < 3) return pts;
-    var corner = cornerFlags(pts);
+    var corner = cornerFlags(pts, zs);
     var out = [pts[0]];
     for (var i = 1; i < pts.length - 1; i++) {
       if (corner[i]) {
@@ -1086,13 +1092,13 @@
 
   var MIN_DIR = 1.0;
 
-  function dirsOf(pts) {
-    var out = new Array(pts.length), i, first = -1;
+  function dirsOf(pts, zs) {
+    var out = new Array(pts.length), i, first = -1, md = MIN_DIR / (zs > 1 ? zs : 1);
     for (i = 0; i < pts.length; i++) {
       var prev = pts[Math.max(0, i - 1)];
       var next = pts[Math.min(pts.length - 1, i + 1)];
       var dx = next.x - prev.x, dy = next.y - prev.y;
-      if (Math.sqrt(dx * dx + dy * dy) < MIN_DIR) { out[i] = null; continue; }
+      if (Math.sqrt(dx * dx + dy * dy) < md) { out[i] = null; continue; }
       out[i] = Math.atan2(dy, dx);
       if (first < 0) first = i;
     }
@@ -1235,7 +1241,7 @@
         for (i = 0; i < raw.length; i++) if (raw[i].p < DOT_P) raw[i].p = DOT_P;
       }
     }
-    var pts = smoothPts(holdEnds(raw, base));
+    var pts = smoothPts(holdEnds(raw, base), el.zs);
     if (tilted) leanOf(pts);
     var alpha = (el.o == null ? 1 : el.o) *
                 (nib.speck ? (1 - (nib.dust || 0.4)) : (nib.grain ? 0.72 : 1));
@@ -1251,7 +1257,7 @@
       return { kind: 'line', alpha: alpha, grain: false, pts: pts,
                w: Math.max(0.5, widthAt(base, nib, 1, 0)) };
     }
-    var angs = dirsOf(pts), left = [], right = [];
+    var angs = dirsOf(pts, el.zs), left = [], right = [];
     for (i = 0; i < pts.length; i++) {
       var ang = angs[i];
       var hw = widthAt(base, nib, pts[i].p, ang, pts[i]) / 2;
@@ -2639,6 +2645,8 @@
           hi: hi ? 1 : 0, u: und ? 1 : 0, ts: Date.now(),
           pts: [tiltPt(wp.x, wp.y, pt)]
         };
+        var zs = self.scrZ();
+        if (zs > 1.2) self.live[id].zs = Math.round(zs * 100) / 100;
         self.paintWet();
       },
 
@@ -2737,7 +2745,7 @@
           return;
         }
         /*@3.NOCJ.61*/
-        var minD = 0.5 / Math.max(0.05, self.cam.z);
+        var minD = 0.5 / Math.max(0.05, st.zs || self.cam.z);
         for (var i = 0; i < pts.length; i++) {
           var w3 = self.toWorld(pts[i]);
           var lp = st.pts[st.pts.length - 1];
