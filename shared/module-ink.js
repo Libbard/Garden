@@ -1443,13 +1443,14 @@
   function fresh(k) { if (!S.on) { delete S.mem[k]; delete S.sig[k]; } return unpackLayer(k); }
   function styleOf(e) { return e.ta && e.ta.x ? 'text' : ((e.ta && e.ta.u) || e.u ? 'under' : 'fill'); }
   /*@3.MOIJ.14*/
-  function carve(list, it, st) {
+  function carve(list, it, st, acc) {
     var out = [];
     list.forEach(function (e) {
       if (!e.ta || e.ta.s !== it.ta.s || styleOf(e) !== st) { out.push(e); return; }
       var f = null;
       try { f = findHost(e.ta); } catch (er) { f = null; }
       if (!f || f.i !== it.ta.i || f.b <= it.ta.a || f.a >= it.ta.b) { out.push(e); return; }
+      if (acc) acc.n++;
       var full = textOf(f.ns), kept = 0;
       [[f.a, it.ta.a], [it.ta.b, f.b]].forEach(function (p) {
         var a = p[0], b = p[1];
@@ -1477,6 +1478,37 @@
       });
     });
     return Object.keys(out);
+  }
+  /*@3.MOIJ.17*/
+  function layersAt(range) {
+    var out = {};
+    if (!HL_OK || !range || marksOff()) return out;
+    KEPT.forEach(function (name) {
+      var h = KEPT_H[name], st = name.indexOf('gmi-t-') === 0 ? 'text' : (name.indexOf('gmi-u-') === 0 ? 'under' : 'fill');
+      if (!h || out[st]) return;
+      h.forEach(function (rg) {
+        if (out[st]) return;
+        try { if (range.compareBoundaryPoints(Range.START_TO_END, rg) > 0 && range.compareBoundaryPoints(Range.END_TO_START, rg) < 0) out[st] = (rg.__ta && rg.__ta.c) || 'yellow'; } catch (e) {}
+      });
+    });
+    return out;
+  }
+  function clearStyles(range, sts) {
+    var items = anchorsOf(range);
+    if (!items.length) return Promise.resolve(0);
+    sts = sts && sts.length ? sts : ['fill', 'under', 'text'];
+    var acc = { n: 0 };
+    return editLayers(function () {
+      var by = {};
+      items.forEach(function (it) { var k = it.sec.id + langTag() + '|' + depthOf(it.sec); (by[k] = by[k] || []).push(it); });
+      return Promise.all(Object.keys(by).map(function (k) {
+        return fresh(k).then(function (list) {
+          var n0 = acc.n;
+          by[k].forEach(function (it) { sts.forEach(function (st) { list = carve(list, it, st, acc); }); });
+          if (acc.n > n0) { S.mem[k] = list.slice(); S.sig[k] = ''; S.dirty[k] = 1; }
+        });
+      })).then(function () { return acc.n; });
+    });
   }
   function addHighlight(range, color, style, opt) {
     var items = anchorsOf(range);
@@ -1599,17 +1631,23 @@
   }
   document.addEventListener('garden:languageChanged', function () { if (!S.on) keptSoon(200); });
   document.addEventListener('garden:marksToggle', function () { if (!S.on) marksShow(!marksOff()); });
+  /*@3.MOIJ.18*/
+  var hlT = 0;
   document.addEventListener('click', function (e) {
     if (S.on || !KEPT.length) return;
+    clearTimeout(hlT);
     var t = e.target && e.target.closest ? e.target.closest('.depth-tab, .accordion-trigger, summary') : null;
     if (t) { keptSoon(120); return; }
     if (e.button || (e.target.closest && e.target.closest('a[href], button, input, textarea, select, .mt-sel, .gsf-menu'))) return;
     var sel = window.getSelection && window.getSelection();
-    if (sel && String(sel).trim()) return;
-    var hit = keptAt(e.clientX, e.clientY);
+    if (e.detail > 1 || (sel && String(sel).trim())) return;
+    var hit = keptAt(e.clientX, e.clientY), cx = e.clientX, cy = e.clientY, ptr = e.pointerType;
     if (!hit) return;
+    hlT = setTimeout(function () { var s2 = window.getSelection && window.getSelection(); if (!(s2 && String(s2).trim())) openHit(hit, cx, cy, ptr); }, 280);
+  }, true);
+  function openHit(hit, cx, cy, ptr) {
     /*@3.MOIJ.11*/
-    if (hit.ta && hit.ta.n && (e.pointerType === 'touch' || (window.matchMedia && matchMedia('(hover: none)').matches))) {
+    if (hit.ta && hit.ta.n && (ptr === 'touch' || (window.matchMedia && matchMedia('(hover: none)').matches))) {
       var off = false;
       try { off = localStorage.getItem('garden_peek_off') === '1'; } catch (eO) {}
       if (!off) {
@@ -1618,9 +1656,9 @@
       }
     }
     js('module-tools.js', function () { return !!window.GardenModTools; }).then(function () {
-      window.GardenModTools.hlMenu(hit, e.clientX, e.clientY + 8);
+      window.GardenModTools.hlMenu(hit, cx, cy + 8);
     }, function () {});
-  }, true);
+  }
 
   window.addEventListener('pagehide', function () { if (S.on && S.ov && S.ov.cv) { split(); persist(); } });
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') push(); });
@@ -1642,6 +1680,8 @@
     editHighlight: editHighlight,
     keptAt: keptAt,
     stylesIn: stylesIn,
+    layersAt: layersAt,
+    clearStyles: clearStyles,
     keptList: keptList,
     rangeOf: rangeOf,
     bulk: bulk,
