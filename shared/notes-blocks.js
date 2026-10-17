@@ -36,8 +36,14 @@
     var s = String(u == null ? '' : u).trim();
     return LOCAL_RE.test(s) ? s : '';
   }
+  /*@3.NOBJ.53*/
+  var DATA_IMG_RE = /^data:image\/(?:png|jpeg|gif|webp|svg\+xml);base64,[A-Za-z0-9+/=]+$/;
+  function dataImg(u) {
+    var s = String(u == null ? '' : u);
+    return s.length <= 600000 && DATA_IMG_RE.test(s) ? s : '';
+  }
   function imgSrc(u) {
-    return httpsOnly(u) || localImg(u);
+    return httpsOnly(u) || localImg(u) || dataImg(u);
   }
 
   /*@3.NOBJ.47*/

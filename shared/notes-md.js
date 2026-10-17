@@ -665,6 +665,12 @@
       if (bulletAt(raw) || numberAt(raw)) { i = readList(lines, i, out, ctx); continue; }
 
       var im = t.match(/^!\[([^\]]*)\]\(\s*([^)\s]+)[^)]*\)\s*$/);
+      var sg = im && /^gardensvg:(\d+)$/.exec(im[2]);
+      if (sg && ctx && ctx.svgs && ctx.svgs[+sg[1]]) {
+        var sv = ctx.svgs[+sg[1]];
+        add(blank('img', sv.ar ? { url: sv.url, alt: sv.alt, iar: sv.ar, inw: sv.w } : { url: sv.url, alt: sv.alt }));
+        i++; continue;
+      }
       if (im) {
         var iu = extUrl(im[2]);
         if (iu) { add(blank('img', { url: iu, alt: im[1] || '' })); i++; continue; }
@@ -865,6 +871,62 @@
     return i;
   }
 
+  /*@3.NOMJ3.52*/
+  var SVG_MAX = 300000;
+  function svgClean(s) {
+    return s.replace(/\[(https?:\/\/[^\]\s]+)\]\(\1\)/g, '$1')
+      .replace(/<script\b[\s\S]*?<\/script\s*>/gi, '')
+      .replace(/<foreignObject\b[\s\S]*?<\/foreignObject\s*>/gi, '')
+      .replace(/<(iframe|object|embed|audio|video|image)\b[\s\S]*?(?:\/>|<\/\1\s*>)/gi, '')
+      .replace(/\son[a-z]+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+      .replace(/\s(?:xlink:)?href\s*=\s*("(?!#)[^"]*"|'(?!#)[^']*')/gi, '')
+      .replace(/@import[^;]*;?|url\(\s*['"]?(?!#)[^)]*\)/gi, 'none')
+      .replace(/javascript:/gi, '');
+  }
+  function svgItem(raw) {
+    if (raw.length > SVG_MAX || typeof btoa !== 'function') return null;
+    var s = svgClean(raw.trim());
+    if (!/^<svg\b/i.test(s) || !/<\/svg>$/i.test(s)) return null;
+    if (!/\sxmlns=/.test(s.slice(0, s.indexOf('>')))) s = s.replace(/^<svg\b/i, '<svg xmlns="http://www.w3.org/2000/svg"');
+    var vb = /\sviewBox\s*=\s*["']\s*[-\d.]+[\s,]+[-\d.]+[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(s);
+    var wa = /\swidth\s*=\s*["']?([\d.]+)(?:px)?["'\s>]/i.exec(s), ha = /\sheight\s*=\s*["']?([\d.]+)(?:px)?["'\s>]/i.exec(s);
+    var w = vb ? +vb[1] : wa ? +wa[1] : 0, hh = vb ? +vb[2] : ha ? +ha[1] : 0;
+    if (!/\swidth\s*=/.test(s.slice(0, s.indexOf('>'))) && w) s = s.replace(/^<svg\b/i, '<svg width="' + w + '"');
+    var head = s.slice(0, s.indexOf('>') + 1);
+    if (!/background|fill\s*:/i.test(head) && !/^<svg\b[^>]*>\s*(?:<(?:title|desc)\b[\s\S]*?<\/(?:title|desc)>\s*)*<rect\b[^>]*width="100%"/i.test(s)) {
+      s = head + '<rect width="100%" height="100%" fill="#ffffff"/>' + s.slice(head.length);
+    }
+    var tm = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(s);
+    var url;
+    try { url = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(s))); } catch (e) { return null; }
+    return { url: url, alt: tm ? tm[1].replace(/<[^>]+>/g, '').trim().slice(0, 120) : '', w: w ? Math.round(w) : 0, ar: w && hh ? Math.round((w / hh) * 1000) / 1000 : 0 };
+  }
+  function liftSvgs(lines, svgs) {
+    var out = [], fence = '', i, j;
+    for (i = 0; i < lines.length; i++) {
+      var ln = lines[i], ft = ln.trim().match(/^(`{3,}|~{3,})/);
+      if (ft) { if (!fence) fence = ft[1]; else if (ln.trim().replace(/[`~]/g, '') === '' && ln.trim().charAt(0) === fence.charAt(0)) fence = ''; out.push(ln); continue; }
+      var at = fence ? -1 : ln.search(/<svg[\s>]/i);
+      if (at < 0) { out.push(ln); continue; }
+      var buf = ln.slice(at), endAt = -1;
+      for (j = i; j < lines.length; j++) {
+        if (j > i) buf += '\n' + lines[j];
+        endAt = buf.search(/<\/svg\s*>/i);
+        if (endAt >= 0) break;
+      }
+      if (endAt < 0) { out.push(ln); continue; }
+      var close = buf.indexOf('>', endAt) + 1, it = svgItem(buf.slice(0, close));
+      if (!it) { out.push(ln); continue; }
+      svgs.push(it);
+      if (ln.slice(0, at).trim()) out.push(ln.slice(0, at));
+      out.push('', '![' + it.alt.replace(/[\[\]]/g, '') + '](gardensvg:' + (svgs.length - 1) + ')', '');
+      var tail = buf.slice(close);
+      if (tail.trim()) out.push.apply(out, tail.replace(/^\n/, '').split('\n'));
+      i = j;
+    }
+    return out;
+  }
+
   function parse(text) {
     var lines = String(text == null ? '' : text)
       .replace(/\r\n?/g, '\n')
@@ -873,8 +935,10 @@
     FNUM = {}; FSEQ = 0; FPEND = ''; FPENDL = []; FBACK = {};
     var fm = frontMatter(lines);
     if (fm.at) lines = lines.slice(fm.at);
+    var svgs = [];
+    lines = liftSvgs(lines, svgs);
     var h = harvest(lines);
-    var ctx = { refs: h.refs, foot: h.foot };
+    var ctx = { refs: h.refs, foot: h.foot, svgs: svgs };
     var out = parseBlocks(h.lines, ctx, 0);
 
     var keys = Object.keys(h.foot).filter(function (kk) { return FNUM[kk]; })

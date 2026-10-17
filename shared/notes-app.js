@@ -4610,10 +4610,13 @@
         var pane = document.getElementById('na-exp-pane-in');
         if (mode === 'append' && list.length === 1) {
           closeExport(0);
-          withEditor(function () {
-            var n = ed.appendBlocks(list[0].doc.blocks);
-            saveState('saved', L('أُضيفت ', 'Added ') + n + L(' كتلة', ' blocks'));
-          });
+          var put = function () {
+            withEditor(function () {
+              var n = ed.appendBlocks(list[0].doc.blocks);
+              saveState('saved', L('أُضيفت ', 'Added ') + n + L(' كتلة', ' blocks'));
+            });
+          };
+          absorbDataImgs(list[0].doc).then(put, put);
           return;
         }
         [].forEach.call(pane.querySelectorAll('.na-imp-pv [data-imp-a]'), function (b) { b.disabled = true; });
@@ -4623,12 +4626,12 @@
       }
     };
   }
-  function importKind(kind) {
+  function importKind(kind, preset) {
     var pane = document.getElementById('na-exp-pane-in');
     var inp = document.getElementById('na-imp-file');
     impMsg('', '');
     if (kind === 'paste' || kind === 'link') {
-      needImport().then(function (I) { I[kind](pane, impHooks()); }, function () {
+      needImport().then(function (I) { I[kind](pane, preset ? Object.assign(impHooks(), { preset: preset }) : impHooks()); }, function () {
         impMsg('error', L('تعذّر تحميلُ أداة الاستيراد.', 'The import tool could not be loaded.'));
       });
       return;
@@ -5521,7 +5524,7 @@
       items: AI_APPS.map(function (a) { return { a: a.k, i: 'fa-up-right-from-square', t: L('افتحْ ', 'Open ') + a.n }; })
     }, function (k) {
       for (var i = 0; i < AI_APPS.length; i++) {
-        if (AI_APPS[i].k === k) { window.open(AI_APPS[i].u, '_blank', 'noopener'); return; }
+        if (AI_APPS[i].k === k) { if (window.GardenAiApp) window.GardenAiApp.open(AI_APPS[i].u); else window.open(AI_APPS[i].u, '_blank', 'noopener'); return; }
       }
     });
   }
@@ -7662,12 +7665,24 @@
     void quiet;
   }
 
-  function importAi() {
+  function importAi(preset, kind) {
     var dlg = document.getElementById('na-exp');
     if (!dlg) return;
     if (!dlg.open) openExport();
     setExpTab('in');
-    importKind('link');
+    importKind(kind || 'link', preset);
+  }
+
+  /*@3.NOAJ.527*/
+  var SHARE_AI = /^https?:\/\/(?:[\w-]+\.)*(?:chatgpt\.com|chat\.openai\.com|claude\.ai|gemini\.google\.com|share\.gemini\.google|g\.co\/gemini|deepseek\.com|qwen\.ai|kimi\.com|kimi\.ai|moonshot\.cn|grok\.com|perplexity\.ai)\//i;
+  function shareIn(qs) {
+    var t = [qs.get('share_text'), qs.get('share_url')].filter(Boolean).join('\n').trim() || String(qs.get('share_title') || '').trim();
+    try { history.replaceState(history.state, '', location.pathname); } catch (e) {}
+    if (!t) return false;
+    var urls = t.match(/https?:\/\/[^\s<>"'«»]+/gi) || [], ai = urls.filter(function (u) { return SHARE_AI.test(u); })[0];
+    navHome();
+    importAi(ai || t, ai ? 'link' : 'paste');
+    return true;
   }
 
   /*@3.NOAJ.241*/
@@ -13050,6 +13065,8 @@
       if (adopt) {
         navHome();
         adoptQuick(adopt);
+      } else if (qs.get('share_url') || qs.get('share_text') || qs.get('share_title')) {
+        shareIn(qs);
       } else if (EMBED && qs.get('mod') === '1') {
         embBoot(qs);
       } else if (qs.get('slides')) {

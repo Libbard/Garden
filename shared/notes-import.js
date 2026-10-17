@@ -418,6 +418,134 @@
     blocks.splice.apply(blocks, [0, blocks.length].concat(out));
   }
 
+  /*@3.NOIJ4.30*/
+  var MISTAKE_RE = /(?:^|\s)(?:الأخطاء|أخطاء|أشهر الأخطاء|خطأ شائع|مفاهيم خاطئة|Common\s+(?:mistakes|errors|pitfalls|misconceptions)|Mistakes|Pitfalls|Misconceptions)(?=[\s:：،,.—–-]|$)/i;
+  var QUIZ_RE = /(?:^|\s)(?:اختبر\s+نفسك|اختبار\s+ذاتيّ?|أسئلة|تمارين|Test\s+yourself|Self[-\s]?(?:check|test|quiz)|Quiz|Questions|Exercises|Practice\s+questions)(?=[\s:：،,.—–-]|$)/i;
+  var KEY_RE = /(?:^|\s)(?:الإجابات|إجابات|الحلول|حلول|الأجوبة|Answers?\s+key|Answers|Solutions)(?=[\s:：،,.—–-]|$)/i;
+  var QITEM_RE = /^\s*(?:\d{1,2}\s*[.)\-–]\s*)?(?:السؤال|سؤال|س\s*\d|Question|Q\s*\d)/i;
+  var AITEM_RE = /^\s*(?:\d{1,2}\s*[.)\-–]\s*)?(?:إجابة|الإجابة|جواب|الجواب|حلّ?|الحلّ?|ج\s*\d|Answer|Solution|A\s*\d)/i;
+  var TAIL_RE = /^[^\p{L}\p{N}]*(?:المصادر|مصادر|المراجع|مراجع|الحواشي|اقتراحات|References|Sources|Footnotes|Follow[-\s]?up|Further reading)/iu;
+  function hText(b) { return runsText(b.rt).replace(/\*\*/g, '').trim(); }
+  function boldLead(b) { return b && b.ty === 'p' && b.rt && b.rt[0] && b.rt[0].b; }
+  function flatRt(bs) {
+    var out = [];
+    bs.forEach(function (b) {
+      var r = [];
+      if (b.ty === 'math') r = [{ s: b.tex || '', c: 1, mth: 1 }];
+      else if (b.ty === 'code' && !b.dgm) r = [{ s: b.src || '', c: 1 }];
+      else if (b.ty === 'ul' || b.ty === 'ol') (b.items || []).forEach(function (it, k) { if (k) r.push({ s: '\n' }); r.push({ s: b.ty === 'ol' ? (k + 1) + '. ' : '• ' }); r = r.concat(clone(it.rt || [])); });
+      else if (b.rt) r = clone(b.rt);
+      if (!letters(runsText(r)) && !/\S/.test(runsText(r))) return;
+      if (out.length) out.push({ s: '\n' });
+      out = out.concat(r);
+    });
+    return out;
+  }
+  function boundary(blocks, i) {
+    var k = i + 1;
+    while (k < blocks.length && !(blocks[k].ty === 'h' || blocks[k].cardStart)) k++;
+    return k;
+  }
+  function selfPairs(blocks) {
+    var found = [], i, b, en;
+    for (i = 0; i < blocks.length; i++) {
+      b = blocks[i];
+      if (b.ty !== 'h' || !MISTAKE_RE.test(hText(b))) continue;
+      var end = i + 1, lv = b.lv || 2;
+      while (end < blocks.length && !(blocks[end].ty === 'h' && (blocks[end].lv || 2) <= lv)) end++;
+      for (var t = i + 1; t < end; t++) {
+        var tb = blocks[t];
+        if (tb.ty !== 'tbl' || !tb.rows || tb.rows.length < 3 || (tb.rows[0] || []).length < 2) continue;
+        en = !/[؀-ۿ]/.test(runsText(tb.rows[1][0].rt));
+        var its = tb.rows.slice(1).filter(function (r) { return letters(runsText(r[0].rt)) && letters(runsText(r[1].rt)); }).map(function (r) {
+          var m = runsText(r[0].rt).trim();
+          return { q: [{ s: en ? 'Why is this wrong: “' + m + '”?' : 'لماذا هذا خطأ: «' + m + '»؟' }], extra: [], a: clone(r[1].rt), fmt: 'qp' };
+        });
+        if (its.length >= 2) found.push({ at: boundary(blocks, t), title: hText(b), en: en, items: its });
+        break;
+      }
+    }
+    var qh = -1, kh = -1;
+    for (i = 0; i < blocks.length; i++) {
+      b = blocks[i];
+      if (b.ty !== 'h') continue;
+      if (qh < 0 && QUIZ_RE.test(hText(b)) && !KEY_RE.test(hText(b))) qh = i;
+      else if (qh >= 0 && KEY_RE.test(hText(b))) { kh = i; break; }
+    }
+    if (qh < 0 || kh < 0) return found;
+    var qlv = blocks[qh].lv || 2, klv = blocks[kh].lv || 2;
+    function marks(from, to, re, lv, anyHead) {
+      var hm = [], bm = [], hs = [];
+      for (var k = from; k < to; k++) {
+        var x = blocks[k], sub = x.ty === 'h' && (x.lv || 2) > lv, t = hText(x).replace(/^[^\p{L}\p{N}]+/u, '');
+        if (sub && re.test(t)) hm.push(k);
+        else if (boldLead(x) && re.test(t)) bm.push(k);
+        if (sub) hs.push(k);
+      }
+      return hm.length ? hm : bm.length ? bm : anyHead ? hs : [];
+    }
+    function cut(a0, a1, m) {
+      var lv = blocks[m].ty === 'h' ? (blocks[m].lv || 2) : 99;
+      for (var k = a0; k < a1; k++) {
+        var x = blocks[k];
+        if (x.ty === 'h' && ((x.lv || 2) <= lv || TAIL_RE.test(hText(x)))) return k;
+      }
+      return a1;
+    }
+    var qEnd = qh + 1;
+    while (qEnd < kh && !(blocks[qEnd].ty === 'h' && (blocks[qEnd].lv || 2) <= qlv)) qEnd++;
+    var kEnd = kh + 1;
+    while (kEnd < blocks.length && !(blocks[kEnd].ty === 'h' && (blocks[kEnd].lv || 2) <= klv)) kEnd++;
+    var qm = marks(qh + 1, qEnd, QITEM_RE, qlv, true), am = marks(kh + 1, kEnd, AITEM_RE, klv, false);
+    var qol = null;
+    if (!qm.length) for (i = qh + 1; i < qEnd; i++) if (blocks[i].ty === 'ol' && flatList(blocks[i])) { qol = blocks[i]; break; }
+    var nQ = qol ? qol.items.length : qm.length;
+    if (nQ < 1 || nQ !== am.length) return found;
+    en = !/[؀-ۿ]/.test(hText(blocks[qh]));
+    var items = [];
+    for (var n = 0; n < nQ; n++) {
+      var a0 = am[n] + 1, a1 = cut(a0, n + 1 < am.length ? am[n + 1] : kEnd, am[n]);
+      var ans = flatRt(blocks.slice(a0, a1).filter(function (x) { return x.ty !== 'hr'; }));
+      if (!letters(runsText(ans)) && !runsText(ans).trim()) return found;
+      if (qol) { items.push({ q: clone(qol.items[n].rt), extra: [], a: ans, fmt: 'q' }); continue; }
+      var q0 = qm[n], q1 = cut(q0 + 1, n + 1 < qm.length ? qm[n + 1] : qEnd, q0);
+      var body = blocks.slice(q0 + 1, q1), lead = body[0] && body[0].ty === 'p' && !(body[0].fmt) ? body.shift() : null;
+      var q = clone(blocks[q0].rt).map(function (x) { return Object.assign({}, x, { b: 1 }); });
+      if (lead) q = q.concat([{ s: '\n' }], clone(lead.rt));
+      items.push({ q: q, extra: body.filter(function (x) { return x.ty === 'code' || x.ty === 'math' || x.ty === 'p' || x.ty === 'quote' || x.ty === 'callout'; }), a: ans, fmt: 'q' });
+    }
+    found.push({ at: kh, title: hText(blocks[qh]), en: en, items: items });
+    return found;
+  }
+  function selfCheck(blocks, rep) {
+    var sets = selfPairs(blocks).sort(function (x, y) { return y.at - x.at; });
+    sets.forEach(function (st) {
+      var cid = 's' + Bk().uid(), e = st.en, dir = e ? 'ltr' : 'rtl', out = [];
+      var head = Bk().blank('h', { lv: 3, card: cid, cardStart: 1, cardTitle: 1, fmt: 'recall', dir: dir,
+        rt: [{ s: (function (t) { return QUIZ_RE.test(t.split(/\s[—–-]\s/)[0]) ? t : (e ? 'Self-check' : 'اختبرْ نفسك') + ' — ' + t; })(st.title.replace(/^[\d.)\s]+/, '').slice(0, 70)) }] });
+      out.push(head);
+      rep.copied += letters(runsText(head.rt));
+      st.items.forEach(function (it) {
+        var q = Bk().blank('p', { card: cid, fmt: it.fmt, dir: dir, rt: it.q });
+        out.push(q);
+        rep.copied += letters(runsText(it.q));
+        it.extra.forEach(function (x) {
+          var c = clone(x); c.id = Bk().uid(); c.card = cid;
+          ['cardStart', 'cardTitle', 'cardEnd', 'cardTone', 'cardLayout', '__rv'].forEach(function (k) { delete c[k]; });
+          out.push(c);
+          rep.copied += letters(blockText(c));
+        });
+        out.push(Bk().blank('p', { card: cid, fmt: 'ans', dir: dir, rt: it.a }));
+        rep.copied += letters(runsText(it.a));
+      });
+      out[out.length - 1].cardEnd = 1;
+      var prev = blocks[st.at - 1];
+      if (prev && prev.card && !prev.cardEnd) prev.cardEnd = 1;
+      blocks.splice.apply(blocks, [st.at, 0].concat(out));
+      rep.recallCards = (rep.recallCards || 0) + 1;
+    });
+  }
+
   function sniff(src) {
     var text = String((src && src.text) || '');
     var name = String((src && src.name) || '');
@@ -768,7 +896,8 @@
     }
 
     rep.recall += blocks.filter(function (x) { return x.ty === 'callout' && (x.cal === 'warning' || x.cal === 'caution'); }).length;
-    if (o.recall && C.recall) recallCards(blocks, o, rep);
+    selfPairs(blocks).forEach(function (st) { rep.recall += st.items.length; });
+    if (o.recall && C.recall) { recallCards(blocks, o, rep); selfCheck(blocks, rep); }
     /*@3.NOIJ4.26*/
     if (o.skin && SKIN_IDS[o.skin]) doc.cards = Object.assign({}, doc.cards || {}, { sk: o.skin });
     else if (o.skin === '' && doc.cards && doc.cards.sk) { doc.cards = Object.assign({}, doc.cards); delete doc.cards.sk; }
@@ -1101,8 +1230,12 @@
       'تتبع الثيماتِ الثلاثة وحجمَ خطِّك', 'Follows all three themes and your text size');
     var n = r.recall;
     box('recall', o.recall, 'بطاقةُ «اختبرْ نفسك» آخرَ كلِّ مجموعة', '“Self-check” card after each group',
-      C.recall ? 'من «أين يقع اللبس» و«للامتحان» — ' + n : 'تصل مع التحديث القادم' + (n ? ' — ' + n + ' جاهزة' : ''),
-      C.recall ? 'From “Common confusion” and “For the exam” — ' + n : 'Arrives with the next update' + (n ? ' — ' + n + ' ready' : ''),
+      !C.recall ? 'تصل مع التحديث القادم' + (n ? ' — ' + n + ' جاهزة' : '')
+        : n ? 'أسئلةُ الردِّ بإجاباتها المطويّة · الأخطاءُ الشائعة · «أين يقع اللبس» — ' + n
+        : 'لم نجد في الردِّ أسئلةً بإجاباتها ولا جدولَ أخطاءٍ شائعة',
+      !C.recall ? 'Arrives with the next update' + (n ? ' — ' + n + ' ready' : '')
+        : n ? 'The reply’s questions with folded answers · common mistakes · “Common confusion” — ' + n
+        : 'This reply has no questions with answers and no common-mistakes table',
       !C.recall || !n);
     return h;
   }
@@ -1142,11 +1275,12 @@
       if (!v.trim()) { msg(st, L('لا نصَّ هنا بعد.', 'There’s no text here yet.')); ta.focus(); return; }
       preview(pane, { text: v, name: '', pasted: 1 }, hooks);
     };
+    if (hooks && hooks.preset) { ta.value = String(hooks.preset); preview(pane, { text: ta.value, name: '', pasted: 1 }, hooks); return; }
     try { ta.focus(); } catch (e) {}
   }
 
   /*@3.NOIJ4.27*/
-  var LINK_AI = { chatgpt: 'ChatGPT', gemini: 'Gemini', claude: 'Claude', deepseek: 'DeepSeek', qwen: 'Qwen', kimi: 'Kimi' };
+  var LINK_AI = { chatgpt: 'ChatGPT', gemini: 'Gemini', claude: 'Claude', deepseek: 'DeepSeek', qwen: 'Qwen', kimi: 'Kimi', grok: 'Grok', perplexity: 'Perplexity' };
   function linkMd(r) {
     return (r.messages || []).map(function (m) {
       return (m.role === 'user' ? '# you asked' : '# ' + r.platform + ' response') + '\n\n' + m.md;
@@ -1164,8 +1298,10 @@
   function linkErr(code, p) {
     var n = LINK_AI[p] || '';
     var E = {
-      unsupported: ['هذا ليس رابطَ مشاركةٍ من ChatGPT أو Gemini أو Claude أو DeepSeek أو Qwen أو Kimi.',
-                    'That isn’t a share link from ChatGPT, Gemini, Claude, DeepSeek, Qwen or Kimi.'],
+      unsupported: ['هذا ليس رابطَ مشاركةٍ من ChatGPT أو Gemini أو Claude أو DeepSeek أو Qwen أو Kimi أو Grok.',
+                    'That isn’t a share link from ChatGPT, Gemini, Claude, DeepSeek, Qwen, Kimi or Grok.'],
+      export_only: [(n || 'هذه المنصّة') + ' لا تسمح بقراءة الرابط آليّاً. افتحِ المحادثة، ومن قائمة «⋯» اخترْ «تصدير» ثمّ Markdown، واستوردِ الملفَّ من «ملفّ Markdown».',
+                    (n || 'This platform') + ' doesn’t allow reading the link automatically. Open the chat, choose “Export” ▸ Markdown from the “⋯” menu, and import the file with “Markdown file”.'],
       private: ['المحادثةُ غيرُ عامّة. من «مشاركة» اجعلْها «عامّةً لمن معه الرابط»' + (p === 'claude' ? ' (‏في Claude لا تخترْ «خاصّ»)' : '') + '، ثمّ انسخِ الرابطَ من جديد.',
                 'The chat isn’t public. Under “Share”, make it “public to anyone with the link”' + (p === 'claude' ? ' (in Claude, not “Private”)' : '') + ', then copy the link again.'],
       not_found: ['لم نجد المحادثة — ربّما أُلغيت مشاركتُها أو حُذفت، أو الرابطُ ناقص.', 'Chat not found — sharing may have been turned off, it was deleted, or the link is incomplete.'],
@@ -1200,7 +1336,7 @@
           'In Claude only: choose “Public — anyone with the link”, not “Private”. The others give a public link directly.') + '</li>' +
         '<li>' + span('الصقِ الرابطَ هنا. ويمكنك إلغاءُ المشاركة بعد الاستيراد.', 'Paste the link here. You can turn sharing off after importing.') + '</li>' +
       '</ol>' +
-      '<p class="na-pg-hint na-imp-ais">ChatGPT · Gemini · Claude · DeepSeek · Qwen · Kimi</p>' +
+      '<p class="na-pg-hint na-imp-ais">ChatGPT · Gemini · Claude · DeepSeek · Qwen · Kimi · Grok</p>' +
       '<p class="na-pg-hint" data-imp-msg role="status" hidden></p>' +
       '<div class="gsf-acts na-imp-acts">' +
         '<button type="button" class="gsf-btn gsf-btn--ghost" data-imp-a="back">' + span('رجوع', 'Back') + '</button>' +
@@ -1249,6 +1385,7 @@
       run(k);
     };
     inp.onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); run('next'); } };
+    if (hooks && hooks.preset) { inp.value = String(hooks.preset); run('next'); return; }
     try { inp.focus(); } catch (e) {}
   }
 

@@ -6361,6 +6361,26 @@ ${baseRules}`) + regenSuffix;
   /*@3.GARJ.359*/
   const _AI_ICON_SVC = `<i class="fa-solid fa-arrow-up-right-from-square ai-svc-ico" aria-hidden="true"></i>`;
 
+  /*@3.GARJ.702*/
+  const _AI_APP_PKG = { 'chatgpt.com': 'com.openai.chatgpt', 'gemini.google.com': 'com.google.android.apps.bard',
+    'chat.qwen.ai': 'ai.qwenlm.chat.android', 'claude.ai': 'com.anthropic.claude', 'chat.deepseek.com': 'com.deepseek.chat' };
+  function aiAppHref(u) {
+    const ua = navigator.userAgent || '';
+    if (!/Android/i.test(ua) || /; wv\)/.test(ua)) return u;
+    try {
+      const x = new URL(u), pkg = _AI_APP_PKG[x.hostname];
+      if (!pkg) return u;
+      return 'intent://' + x.host + x.pathname + x.search + '#Intent;scheme=https;package=' + pkg +
+        ';S.browser_fallback_url=' + encodeURIComponent(u) + ';end';
+    } catch (e) { return u; }
+  }
+  function aiAppOpen(u) {
+    const h = aiAppHref(u);
+    if (h !== u) location.href = h; else window.open(u, '_blank', 'noopener');
+  }
+  const _aiCanShare = () => !!(navigator.share && window.matchMedia && matchMedia('(pointer: coarse)').matches);
+  window.GardenAiApp = { href: aiAppHref, open: aiAppOpen, canShare: _aiCanShare };
+
   /*@3.GARJ.360*/
 
 
@@ -6453,6 +6473,9 @@ ${baseRules}`) + regenSuffix;
           <a class="ai-action-btn ai-svc-btn" href="https://gemini.google.com/" target="_blank" rel="noopener" title="${aiT('انسخ البرومبت وافتح Gemini', 'Copy the prompt and open Gemini')}">
             ${_AI_ICON_SVC} <span class="ai-btn-label">Gemini</span>
           </a>
+          ${_aiCanShare() ? `<button class="ai-action-btn" id="ai-share-app" aria-label="${aiT('أرسلِ البرومبت إلى أيِّ تطبيق', 'Send the prompt to any app')}" title="${aiT('أرسلِ البرومبت إلى أيِّ تطبيق', 'Send the prompt to any app')}">
+            <i class="fa-solid fa-share-nodes" aria-hidden="true"></i> <span class="ai-btn-label">${aiT('تطبيقٌ آخر', 'Other app')}</span>
+          </button>` : ''}
           ${GARDEN_AI_ENDPOINT ? `<button class="ai-action-btn ai-action-btn--primary" id="ai-retry" style="display:none" title="${aiT('إعادة المحاولة', 'Retry')}">
             ${REGEN_ICON}
             <span class="ai-btn-label">${aiT('محاولة', 'Retry')}</span>
@@ -6739,7 +6762,9 @@ ${baseRules}`) + regenSuffix;
         if (!document.body.contains(holder)) return HANDLED;
         key = AI_CACHE_PREFIX + hash;
         if (opts.regen) { try { localStorage.removeItem(key); } catch (e) { } }
-        const local = (!opts.force && !opts.regen) ? getAiCache(key) : null;
+        let local = (!opts.force && !opts.regen) ? getAiCache(key) : null;
+        /*@3.GARJ.703*/
+        if (local && !local.model && aiOwnerMap()) local = null;
         if (local) {
           lastTag = {
             model: local.model, provider: local.provider, tier: local.tier,
@@ -6912,8 +6937,14 @@ ${baseRules}`) + regenSuffix;
       copyPrompt(e.currentTarget));
 
     /*@3.GARJ.386*/
-    overlay.querySelectorAll('.ai-svc-btn').forEach(a =>
-      a.addEventListener('click', () => copyPrompt(a)));
+    overlay.querySelectorAll('.ai-svc-btn').forEach(a => {
+      const h = aiAppHref(a.href);
+      if (h !== a.href) { a.href = h; a.removeAttribute('target'); }
+      a.addEventListener('click', () => copyPrompt(a));
+    });
+    overlay.querySelector('#ai-share-app')?.addEventListener('click', () => {
+      navigator.share({ text: promptTextOut() }).catch(() => {});
+    });
 
     /*@3.GARJ.610*/
     overlay.querySelector('#ai-regen')?.addEventListener('click', () => {
