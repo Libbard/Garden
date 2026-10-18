@@ -315,11 +315,7 @@
       var cards = GardenData.moduleCards(CODE, m);
       var d = 0;
       cards.forEach(function (c) { if (c.nextReview && c.nextReview <= now) d++; });
-      var q = null;
-      try {
-        var raw = localStorage.getItem('garden_' + CODE + '_m' + m + '_quiz');
-        if (raw != null && raw !== '') q = Math.max(0, Math.min(1, parseFloat(raw) / 10));
-      } catch (err) {}
+      var qb = modQuiz(m), q = qb ? qb.s / qb.t : null;
       var href = modHref(m), mk = GardenData.moduleMark ? GardenData.moduleMark(CODE, m) : '';
       mods += '<a class="crs-mod" href="' + esc(href) + '" data-mod="' + m + '"' + (d ? ' data-due="1"' : '') +
           (mk ? ' data-mark="' + mk + '"' : '') +
@@ -1009,6 +1005,20 @@
     toast(L('حُفظ ✓', 'Saved ✓'));
   }
 
+  function modQuiz(m) {
+    var best = null;
+    (GardenData.quizLog ? GardenData.quizLog(CODE) : []).forEach(function (a) {
+      if (String(a.k) !== String(m) || !(a.t > 0)) return;
+      if (!best || a.s / a.t >= best.s / best.t) best = { s: Math.min(a.s, a.t), t: a.t };
+    });
+    if (best) return best;
+    try {
+      var v = parseFloat(localStorage.getItem('garden_' + CODE + '_m' + m + '_quiz'));
+      if (isFinite(v)) return { s: Math.max(0, Math.min(10, Math.round(v))), t: 10 };
+    } catch (e) {}
+    return null;
+  }
+
   function modHref(m) {
     return S.info && S.info.path ? '../' + S.info.path + 'M' + String(m).padStart(2, '0') + '.html' : '#';
   }
@@ -1022,23 +1032,24 @@
     var mk = GardenData.moduleMark(CODE, m);
     var now = Date.now(), due = 0;
     GardenData.moduleCards(CODE, m).forEach(function (c) { if (c.nextReview && c.nextReview <= now) due++; });
-    var q = null;
-    try {
-      var raw = localStorage.getItem('garden_' + CODE + '_m' + m + '_quiz');
-      if (raw != null && raw !== '') q = Math.max(0, Math.min(10, parseFloat(raw)));
-    } catch (e) {}
+    var qb = modQuiz(m);
     var deck = sig.deckSize || sig.cardsTotal || 0;
     var num = function (a, b) { return '<bdi>' + a + '/' + b + '</bdi>'; };
     var line = function (on, html) {
-      return '<li' + (on ? ' class="is-on"' : '') + '><i class="fa-' + (on ? 'solid fa-circle-check' : 'regular fa-circle') +
+      var part = on === 'part';
+      return '<li' + (on ? ' class="' + (part ? 'is-part' : 'is-on') + '"' : '') + '><i class="fa-' +
+        (part ? 'solid fa-circle-half-stroke' : on ? 'solid fa-circle-check' : 'regular fa-circle') +
         '" aria-hidden="true"></i><span>' + html + '</span></li>';
     };
+    var tier = function (got, of, any) { return of && got >= of ? true : (got > 0 || any > 0) ? 'part' : false; };
     var why = line(sig.quiz, !sig.quiz ? esc(L('لم تحلَّ اختبارَها بعد', 'Quiz not taken yet'))
-      : q != null && isFinite(q) ? esc(L('اختبارُها: ', 'Quiz: ')) + num(Math.round(q), 10)
+      : qb ? esc(L('اختبارُها: ', 'Quiz: ')) + num(qb.s, qb.t)
       : esc(L('حللتَ اختبارَها', 'Quiz taken')));
-    if (deck) why += line(sig.cardsStrong > 0, esc(L('بطاقاتٌ متقنة: ', 'Cards mastered: ')) + num(sig.cardsStrong || 0, deck) +
+    if (deck) why += line(tier(sig.cardsStrong || 0, deck, sig.cardsSeen || 0), esc(L('بطاقاتٌ متقنة: ', 'Cards mastered: ')) + num(sig.cardsStrong || 0, deck) +
+      (sig.cardsSeen > sig.cardsStrong ? ' · ' + esc(L('درستَ ', 'studied ')) + num(sig.cardsSeen, deck) : '') +
       (due ? ' · ' + esc(nOf(due, ['تنتظرك', 'تنتظرانك', 'تنتظرك'], ['due', 'due'])) : ''));
-    if (sig.studyTotal) why += line(sig.studyKnown > 0, esc(L('مفاهيمُ فهمتَها: ', 'Concepts understood: ')) + num(sig.studyKnown, sig.studyTotal));
+    if (sig.studyTotal) why += line(sig.studyByQuiz ? true : tier(sig.studyKnown, sig.studyTotal, 0), esc(L('مفاهيمُ فهمتَها: ', 'Concepts understood: ')) +
+      (sig.studyByQuiz ? num(sig.studyTotal, sig.studyTotal) + ' · ' + esc(L('بإتمامك اختبارَ الوحدة', 'by finishing the module quiz')) : num(sig.studyKnown, sig.studyTotal)));
     if (sig.visits) why += line(true, esc(L(
       sig.visits === 1 ? 'فتحتَها يوماً واحداً' : (sig.visits === 2 ? 'فتحتَها يومين' : 'فتحتَها ' + sig.visits + ' أيّام'),
       sig.visits + (sig.visits === 1 ? ' day opened' : ' days opened'))));

@@ -359,6 +359,8 @@
       var v = raw ? JSON.parse(raw) : null;
       return Array.isArray(v) ? v.filter(function (x) {
         return x && x.t > 0 && isFinite(x.s) && x.k != null;
+      }).map(function (x) {
+        return x.s > x.t ? Object.assign({}, x, { s: x.t }) : x;
       }).sort(function (a, b) { return (a.at || 0) - (b.at || 0); }) : [];
     } catch (e) { return []; }
   }
@@ -722,8 +724,8 @@
     if (sig.unmastered) return 0;
     var deck = sig.deckSize || sig.cardsTotal;
     var parts = [[PROG_W.quiz, sig.quiz ? 1 : 0]];
-    if (deck) parts.push([PROG_W.cards, Math.min(1, sig.cardsStrong / deck)]);
-    if (sig.studyTotal) parts.push([PROG_W.study, Math.min(1, sig.studyKnown / sig.studyTotal)]);
+    if (deck) parts.push([PROG_W.cards, Math.min(1, (sig.cardsGrowth != null ? sig.cardsGrowth : sig.cardsStrong) / deck)]);
+    if (sig.studyTotal) parts.push([PROG_W.study, sig.studyByQuiz ? 1 : Math.min(1, sig.studyKnown / sig.studyTotal)]);
     var w = 0, got = 0;
     parts.forEach(function (p) { w += p[0]; got += p[0] * p[1]; });
     var core = w ? got / w : 0;
@@ -770,8 +772,13 @@
     var list = [];
     for (var m = 1; m <= total; m++) {
       var cards = moduleCards(code, m);
-      var strong = 0;
-      cards.forEach(function (c) { if (c && c.interval && c.interval >= CARD_STRONG) strong++; });
+      var strong = 0, seen = 0, growth = 0;
+      cards.forEach(function (c) {
+        if (!c) return;
+        var iv = parseFloat(c.interval) || 0;
+        if (iv >= CARD_STRONG) strong++;
+        if (iv > 0 || c.n > 0 || c.lastGrade != null) { seen++; growth += Math.max(0.15, Math.min(1, iv / CARD_STRONG)); }
+      });
       var st = moduleStudy(code, m);
       list.push({
         deckSize: parseInt(decks[String(m)], 10) || 0,
@@ -783,7 +790,9 @@
         quiz: !!quizzes[String(m)],
         visits: parseInt(visits[String(m)], 10) || 0,
         cardsTotal: cards.length,
-        cardsStrong: strong
+        cardsStrong: strong,
+        cardsSeen: seen,
+        cardsGrowth: growth
       });
     }
     sigCache[code] = list;
@@ -808,7 +817,9 @@
       var sig = {
         mod: base.mod, mastered: base.mastered, unmastered: base.unmastered, quiz: base.quiz,
         visits: base.visits, cardsTotal: base.cardsTotal, cardsStrong: base.cardsStrong, deckSize: base.deckSize,
-        studyTotal: base.studyTotal, studyKnown: base.studyKnown
+        cardsSeen: base.cardsSeen, cardsGrowth: base.cardsGrowth,
+        studyTotal: base.studyTotal, studyKnown: base.studyKnown,
+        studyByQuiz: !!(base.quiz && base.studyTotal && base.studyKnown < base.studyTotal)
       };
       if (sig.mastered) out.mastered++;
       if (sig.quiz) out.quizzes++;
@@ -816,7 +827,7 @@
       out.cards += sig.cardsTotal;
       out.cardsStrong += sig.cardsStrong;
       out.concepts += sig.studyTotal;
-      out.conceptsKnown += sig.studyKnown;
+      out.conceptsKnown += sig.studyByQuiz ? sig.studyTotal : sig.studyKnown;
       sig.score = out.mode === 'manual' ? (sig.mastered ? 1 : 0) : moduleScore(sig);
       sum += sig.score;
       out.perModule.push(sig);

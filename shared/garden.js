@@ -2134,7 +2134,9 @@
     window._gardenQuiz.score = 0;
     window._gardenQuiz.answered = false;
     window._gardenQuiz.marks = [];
+    window._gardenQuiz.picks = [];
     window._gardenQuiz.started = false;
+    window._gardenQuiz.recorded = false;
     liveScore();
     renderQuestion();
   }
@@ -2149,8 +2151,9 @@
     if (!q.questions) return;
     const total = q.questions.length;
     if (q.current >= total) { showResults(); return; }
-    q.answered = false;
     const item = q.questions[q.current];
+    const picked = q.picks ? q.picks[q.current] : null;
+    q.answered = picked != null;
     const labels = ['A', 'B', 'C', 'D'];
     const L = currentLang;
 
@@ -2165,25 +2168,39 @@
     if (counter) counter.textContent = `${q.current + 1} / ${total}`;
     if (prog) prog.style.width = `${(q.current / total) * 100}%`;
     if (qText) qText.innerHTML = item.question?.[L] || '';   /*@3.GARJ.668*/
-    if (fb) { fb.className = 'quiz-feedback hidden'; fb.textContent = ''; }
+    if (fb) { fb.className = 'quiz-feedback hidden'; fb.textContent = ''; fb.removeAttribute('style'); }
     if (nextBtn) nextBtn.classList.add('hidden');
     if (hintBtn) { hintBtn.classList.remove('hidden'); hintBtn.onclick = () => showHint(); }
 
     if (opts) {
-      shuffleMcqOptions(item); /*@3.GARJ.121*/
+      if (!item._gShuf) { shuffleMcqOptions(item); item._gShuf = 1; } /*@3.GARJ.121*/
       opts.innerHTML = (item.options?.[L] || []).map((o, i) =>
         `<button class="mcq-option" onclick="Garden.pick(${i})"><span class="mcq-label">${labels[i]}</span><span>${o}</span></button>`
       ).join('');
     }
+    if (picked != null) paintAnswer(item, picked);
+  }
+
+  function paintAnswer(item, idx) {
+    const ok = idx === item.correctIndex;
+    const btns = document.querySelectorAll('.mcq-option');
+    btns.forEach(b => b.disabled = true);
+    if (ok) btns[idx]?.classList.add('correct');
+    else { btns[idx]?.classList.add('wrong'); btns[item.correctIndex]?.classList.add('correct'); }
+    const fb = document.getElementById('quiz-feedback');
+    if (fb) { fb.removeAttribute('style'); fb.innerHTML = item.explanation?.[currentLang] || ''; fb.className = `quiz-feedback ${ok ? 'quiz-feedback--correct' : 'quiz-feedback--wrong'}`; }
+    document.getElementById('quiz-next-btn')?.classList.remove('hidden');
+    document.getElementById('quiz-hint-btn')?.classList.add('hidden');
   }
 
   function selectOption(idx) {
     const q = window._gardenQuiz;
     if (q.answered) return;
+    if (!q.picks) q.picks = [];
+    if (q.picks[q.current] != null) return;
     q.answered = true;
+    q.picks[q.current] = idx;
     const item = q.questions[q.current];
-    const btns = document.querySelectorAll('.mcq-option');
-    btns.forEach(b => b.disabled = true);
     const ok = idx === item.correctIndex;
     if (!q.marks) q.marks = [];
     q.marks[q.current] = ok ? 1 : 0;
@@ -2196,13 +2213,9 @@
         n: (q.questions || []).length
       });
     }
-    if (ok) { btns[idx]?.classList.add('correct'); q.score++; }
-    else { btns[idx]?.classList.add('wrong'); btns[item.correctIndex]?.classList.add('correct'); }
+    q.score = q.marks.reduce((s, v) => s + (v ? 1 : 0), 0);
     liveScore();
-    const fb = document.getElementById('quiz-feedback');
-    if (fb) { fb.innerHTML = item.explanation?.[currentLang] || ''; fb.className = `quiz-feedback ${ok ? 'quiz-feedback--correct' : 'quiz-feedback--wrong'}`; }
-    document.getElementById('quiz-next-btn')?.classList.remove('hidden');
-    document.getElementById('quiz-hint-btn')?.classList.add('hidden');
+    paintAnswer(item, idx);
   }
 
   function nextQ() { window._gardenQuiz.current++; renderQuestion(); }
@@ -2293,6 +2306,8 @@
       else if (pct >= 0.5) ee.innerHTML = badge('hand-fist');
       else ee.innerHTML = badge('book-open-reader');
     }
+    if (q.recorded) return;
+    q.recorded = true;
     const s = document.documentElement.getAttribute('data-subject') || 'XX', m = document.documentElement.getAttribute('data-module') || '0';
     try { const p = parseInt(localStorage.getItem(`garden_${s}_m${m}_quiz`)) || 0; if (q.score > p) localStorage.setItem(`garden_${s}_m${m}_quiz`, q.score) } catch (e) { }
     /*@3.GARJ.131*/
@@ -2300,7 +2315,8 @@
   }
 
   function retryQuiz() {
-    const q = window._gardenQuiz; q.current = 0; q.score = 0; q.answered = false; q.marks = []; q.started = false; liveScore();
+    const q = window._gardenQuiz; q.current = 0; q.score = 0; q.answered = false; q.marks = []; q.picks = []; q.recorded = false; q.started = false; liveScore();
+    (q.questions || []).forEach(it => { if (it) it._gShuf = 0; });
     document.getElementById('quiz-content')?.classList.remove('hidden');
     document.getElementById('quiz-results')?.classList.add('hidden');
     renderQuestion();
