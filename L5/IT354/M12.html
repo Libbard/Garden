@@ -125,6 +125,11 @@
         <template class="content-en">Advanced Association Rule Algorithms</template>
         <span class="content-target">خوارزميات متقدمة لقواعد الارتباط</span>
       </a>
+      <a href="#fp-tree-algorithm" class="toc-link" data-bilingual>
+        <template class="content-ar">خوارزمية شجرة الأنماط المتكررة (FP-Tree)</template>
+        <template class="content-en">Frequent-Pattern Tree (FP-Tree) Algorithm</template>
+        <span class="content-target">خوارزمية شجرة الأنماط المتكررة (FP-Tree)</span>
+      </a>
 
       <div class="toc-divider"></div>
 
@@ -188,7 +193,7 @@
       <span class="tag">قواعد الارتباط</span>
       <span class="tag">المخطط النجمي</span>
       <span class="tag">OLAP</span>
-      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> ساعة و5 دقائق</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> ساعة و15 دقيقة</span>
     </template>
     <template class="content-en">
       <span class="tag">Data Mining</span>
@@ -196,7 +201,7 @@
       <span class="tag">Association Rules</span>
       <span class="tag">Star Schema</span>
       <span class="tag">OLAP</span>
-      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 1 h 5 min</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 1 h 15 min</span>
     </template>
     <div class="content-target"></div>
   </div>
@@ -921,6 +926,49 @@
   </details>
 </section>
 
+<section id="fp-tree-algorithm" class="concept-card glass-card fade-up" data-study-s="286">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">10</span> خوارزمية شجرة الأنماط المتكررة (FP-Tree)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Frequent-Pattern Tree (FP-Tree) Algorithm</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>خوارزمية فعالة لاكتشاف مجموعات العناصر المتكررة دون الحاجة لتوليد مرشحين (Candidates)، وذلك بضغط قاعدة البيانات في هيكل شجري.</p></template>
+    <template class="content-en"><p>An efficient algorithm for discovering frequent itemsets without generating candidates, by compressing the database into a tree structure.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>تتكون الخوارزمية من خطوتين أساسيتين:</p><ol><li><b>بناء الشجرة (Building the FP-Tree):</b><ul><li>حساب تكرار العناصر الفردية (1-itemsets) وترتيبها تنازلياً حسب التكرار.</li><li>إنشاء جذر للشجرة بتسمية "فارغ" (Null).</li><li>لكل معاملة في قاعدة البيانات: ترتيب عناصرها حسب الترتيب التنازلي السابق، وتقسيمها إلى "رأس" (العنصر الأول) و"ذيل" (باقي العناصر).</li><li>إدراج العناصر بشكل عودي (Recursively): إذا كان للعقدة الحالية ابن يطابق الرأس، نزيد عداده بـ 1. وإلا، ننشئ عقدة جديدة بعداد 1 ونربطها. ثم نكرر العملية باستخدام الذيل كمعاملة جديدة.</li></ul></li><li><b>استخراج الأنماط (FP-growth):</b> استخدام الشجرة المبنية لاستخراج المجموعات المتكررة من خلال بناء قواعد أنماط شرطية (Conditional pattern bases) لكل عنصر.</li></ol></template>
+    <template class="content-en"><p>The algorithm consists of two main steps:</p><ol><li><b>Building the <span class="smart-term" data-term-en="FP-Tree" data-ar="شجرة الأنماط المتكررة" data-en-def="A compressed tree structure that stores relevant information for efficient discovery of frequent itemsets.">FP-Tree<span class="smart-term-tooltip"></span></span>:</b><ul><li>Compute frequent <span class="smart-term" data-term-en="1-itemset" data-ar="مجموعة العنصر الواحد" data-en-def="An itemset containing exactly one item, used to determine the initial frequencies for sorting.">1-itemsets<span class="smart-term-tooltip"></span></span> and sort them in non-increasing order of frequency.</li><li>Create the root of the tree with a "null" label.</li><li>For each transaction: sort its frequent items according to the previous descending order, and designate it as a "head" (first item) and a "tail" (remaining items).</li><li>Insert recursively: if the current node has a child matching the head, increment its count by 1. Otherwise, create a new node with a count of 1 and link it. Repeat the process using only the tail.</li></ul></li><li><b><span class="smart-term" data-term-en="FP-growth" data-ar="نمو الأنماط المتكررة" data-en-def="The second step of the algorithm that extracts frequent itemsets directly from the FP-Tree.">FP-growth<span class="smart-term-tooltip"></span></span>:</b> Use the constructed tree to find frequent itemsets by building conditional pattern bases and conditional FP-trees for each item.</li></ol></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>السر وراء كفاءة FP-Tree هو مشاركة المسارات (Path sharing). من خلال ترتيب العناصر تنازلياً، نضمن أن العناصر الأكثر تكراراً تقع بالقرب من الجذر، مما يسمح لأكبر عدد ممكن من المعاملات بمشاركة نفس العقد، وبالتالي ضغط حجم قاعدة البيانات بشكل هائل.</p><p>على عكس خوارزمية Apriori التي تعاني من مشكلة عنق الزجاجة عند توليد ملايين المرشحين ومسح قاعدة البيانات مراراً، تكتفي FP-Tree بمسحين فقط وتستخرج الأنماط مباشرة من الشجرة.</p></template>
+    <template class="content-en"><p>The secret behind FP-Tree's efficiency is path sharing. By sorting items in descending order of frequency, the most frequent items are placed near the root. This allows the maximum number of transactions to share the same nodes, massively compressing the database size.</p><p>Unlike the Apriori algorithm, which suffers from the bottleneck of generating millions of candidates and repeatedly scanning the database, FP-Tree only requires two scans and extracts patterns directly from the tree.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">ماذا يحدث إذا لم نقم بترتيب العناصر تنازلياً قبل إدراجها في شجرة FP-Tree؟</template>
+      <template class="content-en">What happens if we do not sort the items in descending order before inserting them into the FP-Tree?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>ستفقد الشجرة ميزة 'مشاركة المسارات' الفعالة. ستتفرع الشجرة بشكل كبير جداً وتفشل في ضغط قاعدة البيانات، مما قد يؤدي إلى استهلاك ذاكرة أكبر من حجم قاعدة البيانات الأصلية.</p></template>
+      <template class="content-en"><p>The tree would lose its effective 'path sharing' advantage. It would branch out excessively and fail to compress the database, potentially consuming more memory than the original database itself.</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="professor" class="professor-card glass-card fade-up">
   <div class="professor-header">
     <i class="fa-solid fa-user-graduate sec-icon" aria-hidden="true"></i>
@@ -1172,6 +1220,24 @@
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar"><p>تعتمد الخوارزمية على حقيقة رياضية بسيطة: إذا كان النمط متكرراً في قاعدة البيانات الكلية (تجاوز الحد الأدنى للدعم)، فمن المستحيل ألا يكون متكرراً في قسم واحد على الأقل من أقسامها. بجمع كل الأنماط المتكررة محلياً من كل قسم، نضمن أن القائمة النهائية (المرشحين العالميين) تحتوي حتماً على جميع الأنماط المتكررة عالمياً.</p></template>
           <template class="content-en"><p>The algorithm relies on a simple mathematical fact: if a pattern is frequent in the overall database (exceeds minimum support), it is impossible for it not to be frequent in at least one of its partitions. By unioning all locally frequent patterns from every partition, we guarantee that the final list (global candidates) absolutely contains all globally frequent patterns.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نعتبر الإدراج العودي (Recursive Insertion) وتقسيم المعاملة إلى 'رأس' و'ذيل' ضرورياً في بناء FP-Tree؟</template>
+          <template class="content-en">Why is recursive insertion and splitting the transaction into a 'head' and 'tail' necessary when building an FP-Tree?</template>
+          <span class="content-target">لماذا نعتبر الإدراج العودي (Recursive Insertion) وتقسيم المعاملة إلى 'رأس' و'ذيل' ضرورياً في بناء FP-Tree؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>هذه الآلية هي ما يبني الهيكل الشجري المضغوط. الرأس يمثل العقدة الحالية التي نحاول مطابقتها أو إنشائها. إذا تطابق الرأس مع عقدة موجودة، نزيد العداد فقط (مشاركة المسار). ثم نمرر 'الذيل' (باقي العناصر) كمعاملة جديدة للأبناء، مما يضمن بناء فروع الشجرة خطوة بخطوة بكفاءة ودون تكرار غير ضروري.</p></template>
+          <template class="content-en"><p>This mechanism is what builds the compressed tree structure. The head represents the current node we try to match or create. If it matches an existing node, we just increment the count (path sharing). We then pass the 'tail' (remaining items) as a new transaction to the children, ensuring the tree branches are built step-by-step efficiently without unnecessary duplication.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1507,6 +1573,23 @@
       }
     },
     "id": 19
+  },
+  {
+    "front": {
+      "ar": "ما هي الخطوة الأولى في بناء شجرة FP-Tree؟",
+      "en": "What is the first step in building an FP-Tree?"
+    },
+    "back": {
+      "definition": {
+        "ar": "حساب تكرار العناصر الفردية (1-itemsets) وترتيبها تنازلياً.",
+        "en": "Computing the frequencies of 1-itemsets and sorting them in non-increasing order."
+      },
+      "example": {
+        "ar": "إذا كان الحليب يتكرر 50 مرة والخبز 30، يوضع الحليب قبل الخبز في الترتيب.",
+        "en": "If milk appears 50 times and bread 30, milk is ordered before bread."
+      }
+    },
+    "id": 20
   }
 ]
 </script>
@@ -1516,7 +1599,7 @@
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
         <div id="quiz-content" class="quiz-card glass-card">
           <div class="quiz-header">
-            <span id="quiz-counter">1 / 13</span>
+            <span id="quiz-counter">1 / 14</span>
             <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
           </div>
           <div class="quiz-question" id="quiz-question-text"></div>
@@ -1532,7 +1615,7 @@
         </div>
         <div id="quiz-results" class="quiz-results glass-card hidden">
           <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-          <div class="score-display" id="quiz-score-display">0 / 13</div>
+          <div class="score-display" id="quiz-score-display">0 / 14</div>
           <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
         </div>
       </section>
@@ -1953,6 +2036,38 @@
     },
     "difficulty": "medium",
     "id": 13
+  },
+  {
+    "conceptId": "fp-tree-algorithm",
+    "question": {
+      "ar": "في خطوة بناء شجرة FP-Tree، كيف يتم التعامل مع كل معاملة (Transaction) قبل إدراجها في الشجرة؟",
+      "en": "In the FP-Tree building step, how is each transaction handled before being inserted into the tree?"
+    },
+    "options": {
+      "ar": [
+        "يتم تقسيمها عشوائياً إلى مجموعات فرعية.",
+        "يتم ترتيب عناصرها تنازلياً حسب تكرارها الكلي في قاعدة البيانات.",
+        "يتم إدراجها كما هي دون أي تغيير في الترتيب.",
+        "يتم حذف العناصر الأكثر تكراراً منها لتوفير المساحة."
+      ],
+      "en": [
+        "It is randomly divided into subsets.",
+        "Its items are sorted in descending order based on their overall frequency in the database.",
+        "It is inserted exactly as is without any change in order.",
+        "The most frequent items are removed from it to save space."
+      ]
+    },
+    "correctIndex": 1,
+    "explanation": {
+      "ar": "قبل إدراج المعاملة، يتم ترتيب عناصرها تنازلياً (من الأكثر تكراراً إلى الأقل) لضمان مشاركة المسارات بالقرب من جذر الشجرة.",
+      "en": "Before insertion, the transaction's items are sorted in non-increasing order (most frequent to least) to ensure path sharing near the root of the tree."
+    },
+    "hint": {
+      "ar": "فكر في كيفية جعل المعاملات المختلفة تشترك في نفس العقد الأولية.",
+      "en": "Think about how to make different transactions share the same initial nodes."
+    },
+    "difficulty": "medium",
+    "id": 14
   }
 ]
 </script>

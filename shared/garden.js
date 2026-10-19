@@ -6525,7 +6525,11 @@ ${baseRules}`) + regenSuffix;
   const _AI_ICON_HEADER = `<span class="ai-header-icon"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i></span>`;
 
   /*@3.GARJ.359*/
-  const _AI_ICON_SVC = `<i class="fa-solid fa-arrow-up-right-from-square ai-svc-ico" aria-hidden="true"></i>`;
+  const _AI_SVCS = [
+    { n: 'ChatGPT', u: 'https://chatgpt.com/', d: 'M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0804 4.7783-2.7582a.7948.7948 0 0 0 .3927-.6813v-6.7369l2.02 1.1686a.071.071 0 0 1 .038.052v5.5826a4.504 4.504 0 0 1-4.4945 4.4944zm-9.6607-4.1254a4.4708 4.4708 0 0 1-.5346-3.0137l.142.0852 4.783 2.7582a.7712.7712 0 0 0 .7806 0l5.8428-3.3685v2.3324a.0804.0804 0 0 1-.0332.0615L9.74 19.9502a4.4992 4.4992 0 0 1-6.1408-1.6464zM2.3408 7.8956a4.485 4.485 0 0 1 2.3655-1.9728V11.6a.7664.7664 0 0 0 .3879.6765l5.8144 3.3543-2.0201 1.1685a.0757.0757 0 0 1-.071 0l-4.8303-2.7865A4.504 4.504 0 0 1 2.3408 7.872zm16.5963 3.8558L13.1038 8.364 15.1192 7.2a.0757.0757 0 0 1 .071 0l4.8303 2.7913a4.4944 4.4944 0 0 1-.6765 8.1042v-5.6772a.79.79 0 0 0-.407-.667zm2.0107-3.0231l-.142-.0852-4.7735-2.7818a.7759.7759 0 0 0-.7854 0L9.409 9.2297V6.8974a.0662.0662 0 0 1 .0284-.0615l4.8303-2.7866a4.4992 4.4992 0 0 1 6.6802 4.66zM8.3065 12.863l-2.02-1.1638a.0804.0804 0 0 1-.038-.0567V6.0742a4.4992 4.4992 0 0 1 7.3757-3.4537l-.142.0805L8.704 5.459a.7948.7948 0 0 0-.3927.6813zm1.0976-2.3654l2.602-1.4998 2.6069 1.4998v2.9994l-2.5974 1.4997-2.6067-1.4997Z' },
+    { n: 'Gemini', u: 'https://gemini.google.com/', d: 'M11.04 19.32Q12 21.51 12 24q0-2.49.93-4.68.96-2.19 2.58-3.81t3.81-2.55Q21.51 12 24 12q-2.49 0-4.68-.93a12.3 12.3 0 0 1-3.81-2.58 12.3 12.3 0 0 1-2.58-3.81Q12 2.49 12 0q0 2.49-.96 4.68-.93 2.19-2.55 3.81a12.3 12.3 0 0 1-3.81 2.58Q2.49 12 0 12q2.49 0 4.68.96 2.19.93 3.81 2.55t2.55 3.81' },
+    { n: 'Qwen', u: 'https://chat.qwen.ai/', d: 'M23.919 14.545 20.817 9.17l1.47-2.544a.56.56 0 0 0 0-.566l-1.633-2.83a.57.57 0 0 0-.49-.283h-6.207L12.487.402a.57.57 0 0 0-.49-.284H8.732a.56.56 0 0 0-.49.284L5.139 5.775h-2.94a.56.56 0 0 0-.49.284L.077 8.887a.56.56 0 0 0 0 .567L3.18 14.83l-1.47 2.545a.56.56 0 0 0 0 .566l1.634 2.83a.57.57 0 0 0 .49.283h6.205l1.47 2.545a.57.57 0 0 0 .49.284h3.266a.57.57 0 0 0 .49-.284l3.104-5.375h2.94a.57.57 0 0 0 .49-.283l1.634-2.828a.55.55 0 0 0-.004-.568M8.733.686l1.634 2.828-1.634 2.828H21.8L20.164 9.17H7.425L5.63 6.06Zm1.306 19.801-6.205-.002 1.634-2.83h3.265L2.201 6.344h3.267q3.182 5.517 6.367 11.032zm10.124-5.66L18.53 12l-6.532 11.315-1.634-2.83c2.129-3.673 4.25-7.351 6.373-11.028h3.592l3.102 5.374z' },
+  ];
 
   /*@3.GARJ.702*/
   const _AI_APP_PKG = { 'chatgpt.com': 'com.openai.chatgpt', 'gemini.google.com': 'com.google.android.apps.bard',
@@ -6630,15 +6634,11 @@ ${baseRules}`) + regenSuffix;
             <span class="ai-btn-label">${aiT('نسخ', 'Copy')}</span>
           </button>
           ${GARDEN_AI_ENDPOINT ? `<button class="ai-action-btn ai-action-btn--regen" id="ai-regen" title="${aiT('اشرحها لي من زاوية أخرى', 'Explain it from another angle')}">${REGEN_INNER}</button>` : ''}
-          <a class="ai-action-btn ai-svc-btn" href="https://chat.qwen.ai/" target="_blank" rel="noopener" title="${aiT('انسخ البرومبت وافتح Qwen', 'Copy the prompt and open Qwen')}">
-            ${_AI_ICON_SVC} <span class="ai-btn-label">Qwen</span>
-          </a>
-          <a class="ai-action-btn ai-svc-btn" href="https://chatgpt.com/" target="_blank" rel="noopener" title="${aiT('انسخ البرومبت وافتح ChatGPT', 'Copy the prompt and open ChatGPT')}">
-            ${_AI_ICON_SVC} <span class="ai-btn-label">ChatGPT</span>
-          </a>
-          <a class="ai-action-btn ai-svc-btn" href="https://gemini.google.com/" target="_blank" rel="noopener" title="${aiT('انسخ البرومبت وافتح Gemini', 'Copy the prompt and open Gemini')}">
-            ${_AI_ICON_SVC} <span class="ai-btn-label">Gemini</span>
-          </a>
+          ${_AI_SVCS.map(s => {
+            const t = aiT('انسخ البرومبت وافتح ' + s.n, 'Copy the prompt and open ' + s.n);
+            return `<a class="ai-action-btn ai-svc-btn" href="${s.u}" target="_blank" rel="noopener" aria-label="${t}" title="${t}" data-ar-title="انسخ البرومبت وافتح ${s.n}" data-en-title="Copy the prompt and open ${s.n}">` +
+              `<svg class="ai-svc-logo" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path fill="currentColor" d="${s.d}"/></svg></a>`;
+          }).join('')}
           ${_aiCanShare() ? `<button class="ai-action-btn" id="ai-share-app" aria-label="${aiT('أرسلِ البرومبت إلى أيِّ تطبيق', 'Send the prompt to any app')}" title="${aiT('أرسلِ البرومبت إلى أيِّ تطبيق', 'Send the prompt to any app')}">
             <i class="fa-solid fa-share-nodes" aria-hidden="true"></i> <span class="ai-btn-label">${aiT('تطبيقٌ آخر', 'Other app')}</span>
           </button>` : ''}
@@ -7112,6 +7112,15 @@ ${baseRules}`) + regenSuffix;
     overlay.querySelector('#ai-share-app')?.addEventListener('click', () => {
       navigator.share({ text: promptTextOut() }).catch(() => {});
     });
+    overlay.addEventListener('click', e => {
+      const b = e.target.closest && e.target.closest('.ai-code-copy');
+      const code = b && b.closest('.ai-code') && b.closest('.ai-code').querySelector('code');
+      if (!code || !navigator.clipboard || !navigator.clipboard.writeText) return;
+      navigator.clipboard.writeText(code.textContent).then(() => {
+        b.classList.add('is-done');
+        setTimeout(() => b.classList.remove('is-done'), 1500);
+      }, () => {});
+    });
 
     /*@3.GARJ.610*/
     overlay.querySelector('#ai-regen')?.addEventListener('click', () => {
@@ -7226,51 +7235,187 @@ ${baseRules}`) + regenSuffix;
 
   function formatAiText(text) {
     const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    const inline = s => aiIconMarkup(esc(s))
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/`([^`]+)`/g, '<code dir="ltr">$1</code>');
+    const AR = /[؀-ۿ]/;
+    const inline = s => {
+      const keep = [];
+      const hold = h => '\u0000' + (keep.push(h) - 1) + '\u0000';
+      s = s.replace(/`([^`\n]+)`/g, (m, c) => hold('<code dir="ltr">' + esc(c) + '</code>'));
+      s = s.replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)"<>]+)\)/g, (m, x, u) =>
+        hold('<a href="' + esc(u) + '" target="_blank" rel="noopener">' + esc(x) + '</a>'));
+      if (AR.test(s) && !/\$|\\\(/.test(s)) {
+        s = s.replace(/(^|[^\w\u0000])([A-Za-z_]\w*(?:\(\))?(?:\s?(?:[=!<>]=|[=<>+\-*\/%])\s?[\w.'"]+(?:\(\))?)+)/g,
+          (m, a, e) => a + hold('<bdi dir="ltr">' + esc(e) + '</bdi>'));
+      }
+      return aiIconMarkup(esc(s))
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/(^|[^*\w])\*([^*\s](?:[^*\n]*[^*\s])?)\*(?![*\w])/g, '$1<em>$2</em>')
+        .replace(/~~(.+?)~~/g, '<del>$1</del>')
+        .replace(/\u0000(\d+)\u0000/g, (m, i) => keep[+i]);
+    };
+    const dirOf = raw => (!AR.test(raw) && /[A-Za-z]/.test(raw) ? ' dir="ltr"' : '');
+
+    const KW = new Set(('if else elif for foreach while do switch case default break continue return function def class struct ' +
+      'new delete let const var int long short float double char bool boolean void string public private protected static ' +
+      'final abstract try catch finally throw throws import from as in of is not and or true false null nil None True False ' +
+      'this self super lambda yield async await sub my our local print printf cout cin include using namespace template ' +
+      'typename enum interface extends implements package fun val when match end begin then fi echo select where insert ' +
+      'update into values create table procedure record type program').split(' '));
+    const HASH = /^(py|python|perl|pl|rb|ruby|sh|bash|shell|zsh|r|yaml|yml|toml|make|makefile|ps1|powershell|)$/;
+    const DASH = /^(sql|lua|haskell|hs|ada|vhdl)$/;
+    const hl = (src, lang) => {
+      const re = /(\/\/[^\n]*|\/\*[\s\S]*?\*\/)|(#[^\n]*)|(--[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|\b(\d+(?:\.\d+)?)\b|([A-Za-z_]\w*)/g;
+      const py = /^(py|python)$/.test(lang);
+      let out = '', last = 0, m;
+      while ((m = re.exec(src))) {
+        let cls = '', tok = m[0];
+        if (m[1] && py && tok.slice(0, 2) === '//') { re.lastIndex = m.index + 2; tok = '//'; }
+        else if (m[2] && !HASH.test(lang)) { re.lastIndex = m.index + 1; tok = '#'; }
+        else if (m[3] && !DASH.test(lang)) { re.lastIndex = m.index + 1; tok = '-'; }
+        else if (m[1] || m[2] || m[3]) cls = 'c';
+        else if (m[4]) cls = 's';
+        else if (m[5]) cls = 'n';
+        else if (m[6] && KW.has(tok)) cls = 'k';
+        out += esc(src.slice(last, m.index)) + (cls ? '<span class="ai-tk-' + cls + '">' + esc(tok) + '</span>' : esc(tok));
+        last = m.index + tok.length;
+      }
+      return out + esc(src.slice(last));
+    };
+    const codeBlock = (src, lang) => {
+      const L = (lang || '').toLowerCase().replace(/[^\w#+.-]/g, '').slice(0, 20);
+      const t = aiT('انسخ الكود', 'Copy code');
+      return '<div class="ai-code" dir="ltr"><div class="ai-code-bar"><span class="ai-code-lang">' + esc(L) + '</span>' +
+        '<button type="button" class="ai-code-copy" aria-label="' + t + '" title="' + t + '" data-ar-title="انسخ الكود" data-en-title="Copy code">' +
+        '<i class="fa-solid fa-copy" aria-hidden="true"></i></button></div><pre><code>' + hl(src.replace(/\s+$/, ''), L) + '</code></pre></div>';
+    };
+
+    const ITEM = /^(\s*)([-*•]|([0-9٠-٩]+)[.)])\s+(.*)$/;
+    const num = d => +String(d).replace(/[٠-٩]/g, c => c.charCodeAt(0) - 0x660) || 1;
+    const LANG = /^(javascript|typescript|python|java|kotlin|swift|perl|ruby|php|rust|go|haskell|lisp|scheme|prolog|sql|bash|lua|ada|pascal|fortran|c\+\+|c#|c|js|ts|py)\b[^:]*:$/i;
+    const looksCode = t => {
+      if (ITEM.test(t) || /^#{1,6}\s/.test(t) || t.length < 6) return false;
+      if (/\\(begin|end|frac|tfrac|dfrac|quad|qquad|cdot|times|sum|prod|int|left|right|sqrt|mathbf|mathrm|text|over|le|ge|neq)\b/.test(t)) return false;
+      if (/^#include\s*[<"]/.test(t) || /^from\s+[\w.]+\s+import\s/.test(t) || /^import\s+[\w.]+(\s+as\s+\w+)?;?$/.test(t)) return true;
+      const body = t.replace(/\s(\/\/|#)\s.*$/, '').trim();
+      if (/[^\x20-\x7E\t]/.test(body) || /\*\*|`/.test(body) || /\.$/.test(body) || /^[A-Z][\w ]{0,30}:\s/.test(body)) return false;
+      if (/^(def|class)\s+\w+.*:$/.test(body)) return true;
+      const words = (body.match(/[A-Za-z]{3,}/g) || []).length;
+      if (words >= 8 && (body.match(/[;{}()=[\]<>+*/&|]/g) || []).length * 3 < words) return false;
+      return /[;{}]$/.test(body) && /\)\s*;|;\s*\}|\w\s*\([^)]*\)\s*\{|\{[^}]*;|^\}/.test(body);
+    };
 
     const lines = (text || '').replace(/\r\n/g, '\n').split('\n');
     let html = '';
     let para = [];
-    let list = null; /*@3.GARJ.389*/
-    let inCode = false, codeBuf = [];
+    let list = null, gap = false; /*@3.GARJ.389*/
+    let run = [];
+    let quote = [];
 
-    const flushPara = () => { if (para.length) { html += '<p>' + para.join('<br>') + '</p>'; para = []; } };
-    const flushList = () => { if (list) { html += `<${list.type}>` + list.items.map(i => `<li>${i}</li>`).join('') + `</${list.type}>`; list = null; } };
+    const flushPara = () => {
+      if (!para.length) return;
+      html += '<p' + dirOf(para.map(x => x.m || x).join(' ')) + '>' +
+        para.map(x => (x.m != null ? esc(x.m) : inline(x))).join('<br>') + '</p>';
+      para = [];
+    };
+    const renderList = l => '<' + l.type + (l.type === 'ol' && l.start > 1 ? ' start="' + l.start + '"' : '') + (l.ar ? ' class="ai-ol-ar"' : '') + '>' +
+      l.items.map(i => '<li>' + i.h + (i.sub ? renderList(i.sub) : '') + '</li>').join('') + '</' + l.type + '>';
+    const flushList = () => { if (list) { html += renderList(list); list = null; } gap = false; };
+    let runLang = '', mathEnd = '';
+    const flushRun = () => { if (run.length) { html += codeBlock(run.join('\n'), runLang); run = []; } };
+    const flushQuote = () => { if (quote.length) { html += '<blockquote>' + quote.map(inline).join('<br>') + '</blockquote>'; quote = []; } };
+    const flushAll = () => { flushRun(); flushQuote(); flushPara(); flushList(); };
+    const lastItem = () => {
+      const top = list.items[list.items.length - 1];
+      return top.sub ? top.sub.items[top.sub.items.length - 1] : top;
+    };
 
-    for (const rawLine of lines) {
-      const t = rawLine.trim();
+    for (let i = 0; i < lines.length; i++) {
+      const raw = lines[i];
+      const t = raw.trim();
+
       /*@3.GARJ.390*/
-      if (/^```/.test(t)) {
-        if (inCode) {
-          html += `<pre dir="ltr"><code>${esc(codeBuf.join('\n'))}</code></pre>`;
-          codeBuf = []; inCode = false;
-        } else {
-          flushPara(); flushList(); inCode = true;
+      const fence = t.match(/^```\s*([\w#+.-]*)/);
+      if (fence) {
+        flushAll();
+        const ind = raw.length - raw.replace(/^\s+/, '').length;
+        const buf = [];
+        let j = i + 1;
+        for (; j < lines.length && !/^```/.test(lines[j].trim()); j++) {
+          buf.push(lines[j].replace(new RegExp('^\\s{0,' + ind + '}'), ''));
         }
+        html += codeBlock(buf.join('\n'), fence[1]);
+        i = j;
         continue;
       }
-      if (inCode) { codeBuf.push(rawLine); continue; }
-      if (!t) { flushPara(); flushList(); continue; }
+
+      if (mathEnd || /^(\\\[|\$\$)/.test(t)) {
+        flushRun(); flushQuote(); flushList();
+        if (!mathEnd) {
+          mathEnd = t.slice(0, 2) === '$$' ? '$$' : '\\]';
+          if (t.slice(2).includes(mathEnd)) mathEnd = '';
+        } else if (t.includes(mathEnd)) mathEnd = '';
+        para.push({ m: t });
+        continue;
+      }
+
+      if (run.length && t && (/^(\/\/|#)/.test(t) || /^\s{2,}\S/.test(raw))) { run.push(raw); continue; }
+      if (t && looksCode(t)) {
+        const prev = para[para.length - 1];
+        const lab = typeof prev === 'string' ? prev.match(LANG) : null;
+        runLang = lab ? lab[1] : '';
+        flushQuote(); flushPara(); flushList(); run.push(raw); continue;
+      }
+      flushRun();
+
+      if (!t) { flushQuote(); flushPara(); if (list) gap = true; continue; }
+
+      const q = t.match(/^>\s?(.*)$/);
+      if (q) { flushPara(); flushList(); quote.push(q[1]); continue; }
+      flushQuote();
+
+      if (/^(-{3,}|\*{3,}|_{3,})$/.test(t)) { flushPara(); flushList(); html += '<hr>'; continue; }
+
       /*@3.GARJ.391*/
-      const h = t.match(/^#{1,4}\s+(.*)/);
-      if (h) { flushPara(); flushList(); html += `<h4>${inline(h[1])}</h4>`; continue; }
-      /*@3.GARJ.392*/
-      const ul = t.match(/^[-*•]\s+(.*)/);
-      const ol = t.match(/^\d+[.)]\s+(.*)/);
-      if (ul || ol) {
-        flushPara();
-        const type = ul ? 'ul' : 'ol';
-        if (!list || list.type !== type) { flushList(); list = { type, items: [] }; }
-        list.items.push(inline((ul || ol)[1]));
+      const h = t.match(/^#{1,6}\s+(.*?)\s*#*$/);
+      if (h) { flushPara(); flushList(); html += '<h4' + dirOf(h[1]) + '>' + inline(h[1]) + '</h4>'; continue; }
+
+      if (/^\|.*\|$/.test(t) && i + 1 < lines.length && /^\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?$/.test(lines[i + 1].trim())) {
+        flushPara(); flushList();
+        const cells = r => r.trim().replace(/^\||\|$/g, '').split('|').map(c => inline(c.trim()));
+        let tbl = '<div class="ai-table"><table><thead><tr>' + cells(t).map(c => '<th>' + c + '</th>').join('') + '</tr></thead><tbody>';
+        let j = i + 2;
+        for (; j < lines.length && /^\|/.test(lines[j].trim()); j++) {
+          tbl += '<tr>' + cells(lines[j]).map(c => '<td>' + c + '</td>').join('') + '</tr>';
+        }
+        html += tbl + '</tbody></table></div>';
+        i = j - 1;
         continue;
       }
+
+      /*@3.GARJ.392*/
+      const m = raw.match(ITEM);
+      if (m) {
+        flushPara();
+        const type = m[3] ? 'ol' : 'ul';
+        const ind = m[1].replace(/\t/g, '  ').length;
+        const item = { h: inline(m[4]), sub: null };
+        if (list && ind >= 2) {
+          const top = list.items[list.items.length - 1];
+          if (!top.sub) top.sub = { type, start: num(m[3]), ar: /[٠-٩]/.test(m[3] || ''), items: [] };
+          top.sub.items.push(item);
+        } else {
+          if (!list || list.type !== type) { flushList(); list = { type, start: num(m[3]), ar: /[٠-٩]/.test(m[3] || ''), items: [] }; }
+          list.items.push(item);
+        }
+        gap = false;
+        continue;
+      }
+
+      if (list && /^\s{2,}\S/.test(raw)) { lastItem().h += '<br>' + inline(t); continue; }
       flushList();
-      para.push(inline(t));
+      para.push(t);
     }
-    if (inCode && codeBuf.length) html += `<pre dir="ltr"><code>${esc(codeBuf.join('\n'))}</code></pre>`;
-    flushPara(); flushList();
+    flushAll();
+    if (html && !AR.test(text || '') && /[A-Za-z]/.test(text || '')) html = '<div dir="ltr">' + html + '</div>';
     return html || '<p></p>';
   }
 

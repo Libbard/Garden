@@ -1763,6 +1763,35 @@
       <div class="content-target"><p>للتغلب على بطء مسح قاعدة البيانات، تُستخدم خوارزميات متقدمة:</p><ul><li><b><span class="smart-term" data-term-en="Sampling Algorithm" data-ar="خوارزمية أخذ العينات" data-en-def="Selects samples from the database that fit into memory to find frequent itemsets, minimizing full DB scans.">خوارزمية أخذ العينات<span class="smart-term-tooltip"></span></span> (Sampling Algorithm):</b> تختار عينة من المعاملات تتسع في الذاكرة وتستخرج منها المجموعات المتكررة. إذا كانت هذه المجموعات تشمل جميع المجموعات المتكررة الحقيقية، يتم إيجاد الباقي بمسح ما تبقى من القاعدة. نادراً ما تتطلب مسحاً ثانياً كاملاً.</li><li><b><span class="smart-term" data-term-en="Partition Algorithm" data-ar="خوارزمية التقسيم" data-en-def="Divides the database into memory-fitting subsets, finds local frequent itemsets, and unions them to find global candidates.">خوارزمية التقسيم<span class="smart-term-tooltip"></span></span> (Partition Algorithm):</b> تقسم قاعدة البيانات إلى أجزاء غير متداخلة يتسع كل منها في الذاكرة. تُطبق Apriori على كل قسم. اتحاد المجموعات المتكررة من كل قسم يشكل 'المرشحين العالميين' (Global candidates). أخيراً، يُقاس الدعم الفعلي لهؤلاء المرشحين بمسح قاعدة البيانات بأكملها مرة واحدة.</li></ul></div>
     </div>
   </article>
+
+  <article class="concept-card glass-card fade-up" id="fp-tree-algorithm" data-study-s="116">
+    <div class="concept-header">
+      <h2>
+        <span class="concept-number">12.10</span>
+        <span data-bilingual>
+          <template class="content-ar">خوارزمية شجرة الأنماط المتكررة (FP-Tree)</template>
+          <template class="content-en">Frequent-Pattern Tree (FP-Tree) Algorithm</template>
+          <span class="content-target">خوارزمية شجرة الأنماط المتكررة (FP-Tree)</span>
+        </span>
+      </h2>
+    </div>
+
+    <div class="depth-tabs">
+      <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+      <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    </div>
+
+    <div class="depth-layer active" data-layer="flash" data-bilingual>
+      <template class="content-ar"><p>خوارزمية فعالة لاكتشاف مجموعات العناصر المتكررة دون الحاجة لتوليد مرشحين (Candidates)، وذلك بضغط قاعدة البيانات في هيكل شجري.</p></template>
+      <template class="content-en"><p>An efficient algorithm for discovering frequent itemsets without generating candidates, by compressing the database into a tree structure.</p></template>
+      <div class="content-target"><p>خوارزمية فعالة لاكتشاف مجموعات العناصر المتكررة دون الحاجة لتوليد مرشحين (Candidates)، وذلك بضغط قاعدة البيانات في هيكل شجري.</p></div>
+    </div>
+    <div class="depth-layer" data-layer="full" data-bilingual>
+      <template class="content-ar"><p>تتكون الخوارزمية من خطوتين أساسيتين:</p><ol><li><b>بناء الشجرة (Building the FP-Tree):</b><ul><li>حساب تكرار العناصر الفردية (1-itemsets) وترتيبها تنازلياً حسب التكرار.</li><li>إنشاء جذر للشجرة بتسمية "فارغ" (Null).</li><li>لكل معاملة في قاعدة البيانات: ترتيب عناصرها حسب الترتيب التنازلي السابق، وتقسيمها إلى "رأس" (العنصر الأول) و"ذيل" (باقي العناصر).</li><li>إدراج العناصر بشكل عودي (Recursively): إذا كان للعقدة الحالية ابن يطابق الرأس، نزيد عداده بـ 1. وإلا، ننشئ عقدة جديدة بعداد 1 ونربطها. ثم نكرر العملية باستخدام الذيل كمعاملة جديدة.</li></ul></li><li><b>استخراج الأنماط (FP-growth):</b> استخدام الشجرة المبنية لاستخراج المجموعات المتكررة من خلال بناء قواعد أنماط شرطية (Conditional pattern bases) لكل عنصر.</li></ol></template>
+      <template class="content-en"><p>The algorithm consists of two main steps:</p><ol><li><b>Building the <span class="smart-term" data-term-en="FP-Tree" data-ar="شجرة الأنماط المتكررة" data-en-def="A compressed tree structure that stores relevant information for efficient discovery of frequent itemsets.">FP-Tree<span class="smart-term-tooltip"></span></span>:</b><ul><li>Compute frequent <span class="smart-term" data-term-en="1-itemset" data-ar="مجموعة العنصر الواحد" data-en-def="An itemset containing exactly one item, used to determine the initial frequencies for sorting.">1-itemsets<span class="smart-term-tooltip"></span></span> and sort them in non-increasing order of frequency.</li><li>Create the root of the tree with a "null" label.</li><li>For each transaction: sort its frequent items according to the previous descending order, and designate it as a "head" (first item) and a "tail" (remaining items).</li><li>Insert recursively: if the current node has a child matching the head, increment its count by 1. Otherwise, create a new node with a count of 1 and link it. Repeat the process using only the tail.</li></ul></li><li><b><span class="smart-term" data-term-en="FP-growth" data-ar="نمو الأنماط المتكررة" data-en-def="The second step of the algorithm that extracts frequent itemsets directly from the FP-Tree.">FP-growth<span class="smart-term-tooltip"></span></span>:</b> Use the constructed tree to find frequent itemsets by building conditional pattern bases and conditional FP-trees for each item.</li></ol></template>
+      <div class="content-target"><p>تتكون الخوارزمية من خطوتين أساسيتين:</p><ol><li><b>بناء الشجرة (Building the FP-Tree):</b><ul><li>حساب تكرار العناصر الفردية (1-itemsets) وترتيبها تنازلياً حسب التكرار.</li><li>إنشاء جذر للشجرة بتسمية "فارغ" (Null).</li><li>لكل معاملة في قاعدة البيانات: ترتيب عناصرها حسب الترتيب التنازلي السابق، وتقسيمها إلى "رأس" (العنصر الأول) و"ذيل" (باقي العناصر).</li><li>إدراج العناصر بشكل عودي (Recursively): إذا كان للعقدة الحالية ابن يطابق الرأس، نزيد عداده بـ 1. وإلا، ننشئ عقدة جديدة بعداد 1 ونربطها. ثم نكرر العملية باستخدام الذيل كمعاملة جديدة.</li></ul></li><li><b>استخراج الأنماط (FP-growth):</b> استخدام الشجرة المبنية لاستخراج المجموعات المتكررة من خلال بناء قواعد أنماط شرطية (Conditional pattern bases) لكل عنصر.</li></ol></div>
+    </div>
+  </article>
 </section>
 
 <section id="formula-panel" class="glass-card fade-up section-gap" style="padding:2rem">
