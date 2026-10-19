@@ -1207,9 +1207,12 @@
   }
   function importItems() {
     var gd = A.importDrive && A.driveOn && A.driveOn();
+    var sl = A.slidesCourses ? A.slidesCourses() : [];
     return [
       { a: 'import', i: 'fa-laptop', t: L('ملفّاتٌ من جهازي…', 'Files from my device…') }].concat(gd ? [
-      { a: 'importgd', i: 'fa-cloud-arrow-down', t: L('ملفّاتٌ من درايف…', 'Files from Drive…') }] : []).concat([
+      { a: 'importgd', i: 'fa-cloud-arrow-down', t: L('ملفّاتٌ من درايف…', 'Files from Drive…') }] : []).concat(sl.length ? [
+      { a: 'g:sl', i: 'fa-chalkboard', t: L('السلايداتُ الأصليّة لمادّة', 'A course’s original slides'),
+        sub: sl.map(function (c) { return { a: 'slc:' + c.code, i: 'fa-graduation-cap', t: c.label }; }) }] : []).concat([
       { a: 'c:ai', i: 'fa-wand-magic-sparkles', t: L('من محادثة ذكاء…', 'From an AI chat…') },
       { a: 'c:md', i: 'fa-file-code', t: L('ماركداون…', 'Markdown…') },
       { a: 'c:json', i: 'fa-file-arrow-down', t: L('ملفُّ JSON صُدِّر من هنا…', 'A JSON export from here…') }
@@ -1232,6 +1235,7 @@
     else if (act === 'nnote') A.newNote();
     else if (act === 'import') pickFiles();
     else if (act === 'importgd' && A.importDrive) A.importDrive();
+    else if (act.indexOf('slc:') === 0 && A.slidesOpen) A.slidesOpen(act.slice(4));
     else if (act === 'paste') A.paste();
     else if (act === 'empty') A.emptyTrash();
     else if (act === 'vm') { A.uiSet('xvm', vmOf() === 'grid' ? 'rows' : 'grid'); paint(); }

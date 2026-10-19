@@ -983,7 +983,7 @@
                   course: html.getAttribute('data-subject') || '', module: Number(html.getAttribute('data-module')) || undefined,
                   origin: { page: location.pathname + '#' + sec.id, title: moduleTitle() || document.title.split('·')[0].trim() }, tags: [] });
     try { localStorage.setItem('quick_notes', JSON.stringify(arr)); } catch (e2) { toast(L('تعذّر الحفظ', 'Could not save')); return; }
-    location.href = ROOT + 'hub/notes.html?adopt=' + encodeURIComponent(id);
+    go(ROOT + 'hub/notes.html?adopt=' + encodeURIComponent(id));
   }
 
   /*@3.MOTJ2.6*/
@@ -1110,6 +1110,14 @@
   }
 
   function slidesHref() { var a = document.getElementById('sidebar-slides-btn'); return a ? a.href : ''; }
+  /*@3.MOTJ2.27*/
+  var leaving = false;
+  function go(url) {
+    if (!url) return;
+    leaving = true;
+    try { if (history.state && history.state.mtSheet) { location.replace(url); return; } } catch (e) {}
+    location.href = url;
+  }
   /*@3.MOTJ2.26*/
   function smart(x, y, ctx) {
     ctx = ctx || {};
@@ -1205,10 +1213,10 @@
           else { try { localStorage.setItem('garden_peek_off', '1'); } catch (eP2) {} if (window.GardenModPeek) GardenModPeek.hideAll(); toast(L('أُخفيت نوافذُ الملاحظات', 'Note windows hidden')); }
           return;
         }
-        if (a === 'm-slides') { location.href = slidesHref(); return; }
+        if (a === 'm-slides') { go(slidesHref()); return; }
         if (a === 'm-quiz') {
           var html = document.documentElement;
-          location.href = ROOT + 'hub/quiz.html?c=' + encodeURIComponent(html.getAttribute('data-subject') || '') + '&m=' + encodeURIComponent(html.getAttribute('data-module') || '');
+          go(ROOT + 'hub/quiz.html?c=' + encodeURIComponent(html.getAttribute('data-subject') || '') + '&m=' + encodeURIComponent(html.getAttribute('data-module') || ''));
           return;
         }
         if (a === 'm-keep' && I) { I.keep(!I.keep()); }
@@ -1240,6 +1248,7 @@
       if (el.isConnected) return;
       mo.disconnect();
       window.removeEventListener('popstate', pop);
+      if (leaving) return;
       if (pushed && history.state && history.state.mtSheet) { pushed = false; try { history.back(); } catch (e2) {} }
     });
     mo.observe(el.parentNode || document.body, { childList: true });
@@ -1274,7 +1283,7 @@
       label: o.label, cls: 'gsf-rmenu gsf-rmenu--sheet ' + (o.cls || 'mt-menu'), focus: false,
       onClose: function () {
         window.removeEventListener('popstate', pop);
-        if (pushed && (!acted || KEEP_HIST.test(acted))) { pushed = false; try { history.back(); } catch (e) {} }
+        if (pushed && !leaving && (!acted || KEEP_HIST.test(acted))) { pushed = false; try { history.back(); } catch (e) {} }
       } });
     if (!el) return el;
     ['left', 'insetBlockStart', 'maxBlockSize', 'overflowY'].forEach(function (k) { el.style[k] = ''; });

@@ -2290,6 +2290,33 @@
     return true;
   }
 
+  /*@3.NOAJ.531*/
+  function slidesCourses() {
+    var G = window.Garden, seen = {}, out = [];
+    var add = function (c) {
+      c = String(c || '').toUpperCase();
+      if (!c || seen[c] || !(G && G.slidesOf && G.slidesOf(c))) return;
+      seen[c] = 1; out.push({ code: c, label: courseLabel(c) });
+    };
+    if (S.view && S.view.code) add(S.view.code);
+    try { var sem = window.GardenData && GardenData.semester && GardenData.semester(); ((sem && sem.courses) || []).forEach(function (c) { add(c && c.code); }); } catch (eS) {}
+    idxRead().forEach(function (r) { if (r && !r.d && r.o && r.o.c) add(r.o.c); });
+    return out;
+  }
+  function slidesOpen(code) {
+    var hid = slidesHid();
+    if (hid[code]) { delete hid[code]; try { localStorage.setItem(SL_HID, JSON.stringify(hid)); } catch (eH) {} }
+    exSetView({ k: 'course', code: code });
+  }
+  function slidesPick(anchor) {
+    var sl = slidesCourses(), r = anchor ? anchor.getBoundingClientRect() : { left: 8, right: 8, bottom: 60 };
+    if (sl.length === 1) { slidesOpen(sl[0].code); return; }
+    richMenuAt(isAr() ? r.right : r.left, r.bottom + 4, {
+      head: { ico: 'fa-chalkboard', t: L('السلايداتُ الأصليّة', 'Original slides'), s: L('اخترِ المادّة', 'Pick a course') },
+      items: sl.map(function (c) { return { a: 'slc:' + c.code, i: 'fa-graduation-cap', t: c.label }; })
+    }, function (a) { if (a.indexOf('slc:') === 0) slidesOpen(a.slice(4)); });
+  }
+
   function sweepBlanks() {
     var ids = S.blanks.slice(), i;
     for (i = 0; i < ids.length; i++) dropBlank(ids[i]);
@@ -7596,7 +7623,9 @@
     p.className = 'na-newpop';
     p.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
     p.setAttribute('role', 'menu');
-    p.innerHTML = NEW_ITEMS.map(function (it) {
+    var items = NEW_ITEMS.slice();
+    if (slidesCourses().length) items.splice(4, 0, { k: 'slides', icon: 'fa-chalkboard', ar: 'السلايداتُ الأصليّة لمادّة', en: 'A course’s original slides' });
+    p.innerHTML = items.map(function (it) {
       return '<button type="button" class="na-newpop-i" role="menuitem" data-new="' + it.k + '">' +
         '<i class="fa-solid ' + it.icon + '" aria-hidden="true"></i><span>' +
         esc(L(it.ar, it.en)) + '</span></button>';
@@ -7631,6 +7660,7 @@
       else if (k === 'board') createNote('board');
       else if (k === 'pdf') createPdf();
       else if (k === 'office') createPdf('office');
+      else if (k === 'slides') slidesPick(anchor);
       else if (k === 'ai') importAi();
       else askFile(k);
     });
@@ -11814,6 +11844,8 @@
       termNotice: function () { return S.termNotice || null; },
       slidesBar: slidesBar,
       slidesClick: slidesClick,
+      slidesCourses: slidesCourses,
+      slidesOpen: slidesOpen,
       courseMods: function (code) {
         var ids = idxRead().filter(function (r) { return r && !r.d && r.o && r.o.c === code && r.k !== 'folder'; }).map(function (r) { return r.id; });
         courseAsk(ids, code);
