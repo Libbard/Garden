@@ -285,12 +285,10 @@ window.AlgoWidgets[2] = function(container) {
       _AL.toolbar(2) +
       '<div class="algo-explanation" id="w2-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:800px; margin:0 auto; aspect-ratio:2/1; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; justify-content: center; align-items: center; overflow:visible;">' +
         '<svg id="w2-svg" width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w2-leg-keys"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w2-leg-ptrs"></span></span>' +
@@ -306,7 +304,6 @@ window.AlgoWidgets[2] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-
     var keyRects = [], keyTexts = [];
     var ptrRects = [], ptrDots = [], ptrLines = [];
     var treeGroups = [], treePolys = [], treeLabels = [], treeConds = [];
@@ -320,19 +317,16 @@ window.AlgoWidgets[2] = function(container) {
       container.querySelector('[data-algo-text="w2-leg-target"]').textContent = _AL.exp('Search Target', 'هدف البحث');
     }
  
-
     var dynamicKeys = [];
     var searchTarget = 0;
 
     function generateSteps() {
-
       let startVal = Math.floor(Math.random() * 20) + 10;
       dynamicKeys = [
         startVal, 
         startVal + Math.floor(Math.random() * 15) + 10, 
         startVal + Math.floor(Math.random() * 30) + 30
       ];
-
       searchTarget = dynamicKeys[0] + Math.floor(Math.random() * (dynamicKeys[1] - dynamicKeys[0] - 1)) + 1;
 
       steps = [
@@ -396,11 +390,9 @@ window.AlgoWidgets[2] = function(container) {
       `;
       svgEl.appendChild(defs);
  
-
       for (let i = 0; i < 4; i++) {
         let cx = 160 + (i * 160); // 160, 320, 480, 640
         
-
         let line = document.createElementNS(ns, 'line');
         line.setAttribute('x1', cx); line.setAttribute('y1', 100);
         line.setAttribute('x2', cx); line.setAttribute('y2', 180);
@@ -410,7 +402,6 @@ window.AlgoWidgets[2] = function(container) {
         line.style.transition = 'all 0.3s ease';
         svgEl.appendChild(line);
         ptrLines.push(line);
-
 
         let g = document.createElementNS(ns, 'g');
         g.style.transition = 'all 0.4s cubic-bezier(0.4,0,0.2,1)';
@@ -443,7 +434,6 @@ window.AlgoWidgets[2] = function(container) {
         svgEl.appendChild(g);
         treeGroups.push(g); treePolys.push(poly); treeLabels.push(tLabel); treeConds.push(tCond);
       }
-
 
       for (let j = 0; j < 7; j++) {
         if (j % 2 === 0) {
@@ -494,7 +484,6 @@ window.AlgoWidgets[2] = function(container) {
         }
       }
 
-
       targetGroup = document.createElementNS(ns, 'g');
       targetGroup.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
       targetGroup.style.opacity = '0';
@@ -525,11 +514,9 @@ window.AlgoWidgets[2] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
       
-
       var conds = [`< ${dynamicKeys[0]}`, `${dynamicKeys[0]}-${dynamicKeys[1]}`, `${dynamicKeys[1]}-${dynamicKeys[2]}`, `> ${dynamicKeys[2]}`];
 
       var anyTreeActive = s.trees.length > 0;
-
 
       for (let i = 0; i < 4; i++) {
         let isActive = s.trees.includes(i);
@@ -549,18 +536,15 @@ window.AlgoWidgets[2] = function(container) {
         treeConds[i].textContent = conds[i];
         treeConds[i].setAttribute('fill', isActive ? '#ffffff' : 'var(--text-secondary)');
 
-
         let ptrActive = s.ptrs.includes(i);
         ptrLines[i].style.opacity = (s.ptrs.length > 0 && !ptrActive) ? '0.2' : '1';
         ptrLines[i].setAttribute('stroke', ptrActive ? 'var(--algo-swap)' : 'var(--text-muted)');
         ptrLines[i].setAttribute('marker-end', ptrActive ? 'url(#w2-arr-active)' : 'url(#w2-arr-muted)');
         
-
         ptrRects[i].setAttribute('fill', ptrActive ? 'var(--algo-swap)' : 'var(--bg-elevated)');
         ptrRects[i].setAttribute('stroke', ptrActive ? '#ffffff' : 'var(--text-muted)');
         ptrDots[i].setAttribute('fill', ptrActive ? '#ffffff' : 'var(--text-muted)');
       }
-
 
       for (let k = 0; k < 3; k++) {
         let kActive = s.keys.includes(k);
@@ -575,7 +559,6 @@ window.AlgoWidgets[2] = function(container) {
         keyTexts[k].setAttribute('fill', textFill);
         keyTexts[k].textContent = dynamicKeys[k];
       }
-
 
       if (s.target !== null) {
         targetGroup.style.opacity = '1';

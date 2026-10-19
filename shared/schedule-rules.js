@@ -217,11 +217,16 @@
     if (f.active) {
       var shown = !!overrideFor(wid).show_lectures;
       var kind = f.kind === 'midterm' ? (ar ? 'الميدتيرم' : 'Midterm') : (ar ? 'الفاينل' : 'Final');
+      var rem = false;
+      try { rem = !!((JSON.parse(localStorage.getItem('garden_reminders') || 'null') || {}).rules || {}).focusLectures; }
+      catch (e) {}
       return {
         why: 'focus', kind: f.kind, weekId: wid, shown: shown, canToggle: true,
         text: ar
-          ? ('أسبوعُ تركيزٍ (' + kind + ') — المحاضراتُ المتكرّرةُ ' + (shown ? 'ظاهرةٌ وتُنبِّه' : 'صامتةٌ ولا تُنبِّه'))
-          : ('Focus week (' + kind + ') — recurring lectures are ' + (shown ? 'shown and will remind' : 'silent and will not remind')),
+          ? ('أسبوعُ تركيزٍ (' + kind + ') — المحاضراتُ المتكرّرةُ ' +
+             (shown ? 'ظاهرةٌ وتُنبِّه' : rem ? 'مخفيّةٌ وتنبيهاتُها باقية' : 'مخفيّةٌ ولا تُنبِّه'))
+          : ('Focus week (' + kind + ') — recurring lectures are ' +
+             (shown ? 'shown and will remind' : rem ? 'hidden but still remind' : 'hidden and will not remind')),
         action: ar ? (shown ? 'أسكِتْها' : 'أظهِرْها') : (shown ? 'Silence them' : 'Show them')
       };
     }

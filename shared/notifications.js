@@ -881,6 +881,17 @@
                'One call a day to review your due cards.'),
              !!(s.channels && s.channels.review), off, timeIn('reviewTime', s.reviewTime));
 
+    var ru = s.rules || {};
+    h += '<p class="nt-sec-t">' + esc(L('ما يسكت وحدَه', 'What stays silent')) + '</p>' +
+      optRow('rule.skipDone', L('ما أتممتَه لا يُنبَّه عنه', 'Nothing you marked done'),
+             L('حدثٌ علّمتَه «تمّ» في الجدول — محاضرةٌ أو مذاكرةٌ أو جلسةُ خطّةٍ أو حدثٌ أو اختبار — يسكت تنبيهُه.',
+               'An event you marked done in the schedule (lecture, study, plan session, event or exam) stays silent.'),
+             ru.skipDone !== false, off) +
+      optRow('rule.focusLectures', L('محاضراتُ أسبوعَي الميدتيرم والفاينل', 'Lectures in midterm and final weeks'),
+             L('تُخفى من الجدول في أسبوع التركيز ولا تُنبِّه. فعّلْه إن أخطأنا قراءةَ الأسبوع فتصلك تنبيهاتُها كالعادة.',
+               'They are hidden from the schedule in focus weeks and do not remind. Turn this on if we read the week wrong, and their reminders come back.'),
+             !!ru.focusLectures, off);
+
     /*@3.NOTJ.25*/
     h += '<p class="nt-sec-t">' + esc(L('متى تصل', 'When they arrive')) + '</p>' +
       optRow('quiet', L('الهدوءُ الليليّ', 'Quiet hours'),
@@ -1209,6 +1220,10 @@
       var k = key.slice(3), p = { channels: {} };
       p.channels[k] = !(s.channels && s.channels[k]);
       R.save(p);
+    } else if (key.indexOf('rule.') === 0) {
+      var rk = key.slice(5), ru = s.rules || {}, rp = { rules: {} };
+      rp.rules[rk] = rk === 'skipDone' ? ru.skipDone === false : !ru[rk];
+      R.save(rp);
     }
     try { R.refresh && R.refresh(); } catch (e) {}
     refresh();

@@ -84,12 +84,10 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w1-canvas-container" style="width:100%; max-width:750px; aspect-ratio: 2 / 1; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:visible;">' +
         '<svg id="w1-svg" width="100%" height="100%" viewBox="0 0 750 375" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w1-leg-mis"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-swap);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w1-leg-align"></span></span>' +
@@ -103,13 +101,11 @@ window.AlgoWidgets[1] = function(container) {
  
     var steps = [], cur = 0, playing = false, interval = null;
     
-
     var isInitialized = false;
     var textRects = [], textLabels = [];
     var patRects = [], patLabels = [], patGroups = [];
     var arrowLine, arrowLabel, arrowGroup;
  
-
     var boxSize = 45;
     var gap = 8;
     var stepX = boxSize + gap;
@@ -206,12 +202,10 @@ window.AlgoWidgets[1] = function(container) {
     function buildSVG() {
       var ns = 'http://www.w3.org/2000/svg';
       
-
       var defs = document.createElementNS(ns, 'defs');
       defs.innerHTML = `<marker id="w1-arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--algo-active)" /></marker>`;
       svgEl.appendChild(defs);
  
-
       for(let i=0; i<12; i++) {
         let g = document.createElementNS(ns, 'g');
         g.style.transition = 'opacity 0.4s ease';
@@ -241,7 +235,6 @@ window.AlgoWidgets[1] = function(container) {
         textRects.push(r); textLabels.push(t);
       }
  
-
       for(let i=0; i<6; i++) {
         let g = document.createElementNS(ns, 'g');
         g.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
@@ -271,7 +264,6 @@ window.AlgoWidgets[1] = function(container) {
         patGroups.push(g); patRects.push(r); patLabels.push(t);
       }
  
-
       arrowGroup = document.createElementNS(ns, 'g');
       arrowGroup.style.transition = 'opacity 0.4s ease';
       
@@ -308,7 +300,6 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
  
-
       for(let i=0; i<12; i++) {
         textLabels[i].textContent = s.text[i];
         
@@ -322,7 +313,6 @@ window.AlgoWidgets[1] = function(container) {
           textLabels[i].setAttribute('fill', 'var(--text-primary)');
         }
         
-
         if (i < s.patOffset || i >= s.patOffset + 6) {
           textRects[i].parentNode.style.opacity = '0.3';
         } else {
@@ -330,14 +320,12 @@ window.AlgoWidgets[1] = function(container) {
         }
       }
  
-
       var patShiftX = s.patOffset * stepX;
       for(let i=0; i<6; i++) {
         patLabels[i].textContent = s.pat[i];
         patGroups[i].style.transform = `translateX(${patShiftX}px)`;
  
         if (s.highlightPat.includes(i)) {
-
           let color = (i === 5 && s.highlightText.length > 0) ? 'var(--algo-compare)' : 'var(--algo-swap)';
           patRects[i].setAttribute('fill', color);
           patRects[i].setAttribute('stroke', '#ffffff');
@@ -349,10 +337,8 @@ window.AlgoWidgets[1] = function(container) {
         }
       }
  
-
       if (s.shiftArrow) {
         arrowGroup.style.opacity = '1';
-
         let startArrowX = startX + (s.patOffset * stepX) + (5 * stepX) + boxSize/2;
         let endArrowX = startArrowX + (s.shiftArrow.to * stepX);
  

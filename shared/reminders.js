@@ -40,6 +40,7 @@
         study: 10,
         events: 30
       },
+      rules: { skipDone: true, focusLectures: false, at: 0 },
       reviewTime: '20:00',
       quiet: { on: false, from: '00:00', to: '07:00' },
       snooze: [10, 60],     /*@3.REMJ.15*/
@@ -82,6 +83,7 @@
 
   function save(patch) {
     load();
+    if (patch && patch.rules) patch.rules.at = Date.now();
     if (patch) deepMerge(settings, patch);
     try { localStorage.setItem(LS_KEY, JSON.stringify(settings)); } catch (e) {}
 
@@ -217,6 +219,24 @@
     catch (e) { return {}; }
   }
 
+  var MAX_CANCEL = 120;
+  var cancelled = [];
+  function cancel(id, fireAt, horizon) {
+    if (fireAt > horizon || fireAt <= Date.now() - GRACE_MS) return;
+    if (cancelled.length < MAX_CANCEL && cancelled.indexOf(id) === -1) cancelled.push(id);
+  }
+  function rules() {
+    var r = load().rules || {};
+    return { skipDone: r.skipDone !== false, focusLectures: !!r.focusLectures };
+  }
+  function stateVersion() {
+    var t = Date.parse(scheduleRaw().updated_at || '') || 0;
+    var a = (load().rules || {}).at || 0;
+    var c = 0;
+    try { c = parseInt(localStorage.getItem('garden_rem_sv'), 10) || 0; } catch (e) {}
+    return Math.min(Math.max(t, a, c), Date.now());
+  }
+
   /*@3.REMJ.97*/
   var NAME_MAX = 30;
   function courseName(code) {
@@ -270,6 +290,7 @@
 
     /*@3.REMJ.88*/
     var R = window.GardenScheduleRules;
+    var rl = rules();
 
     var out = [];
     lecs.forEach(function (l) {
@@ -284,14 +305,22 @@
         if (d.getDay() !== dayIdx) continue;
         /*@3.REMJ.89*/
         var day0 = new Date(d); day0.setHours(0, 0, 0, 0);
-        if (R && !R.lectureOn(l, day0).on) continue;
-        /*@3.REMJ.92*/
-        if (R && R.isDone && R.fmtLocalDate &&
-            R.isDone({ src: 'lecture', id: l.id, date: R.fmtLocalDate(day0) })) continue;
         d.setHours(hm.h, hm.m, 0, 0);
         var startMs = d.getTime();
-        if (!R && startMs > endMs) continue;
         var fireAt = startMs - (s.lead.lectures || 0) * 60000;
+        var lid = 'lec:' + (l.id || l.course_code + l.day + l.start_time) + ':' + stamp(startMs);
+        var on = R ? R.lectureOn(l, day0) : { on: true };
+        if (!on.on && !(on.why === 'focus' && rl.focusLectures)) {
+          if (on.why === 'focus' || on.why === 'cancelled') cancel(lid, fireAt, horizon);
+          continue;
+        }
+        /*@3.REMJ.92*/
+        if (rl.skipDone && R && R.isDone && R.fmtLocalDate &&
+            R.isDone({ src: 'lecture', id: l.id, date: R.fmtLocalDate(day0) })) {
+          cancel(lid, fireAt, horizon);
+          continue;
+        }
+        if (!R && startMs > endMs) continue;
         /*@3.REMJ.33*/
         if (fireAt > horizon) continue;
 
@@ -301,7 +330,7 @@
           : (l.attendance === 'in_person' ? '' : tx(' · عن بُعد', ' · Online'));
 
         out.push({
-          id: 'lec:' + (l.id || l.course_code + l.day + l.start_time) + ':' + stamp(startMs),
+          id: lid,
           kind: 'lectures',
           title: cname ? tx('محاضرة ', 'Lecture · ') + cname
                        : tx('محاضرة', 'Lecture'),
@@ -340,13 +369,14 @@
     var list = [];
     try { list = GardenData.allDeadlines() || []; } catch (e) { return []; }
 
-    var out = [], seen = {}, ics = icsState();
+    var out = [], seen = {}, ics = icsState(), rl = rules();
     list.forEach(function (t) {
-      if (!t || t.done || !t.due) return;
+      if (!t || !t.due) return;
 
       var channel = (t.source === 'exam' || t.type === 'exam' || t.type === 'midterm' || t.type === 'final')
         ? 'exams' : 'tasks';
-      if (!s.channels[channel]) return;
+      var skip = t.done && (t.source !== 'exam' || rl.skipDone);
+      if (!s.channels[channel] && !skip) return;
 
       var when = toLocalTime(t.due);
       if (!when) return;
@@ -366,6 +396,7 @@
       seen[rid] = 1;
       if (t.uid && ics.on_server) fireAt = icsFire(when.allDay ? eventMs : when.ms, ymd, ics.lead_days, now);
       else fireAt = applyQuiet(fireAt);
+      if (skip) { if (eventMs > now) cancel(rid, Math.max(fireAt, now), horizon); return; }
       if (fireAt > horizon) return;   /*@3.REMJ.36*/
 
       var cname = t.course ? courseName(t.course) : '';
@@ -399,6 +430,7 @@
     var s = load();
     var sch = scheduleRaw();
     var R = window.GardenScheduleRules;
+    var rl = rules();
     var out = [];
 
     (sch.study_blocks || []).forEach(function (b) {
@@ -413,15 +445,19 @@
         if (d.getDay() !== dayIdx) continue;
         var day0 = new Date(d); day0.setHours(0, 0, 0, 0);
         if (R && R.blockOn && !R.blockOn(b, day0).on) continue;
-        if (R && R.isDone && R.fmtLocalDate &&
-            R.isDone({ src: 'study', id: b.id, date: R.fmtLocalDate(day0) })) continue;
         d.setHours(hm.h, hm.m, 0, 0);
         var startMs = d.getTime();
         var fireAt = startMs - (s.lead.study || 0) * 60000;
+        var bid = 'stu:' + (b.id || b.day + b.start_time) + ':' + stamp(startMs);
+        if (rl.skipDone && R && R.isDone && R.fmtLocalDate &&
+            R.isDone({ src: 'study', id: b.id, date: R.fmtLocalDate(day0) })) {
+          cancel(bid, fireAt, horizon);
+          continue;
+        }
         if (fireAt > horizon) continue;
         var nm = b.custom_label || courseName(b.course_code) || tx('مذاكرة', 'Study');
         out.push({
-          id: 'stu:' + (b.id || b.day + b.start_time) + ':' + stamp(startMs),
+          id: bid,
           kind: 'study',
           title: nm ? tx('مذاكرة · ', 'Study · ') + nm : tx('مذاكرة', 'Study'),
           body: tx('تبدأ ', 'Starts ') + fmtWhen(startMs),
@@ -437,10 +473,13 @@
     var plan = (it && it.active && it.plans) ? it.plans[it.active] : null;
     ((plan && plan.sessions) || []).forEach(function (ss) {
       if (!ss || !ss.date || !ss.start_time) return;
-      if (R && R.isDone && R.isDone({ src: 'intensive', id: ss.id, date: ss.date })) return;
       var when = toLocalTime(ss.date + 'T' + ss.start_time);
       if (!when) return;
       var fireAt = when.ms - (s.lead.study || 0) * 60000;
+      if (rl.skipDone && R && R.isDone && R.isDone({ src: 'intensive', id: ss.id, date: ss.date })) {
+        cancel('stu:plan:' + ss.id + ':' + stamp(when.ms), fireAt, horizon);
+        return;
+      }
       if (fireAt > horizon) return;
       var mn = parseInt(String(ss.module || '').replace(/^M/i, ''), 10) || 0;
       var what = ss.kind === 'buffer' ? tx('مراجعة ما قبل الاختبار', 'Pre-exam review')
@@ -469,14 +508,18 @@
     var s = load();
     var sch = scheduleRaw();
     var R = window.GardenScheduleRules;
+    var rl = rules();
     var out = [];
     (sch.general_events || []).forEach(function (g) {
       if (!g || !g.date || !g.start_time) return;
-      if (R && R.isDone && R.isDone({ src: 'general', id: g.id, date: g.date })) return;
       var when = toLocalTime(g.date + 'T' + g.start_time);
       if (!when) return;
-      var gname = courseName(g.course_code);
       var fireAt = when.ms - (s.lead.events || 0) * 60000;
+      if (rl.skipDone && R && R.isDone && R.isDone({ src: 'general', id: g.id, date: g.date })) {
+        cancel('gen:' + g.id + ':' + stamp(when.ms), fireAt, horizon);
+        return;
+      }
+      var gname = courseName(g.course_code);
       if (fireAt > horizon) return;
       out.push({
         id: 'gen:' + g.id + ':' + stamp(when.ms),
@@ -538,6 +581,7 @@
     var now = Date.now();
     var horizon = now + HORIZON_DAYS * 24 * 60 * 60 * 1000;
     var out = [];
+    cancelled = [];
 
     if (s.channels.lectures) out = out.concat(lectureOccurrences(now, horizon));
     if (s.channels.study) out = out.concat(studyOccurrences(now, horizon));
@@ -671,15 +715,17 @@
   /*@3.REMJ.53*/
   function refreshQueue() {
     if (!window.GardenData || !GardenData.allDeadlines) return Promise.resolve(false);
+    if (!window.GardenScheduleRules) return Promise.resolve(false);
     var items = buildQueue();
-    var sig = signature(items);
+    var drop = cancelled.slice();
+    var sig = signature(items) + '|x:' + drop.join(',');
     if (sig === lastSig) return Promise.resolve(false);
     /*@3.REMJ.54*/
     return ReminderDB.replaceQueue(items).then(function () {
       lastSig = sig;
       /*@3.REMJ.55*/
       if (self.GardenPush && load().enabled) {
-        try { GardenPush.syncWakes(items); } catch (e) {}
+        try { GardenPush.syncWakes(items, { cancel: drop, sv: stateVersion() }); } catch (e) {}
       }
       return true;
     }).catch(function (e) {
@@ -1012,7 +1058,10 @@
   });
   window.addEventListener('garden:syncCompleted', function () { if (load().enabled) sync(); });
   /*@3.REMJ.90*/
-  window.addEventListener('garden:scheduleChanged', function () { if (load().enabled) sync(); });
+  window.addEventListener('garden:scheduleChanged', function () {
+    try { localStorage.setItem('garden_rem_sv', String(Date.now())); } catch (e) {}
+    if (load().enabled) sync();
+  });
 
   /*@3.REMJ.86*/
   window.addEventListener('storage', function (e) {

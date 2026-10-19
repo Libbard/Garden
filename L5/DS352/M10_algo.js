@@ -88,12 +88,10 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w1-svg-container" style="width:100%; max-width:800px; aspect-ratio: 2 / 1; margin: 0 auto; display:flex; justify-content:center; align-items:center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:visible;">' +
         '<svg id="w1-svg" width="100%" height="100%" viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-act"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-sorted);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-comp"></span></span>' +
@@ -108,7 +106,6 @@ window.AlgoWidgets[1] = function(container) {
  
     var steps = [], cur = 0, playing = false, interval = null;
     
-
     var targetN = 5;
     var nextNodeId = 0;
     var nodes = []; 
@@ -127,7 +124,6 @@ window.AlgoWidgets[1] = function(container) {
       container.querySelector('[data-algo-text="w1-hit"]').textContent  = _AL.exp('Cache Hit', 'موجود بالذاكرة (Hit)');
     }
 
-
     function buildFibTree(n, parentId = null) {
       let id = nextNodeId++;
       let node = { id: id, n: n, val: `F(${n})`, parent: parentId, children: [], x: 0, y: 0 };
@@ -140,7 +136,6 @@ window.AlgoWidgets[1] = function(container) {
       }
       return id;
     }
-
 
     function layoutTree(rootId) {
       const vOffset = 75; 
@@ -162,7 +157,6 @@ window.AlgoWidgets[1] = function(container) {
       }
       traverse(rootId, 0);
 
-
       let minX = Infinity, maxX = -Infinity;
       nodes.forEach(n => {
         if(n.x < minX) minX = n.x;
@@ -173,7 +167,6 @@ window.AlgoWidgets[1] = function(container) {
       
       nodes.forEach(n => { n.x += offsetX; });
     }
-
 
     function traceFibonacci(id, currentSteps, currentVis, currentComp, currentMemo) {
       let node = nodeMap[id];
@@ -186,7 +179,6 @@ window.AlgoWidgets[1] = function(container) {
         en: `Need to compute <strong>F(${n})</strong>.`,
         ar: `نحتاج لحساب <strong dir="ltr">F(${n})</strong>.`
       });
-
 
       if (n === 0 || n === 1) {
         currentComp.push(id);
@@ -202,7 +194,6 @@ window.AlgoWidgets[1] = function(container) {
         return;
       }
 
-
       if (memoMap[n]) {
         currentMemo.push(id); 
         currentSteps.push({
@@ -214,7 +205,6 @@ window.AlgoWidgets[1] = function(container) {
         return;
       }
 
-
       traceFibonacci(node.children[0], currentSteps, currentVis, currentComp, currentMemo);
       
       currentSteps.push({
@@ -224,7 +214,6 @@ window.AlgoWidgets[1] = function(container) {
       });
 
       traceFibonacci(node.children[1], currentSteps, currentVis, currentComp, currentMemo);
-
 
       memoMap[n] = true;
       memoOrder.push(n);
@@ -238,7 +227,6 @@ window.AlgoWidgets[1] = function(container) {
     }
 
     function generateSteps() {
-
       targetN = Math.floor(Math.random() * 3) + 3; // 3, 4, or 5
       
       nextNodeId = 0;
@@ -279,7 +267,6 @@ window.AlgoWidgets[1] = function(container) {
       svgHTML += `<marker id="arr-hit" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--algo-compare)" /></marker>`;
       svgHTML += '</defs>';
  
-
       nodes.forEach(n => {
         if (n.parent !== null) {
           let pNode = nodeMap[n.parent];
@@ -298,7 +285,6 @@ window.AlgoWidgets[1] = function(container) {
           
           let stroke = isHit ? 'var(--algo-compare)' : 'var(--text-muted)';
           
-
           let opacity = isVisible ? '1' : '0'; 
           
           if(isVisible && !s.act && !s.comp.includes(n.id) && !isHit && n.id !== s.act) opacity = '0.3'; 
@@ -311,7 +297,6 @@ window.AlgoWidgets[1] = function(container) {
         }
       });
  
-
       nodes.forEach(n => {
         let isVisible = s.vis.includes(n.id);
         
@@ -320,7 +305,6 @@ window.AlgoWidgets[1] = function(container) {
         let textFill = 'var(--algo-text)';
         let scale = '1';
         
-
         let opacity = isVisible ? '1' : '0'; 
 
         if (isVisible) {
@@ -339,7 +323,6 @@ window.AlgoWidgets[1] = function(container) {
             strokeColor = '#ffffff';
             textFill = '#ffffff';
           } else {
-
             fill = 'var(--brand-500)';
             strokeColor = '#ffffff';
             textFill = '#ffffff';
@@ -371,7 +354,6 @@ window.AlgoWidgets[1] = function(container) {
     container.querySelector('[data-algo-btn="prev"]').addEventListener('click',  function(){ stopPlay(); if(cur>0){ cur--; render(); } });
     container.querySelector('[data-algo-btn="step"]').addEventListener('click',  function(){ stopPlay(); if(cur<steps.length-1){ cur++; render(); } });
     container.querySelector('[data-algo-btn="play"]').addEventListener('click',  function(){ playing ? stopPlay() : startPlay(); });
-
     container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function(){ stopPlay(); generateSteps(); cur=0; render(); });
     container.querySelector('.algo-speed input').addEventListener('input', function() {
       if (playing) {
@@ -391,15 +373,12 @@ window.AlgoWidgets[2] = function(container) {
       _AL.toolbar(2) +
       '<div class="algo-explanation" id="w2-exp" style="font-size: 0.95rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px; text-align: center; min-height: 48px;"></div>' +
       
-
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:700px; margin:0 auto; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:hidden; display: flex; flex-direction: column; align-items: center; padding-bottom: 60px;">' +
         '<svg id="w2-svg" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="overflow:visible; margin-top: 15px;"></svg>' +
         
-
         '<div id="w2-formula-box" style="position:absolute; bottom: 15px; width: 90%; max-width: 500px; padding: 8px 15px; background: var(--bg-elevated); border: 2px solid var(--algo-border); border-radius: 8px; text-align: center; font-family: \'JetBrains Mono\', monospace; font-size: 14px; font-weight: bold; color: var(--text-primary); opacity: 0; transition: all 0.4s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.08);"></div>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:4px;margin-right:4px;"></span><span data-algo-text="w2-target"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-swap);border-radius:4px;margin-right:4px;"></span><span data-algo-text="w2-exclude"></span></span>' +
@@ -416,17 +395,14 @@ window.AlgoWidgets[2] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-
     var uiCells = [];
     var uiRowLabels = [];
     var uiColLabels = [];
     var arrowExclude, arrowInclude;
 
-
     var items = [];
     var W = 0;
     var numItems = 0;
-
 
     const CELL_W = 48;
     const CELL_H = 40;
@@ -450,12 +426,10 @@ window.AlgoWidgets[2] = function(container) {
     }
 
     function generateSteps() {
-
       W = Math.floor(Math.random() * 3) + 5;
       numItems = 4;
       items = [{ w: 0, v: 0 }];
       
-
       let wPool = [1, 2, 3, 4, 5];
       wPool.sort(() => Math.random() - 0.5);
       
@@ -524,11 +498,9 @@ window.AlgoWidgets[2] = function(container) {
       uiRowLabels = [];
       uiColLabels = [];
 
-
       let totalW = PAD_LEFT + (W + 1) * (CELL_W + GAP) + 20;
       let totalH = PAD_TOP + (numItems + 1) * (CELL_H + GAP) + 20;
       svgEl.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
-
 
       let defs = makeSVG('defs', {});
       defs.innerHTML = `
@@ -536,7 +508,6 @@ window.AlgoWidgets[2] = function(container) {
         <marker id="w2-arr-inc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1 L 10 5 L 0 9 z" fill="var(--brand-500)"/></marker>
       `;
       svgEl.appendChild(defs);
-
 
       let colTitle = makeSVG('text', { x: PAD_LEFT + ((W + 1) * (CELL_W + GAP)) / 2, y: 15, 'text-anchor': 'middle', fill: 'var(--text-primary)', 'font-family': "'Cairo', sans-serif", 'font-size': '15px', 'font-weight': 'bold' });
       colTitle.textContent = _AL.exp('Capacity (j)', 'السعة المتاحة (j)');
@@ -550,7 +521,6 @@ window.AlgoWidgets[2] = function(container) {
         uiColLabels.push(txt);
       }
 
-
       for (let i = 0; i <= numItems; i++) {
         let y = PAD_TOP + i * (CELL_H + GAP) + CELL_H / 2;
         let txt = makeSVG('text', { x: PAD_LEFT - 10, y: y, 'text-anchor': 'end', 'dominant-baseline': 'middle', fill: 'var(--text-muted)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '13px', 'font-weight': 'bold' });
@@ -558,7 +528,6 @@ window.AlgoWidgets[2] = function(container) {
         svgEl.appendChild(txt);
         uiRowLabels.push(txt);
       }
-
 
       let cellsG = makeSVG('g', {});
       for (let i = 0; i <= numItems; i++) {
@@ -578,7 +547,6 @@ window.AlgoWidgets[2] = function(container) {
       }
       svgEl.appendChild(cellsG);
 
-
       arrowExclude = makeSVG('line', { stroke: 'var(--algo-swap)', 'stroke-width': 3, 'stroke-dasharray': '5,4', 'marker-end': 'url(#w2-arr-exc)', opacity: 0 });
       arrowInclude = makeSVG('path', { fill: 'none', stroke: 'var(--brand-500)', 'stroke-width': 3, 'marker-end': 'url(#w2-arr-inc)', opacity: 0 });
       svgEl.appendChild(arrowExclude);
@@ -594,9 +562,7 @@ window.AlgoWidgets[2] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-
       for (let i = 0; i <= numItems; i++) {
-
         let isRowActive = (i === s.i);
         uiRowLabels[i].setAttribute('fill', isRowActive ? 'var(--algo-active)' : 'var(--text-muted)');
         
@@ -607,13 +573,11 @@ window.AlgoWidgets[2] = function(container) {
           let val = s.dp[i][j];
           let opacity = '1', scale = 'scale(1)', fill = 'var(--bg-elevated)', stroke = 'var(--algo-border)', txtFill = 'var(--text-primary)';
 
-
           if (i > s.i || (i === s.i && j > s.j)) {
             if (s.phase !== 'done') { opacity = '0.1'; val = ''; }
           } else if (s.phase !== 'done' && i < s.i - 1) {
             opacity = '0.25';
           }
-
 
           if (s.phase === 'done' && i === numItems && j === W) {
             fill = 'var(--algo-sorted)'; stroke = '#ffffff'; txtFill = '#ffffff'; scale = 'scale(1.15)';
@@ -634,7 +598,6 @@ window.AlgoWidgets[2] = function(container) {
         }
       }
 
-
       arrowExclude.style.opacity = '0';
       arrowInclude.style.opacity = '0';
 
@@ -651,7 +614,6 @@ window.AlgoWidgets[2] = function(container) {
       if (s.phase === 'compare' && s.from2) {
         let u = uiCells[s.from2.r][s.from2.c];
         let v = uiCells[s.i][s.j];
-
         let startX = u.cx;
         let startY = u.cy + CELL_H/2;
         let endX = v.cx - 10;
@@ -662,7 +624,6 @@ window.AlgoWidgets[2] = function(container) {
         arrowInclude.setAttribute('d', `M ${startX} ${startY} Q ${midX} ${midY} ${endX} ${endY}`);
         arrowInclude.style.opacity = '1';
       }
-
 
       if (s.phase === 'compare' || s.phase === 'exclude') {
         formulaBox.style.opacity = '1';
@@ -714,12 +675,10 @@ window.AlgoWidgets[3] = function(container) {
       _AL.toolbar(3) +
       '<div class="algo-explanation" id="w3-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:600px; margin:0 auto; aspect-ratio: 5/3; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:visible;">' +
         '<svg id="w3-svg" width="100%" height="100%" viewBox="0 0 600 360" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--text-muted);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w3-prev"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w3-check"></span></span>' +
@@ -735,14 +694,12 @@ window.AlgoWidgets[3] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-
     var nodeCoords = {
       i: { x: 150, y: 260 },
       j: { x: 450, y: 260 },
       k: { x: 300, y: 80 }
     };
     var radius = 24;
-
 
     var edgesUI = {};
     var nodesUI = {};
@@ -811,7 +768,6 @@ window.AlgoWidgets[3] = function(container) {
       ];
     }
 
-
     function getEdgeCoords(fromId, toId) {
       let p1 = nodeCoords[fromId];
       let p2 = nodeCoords[toId];
@@ -832,7 +788,6 @@ window.AlgoWidgets[3] = function(container) {
       edgesUI = {};
       nodesUI = {};
 
-
       var defs = document.createElementNS(ns, 'defs');
       defs.innerHTML = `
         <marker id="arr-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)"/></marker>
@@ -840,7 +795,6 @@ window.AlgoWidgets[3] = function(container) {
         <marker id="arr-brand" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-500)"/></marker>
       `;
       svgEl.appendChild(defs);
-
 
       var edgesGroup = document.createElementNS(ns, 'g');
       ['ij', 'ik', 'kj'].forEach(key => {
@@ -873,7 +827,6 @@ window.AlgoWidgets[3] = function(container) {
         edgesUI[key] = { g: g, line: line, text: text, c: c };
       });
       svgEl.appendChild(edgesGroup);
-
 
       var nodesGroup = document.createElementNS(ns, 'g');
       ['i', 'j', 'k'].forEach(id => {
@@ -926,10 +879,7 @@ window.AlgoWidgets[3] = function(container) {
         'var(--brand-500)': 'url(#arr-brand)'
       };
 
-
-
       Object.values(edgesUI).forEach(ui => ui.g.style.opacity = '0');
-
 
       s.edges.forEach(e => {
         let key = e.from + e.to;
@@ -941,7 +891,6 @@ window.AlgoWidgets[3] = function(container) {
           ui.line.setAttribute('marker-end', colorToMarker[e.color]);
 
           ui.text.textContent = e.label;
-
           ui.text.setAttribute('fill', e.color === 'var(--text-muted)' ? 'var(--text-primary)' : e.color);
 
           let mx = (ui.c.x1 + ui.c.x2) / 2 + e.dx;
@@ -950,7 +899,6 @@ window.AlgoWidgets[3] = function(container) {
           ui.text.setAttribute('y', my);
         }
       });
-
 
       ['i', 'j', 'k'].forEach(id => {
         let ui = nodesUI[id];
@@ -1026,12 +974,10 @@ window.AlgoWidgets[4] = function(container) {
       _AL.toolbar(4) +
       '<div class="algo-explanation" id="w4-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:600px; margin:0 auto; aspect-ratio: 5/3; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:visible;">' +
         '<svg id="w4-svg" width="100%" height="100%" viewBox="0 0 600 360" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--text-muted);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w4-normal"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w4-compare"></span></span>' +
@@ -1047,14 +993,12 @@ window.AlgoWidgets[4] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-
     var radius = 24;
     var nodeCoords = {
       i: { x: 150, y: 240 },
       j: { x: 450, y: 240 },
       k: { x: 300, y: 80 }
     };
-
 
     var edgesUI = {};
     var nodesUI = {};
@@ -1070,7 +1014,6 @@ window.AlgoWidgets[4] = function(container) {
 
     function generateSteps() {
       steps = [];
-
       var dij = Math.floor(Math.random() * 15) + 5;
       var dik = Math.floor(Math.random() * 8) + 3;
       var dkj = Math.floor(Math.random() * 8) + 3;
@@ -1152,7 +1095,6 @@ window.AlgoWidgets[4] = function(container) {
       }
     }
 
-
     function getEdgeCoords(fromId, toId) {
       let p1 = nodeCoords[fromId];
       let p2 = nodeCoords[toId];
@@ -1175,7 +1117,6 @@ window.AlgoWidgets[4] = function(container) {
       edgesUI = {};
       nodesUI = {};
 
-
       var defs = document.createElementNS(ns, 'defs');
       defs.innerHTML = `
         <marker id="arr-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="var(--text-muted)"/></marker>
@@ -1185,10 +1126,8 @@ window.AlgoWidgets[4] = function(container) {
       `;
       svgEl.appendChild(defs);
 
-
       var edgesGroup = document.createElementNS(ns, 'g');
       
-
       var offsets = {
         'ij': { dx: 0, dy: -18 },
         'ik': { dx: -25, dy: -15 },
@@ -1207,7 +1146,6 @@ window.AlgoWidgets[4] = function(container) {
         line.setAttribute('x1', c.x1); line.setAttribute('y1', c.y1);
         line.setAttribute('x2', c.x2); line.setAttribute('y2', c.y2);
         line.style.transition = 'all 0.4s ease';
-
 
         let textBg = document.createElementNS(ns, 'rect');
         textBg.setAttribute('x', c.mx + offsets[key].dx - 15);
@@ -1237,7 +1175,6 @@ window.AlgoWidgets[4] = function(container) {
         edgesUI[key] = { g: g, line: line, textBg: textBg, text: text, c: c, offsets: offsets[key] };
       });
       svgEl.appendChild(edgesGroup);
-
 
       var nodesGroup = document.createElementNS(ns, 'g');
       ['i', 'j', 'k'].forEach(id => {
@@ -1275,7 +1212,6 @@ window.AlgoWidgets[4] = function(container) {
       });
       svgEl.appendChild(nodesGroup);
 
-
       formulaTextUI = document.createElementNS(ns, 'text');
       formulaTextUI.setAttribute('x', 300);
       formulaTextUI.setAttribute('y', 330);
@@ -1305,7 +1241,6 @@ window.AlgoWidgets[4] = function(container) {
         'var(--brand-500)': 'url(#arr-brand)'
       };
 
-
       Object.keys(edgesUI).forEach(key => {
         let ui = edgesUI[key];
         let state = s.edgeState[key];
@@ -1327,7 +1262,6 @@ window.AlgoWidgets[4] = function(container) {
         }
       });
 
-
       ['i', 'j', 'k'].forEach(id => {
         let ui = nodesUI[id];
         let isVisible = s.hlNodes.includes(id);
@@ -1348,7 +1282,6 @@ window.AlgoWidgets[4] = function(container) {
           ui.g.style.opacity = '0';
         }
       });
-
 
       if (s.eq) {
         formulaTextUI.style.opacity = '1';
@@ -1416,12 +1349,10 @@ window.AlgoWidgets[5] = function(container) {
       _AL.toolbar(5) +
       '<div class="algo-explanation" id="w5-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" style="position:relative; width:100%; max-width:750px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:visible;">' +
         '<svg id="w5-svg" width="100%" height="100%" viewBox="0 0 750 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-400);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w5-node"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-muted);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w5-empty"></span></span>' +
@@ -1437,7 +1368,6 @@ window.AlgoWidgets[5] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-
     var ui = {
       formula: null,
       root: { g: null, circ: null, text: null },
@@ -1447,7 +1377,6 @@ window.AlgoWidgets[5] = function(container) {
       cardsGroup: null,
       cards: {}
     };
-
 
     const rootPos  = { x: 375, y: 130 };
     const leftPos  = { x: 200, y: 260 };
@@ -1498,7 +1427,6 @@ window.AlgoWidgets[5] = function(container) {
       ];
     }
 
-
     function makeSVG(tag, attrs) {
       let el = document.createElementNS('http://www.w3.org/2000/svg', tag);
       for (let k in attrs) el.setAttribute(k, attrs[k]);
@@ -1509,7 +1437,6 @@ window.AlgoWidgets[5] = function(container) {
     function createChildNode(cx, cy) {
       let g = makeSVG('g', { transform: `translate(${cx}, ${cy})` });
       
-
       let circ = makeSVG('circle', { cx: 0, cy: 0, r: R, fill: 'var(--brand-400)', stroke: 'var(--algo-bg)', 'stroke-width': 2 });
       let tri = makeSVG('polygon', { points: `0,-35 -65,35 65,35`, fill: 'var(--brand-400)', stroke: 'var(--algo-bg)', 'stroke-width': 2 });
       let rect = makeSVG('rect', { x: -25, y: -20, width: 50, height: 40, rx: 6, fill: 'var(--algo-muted)', stroke: 'var(--algo-bg)', 'stroke-width': 2 });
@@ -1534,20 +1461,16 @@ window.AlgoWidgets[5] = function(container) {
       `;
       svgEl.appendChild(defs);
 
-
       ui.formula = makeSVG('text', { x: 375, y: 40, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: 'var(--algo-text)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '18px', 'font-weight': 'bold' });
       svgEl.appendChild(ui.formula);
-
 
       ui.leftArrow = makeSVG('line', { 'stroke-width': 3, 'stroke': 'var(--text-muted)' });
       ui.rightArrow = makeSVG('line', { 'stroke-width': 3, 'stroke': 'var(--text-muted)' });
       svgEl.appendChild(ui.leftArrow);
       svgEl.appendChild(ui.rightArrow);
 
-
       ui.root.g = makeSVG('g', {});
       
-
       ui.root.g.style.transformOrigin = `${rootPos.x}px ${rootPos.y}px`;
       
       ui.root.circ = makeSVG('circle', { cx: rootPos.x, cy: rootPos.y, r: R, fill: 'var(--brand-500)', stroke: 'var(--algo-bg)', 'stroke-width': 2 });
@@ -1556,12 +1479,10 @@ window.AlgoWidgets[5] = function(container) {
       ui.root.g.appendChild(ui.root.text);
       svgEl.appendChild(ui.root.g);
 
-
       ui.leftChild = createChildNode(leftPos.x, leftPos.y);
       ui.rightChild = createChildNode(rightPos.x, rightPos.y);
       svgEl.appendChild(ui.leftChild.g);
       svgEl.appendChild(ui.rightChild.g);
-
 
       ui.cardsGroup = makeSVG('g', { transform: 'translate(0, 340)' });
       let cardCenters = [200, 375, 550];
@@ -1585,12 +1506,10 @@ window.AlgoWidgets[5] = function(container) {
       isInitialized = true;
     }
 
-
     function updateArrow(lineUI, fromPos, toPos, targetType, isResult) {
       let dx = toPos.x - fromPos.x;
       let dy = toPos.y - fromPos.y;
       let dist = Math.hypot(dx, dy);
-
 
       let currentR = isResult ? R * 1.1 : R;
       
@@ -1651,11 +1570,9 @@ window.AlgoWidgets[5] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-
       ui.formula.textContent = s.phase === 'intro' 
         ? 'C[i,j] = min( C[i,k-1] + C[k+1,j] ) + sum(p)' 
         : 'C[1,3] = min( C[1,k-1] + C[k+1,3] ) + sum(p)';
-
 
       let isResult = s.phase === 'result';
       ui.root.circ.setAttribute('fill', (isResult && s.min === s.k) ? 'var(--algo-sorted)' : 'var(--brand-500)');
@@ -1663,14 +1580,11 @@ window.AlgoWidgets[5] = function(container) {
       ui.root.text.textContent = 'a' + s.kLabel;
       ui.root.g.style.transform = isResult ? 'scale(1.1)' : 'scale(1)';
 
-
       updateChildUI(ui.leftChild, s.left, s.leftL, isResult);
       updateChildUI(ui.rightChild, s.right, s.rightL, isResult);
 
-
       updateArrow(ui.leftArrow, rootPos, leftPos, s.left, isResult);
       updateArrow(ui.rightArrow, rootPos, rightPos, s.right, isResult);
-
 
       if (s.phase === 'intro') {
         ui.cardsGroup.style.opacity = '0';

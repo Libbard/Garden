@@ -59,6 +59,7 @@
     var out = [], m;
     MOD_CARD.lastIndex = 0;
     while ((m = MOD_CARD.exec(String(html || '')))) {
+      if (Number(m[1]) >= 20) continue; /*@3.QUBJ.1*/
       out.push({ n: Number(m[1]), ar: strip(m[2]), en: strip(m[3]) });
     }
     return out.sort(function (a, b) { return a.n - b.n; });

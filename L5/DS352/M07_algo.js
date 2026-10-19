@@ -85,16 +85,13 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w1-canvas-container" style="width:100%; min-height:300px; display:flex; flex-wrap:wrap; justify-content:space-evenly; align-items:flex-start; padding:15px 5px; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); gap: 10px;">' +
         
-
         '<div style="text-align:center; flex: 1 1 45%; min-width: 240px; display:flex; flex-direction:column; align-items:center;">' +
           '<h5 data-algo-text="w1-title-left" style="color:var(--text-primary); font-weight:800; font-size:1rem; margin-bottom:5px; font-family:\'Cairo\', sans-serif;"></h5>' +
           '<svg id="w1-tree-left" viewBox="0 0 300 250" style="width:100%; max-width:300px; height:auto; overflow:visible;"></svg>' +
         '</div>' +
         
-
         '<div style="text-align:center; flex: 1 1 45%; min-width: 240px; display:flex; flex-direction:column; align-items:center;">' +
           '<h5 data-algo-text="w1-title-right" style="color:var(--text-primary); font-weight:800; font-size:1rem; margin-bottom:5px; font-family:\'Cairo\', sans-serif;"></h5>' +
           '<svg id="w1-tree-right" viewBox="0 0 300 250" style="width:100%; max-width:300px; height:auto; overflow:visible;"></svg>' +
@@ -102,7 +99,6 @@ window.AlgoWidgets[1] = function(container) {
         
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color: var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-node-normal"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w1-node-active"></span></span>' +
@@ -117,7 +113,6 @@ window.AlgoWidgets[1] = function(container) {
     var counter   = container.querySelector('[data-algo-counter]');
     var steps = [], cur = 0, playing = false, interval = null;
  
-
     var leftNodes = {
       'L0': { id: 'L0', val: 10, x: 150, y: 40,  children: ['L1', 'L2'] },
       'L1': { id: 'L1', val: 5,  x: 75,  y: 120, children: ['L3', 'L4'] },
@@ -182,18 +177,15 @@ window.AlgoWidgets[1] = function(container) {
       });
     }
  
-
     function drawTree(svg, treeData, state) {
       svg.innerHTML = '';
       var radius = 20;
       var ns = 'http://www.w3.org/2000/svg';
       
-
       var treeOpacity = state.fade ? '0.2' : '1';
       var gTree = document.createElementNS(ns, 'g');
       gTree.style.opacity = treeOpacity;
       gTree.style.transition = 'opacity 0.4s ease';
-
 
       Object.keys(treeData).forEach(key => {
         let parent = treeData[key];
@@ -204,12 +196,10 @@ window.AlgoWidgets[1] = function(container) {
           let dy = child.y - parent.y;
           let dist = Math.hypot(dx, dy);
           
-
           let x1 = parent.x + (dx / dist) * radius;
           let y1 = parent.y + (dy / dist) * radius;
           let x2 = child.x - (dx / dist) * radius;
           let y2 = child.y - (dy / dist) * radius;
-
 
           let isErrorLine = state.error && state.error.includes(parent.id) && state.error.includes(child.id);
           
@@ -227,7 +217,6 @@ window.AlgoWidgets[1] = function(container) {
         });
       });
  
-
       Object.keys(treeData).forEach(key => {
         let node = treeData[key];
         
@@ -292,7 +281,6 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
       
-
       drawTree(svgLeft, leftNodes, s.stateL);
       drawTree(svgRight, rightNodes, s.stateR);
     }
@@ -329,12 +317,10 @@ window.AlgoWidgets[2] = function(container) {
       _AL.toolbar(2) +
       '<div class="algo-explanation" id="w2-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w2-canvas-container" style="width:100%; max-width:800px; aspect-ratio: 16 / 9; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:visible;">' +
         '<svg id="w2-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w2-normal"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w2-current"></span></span>' +
@@ -350,11 +336,8 @@ window.AlgoWidgets[2] = function(container) {
 
     var steps = [], cur = 0, playing = false, interval = null;
 
-
-
     const heap = [null, 9, 5, 3, 1, 4, 2];
     
-
     const R = 22;
     const treePos = {
       1: { x: 400, y: 50 },
@@ -364,7 +347,6 @@ window.AlgoWidgets[2] = function(container) {
       5: { x: 325, y: 230 },
       6: { x: 475, y: 230 }
     };
-
 
     const cellW = 55;
     const cellH = 55;
@@ -440,12 +422,10 @@ window.AlgoWidgets[2] = function(container) {
       };
 
       let svgHTML = '<defs>';
-
       ['current', 'child', 'parent'].forEach(key => {
         svgHTML += `<marker id="arr-${key}" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="${colorMap[key]}" /></marker>`;
       });
       svgHTML += '</defs>';
-
 
       for (let i = 1; i <= 6; i++) {
         let leftIdx = 2 * i;
@@ -459,7 +439,6 @@ window.AlgoWidgets[2] = function(container) {
             let dy = p2.y - p1.y;
             let dist = Math.hypot(dx, dy);
             
-
             let x1 = p1.x + (dx/dist)*R;
             let y1 = p1.y + (dy/dist)*R;
             let x2 = p2.x - (dx/dist)*R;
@@ -470,7 +449,6 @@ window.AlgoWidgets[2] = function(container) {
         });
       }
 
-
       [...s.current, ...s.children, ...s.parent].forEach(idx => {
           let tP = treePos[idx];
           let aP = arrPos[idx];
@@ -479,7 +457,6 @@ window.AlgoWidgets[2] = function(container) {
           
           svgHTML += `<line x1="${tP.x}" y1="${tP.y + R + 5}" x2="${aP.x + cellW/2}" y2="${aP.y - 5}" stroke="${color}" stroke-width="2" stroke-dasharray="6,4" opacity="0.4"></line>`;
       });
-
 
       s.children.forEach(childIdx => {
           let cIdx = s.current[0];
@@ -505,7 +482,6 @@ window.AlgoWidgets[2] = function(container) {
           svgHTML += `<path d="M ${x1} ${y1} Q ${midX} ${arcHeight} ${x2} ${y2}" fill="none" stroke="${colorMap['parent']}" stroke-width="3" marker-end="url(#arr-parent)" style="transition: all 0.3s ease;"></path>`;
       });
 
-
       for (let i = 1; i <= 6; i++) {
         let pos = treePos[i];
         let val = heap[i];
@@ -526,7 +502,6 @@ window.AlgoWidgets[2] = function(container) {
           <text x="${pos.x + R + 10}" y="${pos.y}" dy=".1em" text-anchor="middle" dominant-baseline="middle" fill="var(--text-muted)" font-size="12px" font-weight="700" font-family="'JetBrains Mono', monospace">i=${i}</text>
         </g>`;
       }
-
 
       for (let i = 1; i <= 6; i++) {
         let pos = arrPos[i];

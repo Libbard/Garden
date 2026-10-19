@@ -87,12 +87,10 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w1-canvas-container" style="width:100%; max-width:800px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:hidden; position:relative; display: flex; align-items: center; justify-content: center;">' +
         '<svg id="w1-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:16px;height:4px;background:var(--brand-500);margin-right:6px;vertical-align:middle; border-radius: 2px;"></span><span data-algo-text="w1-tn"></span></span>' +
         '<span><span style="display:inline-block;width:16px;height:4px;background:var(--algo-compare);margin-right:6px;vertical-align:middle; border-radius: 2px;"></span><span data-algo-text="w1-c1gn"></span></span>' +
@@ -109,7 +107,6 @@ window.AlgoWidgets[1] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-
     const SVG_W = 800;
     const SVG_H = 450;
     const PAD_L = 70;
@@ -122,7 +119,6 @@ window.AlgoWidgets[1] = function(container) {
     const MAX_N = 50;
     const N0 = 15;
 
-
     function t_n(n) { return 0.5 * n * n + 10 * n + 50; }
     function g_n(n) { return n * n; }
     const C1 = 1.5;
@@ -132,10 +128,8 @@ window.AlgoWidgets[1] = function(container) {
 
     const MAX_Y = Math.max(t_n(MAX_N), c1_g_n(MAX_N)) * 1.05;
 
-
     function scaleX(n) { return PAD_L + (n / MAX_N) * CHART_W; }
     function scaleY(v) { return PAD_T + CHART_H - (v / MAX_Y) * CHART_H; }
-
 
     var uiElements = {
       tnPath: null, c1Path: null, c2Path: null,
@@ -160,7 +154,6 @@ window.AlgoWidgets[1] = function(container) {
       return el;
     }
 
-
     function buildPath(fn) {
       let d = `M ${scaleX(0)},${scaleY(fn(0))}`;
       for (let n = 1; n <= MAX_N; n++) {
@@ -168,7 +161,6 @@ window.AlgoWidgets[1] = function(container) {
       }
       return d;
     }
-
 
     function buildShadePath(topFn, bottomFn) {
       let d = `M ${scaleX(N0)},${scaleY(topFn(N0))}`;
@@ -232,21 +224,17 @@ window.AlgoWidgets[1] = function(container) {
       `;
       svgEl.appendChild(defs);
 
-
       let axesG = makeSVG('g', {});
       
-
       axesG.appendChild(makeSVG('line', { x1: PAD_L, y1: scaleY(0), x2: SVG_W - PAD_R + 30, y2: scaleY(0), stroke: 'var(--text-muted)', 'stroke-width': 2 }));
       let xLbl = makeSVG('text', { x: SVG_W / 2, y: SVG_H - 10, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: 'var(--text-secondary)', 'font-size': '15', 'font-family': "'Cairo', 'Inter', sans-serif", 'font-weight': '800' });
       xLbl.textContent = _AL.lang() === 'ar' ? 'حجم المدخلات (n)' : 'Input Size (n)';
       axesG.appendChild(xLbl);
       
-
       axesG.appendChild(makeSVG('line', { x1: PAD_L, y1: PAD_T - 20, x2: PAD_L, y2: scaleY(0), stroke: 'var(--text-muted)', 'stroke-width': 2 }));
       let yLbl = makeSVG('text', { x: PAD_L - 45, y: SVG_H / 2, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: 'var(--text-secondary)', 'font-size': '15', 'font-family': "'Cairo', 'Inter', sans-serif", 'font-weight': '800', transform: `rotate(-90 ${PAD_L - 45} ${SVG_H / 2})` });
       yLbl.textContent = _AL.lang() === 'ar' ? 'وقت التشغيل' : 'Running Time';
       axesG.appendChild(yLbl);
-
 
       for (let i = 10; i <= MAX_N; i += 10) {
         let x = scaleX(i);
@@ -258,32 +246,26 @@ window.AlgoWidgets[1] = function(container) {
 
       svgEl.appendChild(axesG);
 
-
       let dataG = makeSVG('g', {});
-
 
       uiElements.shadeO = makeSVG('path', { d: buildShadePath(c1_g_n, t_n), fill: 'url(#diag-stripes-o)', opacity: '0' });
       uiElements.shadeOmega = makeSVG('path', { d: buildShadePath(t_n, c2_g_n), fill: 'url(#diag-stripes-omega)', opacity: '0' });
       dataG.appendChild(uiElements.shadeO);
       dataG.appendChild(uiElements.shadeOmega);
 
-
       let n0X = scaleX(N0);
       uiElements.n0Line = makeSVG('line', { x1: n0X, y1: PAD_T - 10, x2: n0X, y2: scaleY(0), stroke: 'var(--algo-active)', 'stroke-width': 2, 'stroke-dasharray': '6,4', opacity: '0' });
       
-
       uiElements.n0Bg = makeSVG('rect', { x: n0X - 16, y: scaleY(0) + 12, width: 32, height: 24, rx: 4, fill: 'var(--algo-canvas-bg)', opacity: '0' });
       uiElements.n0Lbl = makeSVG('text', { x: n0X, y: scaleY(0) + 24, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--algo-active)', 'font-size': '16', 'font-family': "'JetBrains Mono', monospace", 'font-weight': '800', opacity: '0' });
       uiElements.n0Lbl.textContent = "n₀";
       
-
       uiElements.intDot = makeSVG('circle', { cx: n0X, cy: scaleY(t_n(N0)), r: 6, fill: 'var(--algo-active)', stroke: 'var(--algo-canvas-bg)', 'stroke-width': 2, opacity: '0' });
 
       dataG.appendChild(uiElements.n0Line);
       dataG.appendChild(uiElements.n0Bg);
       dataG.appendChild(uiElements.n0Lbl);
       dataG.appendChild(uiElements.intDot);
-
 
       uiElements.c1Path = makeSVG('path', { d: buildPath(c1_g_n), fill: 'none', stroke: 'var(--algo-compare)', 'stroke-width': 3, 'stroke-dasharray': '8,6', opacity: '0' });
       uiElements.c2Path = makeSVG('path', { d: buildPath(c2_g_n), fill: 'none', stroke: 'var(--algo-swap)', 'stroke-width': 3, 'stroke-dasharray': '8,6', opacity: '0' });
@@ -292,7 +274,6 @@ window.AlgoWidgets[1] = function(container) {
       dataG.appendChild(uiElements.c1Path);
       dataG.appendChild(uiElements.c2Path);
       dataG.appendChild(uiElements.tnPath);
-
 
       let lX = scaleX(MAX_N) + 12;
       let fontStr = "'JetBrains Mono', monospace";
@@ -325,7 +306,6 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-
       uiElements.tnPath.style.opacity = s.state.tn;
       uiElements.tnBg.style.opacity = s.state.tn;
       uiElements.tnLbl.style.opacity = s.state.tn;
@@ -346,7 +326,6 @@ window.AlgoWidgets[1] = function(container) {
       uiElements.shadeO.style.opacity = s.state.shadeO ? '1' : '0';
       uiElements.shadeOmega.style.opacity = s.state.shadeOmega ? '1' : '0';
       
-
       uiElements.n0Line.setAttribute('stroke-width', (s.state.shadeO && s.state.shadeOmega) ? '4' : '2');
     }
 

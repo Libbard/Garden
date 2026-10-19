@@ -88,12 +88,10 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w1-canvas" style="width:100%; max-width:600px; aspect-ratio: 4 / 3; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:visible;">' +
         '<svg id="w1-canvas-svg" viewBox="0 0 600 450" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 100%; overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center; flex-wrap:wrap; gap:15px;margin-top:15px;font-size:0.8rem; color: var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w1-pending"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w1-divide"></span></span>' +
@@ -110,14 +108,12 @@ window.AlgoWidgets[1] = function(container) {
  
     var steps = [], cur = 0, playing = false, interval = null;
  
-
     var nodesData = {
       'problem-n': { cx: 300, cy: 75, r: 52, en1: 'Problem', en2: 'size n', ar1: 'مشكلة', ar2: 'بحجم n' },
       'sub-L': { cx: 150, cy: 225, r: 45, en1: 'Sub-problem', en2: 'n/2', ar1: 'مشكلة فرعية', ar2: 'n/2' },
       'sub-R': { cx: 450, cy: 225, r: 45, en1: 'Sub-problem', en2: 'n/2', ar1: 'مشكلة فرعية', ar2: 'n/2' },
       'solution-n': { cx: 300, cy: 375, r: 52, en1: 'Solution', en2: 'of n', ar1: 'حل المشكلة', ar2: 'n' }
     };
-
 
     var linesConfig = [
       { id: 'div-L', from: 'problem-n', to: 'sub-L', en: 'Divide', ar: 'قسّم', dx: -25, dy: -15 },
@@ -129,7 +125,6 @@ window.AlgoWidgets[1] = function(container) {
     function getDelay() { return _AL.speedToDelay(parseInt(container.querySelector('.algo-speed input').value)); }
  
     function updateLabels() {
-
       container.querySelector('[data-algo-text="w1-pending"]').textContent = _AL.exp('Pending', 'قيد الانتظار');
       container.querySelector('[data-algo-text="w1-divide"]').textContent  = _AL.exp('Divide', 'تقسيم');
       container.querySelector('[data-algo-text="w1-conquer"]').textContent = _AL.exp('Conquer', 'حلّ');
@@ -140,14 +135,12 @@ window.AlgoWidgets[1] = function(container) {
     function generateSteps() {
       steps = [];
       
-
       steps.push({
         en: 'Divide-and-Conquer paradigm breaks a complex problem into smaller sub-problems.',
         ar: 'نموذج فرّق تسد يقوم بتقسيم المشكلة المعقدة إلى مشكلات فرعية أصغر.',
         nodes: { 'problem-n': 'active' }, lines: {}
       });
  
-
       steps.push({
         en: '<b>Divide Step:</b> The problem is split into two smaller sub-problems.',
         ar: '<b>خطوة التقسيم:</b> يتم تقسيم المشكلة الأصلية إلى مشكلتين فرعيتين أصغر.',
@@ -155,7 +148,6 @@ window.AlgoWidgets[1] = function(container) {
         lines: { 'div-L': 'compare', 'div-R': 'compare' }
       });
  
-
       steps.push({
         en: '<b>Conquer Step:</b> Solving the left sub-problem recursively.',
         ar: '<b>خطوة الحل:</b> يتم حل المشكلة الفرعية اليسرى بشكل مستقل.',
@@ -163,7 +155,6 @@ window.AlgoWidgets[1] = function(container) {
         lines: { 'div-L': 'fade', 'div-R': 'fade' }
       });
  
-
       steps.push({
         en: 'Solving the right sub-problem.',
         ar: 'يتم الآن حل المشكلة الفرعية اليمنى.',
@@ -171,7 +162,6 @@ window.AlgoWidgets[1] = function(container) {
         lines: { 'div-L': 'fade', 'div-R': 'fade' }
       });
  
-
       steps.push({
         en: 'Sub-problems are now solved independently.',
         ar: 'تم حل كلتا المشكلتين الفرعيتين الآن بشكل مستقل ومستعدتان للدمج.',
@@ -179,7 +169,6 @@ window.AlgoWidgets[1] = function(container) {
         lines: { 'div-L': 'fade', 'div-R': 'fade' }
       });
  
-
       steps.push({
         en: '<b>Combine Step:</b> Solutions from sub-problems are merged into the final solution.',
         ar: '<b>خطوة الدمج:</b> يتم دمج الحلول الفرعية لتشكيل حل المشكلة الأصلية.',
@@ -187,11 +176,9 @@ window.AlgoWidgets[1] = function(container) {
         lines: { 'div-L': 'fade', 'div-R': 'fade', 'com-L': 'active', 'com-R': 'active' }
       });
  
-
       steps.push({
         en: 'Original problem is fully solved using Divide-and-Conquer strategy!',
         ar: 'تم حل المشكلة الأصلية بالكامل باستخدام استراتيجية فرّق تسد!',
-
         nodes: { 'problem-n': 'sorted', 'sub-L': 'fade', 'sub-R': 'fade', 'solution-n': 'sorted' },
         lines: {}
       });
@@ -203,7 +190,6 @@ window.AlgoWidgets[1] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
  
-
       var colorMap = {
         'active': 'var(--algo-active)',
         'compare': 'var(--algo-compare)',
@@ -220,7 +206,6 @@ window.AlgoWidgets[1] = function(container) {
       svgHTML += `<marker id="w1-arr-fade" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="var(--algo-border)" opacity="0.3" /></marker>`;
       svgHTML += '</defs>';
  
-
       var currentLines = s.lines || {};
       linesConfig.forEach(lc => {
         let state = currentLines[lc.id];
@@ -233,7 +218,6 @@ window.AlgoWidgets[1] = function(container) {
         let dy = n2.cy - n1.cy;
         let dist = Math.hypot(dx, dy);
         
-
         let padStart = n1.r + 3; 
         let padEnd = n2.r + 14; 
         
@@ -251,16 +235,13 @@ window.AlgoWidgets[1] = function(container) {
 
         svgHTML += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${color}" stroke-width="${sw}" stroke-dasharray="${dash}" opacity="${opacity}" marker-end="${marker}" style="transition: all 0.3s ease;"></line>`;
 
-
         let labelText = _AL.lang() === 'ar' ? lc.ar : lc.en;
         let midX = ((x1 + x2) / 2) + (lc.dx || 0);
         let midY = ((y1 + y2) / 2) + (lc.dy || 0);
         let fontW = state === 'active' || state === 'compare' ? '800' : '600';
-
         svgHTML += `<text x="${midX}" y="${midY}" text-anchor="middle" dominant-baseline="middle" fill="${color}" opacity="${opacity}" font-size="11px" font-weight="${fontW}" font-family="'Cairo', 'Inter', sans-serif" style="transition: all 0.3s ease;">${labelText}</text>`;
       });
  
-
       var currentNodes = s.nodes || {};
       Object.keys(nodesData).forEach(nId => {
         let state = currentNodes[nId];
@@ -322,7 +303,6 @@ window.AlgoWidgets[2] = function(container) {
       _AL.toolbar(2) +
       '<div class="algo-explanation" id="w2-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w2-canvas" style="width:100%; max-width:700px; aspect-ratio: 2 / 1; margin: 0 auto; display: flex; justify-content: center; align-items: center; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow:hidden;">' +
         '<svg viewBox="0 0 800 400" id="w2-svg" preserveAspectRatio="xMidYMid meet" style="width: 100%; height: 100%;"></svg>' +
       '</div>' +
@@ -341,7 +321,6 @@ window.AlgoWidgets[2] = function(container) {
     var counter = container.querySelector('[data-algo-counter]');
     var steps = [], cur = 0, playing = false, interval = null;
  
-
     var CELL_WIDTH = 40;
     var CELL_HEIGHT = 40;
     var CELL_GAP = 5;
@@ -352,7 +331,6 @@ window.AlgoWidgets[2] = function(container) {
     var POINTER_OFFSET_Y = 70; 
     var SVG_WIDTH = 800;
  
-
     function getArrWidth(len) {
       return len * CELL_WIDTH + Math.max(0, len - 1) * CELL_GAP;
     }
@@ -371,7 +349,6 @@ window.AlgoWidgets[2] = function(container) {
       var leftHalf = initialArr.slice(0, 4);
       var rightHalf = initialArr.slice(4, 8);
       
-
       var center_X = SVG_WIDTH / 2;
       var origWidth = getArrWidth(initialArr.length);
       var halfWidth = getArrWidth(4);
@@ -380,7 +357,6 @@ window.AlgoWidgets[2] = function(container) {
       var leftX = center_X - (BLOCK_GAP / 2) - halfWidth;
       var rightX = center_X + (BLOCK_GAP / 2);
       var resultX = origX;
-
 
       var origLeftCenterX = origX + (halfWidth / 2);
       var origRightCenterX = origX + halfWidth + CELL_GAP + (halfWidth / 2);
@@ -409,7 +385,6 @@ window.AlgoWidgets[2] = function(container) {
           ],
           pointers: [],
           lines: [
-
             { x1: origLeftCenterX, y1: ARRAY_START_Y + CELL_HEIGHT + 5, x2: destLeftCenterX, y2: ARRAY_START_Y + ROW_GAP - 25, class: 'divide-line' },
             { x1: origRightCenterX, y1: ARRAY_START_Y + CELL_HEIGHT + 5, x2: destRightCenterX, y2: ARRAY_START_Y + ROW_GAP - 25, class: 'divide-line' }
           ]
@@ -572,7 +547,6 @@ window.AlgoWidgets[2] = function(container) {
  
       svgEl.innerHTML = ''; 
  
-
       var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
       
       var markerDivide = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
@@ -603,7 +577,6 @@ window.AlgoWidgets[2] = function(container) {
 
       svgEl.appendChild(defs);
 
-
       s.visual.lines.forEach(function(lineData) {
         var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('x1', lineData.x1);
@@ -617,7 +590,6 @@ window.AlgoWidgets[2] = function(container) {
         svgEl.appendChild(line);
       });
  
-
       s.visual.arrays.forEach(function(arrData) {
         var group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
  
@@ -675,7 +647,6 @@ window.AlgoWidgets[2] = function(container) {
           rect.setAttribute('stroke-width', strokeW);
           group.appendChild(rect);
  
-
           var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
           text.setAttribute('x', x + CELL_WIDTH / 2);
           text.setAttribute('y', y + CELL_HEIGHT / 2);
@@ -692,9 +663,7 @@ window.AlgoWidgets[2] = function(container) {
         svgEl.appendChild(group);
       });
  
-
       s.visual.pointers.forEach(function(ptr) {
-
         var pointerText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         pointerText.setAttribute('x', ptr.x);
         pointerText.setAttribute('y', ptr.y);
@@ -706,7 +675,6 @@ window.AlgoWidgets[2] = function(container) {
         pointerText.textContent = ptr.text;
         svgEl.appendChild(pointerText);
  
-
         var arrowLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         arrowLine.setAttribute('x1', ptr.x);
         arrowLine.setAttribute('y1', ptr.y - 15);
@@ -751,12 +719,10 @@ window.AlgoWidgets[3] = function(container) {
       _AL.toolbar(3) +
       '<div class="algo-explanation" id="w3-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w3-canvas" style="position:relative; width:100%; max-width:800px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: flex-end; justify-content: center; overflow:visible; padding-bottom: 30px;">' +
         '<svg id="w3-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:20px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-400);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w3-un"></span></span>' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w3-pi"></span></span>' +
@@ -781,7 +747,6 @@ window.AlgoWidgets[3] = function(container) {
   const SVG_H = 450;
   const MAX_BAR_H = 280;
   
-
   const TOTAL_W = (NUM_ELEMENTS * BAR_WIDTH) + ((NUM_ELEMENTS - 1) * BAR_GAP);
   const START_X = (SVG_W - TOTAL_W) / 2;
   const BASE_Y = SVG_H - 60;
@@ -962,21 +927,16 @@ window.AlgoWidgets[3] = function(container) {
     svgEl.innerHTML = '';
     uiBars = [];
 
-
     for(let i=0; i<NUM_ELEMENTS; i++) {
       let x = START_X + i * (BAR_WIDTH + BAR_GAP);
       let g = makeSVG('g', {});
       
-
       let rect = makeSVG('rect', { x: x, y: BASE_Y, width: BAR_WIDTH, height: 0, rx: 6, ry: 6 });
       
-
       let txtBg = makeSVG('rect', { x: x + 5, width: BAR_WIDTH - 10, height: 26, rx: 4, fill: 'rgba(0,0,0,0.2)' });
       
-
       let valTxt = makeSVG('text', { x: x + BAR_WIDTH/2, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: '#ffffff', 'font-family': "'JetBrains Mono', monospace", 'font-size': '16px', 'font-weight': '800' });
       
-
       let idxTxt = makeSVG('text', { x: x + BAR_WIDTH/2, y: BASE_Y + 25, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--text-muted)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '14px', 'font-weight': 'bold' });
       idxTxt.textContent = i;
 
@@ -988,7 +948,6 @@ window.AlgoWidgets[3] = function(container) {
 
       uiBars.push({ g, rect, txtBg, valTxt, x });
     }
-
 
     function createPointer(color, labelStr, isTop) {
       let g = makeSVG('g', { opacity: 0 });
@@ -1016,7 +975,6 @@ window.AlgoWidgets[3] = function(container) {
       
     var maxVal = Math.max(...s.array, 1); 
       
-
     s.array.forEach(function(val, idx) {
       var ui = uiBars[idx];
       var barHeight = (val / maxVal) * MAX_BAR_H;
@@ -1028,7 +986,6 @@ window.AlgoWidgets[3] = function(container) {
       ui.txtBg.setAttribute('y', currentY + 10);
       ui.valTxt.setAttribute('y', currentY + 23);
       ui.valTxt.textContent = val;
-
 
       let fill = 'var(--brand-400)';
       let isSorted = false;
@@ -1049,14 +1006,12 @@ window.AlgoWidgets[3] = function(container) {
 
       ui.rect.setAttribute('fill', fill);
       
-
       if (s.activeRange && (idx < s.activeRange[0] || idx > s.activeRange[1])) {
         ui.g.style.opacity = '0.3';
       } else {
         ui.g.style.opacity = '1';
       }
     });
-
 
     function updatePointer(ptrUi, targetIdx, isComparing, isSwapping) {
       if (targetIdx >= 0 && targetIdx < NUM_ELEMENTS) {
@@ -1072,27 +1027,23 @@ window.AlgoWidgets[3] = function(container) {
         ptrUi.txt.setAttribute('fill', color);
 
         if (ptrUi.isTop) {
-
           targetY = BASE_Y - MAX_BAR_H - 30;
           ptrUi.poly.setAttribute('points', `${targetX},${targetY+10} ${targetX-8},${targetY-4} ${targetX+8},${targetY-4}`);
           ptrUi.txt.setAttribute('x', targetX);
           ptrUi.txt.setAttribute('y', targetY - 18);
         } else {
-
           targetY = BASE_Y + 50; 
           ptrUi.poly.setAttribute('points', `${targetX},${targetY-10} ${targetX-8},${targetY+4} ${targetX+8},${targetY+4}`);
           ptrUi.txt.setAttribute('x', targetX);
           ptrUi.txt.setAttribute('y', targetY + 18);
         }
         
-
         ptrUi.g.style.transform = isComparing ? 'scale(1.2)' : 'scale(1)';
         ptrUi.g.style.transformOrigin = `${targetX}px ${targetY}px`;
       } else {
         ptrUi.g.style.opacity = '0';
       }
     }
-
 
     let isDone = (s.sortedRegions.length === 1 && s.sortedRegions[0][0] === 0 && s.sortedRegions[0][1] === NUM_ELEMENTS - 1);
     
@@ -1141,18 +1092,15 @@ window.AlgoWidgets[4] = function(container) {
           _AL.toolbar(4) +
           '<div class="algo-explanation" id="w4-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 10px;"></div>' +
           
-
           '<div class="algo-canvas" style="width:100%; max-width: 600px; aspect-ratio: 4 / 3; margin: 0 auto; overflow:hidden; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center;">' +
             '<svg id="w4-svg-canvas" viewBox="0 0 600 450" preserveAspectRatio="xMidYMid meet" style="width:100%; height:100%;"></svg>' +
           '</div>' +
           
-
           '<div class="algo-legend" style="margin-top:12px; text-align:center; display:flex; justify-content:center; flex-wrap:wrap; gap:15px; font-size:0.8rem; color:var(--text-secondary);">' +
             '<span><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--algo-active); margin-inline-end:5px;"></span><span data-algo-text="w4-current"></span></span>' +
             '<span><span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:var(--algo-sorted); margin-inline-end:5px;"></span><span data-algo-text="w4-path-node"></span></span>' +
           '</div>' +
           
-
           '<div id="w4-results-container" style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:15px; min-height:30px;"></div>' +
         '</div>';
       
@@ -1164,7 +1112,6 @@ window.AlgoWidgets[4] = function(container) {
       
         var steps = [], cur = 0, playing = false, interval = null;
       
-
         var nodes = {
           'a': { x: 300, y: 60, left: 'b', right: 'c' },
           'b': { x: 180, y: 160, left: 'd', right: 'e' },
@@ -1182,11 +1129,9 @@ window.AlgoWidgets[4] = function(container) {
           container.querySelector('[data-algo-text="w4-path-node"]').textContent = _AL.lang() === 'ar' ? 'تمت زيارتها' : 'Visited Node';
         }
       
-
         var completedPaths = { pre: null, in: null, post: null };
 
         function addStep(traversalType, currentNode, currentPath, en, ar) {
-
           let currentCompleted = {
             pre: completedPaths.pre ? [...completedPaths.pre] : null,
             in: completedPaths.in ? [...completedPaths.in] : null,
@@ -1284,7 +1229,6 @@ window.AlgoWidgets[4] = function(container) {
           counter.textContent = _AL.stepLabel(cur, steps.length - 1);
           expEl.innerHTML = _AL.exp(s.en, s.ar);
           
-
           resultsContainer.innerHTML = '';
           var comp = s.completed;
           if (comp.pre) resultsContainer.innerHTML += createBadge('Preorder', 'أمامي', comp.pre, 'var(--brand-500)');
@@ -1293,14 +1237,12 @@ window.AlgoWidgets[4] = function(container) {
       
           svgEl.innerHTML = ''; 
       
-
           for (var nodeId in nodes) {
             var node = nodes[nodeId];
             if (node.left) { drawEdge(nodeId, node.left); }
             if (node.right) { drawEdge(nodeId, node.right); }
           }
       
-
           for (var nodeId in nodes) {
             var node = nodes[nodeId];
             
@@ -1361,7 +1303,6 @@ window.AlgoWidgets[4] = function(container) {
           line.setAttribute('y1', p.y);
           line.setAttribute('x2', c.x);
           line.setAttribute('y2', c.y);
-
           line.setAttribute('stroke', 'var(--text-muted)');
           line.setAttribute('stroke-width', '3');
           line.setAttribute('opacity', '0.6'); 
@@ -1400,12 +1341,10 @@ window.AlgoWidgets[5] = function(container) {
       _AL.toolbar(5) +
       '<div class="algo-explanation" id="w5-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-canvas" id="w5-canvas" style="position:relative; width:100%; max-width:800px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:hidden;">' +
         '<svg id="w5-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
         '<span><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w5-points"></span></span>' +
         '<span><span style="display:inline-block;width:16px;height:2px;border-bottom:2px dashed var(--algo-active);margin-right:4px;vertical-align:middle;"></span><span data-algo-text="w5-divline"></span></span>' +
@@ -1457,7 +1396,6 @@ window.AlgoWidgets[5] = function(container) {
       basePoints = [];
       var numPoints = Math.floor(Math.random() * 6) + 12; // 12 to 17 points
       
-
       var minDistance = 30; 
       for (var i = 0; i < numPoints; i++) {
         var newP;
@@ -1613,7 +1551,6 @@ window.AlgoWidgets[5] = function(container) {
       svgEl.innerHTML = '';
       uiElements.points = {};
 
-
       let defs = makeSVG('defs', {});
       defs.innerHTML = `
         <pattern id="w5-strip-pattern" width="8" height="8" patternTransform="rotate(45)" patternUnits="userSpaceOnUse">
@@ -1622,20 +1559,17 @@ window.AlgoWidgets[5] = function(container) {
       `;
       svgEl.appendChild(defs);
 
-
       uiElements.stripRect = makeSVG('rect', { y: 0, height: SVG_H, fill: 'url(#w5-strip-pattern)', opacity: 0 });
       uiElements.divLine = makeSVG('line', { y1: 0, y2: SVG_H, stroke: 'var(--algo-active)', 'stroke-width': 2, 'stroke-dasharray': '8,6', opacity: 0 });
       
       svgEl.appendChild(uiElements.stripRect);
       svgEl.appendChild(uiElements.divLine);
 
-
       uiElements.bestLine = makeSVG('line', { stroke: 'var(--algo-sorted)', 'stroke-width': 4, opacity: 0 });
       uiElements.compLine = makeSVG('line', { stroke: 'var(--algo-compare)', 'stroke-width': 3, 'stroke-dasharray': '6,4', opacity: 0 });
       
       svgEl.appendChild(uiElements.bestLine);
       svgEl.appendChild(uiElements.compLine);
-
 
       let nodesGroup = makeSVG('g', {});
       basePoints.forEach(p => {
@@ -1656,7 +1590,6 @@ window.AlgoWidgets[5] = function(container) {
       });
       svgEl.appendChild(nodesGroup);
 
-
       uiElements.distBadge.g = makeSVG('g', { opacity: 0 });
       uiElements.distBadge.bg = makeSVG('rect', { width: 54, height: 24, rx: 6, fill: 'var(--algo-compare)' });
       uiElements.distBadge.txt = makeSVG('text', { 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: '#ffffff', 'font-family': "'JetBrains Mono', monospace", 'font-weight': '800', 'font-size': '13px' });
@@ -1675,7 +1608,6 @@ window.AlgoWidgets[5] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-
       if (s.divLineX !== null) {
         uiElements.divLine.setAttribute('x1', s.divLineX);
         uiElements.divLine.setAttribute('x2', s.divLineX);
@@ -1691,7 +1623,6 @@ window.AlgoWidgets[5] = function(container) {
       } else {
         uiElements.stripRect.style.opacity = '0';
       }
-
 
       if (s.comparing) {
         let p1 = basePoints.find(p => p.id === s.comparing[0]);
@@ -1720,7 +1651,6 @@ window.AlgoWidgets[5] = function(container) {
         uiElements.distBadge.g.style.opacity = '0';
       }
 
-
       if (s.minPair) {
         let p1 = basePoints.find(p => p.id === s.minPair[0]);
         let p2 = basePoints.find(p => p.id === s.minPair[1]);
@@ -1728,10 +1658,8 @@ window.AlgoWidgets[5] = function(container) {
         uiElements.bestLine.setAttribute('x1', p1.x); uiElements.bestLine.setAttribute('y1', p1.y);
         uiElements.bestLine.setAttribute('x2', p2.x); uiElements.bestLine.setAttribute('y2', p2.y);
         
-
         uiElements.bestLine.style.opacity = s.comparing ? '0.4' : '1';
         
-
         if (!s.comparing) {
           let mx = (p1.x + p2.x) / 2;
           let my = (p1.y + p2.y) / 2;
@@ -1747,7 +1675,6 @@ window.AlgoWidgets[5] = function(container) {
       } else {
         uiElements.bestLine.style.opacity = '0';
       }
-
 
       Object.keys(uiElements.points).forEach(id => {
         let ui = uiElements.points[id];
@@ -1798,7 +1725,6 @@ window.AlgoWidgets[5] = function(container) {
     container.querySelector('[data-algo-btn="step"]').addEventListener('click', function() { stopPlay(); if (cur < steps.length - 1) { cur++; render(); } });
     container.querySelector('[data-algo-btn="play"]').addEventListener('click', function() { playing ? stopPlay() : startPlay(); });
     
-
     container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function() { 
       stopPlay(); 
       isInitialized = false; 

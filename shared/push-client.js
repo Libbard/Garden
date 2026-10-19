@@ -274,19 +274,25 @@
     return out.sort(function (a, b) { return a.at - b.at; }).slice(0, MAX_WAKES);
   }
 
-  function syncWakes(items) {
+  function syncWakes(items, extra) {
     if (!supported()) return Promise.resolve({ ok: false, reason: 'unsupported' });
     var rems = remPayload(items);
+    var drop = [];
+    ((extra && extra.cancel) || []).forEach(function (x) {
+      var id = String(x || '').replace(/[^A-Za-z0-9:._-]/g, '_').slice(0, 64);
+      if (id && drop.length < 120 && drop.indexOf(id) === -1) drop.push(id);
+    });
+    var sv = Math.max(0, Math.floor(Number(extra && extra.sv) || 0));
     /*@3.PUCJ.27*/
     var sig = vaultId() + '|' + rems.map(function (r) {
       return r.id + '@' + r.at + '#' + r.title.length + ':' + r.body.length;
-    }).join(',');
+    }).join(',') + '|x:' + drop.join(',');
     var last = lastUpload();
     if (last && last.sig === sig && (Date.now() - (last.at || 0)) < REUPLOAD_MS) {
       return Promise.resolve({ ok: true, skipped: true });
     }
 
-    return post('/v1/reminders', { vault_id: vaultId(), device_id: deviceId(), reminders: rems })
+    return post('/v1/reminders', { vault_id: vaultId(), device_id: deviceId(), reminders: rems, cancel: drop, sv: sv })
       .then(function (r) {
         /*@3.PUCJ.28*/
         try {

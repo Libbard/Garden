@@ -411,14 +411,22 @@
 
     /*@3.SEMJ.34*/
     var todayName = GardenData.todayDayName();
+    var R = window.GardenScheduleRules;
+    var d0 = new Date(); d0.setHours(0, 0, 0, 0);
+    var focus = R && R.weekFocus ? R.weekFocus(d0) : { active: false };
     (S.sched.lectures || []).forEach(function (x) {
       if (!x || !mine[x.course_code] || !x.recurring) return;
       if (x.day !== todayName) return;
+      var v = R && R.lectureOn ? R.lectureOn(x, d0) : { on: true };
+      if (!v.on && v.why !== 'focus') return;
       out.push({
-        kind: 'lecture', code: x.course_code, days: 0,
+        kind: 'lecture', code: x.course_code, days: 0, muted: !v.on,
         title: L(x.kind === 'lab' ? 'معمل' : 'محاضرة', x.kind === 'lab' ? 'Lab' : 'Lecture'),
         meta: hhmm(x.start_time) + (x.room ? ' · ' + x.room : '') +
-              (x.attendance === 'remote' ? ' · ' + L('عن بُعد', 'Remote') : ''),
+              (x.attendance === 'remote' ? ' · ' + L('عن بُعد', 'Remote') : '') +
+              (v.on ? '' : ' · ' + (focus.kind === 'final'
+                ? L('مخفيّةٌ — أسبوعُ الفاينل', 'Hidden: final week')
+                : L('مخفيّةٌ — أسبوعُ الميدتيرم', 'Hidden: midterm week'))),
         href: 'schedule.html', sortKey: '0000-00-00T' + hhmm(x.start_time)
       });
     });
@@ -488,7 +496,7 @@
       }
       var ci = x.code ? info({ code: x.code }) : null;
       var ico = x.kind === 'exam' ? 'fa-file-pen' : (x.kind === 'lecture' ? 'fa-chalkboard-user' : 'fa-list-check');
-      html += '<a class="sem-ev" href="' + esc(x.href) + '"' +
+      html += '<a class="sem-ev' + (x.muted ? ' is-muted' : '') + '" href="' + esc(x.href) + '"' +
           (ci && ci.color ? ' style="--ev-color:' + esc(ci.color) + '"' : '') + '>' +
         '<span class="sem-ev-dot" aria-hidden="true"></span>' +
         '<span class="sem-ev-b">' +

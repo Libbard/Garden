@@ -59,6 +59,7 @@
     ['shared/endpoints.js',
      'shared/reminders-db.js',
      'shared/garden-data.js',
+     'shared/schedule-rules.js',
      'shared/push-client.js',
      'shared/reminders.js'
     ].reduce(function (chain, src) {

@@ -453,7 +453,7 @@ signal(S2);</code></pre>
 </section>
 
 <!-- CONCEPT 3 -->
-<section id="deadlock-prevention" class="concept-card glass-card fade-up" data-study-s="509">
+<section id="deadlock-prevention" class="concept-card glass-card fade-up" data-study-s="505">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">3</span> الوقاية من الجمود (Deadlock Prevention)</h2></template>
     <template class="content-en"><h2><span class="concept-number">3</span> Deadlock Prevention</h2></template>
@@ -472,8 +472,8 @@ signal(S2);</code></pre>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>طرق إبطال الشروط:</p><ol><li><strong>1. الاستبعاد المتبادل</strong> — لا يُطلب للموارد القابلة للمشاركة (مثل الملفات للقراءة فقط)، ولكن يجب أن يظل للموارد غير القابلة للمشاركة.</li><li><strong>2. الاحتفاظ والانتظار</strong> — نطلب من العملية طلب جميع مواردها وتخصيصها قبل بدء التنفيذ، أو السماح لها بطلب موارد فقط عندما لا تحتفظ بأي مورد آخر.</li><li><strong>3. عدم المقاطعة</strong> — إذا طلبت عملية تحتفظ بموارد مورداً لا يمكن تخصيصه فوراً، يتم تحرير جميع الموارد التي تحتفظ بها حالياً وتضاف لقائمة الانتظار.</li><li><strong>4. الانتظار الدائري</strong> — فرض ترتيب كلي (Total Ordering) لجميع أنواع الموارد، واشتراط أن تطلب كل عملية الموارد بترتيب تصاعدي.</li></ol></template>
-    <template class="content-en"><p>Invalidating conditions:</p><ol><li><strong>1. Mutual Exclusion</strong> — not required for sharable resources (e.g., read-only files); must hold for non-sharable.</li><li><strong>2. Hold and Wait</strong> — guarantee that whenever a process requests a resource, it does not hold any other resources (request all before execution).</li><li><strong>3. No Preemption</strong> — if a process holding resources requests another that cannot be immediately allocated, all currently held resources are released and preempted.</li><li><strong>4. Circular Wait</strong> — impose a total ordering of all resource types, and require that each process requests resources in an increasing order of enumeration.</li></ol></template>
+    <template class="content-ar"><p>طرق إبطال الشروط:</p><ol><li><strong>الاستبعاد المتبادل</strong> — لا يُطلب للموارد القابلة للمشاركة (مثل الملفات للقراءة فقط)، ولكن يجب أن يظل للموارد غير القابلة للمشاركة.</li><li><strong>الاحتفاظ والانتظار</strong> — نطلب من العملية طلب جميع مواردها وتخصيصها قبل بدء التنفيذ، أو السماح لها بطلب موارد فقط عندما لا تحتفظ بأي مورد آخر.</li><li><strong>عدم المقاطعة</strong> — إذا طلبت عملية تحتفظ بموارد مورداً لا يمكن تخصيصه فوراً، يتم تحرير جميع الموارد التي تحتفظ بها حالياً وتضاف لقائمة الانتظار.</li><li><strong>الانتظار الدائري</strong> — فرض ترتيب كلي (Total Ordering) لجميع أنواع الموارد، واشتراط أن تطلب كل عملية الموارد بترتيب تصاعدي.</li></ol></template>
+    <template class="content-en"><p>Invalidating conditions:</p><ol><li><strong>Mutual Exclusion</strong> — not required for sharable resources (e.g., read-only files); must hold for non-sharable.</li><li><strong>Hold and Wait</strong> — guarantee that whenever a process requests a resource, it does not hold any other resources (request all before execution).</li><li><strong>No Preemption</strong> — if a process holding resources requests another that cannot be immediately allocated, all currently held resources are released and preempted.</li><li><strong>Circular Wait</strong> — impose a total ordering of all resource types, and require that each process requests resources in an increasing order of enumeration.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -946,7 +946,7 @@ void *do_work_two(void *param) {
 </section>
 
 <!-- CONCEPT 7 -->
-<section id="recovery-from-deadlock" class="concept-card glass-card fade-up" data-study-s="338">
+<section id="recovery-from-deadlock" class="concept-card glass-card fade-up" data-study-s="337">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">7</span> التعافي من الجمود (Recovery from Deadlock)</h2></template>
     <template class="content-en"><h2><span class="concept-number">7</span> Recovery from Deadlock</h2></template>
@@ -965,8 +965,8 @@ void *do_work_two(void *param) {
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>هناك طريقتان رئيسيتان للتعافي:</p><ol><li><strong>1. إنهاء العمليات (Process Termination)</strong> — إما إحباط (Abort) جميع العمليات المتورطة في الجمود (مكلف جداً)، أو إحباط عملية واحدة في كل مرة حتى يتم القضاء على دورة الجمود. يتم اختيار العملية بناءً على الأولوية، وقت التنفيذ، الموارد المستخدمة، ونوع العملية (تفاعلية أم دفعية).</li><li><strong>2. سحب الموارد (Resource Preemption)</strong> — اختيار 'ضحية' (Victim) لتقليل التكلفة، ثم التراجع (Rollback) بالعملية إلى حالة آمنة سابقة وإعادة تشغيلها. يجب الحذر من <strong>المجاعة (Starvation)</strong> حيث قد يتم اختيار نفس العملية كضحية دائماً.</li></ol></template>
-    <template class="content-en"><p>There are two main approaches to recovery:</p><ol><li><strong>1. Process Termination</strong> — Abort all deadlocked processes (very costly), or abort one process at a time until the deadlock cycle is eliminated. The choice of which to abort depends on priority, computed time, resources used, and if it's interactive/batch.</li><li><strong>2. Resource Preemption</strong> — Select a victim to minimize cost, rollback the process to some safe state, and restart it. Must handle <strong>Starvation</strong>, ensuring the same process isn't always picked as the victim (e.g., by including the number of rollbacks in the cost factor).</li></ol></template>
+    <template class="content-ar"><p>هناك طريقتان رئيسيتان للتعافي:</p><ol><li><strong>إنهاء العمليات (Process Termination)</strong> — إما إحباط (Abort) جميع العمليات المتورطة في الجمود (مكلف جداً)، أو إحباط عملية واحدة في كل مرة حتى يتم القضاء على دورة الجمود. يتم اختيار العملية بناءً على الأولوية، وقت التنفيذ، الموارد المستخدمة، ونوع العملية (تفاعلية أم دفعية).</li><li><strong>سحب الموارد (Resource Preemption)</strong> — اختيار 'ضحية' (Victim) لتقليل التكلفة، ثم التراجع (Rollback) بالعملية إلى حالة آمنة سابقة وإعادة تشغيلها. يجب الحذر من <strong>المجاعة (Starvation)</strong> حيث قد يتم اختيار نفس العملية كضحية دائماً.</li></ol></template>
+    <template class="content-en"><p>There are two main approaches to recovery:</p><ol><li><strong>Process Termination</strong> — Abort all deadlocked processes (very costly), or abort one process at a time until the deadlock cycle is eliminated. The choice of which to abort depends on priority, computed time, resources used, and if it's interactive/batch.</li><li><strong>Resource Preemption</strong> — Select a victim to minimize cost, rollback the process to some safe state, and restart it. Must handle <strong>Starvation</strong>, ensuring the same process isn't always picked as the victim (e.g., by including the number of rollbacks in the cost factor).</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>

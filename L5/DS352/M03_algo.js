@@ -772,12 +772,10 @@ window.AlgoWidgets[4] = function (container) {
     _AL.toolbar(4) +
     '<div class="algo-explanation" id="w4-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
     
-
     '<div class="algo-canvas" style="position:relative; width:100%; max-width:800px; margin:0 auto; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:hidden;">' +
       '<svg id="w4-svg" width="100%" height="100%" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
     '</div>' +
     
-
     '<div class="algo-legend" style="display:flex;justify-content:center;flex-wrap:wrap;gap:15px;margin-top:15px;font-size:0.85rem;color:var(--text-secondary);">' +
       '<span><span style="display:inline-block;width:12px;height:12px;background:var(--bg-elevated);border:2px solid var(--text-muted);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w4-point"></span></span>' +
       '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:50%;margin-right:4px;"></span><span data-algo-text="w4-current"></span></span>' +
@@ -794,11 +792,9 @@ window.AlgoWidgets[4] = function (container) {
   var steps = [], cur = 0, playing = false, interval = null;
   var isInitialized = false;
 
-
   const W = 800, H = 450, PADDING = 60;
   const RADIUS = 8;
   
-
   var points = [];
   var uiPoints = [];
   var uiBestLine = null;
@@ -820,7 +816,6 @@ window.AlgoWidgets[4] = function (container) {
 
   function generateSteps() {
     points = [];
-
     var numPoints = Math.floor(Math.random() * 5) + 8; 
     
     for (var i = 0; i < numPoints; i++) {
@@ -883,19 +878,15 @@ window.AlgoWidgets[4] = function (container) {
     svgEl.innerHTML = '';
     uiPoints = [];
 
-
     let linesG = makeSVG('g', {});
     
-
     uiBestLine = makeSVG('line', { stroke: 'var(--algo-sorted)', 'stroke-width': 4, opacity: 0 });
     linesG.appendChild(uiBestLine);
-
 
     uiCurrLine = makeSVG('line', { stroke: 'var(--algo-compare)', 'stroke-width': 2.5, 'stroke-dasharray': '6,4', opacity: 0 });
     linesG.appendChild(uiCurrLine);
     
     svgEl.appendChild(linesG);
-
 
     let nodesG = makeSVG('g', {});
     points.forEach((p, i) => {
@@ -903,7 +894,6 @@ window.AlgoWidgets[4] = function (container) {
       
       let circ = makeSVG('circle', { cx: p.x, cy: p.y, r: RADIUS, fill: 'var(--bg-elevated)', stroke: 'var(--text-muted)', 'stroke-width': 2 });
       
-
       let lblBg = makeSVG('circle', { cx: p.x, cy: p.y - 20, r: 10, fill: 'var(--algo-canvas-bg)', opacity: 0.8 });
       let lbl = makeSVG('text', { x: p.x, y: p.y - 20, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--text-primary)', 'font-family': "'JetBrains Mono', monospace", 'font-weight': 'bold', 'font-size': '14px' });
       lbl.textContent = p.id;
@@ -916,7 +906,6 @@ window.AlgoWidgets[4] = function (container) {
       uiPoints.push({ g, circ, lblBg, lbl, x: p.x, y: p.y });
     });
     svgEl.appendChild(nodesG);
-
 
     uiDistLabel.g = makeSVG('g', { opacity: 0 });
     uiDistLabel.bg = makeSVG('rect', { width: 54, height: 24, rx: 6, fill: 'var(--algo-compare)' });
@@ -935,7 +924,6 @@ window.AlgoWidgets[4] = function (container) {
     counter.textContent = _AL.stepLabel(cur, steps.length - 1);
     expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-
     if (s.bestPair) {
       let bp1 = points[s.bestPair[0]];
       let bp2 = points[s.bestPair[1]];
@@ -946,7 +934,6 @@ window.AlgoWidgets[4] = function (container) {
       uiBestLine.style.opacity = '0';
     }
 
-
     if (s.p1 !== null && s.p2 !== null && s.phase !== 'done') {
       let cp1 = points[s.p1];
       let cp2 = points[s.p2];
@@ -956,7 +943,6 @@ window.AlgoWidgets[4] = function (container) {
       let mx = (cp1.x + cp2.x) / 2;
       let my = (cp1.y + cp2.y) / 2;
       
-
       let isNewMin = s.phase === 'new_min';
       let boxColor = isNewMin ? 'var(--algo-swap)' : 'var(--algo-compare)';
       uiCurrLine.setAttribute('stroke', boxColor);
@@ -973,14 +959,12 @@ window.AlgoWidgets[4] = function (container) {
       uiCurrLine.style.opacity = '1';
       uiDistLabel.g.style.opacity = '1';
       
-
       uiDistLabel.g.style.transform = isNewMin ? 'scale(1.2)' : 'scale(1)';
       uiDistLabel.g.style.transformOrigin = `${mx}px ${my}px`;
     } else {
       uiCurrLine.style.opacity = '0';
       uiDistLabel.g.style.opacity = '0';
     }
-
 
     uiPoints.forEach((ui, idx) => {
       let isComparing = (idx === s.p1 || idx === s.p2) && s.phase !== 'done';
@@ -1001,7 +985,6 @@ window.AlgoWidgets[4] = function (container) {
         stroke = '#ffffff';
         scale = 'scale(1.4)';
         opacity = '1';
-
         ui.g.parentNode.appendChild(ui.g); 
       } else if (isBest) {
         fill = 'var(--algo-sorted)';
@@ -1033,7 +1016,6 @@ window.AlgoWidgets[4] = function (container) {
   container.querySelector('[data-algo-btn="step"]').addEventListener('click', function () { stopPlay(); if (cur < steps.length - 1) { cur++; render(); } });
   container.querySelector('[data-algo-btn="play"]').addEventListener('click', function () { playing ? stopPlay() : startPlay(); });
   
-
   container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function () { 
     stopPlay(); 
     isInitialized = false;
@@ -1351,14 +1333,12 @@ window.AlgoWidgets[6] = function(container) {
       '<div class="w6-table-container">' +
         '<h5 data-algo-text="w6-subsets-table-title"></h5>' +
         
-
         '<div class="w6-legend">' +
           '<span class="w6-legend-item"><span class="w6-legend-color" style="background-color: var(--algo-compare);"></span> <span data-algo-text="w6-leg-current"></span></span>' +
           '<span class="w6-legend-item"><span class="w6-legend-color" style="background-color: var(--algo-swap);"></span> <span data-algo-text="w6-leg-infeasible"></span></span>' +
           '<span class="w6-legend-item"><span class="w6-legend-color" style="background-color: rgba(var(--algo-sorted-rgb), 0.2);"></span> <span data-algo-text="w6-leg-feasible"></span></span>' +
           '<span class="w6-legend-item"><span class="w6-legend-color" style="background-color: var(--algo-sorted);"></span> <span data-algo-text="w6-leg-optimal"></span></span>' +
         '</div>' +
-
 
         '<div class="w6-table-scroll-area">' +
           '<table id="w6-subsets-table" class="w6-subsets-table">' +
@@ -1373,34 +1353,27 @@ window.AlgoWidgets[6] = function(container) {
         '</div>' +
       '</div>' +
       '<style>' +
-        
         '.w6-knapsack-container { display: flex; justify-content: center; align-items: stretch; gap: 15px; margin-top: 10px; flex-wrap: wrap; }' +
         '.w6-items-display { flex: 1; min-width: 200px; max-width: 400px; border: 1px solid var(--algo-border); padding: 10px; border-radius: 8px; background-color: var(--algo-canvas-bg); text-align: center; }' +
         '.w6-knapsack-info { width: 140px; border: 1px solid var(--algo-border); padding: 10px; border-radius: 8px; background-color: var(--algo-canvas-bg); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }' +
-        
         
         '.w6-items-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }' +
         '.w6-item-box { width: 65px; height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center; border: 1px solid var(--algo-muted); border-radius: 6px; background-color: var(--brand-400); color: var(--algo-text); font-size: 0.8em; line-height: 1.3; transition: all 0.2s ease-in-out; }' +
         '.w6-item-box.w6-item-selected { background-color: var(--algo-active); border-color: var(--algo-active); color: var(--algo-bg); transform: scale(1.05); box-shadow: 0 4px 8px var(--brand-glow); }' +
         
-        
         '.w6-capacity-value { font-size: 1.3em; font-weight: bold; color: var(--algo-active); margin-top: 5px; }' +
         '.w6-table-container { margin-top: 30px; text-align: center; }' +
-        
         
         '.w6-legend { display: flex; justify-content: center; gap: 15px; margin: 15px 0; flex-wrap: wrap; font-size: 0.9em; color: var(--algo-text); }' +
         '.w6-legend-item { display: flex; align-items: center; gap: 6px; }' +
         '.w6-legend-color { width: 16px; height: 16px; border-radius: 4px; border: 1px solid var(--algo-border); }' +
 
-        
         '.w6-table-scroll-area { max-height: 300px; overflow-y: auto; border: 1px solid var(--algo-border); border-radius: 8px; margin: 0 auto; max-width: 800px; background-color: var(--algo-canvas-bg); }' +
         '.w6-subsets-table { width: 100%; border-collapse: collapse; margin: 0; }' +
         '.w6-subsets-table th, .w6-subsets-table td { border: 1px solid var(--algo-border); border-top: none; padding: 10px; text-align: center; }' +
         
-        
         '.w6-subsets-table thead th { position: sticky; top: 0; z-index: 10; background-color: var(--brand-500); color: var(--algo-bg); box-shadow: 0 1px 2px rgba(0,0,0,0.1); }' +
 
-        
         '.w6-subsets-table tbody tr:nth-child(even) { background-color: rgba(var(--brand-rgb), 0.1); }' +
         '.w6-subsets-table tbody tr.w6-current-subset { background-color: var(--algo-compare); color: var(--algo-bg); font-weight: bold; }' +
         '.w6-subsets-table tbody tr.w6-infeasible { background-color: var(--algo-swap); color: var(--algo-bg); }' +
@@ -1561,7 +1534,6 @@ window.AlgoWidgets[6] = function(container) {
       s.items.forEach(function(item, idx) {
         var itemBox = document.createElement('div');
         itemBox.className = 'w6-item-box';
-
         itemBox.innerHTML = '<strong>' + item.id + '</strong><span>' + item.weight + 'kg</span><span>$' + item.value + '</span>';
         if (s.currentSubsetIndices.includes(idx)) {
           itemBox.classList.add('w6-item-selected');
@@ -1605,22 +1577,17 @@ window.AlgoWidgets[6] = function(container) {
         subsetsTableBody.appendChild(tr);
       });
 	  
-
       var scrollArea = container.querySelector('.w6-table-scroll-area');
       
-
       var activeRow = container.querySelector('.w6-current-subset');
       
-
       if (!activeRow && cur === steps.length - 1) {
         activeRow = container.querySelector('.w6-optimal');
       }
       
       if (scrollArea && activeRow) {
-
         var scrollPosition = activeRow.offsetTop - (scrollArea.clientHeight / 2) + (activeRow.clientHeight / 2);
         
-
         scrollArea.scrollTo({
           top: scrollPosition,
           behavior: 'smooth'
@@ -1655,16 +1622,13 @@ window.AlgoWidgets[7] = function(container) {
   container.innerHTML = '<div class="algo-widget">' +
       _AL.titleHTML(7) +
       _AL.toolbar(7) +
-
       '<div class="algo-explanation" id="w7-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 10px;"></div>' +
       
       '<div class="algo-assignment-container" style="display:flex; flex-direction:column; align-items:center; gap:10px; margin-top:10px;">' +
       
-
       '<div class="algo-matrix-wrapper" style="border:1px solid var(--algo-border); border-radius: var(--radius-md); padding:10px; background:var(--algo-canvas-bg); width: 100%; max-width: 500px; overflow-x: auto;">' +
       '<h5 style="text-align:center; margin-top:0; margin-bottom:10px; color:var(--algo-text); font-size: 0.95rem; font-weight: 800;" data-algo-text="w7-cost-matrix-title"></h5>' +
       
-
       '<table id="w7-cost-matrix" class="algo-table" style="width:100%; border-collapse:collapse; font-size: 0.75rem; margin: 0 auto; text-align: center;">' +
       '<thead style="background:var(--bg-elevated); color: var(--text-primary); font-weight: 800;">' +
       '<tr id="w7-matrix-header"></tr>' +
@@ -1673,18 +1637,15 @@ window.AlgoWidgets[7] = function(container) {
       '</table>' +
       '</div>' +
       
-
       '<div class="algo-svg-wrapper" style="width:100%; max-width:500px; aspect-ratio: 5 / 2; border:1px solid var(--algo-border); border-radius: var(--radius-md); background:var(--algo-canvas-bg); overflow: hidden;">' +
       '<svg id="w7-assignment-svg" width="100%" height="100%" viewBox="0 0 600 250" preserveAspectRatio="xMidYMid meet"></svg>' +
       '</div>' +
       
-
       '<div class="algo-current-info" style="text-align:center; font-size:0.9rem; line-height:1.6; color:var(--algo-text);">' +
       '<div id="w7-optimal-found" style="margin-top:5px; font-weight:bold; color:var(--algo-sorted); display:none;"></div>' +
       '</div>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex;justify-content:center;gap:15px;margin-top:10px;font-size:0.8rem; color:var(--algo-text);">' +
       '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-active);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w7-current-assignment"></span></span>' +
       '<span><span style="display:inline-block;width:12px;height:12px;background:var(--algo-sorted);border-radius:3px;margin-right:4px;"></span><span data-algo-text="w7-optimal-solution"></span></span>' +
@@ -1728,7 +1689,6 @@ window.AlgoWidgets[7] = function(container) {
       container.querySelector('[data-algo-text="w7-current-assignment"]').textContent = _AL.exp('Current Assignment', 'التعيين الحالي');
       container.querySelector('[data-algo-text="w7-optimal-solution"]').textContent = _AL.exp('Optimal Solution', 'الحل الأمثل');
  
-
       matrixHeaderEl.innerHTML = '<th style="padding: 6px; white-space: nowrap; border-bottom: 2px solid var(--brand-500);">' + _AL.exp('Person', 'الشخص') + '</th>';
       for (var j = 0; j < numEntities; j++) {
         matrixHeaderEl.innerHTML += '<th style="padding: 6px; white-space: nowrap; border-bottom: 2px solid var(--brand-500);">' + _AL.exp('Job ' + (j + 1), 'الوظيفة ' + (j + 1)) + '</th>';
@@ -1846,7 +1806,6 @@ window.AlgoWidgets[7] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
  
-
       if(matrixTableEl) {
         matrixTableEl.style.setProperty('direction', _AL.lang() === 'ar' ? 'rtl' : 'ltr', 'important');
       }
@@ -2408,7 +2367,6 @@ window.AlgoWidgets[9] = function(container) {
       _AL.toolbar(9) +
       '<div class="algo-explanation" id="w9-exp" style="font-size: 0.9rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 15px; width: 100%; max-width: 800px; margin: 0 auto;">' +
         '<div class="algo-canvas" id="w9-canvas" style="position:relative; width:100%; aspect-ratio: 16/9; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); display: flex; align-items: center; justify-content: center; overflow:hidden;">' +
           '<svg id="w9-svg" width="100%" height="100%" viewBox="0 0 600 350" preserveAspectRatio="xMidYMid meet" style="overflow:visible;"></svg>' +
@@ -2437,7 +2395,6 @@ window.AlgoWidgets[9] = function(container) {
     var steps = [], cur = 0, playing = false, interval = null;
     var isInitialized = false;
 
-
     const RADIUS = 22;
     var graph = {
       'A': ['B', 'C'],
@@ -2460,7 +2417,6 @@ window.AlgoWidgets[9] = function(container) {
     };
 
     var allEdges = [];
-
     let seenEdges = new Set();
     Object.keys(graph).forEach(u => {
       graph[u].forEach(v => {
@@ -2488,7 +2444,6 @@ window.AlgoWidgets[9] = function(container) {
     function generateSteps() {
       steps = [];
       
-
       let nodesArray = Object.keys(graph);
       let startNode = nodesArray[Math.floor(Math.random() * nodesArray.length)];
 
@@ -2526,7 +2481,6 @@ window.AlgoWidgets[9] = function(container) {
           ar: `سحب العقدة <strong>${u}</strong> من الطابور. الآن سنعالج جميع جيرانها غير المستكشفين.`
         });
 
-
         var neighbors = graph[u].slice().sort();
         for (var i = 0; i < neighbors.length; i++) {
           var v = neighbors[i];
@@ -2557,8 +2511,6 @@ window.AlgoWidgets[9] = function(container) {
           }
         }
         
-
-
       }
 
       steps.push({
@@ -2583,12 +2535,10 @@ window.AlgoWidgets[9] = function(container) {
       let edgesG = makeSVG('g', {});
       let nodesG = makeSVG('g', {});
 
-
       allEdges.forEach(e => {
         let p1 = nodePositions[e.u];
         let p2 = nodePositions[e.v];
         
-
         let dx = p2.x - p1.x; let dy = p2.y - p1.y; let dist = Math.hypot(dx, dy);
         let x1 = p1.x + (dx/dist) * RADIUS; let y1 = p1.y + (dy/dist) * RADIUS;
         let x2 = p2.x - (dx/dist) * RADIUS; let y2 = p2.y - (dy/dist) * RADIUS;
@@ -2598,7 +2548,6 @@ window.AlgoWidgets[9] = function(container) {
         uiEdges[e.id] = line;
       });
 
-
       Object.keys(nodePositions).forEach(id => {
         let p = nodePositions[id];
         let g = makeSVG('g', { 'transform-origin': `${p.x}px ${p.y}px` });
@@ -2606,7 +2555,6 @@ window.AlgoWidgets[9] = function(container) {
         let circ = makeSVG('circle', { cx: p.x, cy: p.y, r: RADIUS, fill: 'var(--bg-elevated)', stroke: 'var(--text-muted)', 'stroke-width': 2 });
         let txt = makeSVG('text', { x: p.x, y: p.y, 'text-anchor': 'middle', 'dominant-baseline': 'middle', dy: '.1em', fill: 'var(--text-primary)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '18px', 'font-weight': '800' });
         txt.textContent = id;
-
 
         let distTxt = makeSVG('text', { x: p.x, y: p.y + RADIUS + 15, 'text-anchor': 'middle', 'dominant-baseline': 'middle', fill: 'var(--text-muted)', 'font-family': "'JetBrains Mono', monospace", 'font-size': '14px', 'font-weight': '700', opacity: 0 });
 
@@ -2630,7 +2578,6 @@ window.AlgoWidgets[9] = function(container) {
       counter.textContent = _AL.stepLabel(cur, steps.length - 1);
       expEl.innerHTML = _AL.exp(s.en, s.ar);
 
-
       Object.keys(uiEdges).forEach(edgeId => {
         let line = uiEdges[edgeId];
         let isHl = s.highlightedEdge === edgeId;
@@ -2646,10 +2593,8 @@ window.AlgoWidgets[9] = function(container) {
         line.setAttribute('stroke-dasharray', dash);
         line.style.opacity = op;
         
-
         if(isHl) line.parentNode.appendChild(line);
       });
-
 
       Object.keys(uiNodes).forEach(id => {
         let ui = uiNodes[id];
@@ -2668,7 +2613,6 @@ window.AlgoWidgets[9] = function(container) {
 
         if (isCur) {
           fill = 'var(--algo-active)'; stroke = '#ffffff'; txtFill = '#ffffff'; scale = 'scale(1.2)';
-
           ui.g.parentNode.appendChild(ui.g);
         } else if (inQ) {
           fill = 'var(--algo-compare)'; stroke = '#ffffff'; txtFill = '#ffffff'; scale = 'scale(1.1)';
@@ -2682,7 +2626,6 @@ window.AlgoWidgets[9] = function(container) {
         ui.txt.setAttribute('fill', txtFill);
         ui.g.style.transform = scale;
 
-
         let d = s.distances[id];
         if (d !== Infinity) {
           ui.distTxt.textContent = `d=${d}`;
@@ -2692,7 +2635,6 @@ window.AlgoWidgets[9] = function(container) {
           ui.distTxt.style.opacity = '0';
         }
       });
-
 
       queueEl.innerHTML = '';
       if (s.queue.length === 0) {
@@ -2735,7 +2677,6 @@ window.AlgoWidgets[9] = function(container) {
     container.querySelector('[data-algo-btn="step"]').addEventListener('click', function() { stopPlay(); if (cur < steps.length - 1) { cur++; render(); } });
     container.querySelector('[data-algo-btn="play"]').addEventListener('click', function() { playing ? stopPlay() : startPlay(); });
     
-
     container.querySelector('[data-algo-btn="reset"]').addEventListener('click', function() { 
       stopPlay(); 
       isInitialized = false;

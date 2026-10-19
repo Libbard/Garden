@@ -86,12 +86,10 @@ window.AlgoWidgets[1] = function(container) {
       _AL.toolbar(1) +
       '<div class="algo-explanation" id="w1-exp" style="font-size: 0.85rem; font-weight: 600; line-height: 1.6; margin-bottom: 15px;"></div>' +
       
-
       '<div class="algo-svg-wrapper" style="width: 100%; max-width: 550px; aspect-ratio: 5 / 3; margin: 0 auto; border: 1px solid var(--algo-border); border-radius: var(--radius-md); background: var(--algo-canvas-bg); overflow: hidden;">' +
       '<svg id="w1-canvas" width="100%" height="100%" viewBox="0 0 500 300" preserveAspectRatio="xMidYMid meet"></svg>' +
       '</div>' +
       
-
       '<div class="algo-legend" style="display:flex; justify-content:center; flex-wrap:wrap; gap:15px; margin-top:15px; font-size: 0.8rem; color: var(--text-secondary);">' +
         '<span style="display:flex; align-items:center; gap:6px;"><span style="display:inline-block;width:12px;height:12px;background:var(--brand-500);border-radius:3px;"></span><span data-algo-text="w1-normal"></span></span>' +
         '<span style="display:flex; align-items:center; gap:6px;"><span style="display:inline-block;width:12px;height:12px;background:var(--algo-compare);border-radius:3px;"></span><span data-algo-text="w1-source"></span></span>' +
@@ -99,7 +97,6 @@ window.AlgoWidgets[1] = function(container) {
         '<span style="display:flex; align-items:center; gap:6px;"><span style="display:inline-block;width:12px;height:12px;background:var(--bg-elevated);border:1px dashed var(--algo-muted);border-radius:3px;"></span><span data-algo-text="w1-removed"></span></span>' +
       '</div>' +
       
-
       '<div class="algo-output" id="w1-output" style="margin-top:20px; text-align:center;"></div>' +
     '</div>';
  
@@ -156,7 +153,6 @@ window.AlgoWidgets[1] = function(container) {
       var currentEdges = edges.map(e => ({ ...e }));
       var removedOrder = [];
  
-
       function updateNodeStatuses() {
         currentNodes.forEach(n => {
           if (n.status !== 'removed' && n.status !== 'current') {
@@ -183,7 +179,6 @@ window.AlgoWidgets[1] = function(container) {
         sources.sort((a, b) => a.id.localeCompare(b.id));
         var sourceToRemove = sources[0].id;
  
-
         currentNodes.find(n => n.id === sourceToRemove).status = 'current';
         steps.push({
           nodes: currentNodes.map(n => ({ ...n })),
@@ -193,7 +188,6 @@ window.AlgoWidgets[1] = function(container) {
           ar: 'تحديد العقدة المصدر <strong dir="ltr">' + sourceToRemove + '</strong> لكي يتم حذفها من الرسم البياني.'
         });
  
-
         currentNodes.find(n => n.id === sourceToRemove).status = 'removed';
         removedOrder.push(sourceToRemove);
         
@@ -237,7 +231,6 @@ window.AlgoWidgets[1] = function(container) {
       svg.setAttribute('viewBox', '0 0 500 300');
       svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
  
-
       var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
       
       var markerActive = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
@@ -270,7 +263,6 @@ window.AlgoWidgets[1] = function(container) {
  
       svg.appendChild(defs);
  
-
       s.edges.forEach(edge => {
         var fromNode = s.nodes.find(n => n.id === edge.from);
         var toNode = s.nodes.find(n => n.id === edge.to);
@@ -280,7 +272,6 @@ window.AlgoWidgets[1] = function(container) {
         var dy = toNode.y - fromNode.y;
         var angle = Math.atan2(dy, dx);
  
-
         var x1 = fromNode.x + NODE_RADIUS * Math.cos(angle);
         var y1 = fromNode.y + NODE_RADIUS * Math.sin(angle);
         var x2 = toNode.x - NODE_RADIUS * Math.cos(angle); 
@@ -298,7 +289,6 @@ window.AlgoWidgets[1] = function(container) {
           line.setAttribute('opacity', '0.8');
           line.setAttribute('marker-end', 'url(#arrow-active)');
         } else {
-
           line.setAttribute('stroke', 'var(--algo-muted)');
           line.setAttribute('stroke-width', '1.5');
           line.setAttribute('stroke-dasharray', '4,4');
@@ -308,9 +298,7 @@ window.AlgoWidgets[1] = function(container) {
         svg.appendChild(line);
       });
  
-
       s.nodes.forEach(node => {
-
         var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         
         var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
@@ -329,7 +317,6 @@ window.AlgoWidgets[1] = function(container) {
         text.setAttribute('font-weight', '800');
         text.textContent = node.label;
  
-
         if (node.status === 'normal') {
           circle.setAttribute('fill', 'var(--brand-500)');
           circle.setAttribute('stroke', 'var(--brand-600)');
@@ -357,7 +344,6 @@ window.AlgoWidgets[1] = function(container) {
  
       canvasEl.appendChild(svg);
  
-
       var outputHtml = '<div style="font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-bottom:8px;">' + _AL.exp('Topological Order:', 'الترتيب الطوبولوجي:') + '</div>';
       outputHtml += '<div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">';
       
@@ -442,7 +428,6 @@ window.AlgoWidgets[2] = function(container) {
           '<line id="w2-edge-ab" class="edge" x1="" y1="" x2="" y2="" marker-end="url(#arrowhead-active)" stroke-width="2"></line>' +
           '<line id="w2-edge-bc" class="edge" x1="" y1="" x2="" y2="" marker-end="url(#arrowhead-active)" stroke-width="2"></line>' +
           '<line id="w2-edge-de" class="edge" x1="" y1="" x2="" y2="" marker-end="url(#arrowhead-active)" stroke-width="2"></line>' +
-
           '<path id="w2-edge-ca-back" class="edge" d="" marker-end="url(#arrowhead-compare)" stroke-width="2" fill="none"></path>' +
           '<line id="w2-edge-ac-forward" class="edge" x1="" y1="" x2="" y2="" marker-end="url(#arrowhead-swap)" stroke-width="2"></line>' +
           '<line id="w2-edge-dc-cross" class="edge" x1="" y1="" x2="" y2="" marker-end="url(#arrowhead-sorted)" stroke-width="2"></line>' +

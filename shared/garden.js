@@ -5,7 +5,21 @@
   var PLANS = [
     { code: 'CS476', map: { 3: 4, 4: 5, 5: 6, 6: 7, 7: 8, 8: 9, 9: 10, 10: 11, 11: 12, 12: 13 }, retire: [2] },
     /*@3.GARJ.658*/
-    { code: 'CS230', map: { 11: 8, 8: 9, 12: 10, 9: 11, 10: 12 }, retire: [] }
+    { code: 'CS230', map: { 11: 8, 8: 9, 12: 10, 9: 11, 10: 12 }, retire: [] },
+    /*@3.GARJ.706*/
+    { code: 'CS350', map: { 12: 20 }, retire: [11] },
+    { code: 'IT244', map: { 12: 20 }, retire: [11] },
+    { code: 'DS350', map: { 12: 20 }, retire: [11] },
+    /*@3.GARJ.708*/
+    { code: 'CS364', map: { 6: 8, 7: 9, 8: 10 }, retire: [3, 4, 5, 9, 10], notesTo: { 4: 5, 5: 6, 9: 11, 10: 12 } },
+    { code: 'IT364', map: { 6: 8, 7: 9, 8: 10 }, retire: [3, 4, 5, 9, 10], notesTo: { 4: 5, 5: 6, 9: 11, 10: 12 } },
+    /*@3.GARJ.709*/
+    { code: 'CS470', map: { 1: 20, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 }, retire: [7, 12], notesTo: { 7: 6 } },
+    { code: 'IT352', map: { 1: 20, 2: 1, 3: 2, 4: 3, 5: 4, 6: 5 }, retire: [7, 12], notesTo: { 7: 6 } },
+    /*@3.GARJ.710*/
+    { code: 'CS360', map: { 6: 7, 8: 11, 11: 12, 12: 13 }, retire: [5, 7, 9, 10], notesTo: { 7: 8, 9: 11, 10: 11 } },
+    { code: 'IT351', map: { 6: 7, 8: 11, 11: 12, 12: 13 }, retire: [5, 7, 9, 10], notesTo: { 7: 8, 9: 11, 10: 11 } },
+    { code: 'DS360', map: { 6: 7, 8: 11, 11: 12, 12: 13 }, retire: [5, 7, 9, 10], notesTo: { 7: 8, 9: 11, 10: 11 } }
   ];
   var TS = '__syncT_', T0_KEY = 'garden_unit_slots_t0', VISITS = 'garden_module_visits';
   var EMPTY = { fc: '{}', notes: '[]', quiz: '' };
@@ -53,6 +67,21 @@
       else { put(dest, x.v); written[dest] = 1; moved++; }
     });
     movers.forEach(function (x) { if (!written[x.k]) { vacate(x.k, x.s); written[x.k] = 1; } });
+    /*@3.GARJ.707*/
+    var nt = p.notesTo || {};
+    var nmov = old.filter(function (x) { return x.s === 'notes' && p.retire.indexOf(x.n) >= 0 && has(nt, x.n); });
+    nmov.forEach(function (x) {
+      var dest = 'garden_' + p.code + '_m' + nt[x.n] + '_notes';
+      if (get(dest) !== null && !isOld(dest) && !written[dest]) { raw(x.k + '_legacy', x.v); return; }
+      if (written[dest]) { /*@3.GARJ.711*/
+        try {
+          var a = JSON.parse(get(dest) || '[]'), b = JSON.parse(x.v || '[]');
+          if (Array.isArray(a) && Array.isArray(b)) { put(dest, JSON.stringify(a.concat(b))); moved++; return; }
+        } catch (e) {}
+      }
+      put(dest, x.v); written[dest] = 1; moved++;
+    });
+    nmov.forEach(function (x) { if (!written[x.k]) { vacate(x.k, x.s); written[x.k] = 1; } });
     var qk = 'garden_' + p.code + '_quizlog';
     try {
       var log = JSON.parse(get(qk) || 'null');
@@ -3405,12 +3434,12 @@
 
   /*@3.GARJ.663*/
   const SLIDES = { CS230: 13, CS231: 13, CS240: 13, CS241: 13, CS242: 13, CS243: 13, CS350: 13, CS351: 13, CS352: 13,
-    CS353: 13, CS360: 12, CS361: 13, CS362: 13, CS363: 13, CS364: 10, CS470: 12, CS471: 13, CS475: 13, CS476: 13,
+    CS353: 13, CS360: 13, CS361: 13, CS362: 13, CS363: 13, CS364: 13, CS470: 13, CS471: 13, CS475: 13, CS476: 13,
     CS477: 13, CS478: 13, CS479: 12, CS480: 12, CS481: 13, DS230: 13, DS231: 12, DS240: 13, DS242: 13, DS243: 13,
-    DS350: 13, DS351: 13, DS352: 13, DS353: 12, DS360: 12, DS361: 13, DS362: 13, DS363: 13, DS364: 13, DS470: 13,
+    DS350: 13, DS351: 13, DS352: 13, DS353: 12, DS360: 13, DS361: 13, DS362: 13, DS363: 13, DS364: 13, DS470: 13,
     DS471: 13, DS472: 13, DS473: 13, DS479: 12, DS480: 13, DS481: 13, DS482: 13, DS483: 13, ENG103: 10, ISLAM101: 12,
     ISLAM102: 12, ISLAM103: 10, ISLAM104: 14, IT231: 15, IT232: 13, IT233: 13, IT241: 13, IT244: 13, IT245: 13,
-    IT351: 12, IT352: 12, IT353: 13, IT354: 12, IT361: 13, IT362: 12, IT363: 13, IT364: 10, IT365: 12, IT474: 13,
+    IT351: 13, IT352: 13, IT353: 13, IT354: 12, IT361: 13, IT362: 12, IT363: 13, IT364: 13, IT365: 12, IT474: 13,
     IT475: 13, IT476: 12, IT478: 12, IT479: 12, IT484: 13, IT485: 13, IT487: 14, IT488: 12, MATH150: 12, MATH241: 13,
     MATH251: 12, SCI101: 10, SCI201: 11, STAT101: 12, STAT202: 11 };
   function slidesLink() {
