@@ -522,7 +522,7 @@
         '<span class="day-date">' + esc(dayLabel(dd)) + '</span>' +
         '<span class="day-tag">' + byDate[ds].length + ' ' + T('جلسة', 'sessions') + '</span></div>' +
         byDate[ds].map(function (s) {
-          var label = s.kind === 'buffer' ? T('مراجعة ما قبل الاختبار', 'Pre-exam review')
+          var label = s.kind === 'buffer' ? (s.review === 'practice' ? T('اختبارٌ تجريبيّ', 'Practice test') : T('مراجعة ما قبل الاختبار', 'Pre-exam review'))
                     : s.kind === 'spaced' ? T('مراجعة متباعدة', 'Spaced review')
                     : T('وحدة ' + parseInt(String(s.module).replace('M',''), 10), 'Module ' + parseInt(String(s.module).replace('M',''), 10)) +
                       (s.total_parts > 1 ? ' (' + s.part + '/' + s.total_parts + ')' : '');

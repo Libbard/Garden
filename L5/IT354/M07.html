@@ -260,7 +260,7 @@
   </details>
 </section>
 
-<section id="two-phase-locking" class="concept-card glass-card fade-up" data-study-s="905">
+<section id="two-phase-locking" class="concept-card glass-card fade-up" data-study-s="973">
   <div class="concept-header" data-bilingual>
     <template class="content-ar"><h2><span class="concept-number">2</span> القفل ثنائي الطور (2PL)</h2></template>
     <template class="content-en"><h2><span class="concept-number">2</span> Two-Phase Locking (2PL)</h2></template>
@@ -279,8 +279,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>يتكون القفل ثنائي الطور من مرحلتين حصريتين:</p><ol><li><b>مرحلة القفل (النمو):</b> تطبق المعاملة الأقفال (قراءة أو كتابة) على عناصر البيانات المطلوبة واحداً تلو الآخر.</li><li><b>مرحلة إلغاء القفل (الانكماش):</b> تقوم المعاملة بتحرير عناصر البيانات المقفلة واحداً تلو الآخر.</li></ol><p>الشرط الأساسي: خلال مرحلة القفل، يجب ألا تبدأ مرحلة إلغاء القفل، وخلال مرحلة إلغاء القفل، يجب ألا تبدأ مرحلة القفل.</p><p>يوجد نوعان من الأقفال: قفل مشترك (Shared/Read) وقفل حصري (Exclusive/Write). يمكن تحويل الأقفال عبر الترقية (Upgrade) من قراءة لكتابة، أو التخفيض (Downgrade) من كتابة لقراءة.</p><p><b>مثال عملي على التنفيذ التسلسلي:</b> بفرض القيم الأولية X=20 و Y=30.</p><ol><li><b>تنفيذ T1 ثم T2:</b> تقرأ T1 قيمة Y (30) وتضيفها إلى X لتصبح X=50. ثم تقرأ T2 قيمة X الجديدة (50) وتضيفها إلى Y لتصبح Y=80. النتيجة النهائية: X=50, Y=80.</li><li><b>تنفيذ T2 ثم T1:</b> تقرأ T2 قيمة X (20) وتضيفها إلى Y لتصبح Y=50. ثم تقرأ T1 قيمة Y الجديدة (50) وتضيفها إلى X لتصبح X=70. النتيجة النهائية: X=70, Y=50.</li></ol><p>يضمن بروتوكول 2PL أن أي تنفيذ متزامن سينتج إحدى هاتين النتيجتين الصحيحتين، ولن يسمح بتداخل يؤدي إلى نتائج غير متسقة.</p></template>
-    <template class="content-en"><p>Two-Phase Locking consists of two mutually exclusive phases:</p><ol><li><b>Locking (Growing) Phase:</b> A transaction applies locks (read or write) on desired data items one at a time.</li><li><b>Unlocking (Shrinking) Phase:</b> A transaction unlocks its locked data items one at a time.</li></ol><p>Requirement: During the locking phase, the unlocking phase must not start, and during the unlocking phase, the locking phase must not begin.</p><p>There are two lock modes: Shared (Read) and Exclusive (Write). Locks can be converted via Upgrade (read to write) or Downgrade (write to read).</p><p><b>Worked Example of Serial Execution:</b> Assuming initial values X=20 and Y=30.</p><ol><li><b>T1 followed by T2:</b> T1 reads Y (30) and adds it to X, making X=50. Then T2 reads the new X (50) and adds it to Y, making Y=80. Final result: X=50, Y=80.</li><li><b>T2 followed by T1:</b> T2 reads X (20) and adds it to Y, making Y=50. Then T1 reads the new Y (50) and adds it to X, making X=70. Final result: X=70, Y=50.</li></ol><p>The 2PL protocol guarantees that any concurrent execution will yield one of these two correct serial results, preventing inconsistent interleaving.</p></template>
+    <template class="content-ar"><p>يتكون القفل ثنائي الطور من مرحلتين حصريتين:</p><ol><li><b>مرحلة القفل (النمو):</b> تطبق المعاملة الأقفال (قراءة أو كتابة) على عناصر البيانات المطلوبة واحداً تلو الآخر.</li><li><b>مرحلة إلغاء القفل (الانكماش):</b> تقوم المعاملة بتحرير عناصر البيانات المقفلة واحداً تلو الآخر.</li></ol><p>الشرط الأساسي: خلال مرحلة القفل، يجب ألا تبدأ مرحلة إلغاء القفل، وخلال مرحلة إلغاء القفل، يجب ألا تبدأ مرحلة القفل.</p><p>يوجد نوعان من الأقفال: قفل مشترك (Shared/Read) وقفل حصري (Exclusive/Write). يمكن تحويل الأقفال عبر الترقية (Upgrade) من قراءة لكتابة، أو التخفيض (Downgrade) من كتابة لقراءة.</p><p><b>مثال عملي على التنفيذ التسلسلي:</b> بفرض القيم الأولية X=20 و Y=30.</p><ol><li><b>تنفيذ T1 ثم T2:</b> تقرأ T1 قيمة Y (30) وتضيفها إلى X لتصبح X=50. ثم تقرأ T2 قيمة X الجديدة (50) وتضيفها إلى Y لتصبح Y=80. النتيجة النهائية: X=50, Y=80.</li><li><b>تنفيذ T2 ثم T1:</b> تقرأ T2 قيمة X (20) وتضيفها إلى Y لتصبح Y=50. ثم تقرأ T1 قيمة Y الجديدة (50) وتضيفها إلى X لتصبح X=70. النتيجة النهائية: X=70, Y=50.</li></ol><p>يضمن بروتوكول 2PL أن أي تنفيذ متزامن سينتج إحدى هاتين النتيجتين الصحيحتين، ولن يسمح بتداخل يؤدي إلى نتائج غير متسقة.</p><p>لكي يعمل نظام الأقفال بشكل صحيح، يجب أن تكون جميع المعاملات <b>جيدة التكوين (Well-formed)</b>. تُعتبر <span class="smart-term" data-term-en="Well-formed Transaction" data-ar="معاملة جيدة التكوين" data-en-def="A transaction that correctly requests locks before access and does not perform redundant lock or unlock operations.">المعاملة جيدة التكوين<span class="smart-term-tooltip"></span></span> إذا التزمت بالقواعد التالية:</p><ul><li>يجب أن تطلب قفل عنصر البيانات قبل أن تقوم بقراءته أو كتابته.</li><li>يجب ألا تطلب قفل عنصر بيانات هو مقفل بالفعل بواسطتها.</li><li>يجب ألا تحاول تحرير (إلغاء قفل) عنصر بيانات غير مقفل.</li></ul><p>هذه القواعد تضمن أن المعاملة تتصرف بشكل منطقي ولا تتسبب في أخطاء برمجية لمدير الأقفال.</p></template>
+    <template class="content-en"><p>Two-Phase Locking consists of two mutually exclusive phases:</p><ol><li><b>Locking (Growing) Phase:</b> A transaction applies locks (read or write) on desired data items one at a time.</li><li><b>Unlocking (Shrinking) Phase:</b> A transaction unlocks its locked data items one at a time.</li></ol><p>Requirement: During the locking phase, the unlocking phase must not start, and during the unlocking phase, the locking phase must not begin.</p><p>There are two lock modes: Shared (Read) and Exclusive (Write). Locks can be converted via Upgrade (read to write) or Downgrade (write to read).</p><p><b>Worked Example of Serial Execution:</b> Assuming initial values X=20 and Y=30.</p><ol><li><b>T1 followed by T2:</b> T1 reads Y (30) and adds it to X, making X=50. Then T2 reads the new X (50) and adds it to Y, making Y=80. Final result: X=50, Y=80.</li><li><b>T2 followed by T1:</b> T2 reads X (20) and adds it to Y, making Y=50. Then T1 reads the new Y (50) and adds it to X, making X=70. Final result: X=70, Y=50.</li></ol><p>The 2PL protocol guarantees that any concurrent execution will yield one of these two correct serial results, preventing inconsistent interleaving.</p><p>For the locking system to work correctly, all transactions must be <b>well-formed</b>. A transaction is considered well-formed if it adheres to the following rules:</p><ul><li>It must lock the data item before it reads or writes to it.</li><li>It must not lock a data item that is already locked by itself.</li><li>It must not try to unlock a free (unlocked) data item.</li></ul><p>These rules ensure the transaction behaves logically and does not cause programmatic errors for the Lock Manager.</p></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -1226,6 +1226,24 @@ else if LOCK(X) = "read-locked" then
         </div>
       </div>
     </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا نهتم بأن تكون المعاملة 'جيدة التكوين'؟ ألا يمنع مدير الأقفال الأخطاء تلقائياً؟</template>
+          <template class="content-en">Why do we care if a transaction is 'well-formed'? Doesn't the Lock Manager prevent errors automatically?</template>
+          <span class="content-target">لماذا نهتم بأن تكون المعاملة 'جيدة التكوين'؟ ألا يمنع مدير الأقفال الأخطاء تلقائياً؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>مدير الأقفال ينظم الطلبات، لكنه يفترض أن المعاملات مبرمجة بشكل صحيح. إذا حاولت معاملة فك قفل لم تطلبه، أو قراءة بيانات دون قفلها، فهذا خلل في كود المعاملة نفسها سيؤدي إلى انهيار النظام أو تلف البيانات، بغض النظر عن مدى كفاءة مدير الأقفال.</p></template>
+          <template class="content-en"><p>The Lock Manager organizes requests, but it assumes transactions are programmed correctly. If a transaction tries to unlock something it didn't lock, or reads data without locking it, this is a flaw in the transaction's code that will lead to system crashes or data corruption, regardless of the Lock Manager's efficiency.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1617,7 +1635,7 @@ else if LOCK(X) = "read-locked" then
         <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
         <div id="quiz-content" class="quiz-card glass-card">
           <div class="quiz-header">
-            <span id="quiz-counter">1 / 11</span>
+            <span id="quiz-counter">1 / 12</span>
             <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
           </div>
           <div class="quiz-question" id="quiz-question-text"></div>
@@ -1633,7 +1651,7 @@ else if LOCK(X) = "read-locked" then
         </div>
         <div id="quiz-results" class="quiz-results glass-card hidden">
           <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-          <div class="score-display" id="quiz-score-display">0 / 11</div>
+          <div class="score-display" id="quiz-score-display">0 / 12</div>
           <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
         </div>
       </section>
@@ -1990,6 +2008,38 @@ else if LOCK(X) = "read-locked" then
     },
     "difficulty": "hard",
     "id": 11
+  },
+  {
+    "conceptId": "two-phase-locking",
+    "question": {
+      "ar": "أي من التصرفات التالية يجعل المعاملة غير جيدة التكوين (Not well-formed)؟",
+      "en": "Which of the following behaviors makes a transaction NOT well-formed?"
+    },
+    "options": {
+      "ar": [
+        "طلب قفل قراءة قبل قراءة البيانات.",
+        "تحرير قفل بعد الانتهاء من استخدام البيانات.",
+        "محاولة تحرير قفل لعنصر بيانات لم تقم المعاملة بقفله.",
+        "ترقية قفل قراءة إلى قفل كتابة."
+      ],
+      "en": [
+        "Requesting a read lock before reading the data.",
+        "Releasing a lock after finishing with the data.",
+        "Attempting to unlock a data item that the transaction has not locked.",
+        "Upgrading a read lock to a write lock."
+      ]
+    },
+    "correctIndex": 2,
+    "explanation": {
+      "ar": "المعاملة جيدة التكوين يجب ألا تحاول تحرير عنصر بيانات حر أو لم تقم هي بقفله، لأن هذا يعتبر خطأ منطقياً في إدارة الأقفال.",
+      "en": "A well-formed transaction must not try to unlock a free data item or one it hasn't locked, as this is a logical error in lock management."
+    },
+    "hint": {
+      "ar": "لا يمكنك إرجاع مفتاح لغرفة لم تفتحها.",
+      "en": "You can't return a key for a room you didn't open."
+    },
+    "difficulty": "easy",
+    "id": 12
   }
 ]
 </script>

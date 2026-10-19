@@ -30,6 +30,19 @@
       .catch(function () { index = {}; return index; });
   }
 
+  /*@3.SCPJ.133*/
+  var facts = null;
+  function loadFacts() {
+    if (facts) return facts;
+    function get(u) { return fetch(u).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); }
+    facts = Promise.all([get('../shared/data/study_minutes.json'), get('../data/quiz/index.json')]).then(function (a) {
+      return { min: (a[0] && a[0].courses) || {}, qi: (a[1] && a[1].courses) || {} };
+    });
+    return facts;
+  }
+  function factsSync() { return factsVal || { min: {}, qi: {} }; }
+  var factsVal = null;
+
   function loadMap(path) {
     if (maps[path]) return Promise.resolve(maps[path]);
     return fetch(MAP_BASE + path).then(function (r) { return r.json(); })
@@ -56,8 +69,26 @@
     });
   }
 
+  function enrich(code, list) {
+    var F = factsSync(), mins = F.min[code] || {}, q = F.qi[code];
+    var per = q && Array.isArray(q.per) ? q.per : [];
+    var mean = 0;
+    per.forEach(function (x) { mean += (x && x[0]) || 0; });
+    mean = per.length ? mean / per.length : 0;
+    list.forEach(function (m) {
+      var n = modNum(m.id);
+      if (mins[m.id]) m.minutes = mins[m.id];
+      if (mean && per[n - 1]) m.emph = Math.round(per[n - 1][0] / mean * 100) / 100;
+    });
+    if (q && window.GardenData && GardenData.useCourseIndex) { try { GardenData.useCourseIndex(code, q); } catch (e) {} }
+    return list;
+  }
   function loadModules(code) {
     if (modulesCache[code]) return Promise.resolve(modulesCache[code]);
+    return loadFacts().then(function (f) { factsVal = f; return loadModulesRaw(code); })
+      .then(function (list) { return enrich(code, list); });
+  }
+  function loadModulesRaw(code) {
     var own = ownModules(code);
     if (own) { modulesCache[code] = own; return Promise.resolve(own); }
     return loadIndex().then(function (idx) {
@@ -94,6 +125,7 @@
   }
 
   function modTitle(m) { return isAr() ? m.title : (m.title_en || m.title); }
+  function modMinutes(m) { return m.minutes || Math.round((m.hours || 2) * 60 * 0.2 / 5) * 5 || 45; }
   function modNum(id) { return parseInt(String(id).replace(/^M/i, ''), 10) || 0; }
   function modOf(code, mid) { return (modulesCache[code] || []).filter(function (m) { return m.id === mid; })[0] || null; }
 
@@ -166,7 +198,7 @@
     if (busyCache[dstr]) return busyCache[dstr];
     var out = [];
     try {
-      S.eventsOnDate(s2d(dstr)).forEach(function (e) {
+      S.eventsOnDate(s2d(dstr), { ignoreFilter: true }).forEach(function (e) {
         if (e.src === 'intensive') return;
         if (e.allDay || e.start == null) return;
         out.push({ s: e.start, e: (e.end != null ? e.end : e.start + 60) });
@@ -178,11 +210,22 @@
   }
   function clearBusy() { busyCache = {}; }
 
+  /*@3.SCPJ.134*/
+  function riskOf(code) {
+    try {
+      if (!window.GardenData) return 0.5;
+      var pr = GardenData.coursePrediction ? GardenData.coursePrediction(code) : null;
+      if (pr && pr.state === 'ready' && typeof pr.pass === 'number') return Math.max(0, Math.min(1, 1 - pr.pass));
+      var cp = GardenData.courseProgress ? GardenData.courseProgress(code) : null;
+      if (cp && cp.known) return Math.max(0, Math.min(1, 1 - cp.pct / 100 * 0.8));
+    } catch (e) {}
+    return 0.5;
+  }
   function dayEndHour() { var st = S.data().settings || {}; return st.day_end_hour || 23; }
   function engineCtx(extra) {
     var c = {
       today: todayStr(), nowMin: nowMin(), dayEndHour: dayEndHour(),
-      busyOn: busyOn, known: knownOf, mastered: isMastered
+      busyOn: busyOn, known: knownOf, mastered: isMastered, risk: riskOf
     };
     if (extra) Object.keys(extra).forEach(function (k) { c[k] = extra[k]; });
     return c;
@@ -215,7 +258,9 @@
       if (!s.module) return;
       var m = modOf(s.course, s.module);
       if (!m) return;
-      s.title = m.title; s.title_en = m.title_en;
+      var more = (s.also || []).map(function (id) { return modOf(s.course, id); }).filter(Boolean);
+      s.title = [m].concat(more).map(function (x) { return x.title; }).join(' · ');
+      s.title_en = [m].concat(more).map(function (x) { return x.title_en || x.title; }).join(' · ');
       var a = firstPoint(m, false), b = firstPoint(m, true);
       if (a) s.tip = a; else delete s.tip;
       if (b) s.tip_en = b; else delete s.tip_en;
@@ -224,6 +269,7 @@
   }
   function sessTitle(s) {
     var m = s.module ? modOf(s.course, s.module) : null;
+    if (m && s.also && s.also.length) return [m].concat(s.also.map(function (id) { return modOf(s.course, id); }).filter(Boolean)).map(modTitle).join(' · ');
     if (m) return modTitle(m);
     return isAr() ? (s.title || '') : (s.title_en || s.title || '');
   }
@@ -244,12 +290,14 @@
       cfg: {
         start_date: todayStr(),
         exam_dates: {},
+        exam_times: {},
+        exam_ends: {},
         courses: courses.slice(),
         modules: {},
         sessions_per_day: 2,
         session_minutes: 60,
         /*@3.SCPJ.58*/
-        parts_mode: 1,
+        parts_mode: 'auto',
         rest_days: ['friday', 'saturday'],
         spacing: 'off',                     /*@3.SCPJ.59*/
         review_mode: 'auto',
@@ -264,6 +312,7 @@
       editing: false,
       result: null
     };
+    applyPrefs(wizard.cfg);
     seedExamDates();
 
     /*@3.SCPJ.62*/
@@ -272,11 +321,14 @@
       wizard.editing = true;
       wizard.cfg.start_date = todayStr();
       wizard.cfg.exam_dates = clone(p.exam_dates);
+      wizard.cfg.exam_times = clone(p.exam_times || {});
+      wizard.cfg.exam_ends = clone(p.exam_ends || {});
       var live = S.data(), want = wizard.tab === 'midterm' ? 'midterm' : 'final';
       Object.keys(wizard.cfg.exam_dates).forEach(function (c) {
         var x = realExam(live, c, want);
         if (x && x.date && !x.plan_tab) wizard.cfg.exam_dates[c] = x.date;
       });
+      liveTimes(wizard.cfg, wizard.tab);
       wizard.cfg.courses = p.courses.filter(function (c) { return courses.indexOf(c) !== -1; });
       if (!wizard.cfg.courses.length) wizard.cfg.courses = courses.slice();
       ['modules', 'extra_reviews', 'window', 'day_caps'].forEach(function (k) { wizard.cfg[k] = clone(p[k]); });
@@ -291,6 +343,7 @@
     }
     /*@3.SCPJ.116*/
     wizard.shown = clone(wizard.cfg.exam_dates);
+    wizard.shownTimes = clone(wizard.cfg.exam_times);
 
     showWizard();
     loadModulesFor(courses).then(function (m) {
@@ -300,6 +353,48 @@
     });
   }
   function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  /*@3.SCPJ.124*/
+  var PREF_KEYS = ['sessions_per_day', 'session_minutes', 'parts_mode', 'rest_days', 'spacing', 'review_mode',
+                   'pace', 'max_course_day', 'avoid_conflicts', 'window'];
+  function lastPrefs() {
+    var st = store();
+    if (st.prefs && typeof st.prefs === 'object') return st.prefs;
+    var best = null;
+    Object.keys(st.plans).forEach(function (k) {
+      var q = st.plans[k];
+      if (q && (!best || String(q.updated_at || '') > String(best.updated_at || ''))) best = q;
+    });
+    if (!best) return null;
+    var out = {};
+    PREF_KEYS.forEach(function (k) { if (best[k] !== undefined) out[k] = k === 'spacing' ? (best.spacing_wanted || best.spacing) : best[k]; });
+    return out;
+  }
+  function applyPrefs(cfg) {
+    var pr = lastPrefs();
+    if (!pr) return;
+    PREF_KEYS.forEach(function (k) { if (pr[k] !== undefined && pr[k] !== null) cfg[k] = clone(pr[k]); });
+    if (!cfg.window || typeof cfg.window !== 'object') cfg.window = { start_time: DEFAULT_START };
+    if (!cfg.window.end_time) cfg.window.end_time = pad2(dayEndHour()) + ':00';
+  }
+  function savePrefs(cfg) {
+    var pr = {};
+    PREF_KEYS.forEach(function (k) { if (cfg[k] !== undefined) pr[k] = clone(cfg[k]); });
+    store().prefs = pr;
+  }
+  /*@3.SCPJ.125*/
+  function liveTimes(cfg, tab) {
+    var d = S.data(), want = tab === 'midterm' ? 'midterm' : 'final';
+    cfg.exam_times = cfg.exam_times || {};
+    cfg.exam_ends = cfg.exam_ends || {};
+    Object.keys(cfg.exam_dates || {}).forEach(function (c) {
+      var x = realExam(d, c, want);
+      if (!x || x.date !== cfg.exam_dates[c]) return;
+      if (x.start_time) { cfg.exam_times[c] = x.start_time; cfg.exam_ends[c] = x.end_time || ''; }
+      else { delete cfg.exam_times[c]; delete cfg.exam_ends[c]; }
+    });
+    return cfg;
+  }
 
   /*@3.SCPJ.63*/
   function focusOf(tab) {
@@ -327,6 +422,9 @@
       var x = realExam(d, c, wantType);
       if (x && x.date) wizard.cfg.exam_dates[c] = x.date;
     });
+    wizard.cfg.exam_times = {};
+    wizard.cfg.exam_ends = {};
+    liveTimes(wizard.cfg, wizard.tab);
     wizard.cfg.start_date = todayStr();
   }
 
@@ -343,12 +441,25 @@
 
   /*@3.SCPJ.65*/
   /*@3.SCPJ.112*/
+  function midOf(code, total) {
+    try {
+      var f = window.GardenData && GardenData.forecastScope ? GardenData.forecastScope(code) : null;
+      if (f && f.midSet && f.mid >= 1 && f.mid <= total) return f.mid;
+      var q = factsSync().qi[code];
+      if (q && q.mid >= 1 && q.mid < total) return q.mid;
+      if (f && f.mid >= 1 && f.mid <= total) return f.mid;
+    } catch (e) {}
+    return Math.min(6, total);
+  }
   function defaultSelectFor(code) {
     var list = wizard.mods[code] || [];
+    var prev = store().plans[wizard.tab];
+    var had = prev && prev.modules && Array.isArray(prev.modules[code]) && (prev.courses || []).indexOf(code) !== -1;
+    var mid = midOf(code, list.length);
     var sel = [];
     list.forEach(function (m) {
       var n = modNum(m.id);
-      if (wizard.tab === 'midterm' ? n <= 6 : n > 6) sel.push(m.id);
+      if (had ? prev.modules[code].indexOf(m.id) !== -1 : (wizard.tab === 'midterm' ? n <= mid : n > mid)) sel.push(m.id);
     });
     /*@3.SCPJ.66*/
     wizard.cfg.modules[code] = sel.filter(function (id) { return !isMastered(code, id); });
@@ -445,12 +556,24 @@
         S.courseColor(c) + '"></span><span class="ip-code">' + esc(S.courseShort(c)) + '</span></span>' +
         '<input type="date" class="sch-input ip-exam" data-code="' + esc(c) + '" value="' + ex + '"' + (on ? '' : ' disabled') +
         ' aria-label="' + esc(T('تاريخ اختبار ', 'Exam date for ') + S.courseShort(c)) + '">' +
+        examTimeHtml(c, on) +
         '<span class="ip-left' + (left != null && left <= 3 ? ' is-near' : '') + '">' + esc(tag) + '</span></div>';
     });
     h += '<p class="sch-editor-hint">' + T(
-      'التاريخ يُضاف إلى الجدول وصفحة المادة حدثاً لكامل اليوم حتى تحدّد ساعته. ومادّةٌ مضى اختبارُها تخرج من الخطة وحدَها.',
-      'Each date is added to the schedule and the course page as an all-day event until you set its hour. A course whose exam has passed leaves the plan on its own.') + '</p>';
+      'الساعةُ تُقرأ من الجدول وحدَها، وإن عرفتَها فاكتبها: يومُ الاختبار يصير لمراجعته قبله ولغيره بعده، ولا جلسةَ تقترب منه. والتاريخُ والساعةُ يُحفظان في الجدول. ومادّةٌ مضى اختبارُها تخرج من الخطة وحدَها.',
+      'The hour is read from your schedule; if you know it, set it: the exam day then holds its review before it and other courses after it, and no session comes near it. Date and hour are saved to the schedule. A course whose exam has passed leaves the plan on its own.') + '</p>';
     return h;
+  }
+
+  function examTimeHtml(c, on) {
+    var t = (wizard.cfg.exam_times || {})[c];
+    if (!t) {
+      return '<button type="button" class="sch-btn sch-btn-secondary sch-btn-xs ip-extime-add" data-extime="' + esc(c) + '"' + (on ? '' : ' disabled') + '>' +
+        '<i class="fa-solid fa-clock" aria-hidden="true"></i> ' + T('ساعته؟', 'Hour?') + '</button>';
+    }
+    return '<span class="ip-extime">' + timePick('ip-extime-' + c, t, T('ساعة اختبار ', 'Exam hour for ') + S.courseShort(c)) +
+      '<button type="button" class="ip-tiny" data-extime-clear="' + esc(c) + '" aria-label="' + esc(T('ساعةٌ مجهولة', 'Hour unknown')) + '"' +
+      ' data-ar-title="ساعةٌ مجهولة" data-en-title="Hour unknown"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></span>';
   }
 
   function weightOf(code, m) {
@@ -474,8 +597,9 @@
       var sel = wizard.cfg.modules[code] || [];
       var ws = list.map(function (m) { return weightOf(code, m); }).sort(function (a, b) { return b - a; });
       var cut = ws.length >= 3 ? ws[Math.max(0, Math.floor(ws.length / 3) - 1)] : 2;
-      var hrs = 0;
-      list.forEach(function (m) { if (sel.indexOf(m.id) !== -1) hrs += m.hours; });
+      var mins = 0;
+      list.forEach(function (m) { if (sel.indexOf(m.id) !== -1) mins += modMinutes(m); });
+      var hrs = Math.round(mins / 6) / 10;
       h += '<div class="ip-course"><div class="ip-course-head">' +
         '<span class="ip-dot" style="background:' + S.courseColor(code) + '"></span>' +
         '<b class="ip-code">' + esc(S.courseShort(code)) + '</b>' +
@@ -492,10 +616,11 @@
         var on = sel.indexOf(m.id) !== -1;
         var cls = st === 'mastered' ? 'is-mastered' : (on ? 'is-on' : 'is-off');
         var key = weightOf(code, m) >= cut && cut <= 1;
-        var hrs1 = m.hours + (isAr() ? ' س' : 'h');
+        var hrs1 = modMinutes(m) + (isAr() ? ' د' : 'm');
         h += '<button class="ip-mod ' + cls + '" data-code="' + esc(code) + '" data-mid="' + esc(m.id) + '" ' +
           'aria-label="' + esc(modNum(m.id) + ' · ' + modTitle(m) + ' · ' + (st === 'mastered' ? T('أتقنتُها', 'mastered') : on ? T('في الخطة', 'in the plan') : T('خارجها', 'out'))) + '" ' +
-          'title="' + esc(modTitle(m) + ' · ' + T('صعوبة', 'difficulty') + ' ' + m.difficulty + '/10 · ' + hrs1) + '">' +
+          'title="' + esc(modTitle(m) + ' · ' + T('صعوبة', 'difficulty') + ' ' + m.difficulty + '/10 · ' + hrs1 +
+            (m.emph ? ' · ' + T('وزنُها في أسئلة المراجعة ', 'weight in review questions ') + m.emph + '×' : '')) + '">' +
           '<span class="ip-mod-n">' + modNum(m.id) + (key ? ' <span class="ip-star" aria-hidden="true">★</span>' : '') + '</span>' +
           '<span class="ip-mod-t">' + esc(modTitle(m)) + '</span>' +
           '<span class="ip-mod-meta"><span class="ip-diff d' + Math.min(3, Math.ceil(m.difficulty / 3.5)) + '">' +
@@ -547,7 +672,7 @@
     h += '<div class="ip-card-grp"><div class="ip-grp-h"><i class="fa-solid fa-layer-group" aria-hidden="true"></i>' + T('التوزيع', 'Layout') + '</div>';
     /*@3.SCPJ.69*/
     h += '<label class="sch-label">' + T('جلساتٌ لكلِّ وحدة', 'Sessions per module') + '</label>' +
-      pills('parts', [[1, '1'], [2, '2'], [3, '3'], ['auto', T('حسب ساعاتها', 'By its hours')]], c.parts_mode);
+      pills('parts', [['auto', T('حسب محتواها', 'By its content')], [1, '1'], [2, '2'], [3, '3']], c.parts_mode);
     h += '<label class="sch-label">' + T('حدُّ المادّة الواحدة في اليوم', 'Max sessions of one course per day') + '</label>' +
       pills('mcd', [[0, T('تلقائيّ', 'Auto')], [1, '1'], [2, '2'], [3, '3']], c.max_course_day || 0);
     h += '<label class="sch-label">' + T('إيقاع التوزيع', 'Pace') + '</label>' +
@@ -617,6 +742,10 @@
       : T('لا يتّسع لكلِّ شيء', 'Not enough time for everything');
   }
   function modeText(d) {
+    if (d.urgent && (d.mode === 'triage' || d.mode === 'tight')) {
+      return T('اختبارٌ خلال يوم: الأقربُ موعداً أوّلاً، وآخرُ ما قبل كلِّ اختبارٍ مراجعتُه، ولا جلسةَ تزاحمه — وما لم يتّسع تراه أدناه بحلولٍ مجرَّبة.',
+        'An exam within a day: the nearest exam comes first, the last thing before each exam is its review, nothing crowds it — and what did not fit is below with tested fixes.');
+    }
     if (d.mode === 'relaxed') return T('وُزّعت الوحداتُ على المدّة وبقي آخرُها للمراجعة.', 'Modules are spread out and the last days are left for review.');
     if (d.mode === 'balanced') return T('الوحداتُ موزّعةٌ واليومُ السابق للاختبار للمراجعة.', 'Modules are spread out; the day before each exam is for review.');
     if (d.mode === 'tight') return T('قُدّمت الوحداتُ على المراجعة، فالمراجعةُ في ما بقي من وقت.', 'Modules come first; review only takes the time that is left.');
@@ -650,14 +779,24 @@
       h += '<p class="sch-editor-hint">' + esc(T('خرجت من الخطة لأن اختبارها مضى: ', 'Left out because their exam has passed: ') +
         d.passed.map(function (c) { return S.courseShort(c); }).join(' · ')) + '</p>';
     }
+    var noT = Object.keys(d.per_course).filter(function (c) { return d.per_course[c].no_time; })
+      .concat(d.today_no_time || []);
+    if (noT.length) {
+      h += '<div class="ip-hourhint"><span>' + esc(T('ساعةُ الاختبار مجهولة في ', 'Exam hour unknown for ') +
+        noT.map(function (c) { return S.courseShort(c); }).join(' · ') +
+        T(' — فيومُه لا يُستغلّ لمراجعته، وقد تقترب منه جلسة.', ' — so its day is not used for its review, and a session may sit close to it.')) + '</span>' +
+        '<button type="button" class="sch-btn sch-btn-secondary sch-btn-xs" id="ip-set-hours"><i class="fa-solid fa-clock" aria-hidden="true"></i> ' +
+        T('حدّد الساعات', 'Set the hours') + '</button></div>';
+    }
     h += '<div class="ip-pc">' + Object.keys(d.per_course).map(function (c) {
       var pc = d.per_course[c];
       return '<div class="ip-pc-row"><span class="ip-dot" style="background:' + S.courseColor(c) + '"></span>' +
         '<b class="ip-code">' + esc(S.courseShort(c)) + '</b>' +
-        '<span>' + esc(T(pc.placed + ' وحدة', pc.placed + ' modules')) + '</span>' +
+        '<span>' + esc(nMods(pc.placed)) + '</span>' +
         (pc.dropped ? '<span class="ip-warn">' + esc(T(pc.dropped + ' لم تتّسع', pc.dropped + ' left out')) + '</span>' : '') +
-        '<span class="ip-pc-r">' + (pc.buffer ? '<i class="fa-solid fa-rotate" aria-hidden="true"></i> ' + esc(T('مراجعة قبل الاختبار', 'pre-exam review')) : '') +
-        ' · ' + esc(shortDate(pc.exam)) + '</span></div>';
+        '<span class="ip-pc-r">' + (pc.review_at ? '<i class="fa-solid fa-rotate" aria-hidden="true"></i> ' +
+          esc(T('مراجعته ', 'review ') + dayShort(pc.review_at.date) + ' ' + S.fmtTime12(pc.review_at.time)) + ' · ' : '') +
+        '<i class="fa-solid fa-file-pen" aria-hidden="true"></i> ' + esc(shortDate(pc.exam) + (pc.exam_time ? ' ' + S.fmtTime12(pc.exam_time) : '')) + '</span></div>';
     }).join('') + '</div>';
     if (r.unplaced.length) {
       h += '<div class="sch-editor-subhead"><span>' + T('لم تتّسع', 'Did not fit') + '</span></div>' +
@@ -688,7 +827,7 @@
       h += '<p class="sch-editor-hint">' + esc(T('لم يبقَ وقتٌ لمراجعة ما قبل الاختبار في: ', 'No time was left for a pre-exam review in: ') +
         d.buffers.missed.map(function (c) { return S.courseShort(c); }).join(' · ')) + '</p>';
     }
-    h += '<div class="ip-preview">' + previewHtml(r.sessions) + '</div>';
+    h += '<div class="ip-preview">' + previewHtml(r.sessions, wizard.cfg) + '</div>';
     return h;
   }
   function stat(n, label, tone) {
@@ -711,12 +850,25 @@
     return Object.keys(seen).length;
   }
 
-  function previewHtml(sessions) {
+  function previewHtml(sessions, cfg) {
     var byDate = {};
     sessions.forEach(function (s) { (byDate[s.date] = byDate[s.date] || []).push(s); });
+    if (cfg) cfg.courses.forEach(function (c) {
+      var d = cfg.exam_dates[c];
+      if (d && d >= cfg.start_date) (byDate[d] = byDate[d] || []);
+    });
     return Object.keys(byDate).sort().map(function (d) {
+      var rows = byDate[d].concat(cfg ? examRows(cfg, d) : []).sort(function (a, b) {
+        return (a.start_time || '99').localeCompare(b.start_time || '99');
+      });
       return '<div class="ip-prev-day"><div class="ip-prev-date">' + esc(dayShort(d) + ' ' + shortDate(d)) + '</div>' +
-        byDate[d].map(function (s) {
+        rows.map(function (s) {
+          if (s.exam) {
+            return '<div class="ip-prev-item is-exam" style="--event-color:' + S.courseColor(s.course) + '">' +
+              '<span class="ip-prev-time">' + esc(s.start_time ? S.fmtTime12(s.start_time) : T('ساعةٌ مجهولة', 'hour unknown')) + '</span>' +
+              '<span class="ip-prev-course">' + esc(S.courseShort(s.course)) + '</span>' +
+              '<span class="ip-prev-mod"><i class="fa-solid fa-file-pen" aria-hidden="true"></i> ' + esc(T('الاختبار', 'Exam')) + '</span></div>';
+          }
           return '<div class="ip-prev-item" style="--event-color:' + S.courseColor(s.course) + '">' +
             '<span class="ip-prev-time">' + esc(S.fmtTime12(s.start_time)) + '</span>' +
             '<span class="ip-prev-course">' + esc(S.courseShort(s.course)) + '</span>' +
@@ -725,12 +877,27 @@
     }).join('');
   }
 
-  function sessionLabel(s) {
-    if (s.kind === 'buffer') return T('مراجعة ما قبل الاختبار', 'Pre-exam review');
+  function sessionLabel(s, p) {
+    if (s.kind === 'buffer') return reviewLabel(s, p);
     if (s.kind === 'spaced') return T('مراجعة · وحدة ' + modNum(s.module), 'Review · module ' + modNum(s.module));
-    var base = T('الوحدة ' + modNum(s.module), 'Module ' + modNum(s.module));
+    var nums = [modNum(s.module)].concat((s.also || []).map(modNum));
+    var base = nums.length > 1 ? T('الوحدات ' + nums.join(' و'), 'Modules ' + nums.join(' + ')) : T('الوحدة ' + modNum(s.module), 'Module ' + modNum(s.module));
     if (s.total_parts > 1) base += ' · ' + T('الجلسة ' + s.part + ' من ' + s.total_parts, 'session ' + s.part + ' of ' + s.total_parts);
     return base;
+  }
+
+  /*@3.SCPJ.127*/
+  function reviewLabel(s, p) {
+    if (s.review === 'practice') return T('اختبارٌ تجريبيّ', 'Practice test');
+    var ex = p && p.exam_dates ? p.exam_dates[s.course] : (wizard && wizard.cfg ? wizard.cfg.exam_dates[s.course] : '');
+    if (ex && s.date === ex) return T('تسخينٌ قبل الاختبار', 'Pre-exam warm-up');
+    return T('مراجعة ما قبل الاختبار', 'Pre-exam review');
+  }
+  function examRows(cfg, d) {
+    return (cfg.courses || []).filter(function (c) { return cfg.exam_dates[c] === d; }).map(function (c) {
+      var t = (cfg.exam_times || {})[c] || '';
+      return { exam: true, course: c, start_time: t };
+    });
   }
 
   function captureStepDates() {
@@ -742,6 +909,9 @@
       var c = i.getAttribute('data-code');
       if (i.value) wizard.cfg.exam_dates[c] = i.value;
       else delete wizard.cfg.exam_dates[c];
+    });
+    box.querySelectorAll('.ip-extime input[type=hidden]').forEach(function (i) {
+      if (i.value) wizard.cfg.exam_times[i.id.slice(10)] = i.value;
     });
   }
   function keepTimes() {
@@ -783,6 +953,7 @@
       renderWizard();
     });
     bind('ip-save', function () { commitPlan(); });
+    bind('ip-set-hours', function () { wizard.step = 1; wizard.result = null; renderWizard(); });
     bind('ip-reset', resetSelection);
 
     box.querySelectorAll('[data-ipinc]').forEach(function (b) {
@@ -800,6 +971,22 @@
     });
     box.querySelectorAll('.ip-exam').forEach(function (i) {
       i.addEventListener('change', function () { captureStepDates(); renderWizard(); });
+    });
+    box.querySelectorAll('[data-extime]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        captureStepDates();
+        wizard.cfg.exam_times[this.getAttribute('data-extime')] = '09:00';
+        renderWizard();
+      });
+    });
+    box.querySelectorAll('[data-extime-clear]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        captureStepDates();
+        var c = this.getAttribute('data-extime-clear');
+        delete wizard.cfg.exam_times[c];
+        delete wizard.cfg.exam_ends[c];
+        renderWizard();
+      });
     });
     box.querySelectorAll('[data-ptab]').forEach(function (b) {
       b.addEventListener('click', function () {
@@ -938,6 +1125,8 @@
       updated_at: new Date().toISOString(),
       start_date: cfg.start_date,
       exam_dates: clone(cfg.exam_dates),
+      exam_times: clone(cfg.exam_times || {}),
+      exam_ends: clone(cfg.exam_ends || {}),
       courses: cfg.courses.slice(),
       modules: clone(cfg.modules),
       sessions_per_day: cfg.sessions_per_day,
@@ -967,8 +1156,10 @@
     if (!r || !r.ok) return;
     var st = store();
     st.plans[wizard.tab] = planFromCfg(wizard.cfg, r, st.plans[wizard.tab]);
+    savePrefs(wizard.cfg);
+    if (wizard.tab === 'midterm') saveMidScope(wizard.cfg);
     /*@3.SCPJ.81*/
-    syncExamEvents(wizard.tab, wizard.cfg.exam_dates);
+    syncExamEvents(wizard.tab, wizard.cfg.exam_dates, wizard.cfg.exam_times);
     st.active = wizard.tab;
     activeTab = wizard.tab;
     persist();
@@ -978,8 +1169,25 @@
     openPanel();
   }
 
+  /*@3.SCPJ.126*/
+  function saveMidScope(cfg) {
+    if (!window.GardenData || !GardenData.setMidtermModules) return;
+    cfg.courses.forEach(function (code) {
+      var list = wizard.mods[code] || [];
+      var sel = cfg.modules[code] || [];
+      var k = 0;
+      list.forEach(function (m) { if (sel.indexOf(m.id) !== -1 || isMastered(code, m.id)) k = Math.max(k, modNum(m.id)); });
+      if (!k || k >= list.length) return;
+      for (var n = 1; n <= k; n++) {
+        var m = list.filter(function (x) { return modNum(x.id) === n; })[0];
+        if (!m || (sel.indexOf(m.id) === -1 && !isMastered(code, m.id))) return;
+      }
+      if (k !== midOf(code, list.length)) { try { GardenData.setMidtermModules(code, k); } catch (e) {} }
+    });
+  }
+
   /*@3.SCPJ.82*/
-  function syncExamEvents(tab, examDates) {
+  function syncExamEvents(tab, examDates, examTimes) {
     var d = S.data();
     if (!Array.isArray(d.exams)) d.exams = [];
     var type = tab === 'midterm' ? 'midterm' : 'final';
@@ -989,15 +1197,22 @@
       if (!date) return;
       var found = realExam(d, code, type);
 
+      var t = examTimes ? (examTimes[code] || '') : null;
       if (found) {
         var shown = (wizard && wizard.shown) ? wizard.shown[code] : undefined;
         if (found.date !== date && date !== shown) found.date = date;
+        var shownT = (wizard && wizard.shownTimes) ? (wizard.shownTimes[code] || '') : undefined;
+        if (t !== null && t !== shownT && t !== (found.start_time || '')) {
+          found.start_time = t;
+          found.all_day = !t;
+          if (!t) found.end_time = '';
+        }
         return;                                  /*@3.SCPJ.83*/
       }
       d.exams.push({
         id: 'exam_ip_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
         course_code: code, date: date,
-        start_time: '', end_time: '', all_day: true,
+        start_time: t || '', end_time: '', all_day: !t,
         exam_type: type, room: '', notes: '', plan_tab: tab
       });
     });
@@ -1081,7 +1296,8 @@
   }
   function cfgOfPlan(p) {
     return {
-      start_date: p.start_date, exam_dates: p.exam_dates, courses: p.courses, modules: p.modules,
+      start_date: p.start_date, exam_dates: p.exam_dates, exam_times: p.exam_times || {}, exam_ends: p.exam_ends || {},
+      courses: p.courses, modules: p.modules,
       sessions_per_day: p.sessions_per_day, session_minutes: p.session_minutes, parts_mode: p.parts_mode,
       rest_days: p.rest_days, spacing: p.spacing_wanted || p.spacing || 'off', review_mode: p.review_mode,
       pace: p.pace, max_course_day: p.max_course_day || 0, avoid_conflicts: p.avoid_conflicts !== false,
@@ -1100,13 +1316,15 @@
   var moving = false;
   var undoStack = [];
   var toastT = null;
+  var addFor = null;            /*@3.SCPJ.128*/
+  var addCourse = null;
 
   function openPanel(opts) {
     var ov = document.getElementById('modal-plan-panel');
     if (!ov) return;
     activeTab = store().active || activeTab;
     panelView = 'main'; editingSession = null; cardFor = null;
-    sel = {}; selectMode = false; moving = false;
+    sel = {}; selectMode = false; moving = false; addFor = null;
     if (opts && opts.tab) panelTab = opts.tab;
     clearBusy();
     var codes = [];
@@ -1131,6 +1349,10 @@
   function nDays(n) {
     if (window.Garden && window.Garden.smartCount) return window.Garden.smartCount(n, ['يوم', 'يومان', 'أيام'], ['day', 'days']);
     return n + ' ' + T('يوماً', 'days');
+  }
+  function nMods(n) {
+    if (window.Garden && window.Garden.smartCount) return window.Garden.smartCount(n, ['وحدة', 'وحدتان', 'وحدات'], ['module', 'modules']);
+    return n + ' ' + T('وحدة', 'modules');
   }
   function nSessions(n) {
     if (window.Garden && window.Garden.smartCount) {
@@ -1277,7 +1499,7 @@
     var h = subnav(T('اليوم والوقت', 'Day & time'));
     h += '<div class="ip-note">' +
       '<span class="ip-dot" style="background:' + S.courseColor(s.course) + '"></span> ' +
-      esc(S.courseShort(s.course)) + ' · ' + esc(sessionLabel(s)) + '</div>';
+      esc(S.courseShort(s.course)) + ' · ' + esc(sessionLabel(s, p)) + '</div>';
     var dMax = sessionDateMax(p, s);
     h += '<label class="sch-label" for="ip-se-date">' + T('اليوم', 'Day') + '</label>' +
       '<input type="date" class="sch-input" id="ip-se-date" value="' + esc(s.date) + '"' +
@@ -1411,18 +1633,27 @@
   }
   function examsOn(p, d) { return p.courses.filter(function (c) { return p.exam_dates[c] === d; }); }
 
-  function chipHtml(s, p) {
+  /*@3.SCPJ.132*/
+  function isLate(s, p) {
     var ex = p.exam_dates[s.course];
-    var late = ex && s.date >= ex;
+    if (!ex || s.date < ex) return false;
+    if (s.date > ex) return true;
+    var t = (p.exam_times || {})[s.course];
+    var m = /^(\d{1,2}):(\d{2})/.exec(s.start_time || ''), e = /^(\d{1,2}):(\d{2})/.exec(t || '');
+    if (!m || !e) return true;
+    return (+m[1]) * 60 + (+m[2]) + (s.minutes || 60) > (+e[1]) * 60 + (+e[2]);
+  }
+  function chipHtml(s, p) {
+    var late = isLate(s, p);
     var cls = 'ip-chip k-' + (s.kind || 'study') + (s.done ? ' is-done' : '') + (sel[s.id] ? ' is-sel' : '') +
       (late ? ' is-late' : '') + (s.locked ? ' is-locked' : '');
-    var t = s.kind === 'buffer' ? T('مراجعة قبل الاختبار', 'Pre-exam review') : (sessTitle(s) || sessionLabel(s));
-    var lab = S.courseShort(s.course) + ' · ' + sessionLabel(s) + (t ? ' · ' + t : '') + (s.start_time ? ' · ' + S.fmtTime12(s.start_time) : '');
+    var t = s.kind === 'buffer' ? reviewLabel(s, p) : (sessTitle(s) || sessionLabel(s, p));
+    var lab = S.courseShort(s.course) + ' · ' + (s.kind === 'buffer' ? t : sessionLabel(s, p) + (t ? ' · ' + t : '')) + (s.start_time ? ' · ' + S.fmtTime12(s.start_time) : '');
     return '<button type="button" class="' + cls + '" data-sid="' + esc(s.id) + '" style="--chip-color:' + S.courseColor(s.course) + '"' +
       ' aria-pressed="' + (sel[s.id] ? 'true' : 'false') + '" aria-label="' + esc(lab) + '" title="' + esc(lab) + '">' +
       '<span class="ip-chip-c">' + esc(S.courseShort(s.course)) + '</span>' +
-      '<span class="ip-chip-n">' + (s.kind === 'buffer' ? '<i class="fa-solid fa-flag-checkered" aria-hidden="true"></i>'
-        : s.kind === 'spaced' ? '<i class="fa-solid fa-rotate" aria-hidden="true"></i>' + modNum(s.module) : 'M' + modNum(s.module)) + '</span>' +
+      '<span class="ip-chip-n">' + (s.kind === 'buffer' ? '<i class="fa-solid ' + (s.review === 'practice' ? 'fa-pen-to-square' : 'fa-flag-checkered') + '" aria-hidden="true"></i>'
+        : s.kind === 'spaced' ? '<i class="fa-solid fa-rotate" aria-hidden="true"></i>' + modNum(s.module) : 'M' + [modNum(s.module)].concat((s.also || []).map(modNum)).join('+')) + '</span>' +
       '<span class="ip-chip-t">' + esc(t) + '</span>' +
       (s.key ? '<span class="ip-star" aria-hidden="true">★</span>' : '') +
       (s.done ? '<i class="fa-solid fa-check ip-chip-ok" aria-hidden="true"></i>' : '') +
@@ -1478,7 +1709,11 @@
             '<button type="button" class="ip-cell-load" data-act="daycap" data-date="' + d + '"' +
               ' aria-label="' + esc(T('سعة ' + dayShort(d) + ' ' + shortDate(d) + ': ' + list.length + ' من ' + cap + ' — غيّرها', dayShort(d) + ' ' + shortDate(d) + ' capacity: ' + list.length + ' of ' + cap + ' — change it')) + '">' +
               (cap === 0 && !list.length ? esc(T('راحة', 'rest')) : list.length + '/' + cap) +
-              (p.day_caps[d] != null ? ' <i class="fa-solid fa-lock" aria-hidden="true"></i>' : '') + '</button></div>';
+              (p.day_caps[d] != null ? ' <i class="fa-solid fa-lock" aria-hidden="true"></i>' : '') + '</button>' +
+            (d >= today ? '<button type="button" class="ip-cell-add" data-act="add" data-date="' + d + '"' +
+              ' aria-label="' + esc(T('أضف جلسةً يومَ ' + dayShort(d) + ' ' + shortDate(d), 'Add a session on ' + dayShort(d) + ' ' + shortDate(d))) + '"' +
+              ' data-ar-title="أضف جلسة" data-en-title="Add a session"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>' : '') +
+            '</div>';
           exs.forEach(function (c) {
             h += '<div class="ip-exam-tag" style="--chip-color:' + S.courseColor(c) + '"><i class="fa-solid fa-file-pen" aria-hidden="true"></i> ' +
               esc(T('اختبار ', 'Exam · ') + S.courseShort(c)) + '</div>';
@@ -1496,7 +1731,100 @@
 
   function selIds() { return Object.keys(sel).filter(function (k) { return sel[k]; }); }
 
+  /*@3.SCPJ.129*/
+  function addBarHtml(p) {
+    var d = addFor;
+    var codes = p.courses.filter(function (c) { var ex = p.exam_dates[c]; return !ex || d < ex; });
+    if (!addCourse || codes.indexOf(addCourse) === -1) addCourse = codes[0] || null;
+    var h = '<div class="ip-selbar ip-addbar" role="toolbar" aria-label="' + esc(T('أضف جلسة', 'Add a session')) + '">' +
+      '<b>' + esc(T('أضف إلى ' + dayShort(d) + ' ' + shortDate(d), 'Add to ' + dayShort(d) + ' ' + shortDate(d))) + '</b>';
+    if (!codes.length) {
+      return h + '<span class="sch-editor-hint">' + esc(T('اختباراتُ موادِّ الخطة كلُّها في هذا اليوم أو قبله.', 'Every course in the plan has its exam on or before this day.')) + '</span>' +
+        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="add-close">' + T('إغلاق', 'Close') + '</button></div>';
+    }
+    h += '<div class="ip-pills ip-add-courses">' + codes.map(function (c) {
+      var on = c === addCourse;
+      return '<button type="button" class="ip-pill' + (on ? ' active' : '') + '" aria-pressed="' + on + '" data-act="add-course" data-code="' + esc(c) + '">' +
+        '<span class="ip-dot" style="background:' + S.courseColor(c) + '"></span> <span class="ip-code">' + esc(S.courseShort(c)) + '</span></button>';
+    }).join('') + '</div>';
+    var mods = modulesCache[addCourse] || [];
+    var inPlan = (p.modules || {})[addCourse] || [];
+    var placed = {};
+    p.sessions.forEach(function (x) { if (x.course === addCourse && x.kind === 'study' && x.module) placed[x.module] = 1; });
+    h += '<div class="ip-pills ip-add-mods">' +
+      '<button type="button" class="ip-pill" data-act="add-pick" data-kind="buffer"><i class="fa-solid fa-flag-checkered" aria-hidden="true"></i> ' + T('مراجعة', 'Review') + '</button>' +
+      '<button type="button" class="ip-pill" data-act="add-pick" data-kind="practice"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> ' + T('اختبارٌ تجريبيّ', 'Practice test') + '</button>' +
+      '<span class="ip-add-l">' + esc(T('أو وحدة:', 'or a module:')) + '</span>' +
+      mods.map(function (m) {
+        var want = !placed[m.id] && inPlan.indexOf(m.id) !== -1 && !isMastered(addCourse, m.id);
+        var hint = isMastered(addCourse, m.id) ? T('أتقنتُها', 'mastered') : placed[m.id] ? T('موزّعة', 'scheduled') : inPlan.indexOf(m.id) !== -1 ? T('لم تُوزَّع', 'not scheduled') : T('خارج الخطة', 'outside the plan');
+        return '<button type="button" class="ip-pill' + (want ? ' is-want' : '') + '" data-act="add-pick" data-kind="study" data-mid="' + esc(m.id) + '"' +
+          ' aria-label="' + esc(T('الوحدة ', 'Module ') + modNum(m.id) + ' · ' + modTitle(m) + ' · ' + hint) + '" title="' + esc(modTitle(m) + ' · ' + hint) + '">' +
+          modNum(m.id) + '</button>';
+      }).join('') + '</div>' +
+      '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="add-close">' + T('إغلاق', 'Close') + '</button></div>';
+    return h;
+  }
+  function addSession(kind, mid) {
+    var p = curPlan();
+    if (!p || !addFor || !addCourse) return;
+    snapshot(p);
+    var s = {
+      id: 'ip_' + addFor.replace(/-/g, '') + '_a_' + Math.random().toString(36).slice(2, 7),
+      date: addFor, order: 99, course: addCourse, module: kind === 'study' ? mid : null, part: 1, total_parts: 1,
+      kind: kind === 'study' ? 'study' : 'buffer', start_time: '', minutes: p.session_minutes, done: false, note: '', prio: 0.5, locked: true
+    };
+    if (kind !== 'study') s.review = kind === 'practice' ? 'practice' : 'final';
+    if (kind === 'study') {
+      var u = p.unplaced.filter(function (x) { return x.course === addCourse && x.module === mid; })[0];
+      if (u) { s.prio = u.prio; p.unplaced.splice(p.unplaced.indexOf(u), 1); }
+    }
+    decorate([s]);
+    p.sessions.push(s);
+    var date = addFor;
+    relayDays(p, [date]);
+    var when = dayShort(date) + ' ' + shortDate(date) + (s.start_time ? ' · ' + S.fmtTime12(s.start_time) : '');
+    commitOp(p, T('أُضيفت جلسةٌ يومَ ' + when + '.', 'Session added on ' + when + '.'));
+  }
+
+  function dayList(p, date) {
+    return p.sessions.filter(function (x) { return x.date === date; }).sort(function (a, b) {
+      return (a.start_time || '').localeCompare(b.start_time || '') || a.order - b.order;
+    });
+  }
+  function nudge(id, n) {
+    var p = curPlan();
+    var s = p && p.sessions.filter(function (x) { return x.id === id; })[0];
+    if (!s) return;
+    var list = dayList(p, s.date);
+    var i = list.indexOf(s), j = i + n;
+    if (j < 0 || j >= list.length) {
+      toast(n < 0 ? T('هي أوّلُ جلسات يومها.', 'It is already the first of its day.') : T('هي آخرُ جلسات يومها.', 'It is already the last of its day.'));
+      return;
+    }
+    moveTo([id], s.date, j, true);
+  }
+  function swapTwo(a, b) {
+    var p = curPlan();
+    if (!p) return;
+    var x = p.sessions.filter(function (q) { return q.id === a; })[0], y = p.sessions.filter(function (q) { return q.id === b; })[0];
+    if (!x || !y) return;
+    var ex = p.exam_dates[x.course], ey = p.exam_dates[y.course];
+    if ((ex && y.date >= ex) || (ey && x.date >= ey)) {
+      toast(T('لا تبديل: إحداهما تصير يومَ اختبار مادّتها أو بعده.', 'No swap: one would land on or after its exam.'));
+      return;
+    }
+    snapshot(p);
+    var d = x.date, o = x.order, t = x.start_time;
+    x.date = y.date; x.order = y.order; x.start_time = y.start_time;
+    y.date = d; y.order = o; y.start_time = t;
+    [x, y].forEach(function (q) { q.locked = true; delete q.time_locked; });
+    relayDays(p, [x.date, y.date]);
+    commitOp(p, T('بُدّلت الجلستان.', 'The two sessions were swapped.'));
+  }
+
   function selBarHtml(p) {
+    if (addFor) return addBarHtml(p);
     var ids = selIds();
     if (!ids.length && !moving) return '';
     var trayN = ids.filter(function (k) { return k.charAt(0) === 'u'; }).length;
@@ -1509,6 +1837,13 @@
     }
     h += '<b>' + esc(T(ids.length + ' محدّدة', ids.length + ' selected')) + '</b>' +
       '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="move"><i class="fa-solid fa-arrows-up-down-left-right" aria-hidden="true"></i> ' + T('انقل إلى…', 'Move to…') + '</button>';
+    if (sessN === 1 && !trayN) {
+      h += '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="nudge" data-n="-1"><i class="fa-solid fa-arrow-up" aria-hidden="true"></i> ' + T('أبكر في يومها', 'Earlier that day') + '</button>' +
+        '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="nudge" data-n="1"><i class="fa-solid fa-arrow-down" aria-hidden="true"></i> ' + T('أخّر في يومها', 'Later that day') + '</button>';
+    }
+    if (sessN === 2 && !trayN) {
+      h += '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="swap"><i class="fa-solid fa-right-left" aria-hidden="true"></i> ' + T('بدّل بينهما', 'Swap them') + '</button>';
+    }
     if (sessN) {
       h += '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="shift" data-n="-1">' + T('يوم −1', 'Day −1') + '</button>' +
         '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-act="shift" data-n="1">' + T('يوم +1', 'Day +1') + '</button>' +
@@ -1560,7 +1895,7 @@
     }
 
     var mode = (p.diagnostics && p.diagnostics.mode) || '';
-    var lateN = p.sessions.filter(function (s) { var ex = p.exam_dates[s.course]; return ex && s.date >= ex; }).length;
+    var lateN = p.sessions.filter(function (s) { return isLate(s, p); }).length;
     h += '<div class="ip-state">' + (mode ? '<span class="ip-mode m-' + mode + '">' + esc(modeLabel(mode)) + '</span> ' : '') + esc(stateText(p)) +
       (lateN ? ' <span class="ip-warn">' + esc(T(nSessions(lateN) + ' بعد اختبار مادّتها', nSessions(lateN) + ' after their exam')) + '</span>' : '') + '</div>';
 
@@ -1582,8 +1917,8 @@
       }
       h += boardHtml(p);
       h += '<p class="sch-editor-hint ip-board-hint">' + T(
-        'اضغط الجلسة لتفتح بطاقتها · Ctrl أو Shift مع الضغط لتحديد عدّة · اسحبها بالفأرة إلى يومٍ آخر · وباللمس اضغط مطوّلاً لتبدأ التحديد.',
-        'Tap a session to open its card · Ctrl or Shift-click to select several · drag with the mouse to another day · on touch, long-press to start selecting.') + '</p>';
+        'اضغط الجلسة لتفتح بطاقتها · Ctrl أو Shift لتحديد عدّة · اسحبها إلى يومٍ آخر أو بين جلسات يومها لترتيبها · «＋» يضيف جلسةً لليوم · حدّد جلسةً لتقدّمها أو تؤخّرها في يومها، وجلستين لتبدّل بينهما · Alt مع الأسهم من لوحة المفاتيح · وباللمس اضغط مطوّلاً لتبدأ التحديد.',
+        'Tap a session to open its card · Ctrl or Shift to select several · drag it to another day, or between its day\'s sessions to reorder · "+" adds a session to a day · select one session to move it earlier or later in its day, or two to swap them · Alt + arrow keys on a keyboard · on touch, long-press to start selecting.') + '</p>';
     } else if (panelTab === 'today') {
       h += '<div id="ip-today-cards"></div>';
     } else {
@@ -1662,6 +1997,7 @@
   function commitOp(p, msg) {
     sel = {};
     moving = false;
+    addFor = null;
     persist(); S.render(); renderPanel();
     if (msg) toast(msg, true);
   }
@@ -1676,19 +2012,22 @@
     return s;
   }
 
-  function moveTo(ids, date) {
+  function moveTo(ids, date, index, keepSel) {
     var p = curPlan();
     if (!p) return;
     snapshot(p);
     var touched = [date], moved = 0, blocked = 0;
-    var trayIdx = [];
+    var trayIdx = [], landed = [], sameDay = 0;
+    var reorder = typeof index === 'number';
     ids.forEach(function (id) {
       if (id.charAt(0) === 'u') {
         var u = p.unplaced[parseInt(id.slice(1), 10)];
         if (!u) return;
         var ex = p.exam_dates[u.course];
         if (ex && date >= ex) { blocked++; return; }
-        p.sessions.push(makeSession(u, date, p));
+        var ns = makeSession(u, date, p);
+        p.sessions.push(ns);
+        landed.push(ns);
         trayIdx.push(parseInt(id.slice(1), 10));
         moved++;
         return;
@@ -1697,21 +2036,34 @@
       if (!s) return;
       var ex2 = p.exam_dates[s.course];
       if (ex2 && date >= ex2) { blocked++; return; }
-      if (s.date === date) return;
+      if (s.date === date && !reorder) return;
+      if (s.date === date) sameDay++;
       touched.push(s.date);
       s.date = date; s.locked = true; s.order = 99;
       if (s.time_locked) delete s.time_locked;
+      landed.push(s);
       moved++;
     });
     p.unplaced = p.unplaced.filter(function (u, i) { return trayIdx.indexOf(i) === -1; });
+    if (reorder && landed.length) {
+      var rest = dayList(p, date).filter(function (x) { return landed.indexOf(x) === -1; });
+      var at = Math.max(0, Math.min(rest.length, index));
+      rest.splice.apply(rest, [at, 0].concat(landed));
+      rest.forEach(function (x, i) {
+        x.order = i;
+        if (!x.done && x.time_locked && i >= at) delete x.time_locked;
+      });
+    }
     relayDays(p, touched);
     if (!moved) {
       undoStack.pop(); sel = {}; moving = false; renderPanel();
       if (blocked) toast(T('لم تُنقل: ' + dayShort(date) + ' ' + shortDate(date) + ' يومُ اختبار مادّتها أو بعده.', 'Not moved: ' + dayShort(date) + ' ' + shortDate(date) + ' is on or after its exam.'));
       return;
     }
-    commitOp(p, T('نُقلت ' + nSessions(moved) + ' إلى ' + dayShort(date) + ' ' + shortDate(date) + '.', 'Moved ' + nSessions(moved) + ' to ' + dayShort(date) + ' ' + shortDate(date) + '.') +
+    var keep = keepSel ? clone(sel) : null;
+    commitOp(p, (keepSel || sameDay === moved ? T('رُتّبت في يومها.', 'Reordered within its day.') : T('نُقلت ' + nSessions(moved) + ' إلى ' + dayShort(date) + ' ' + shortDate(date) + '.', 'Moved ' + nSessions(moved) + ' to ' + dayShort(date) + ' ' + shortDate(date) + '.')) +
       (blocked ? ' ' + T(blocked + ' لم تُنقل: اليومُ بعد اختبار مادّتها.', blocked + ' not moved: that day is after their exam.') : ''));
+    if (keep) { sel = keep; selectMode = true; renderPanel(); }
   }
 
   function shiftBy(ids, n) {
@@ -1794,6 +2146,9 @@
       snapshot(p);
       var keep = p.sessions.filter(function (s) { return s.done || (s.locked && s.date >= today); });
       var skip = p.unplaced.filter(function (u) { return u.reason === 'manual'; });
+      p.exam_times = p.exam_times || {};
+      p.exam_ends = p.exam_ends || {};
+      liveTimes(p, activeTab);
       var cfg = cfgOfPlan(p);
       cfg.start_date = today > p.start_date ? today : p.start_date;
       var r = E.compute(cfg, mods, engineCtx({ keep: keep, skip: skip }), { noAdvice: true });
@@ -1903,8 +2258,22 @@
     if (a === 'clear') { sel = {}; selectMode = false; renderPanel(); return; }
     if (a === 'cancel-move') { moving = false; renderPanel(); return; }
     if (a === 'daycap') { capMenu(el); return; }
+    if (a === 'add') {
+      var ad = el.getAttribute('data-date');
+      addFor = addFor === ad ? null : ad;
+      sel = {}; moving = false;
+      var pp = curPlan();
+      if (pp && addFor) loadModulesFor(pp.courses).then(function () { if (addFor) renderPanel(); });
+      renderPanel();
+      return;
+    }
+    if (a === 'add-close') { addFor = null; renderPanel(); return; }
+    if (a === 'add-course') { addCourse = el.getAttribute('data-code'); renderPanel(); return; }
+    if (a === 'add-pick') { addSession(el.getAttribute('data-kind'), el.getAttribute('data-mid')); return; }
     if (!ids.length) return;
     if (a === 'move') { moving = true; renderPanel(); return; }
+    if (a === 'nudge') { nudge(ids[0], parseInt(el.getAttribute('data-n'), 10)); return; }
+    if (a === 'swap') { var two = ids.filter(function (k) { return k.charAt(0) !== 'u'; }); if (two.length === 2) swapTwo(two[0], two[1]); return; }
     if (a === 'shift') { shiftBy(ids.filter(function (k) { return k.charAt(0) !== 'u'; }), parseInt(el.getAttribute('data-n'), 10)); return; }
     if (a === 'tray') { toTray(ids.filter(function (k) { return k.charAt(0) !== 'u'; })); return; }
     if (a === 'done') { setDoneIds(ids.filter(function (k) { return k.charAt(0) !== 'u'; })); return; }
@@ -1974,9 +2343,19 @@
     });
 
     box.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape' && (moving || selIds().length)) {
+      if (e.key === 'Escape' && (moving || addFor || selIds().length)) {
         e.preventDefault(); e.stopPropagation();
-        moving = false; sel = {}; selectMode = false; renderPanel();
+        moving = false; addFor = null; sel = {}; selectMode = false; renderPanel();
+        return;
+      }
+      /*@3.SCPJ.130*/
+      var kc = e.target && e.target.closest && e.target.closest('.ip-chip[data-sid]');
+      if (kc && e.altKey && /^Arrow(Up|Down|Left|Right)$/.test(e.key)) {
+        e.preventDefault();
+        var kid = kc.getAttribute('data-sid');
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { sel = {}; sel[kid] = true; nudge(kid, e.key === 'ArrowUp' ? -1 : 1); }
+        else shiftBy([kid], ((e.key === 'ArrowRight') !== isAr()) ? 1 : -1);
+        setTimeout(function () { var f = document.querySelector('.ip-chip[data-sid="' + kid + '"]'); if (f) f.focus(); }, 0);
       }
     });
 
@@ -2023,6 +2402,18 @@
         dragging.over = tgt;
         if (tgt) tgt.classList.add('is-drop');
       }
+      /*@3.SCPJ.131*/
+      box.querySelectorAll('.ip-ins, .ip-ins-end').forEach(function (x) { x.classList.remove('ip-ins', 'ip-ins-end'); });
+      dragging.index = null;
+      if (tgt && tgt.hasAttribute('data-date')) {
+        var others = Array.prototype.filter.call(tgt.querySelectorAll('.ip-chip[data-sid]'), function (c) { return !sel[c.getAttribute('data-sid')]; });
+        var at = 0;
+        others.forEach(function (c) { var r = c.getBoundingClientRect(); if (e.clientY > r.top + r.height / 2) at++; });
+        dragging.index = at;
+        if (others.length) {
+          if (at < others.length) others[at].classList.add('ip-ins'); else tgt.classList.add('ip-ins-end');
+        }
+      }
     });
     function endDrag(e) {
       if (hold) {
@@ -2042,7 +2433,7 @@
       var ids = selIds();
       if (!d.over || e.type === 'pointercancel') { renderPanel(); return; }
       if (d.over.hasAttribute('data-tray')) toTray(ids.filter(function (k) { return k.charAt(0) !== 'u'; }));
-      else moveTo(ids, d.over.getAttribute('data-date'));
+      else moveTo(ids, d.over.getAttribute('data-date'), d.index);
     }
     box.addEventListener('pointerup', endDrag);
     box.addEventListener('pointercancel', endDrag);
@@ -2068,15 +2459,40 @@
     }).join('') + '</div>';
   }
 
+  function planOfSession(s) {
+    var t = findPlanOf(s.id);
+    return t ? store().plans[t] : null;
+  }
+  function reviewHint(s, p) {
+    var ex = p && p.exam_dates ? p.exam_dates[s.course] : '';
+    if (s.review === 'practice') {
+      return T('حُلَّ أسئلةً من وحدات المادّة كلِّها بلا نظرٍ في ملاحظاتك، ثمّ صحّح وعُدْ إلى ما أخطأت فيه — الاسترجاعُ يثبّت أكثر من إعادة القراءة.',
+        'Answer questions from every module without looking at your notes, then check and go back to what you missed — retrieval sticks better than rereading.');
+    }
+    if (ex && s.date === ex) {
+      return T('تسخينٌ لا درسٌ جديد: رؤوسُ الأقلام والقوانينُ وما أخطأتَ فيه سابقاً، ثمّ استرحْ قبل الاختبار.',
+        'A warm-up, not a new lesson: headlines, formulas and past mistakes — then rest before the exam.');
+    }
+    return T('مرّ على وحدات المادة كلِّها: رؤوسُ الأقلام، وما أخطأتَ فيه، وأسئلةُ الاختبارات السابقة. لا وحدةَ جديدة اليوم.',
+      'Go over every module of the course: headlines, what you got wrong, past exam questions. No new module today.');
+  }
+
   function sessionCard(s, mod, full) {
     var color = S.courseColor(s.course);
-    var title = s.kind === 'buffer' ? T('مراجعة ما قبل الاختبار', 'Pre-exam review') : (mod ? modTitle(mod) : (sessTitle(s) || sessionLabel(s)));
+    var sp = planOfSession(s);
+    var title = s.kind === 'buffer' ? reviewLabel(s, sp) : (mod ? modTitle(mod) : (sessTitle(s) || sessionLabel(s, sp)));
     var diff = mod ? mod.difficulty : null;
     var body = mod ? briefHtml(mod, full ? 99 : 4) : '';
+    var more = (s.also || []).map(function (id) { return modOf(s.course, id); }).filter(Boolean);
+    if (mod && more.length) {
+      title = [mod].concat(more).map(modTitle).join(' · ');
+      body = [mod].concat(more).map(function (m) {
+        return '<div class="ip-card-part"><b>' + esc(T('الوحدة ', 'Module ') + modNum(m.id) + ' · ' + modTitle(m)) + '</b>' + briefHtml(m, full ? 99 : 2) + '</div>';
+      }).join('');
+    }
     if (!body) {
       body = s.kind === 'buffer'
-        ? '<p class="sch-editor-hint">' + T('مرّ على وحدات المادة كلِّها: رؤوسُ الأقلام، وما أخطأتَ فيه، وأسئلةُ الاختبارات السابقة. لا وحدةَ جديدة اليوم.',
-            'Go over every module of the course: headlines, what you got wrong, past exam questions. No new module today.') + '</p>'
+        ? '<p class="sch-editor-hint">' + esc(reviewHint(s, sp)) + '</p>'
         : '<p class="sch-editor-hint">' + T('لا تفاصيل محفوظة لهذه الوحدة — افتحها وابدأ بأهدافها.', 'No stored details for this module — open it and start from its objectives.') + '</p>';
     }
     return '<article class="ip-card' + (s.done ? ' is-done' : '') + (full ? ' is-full' : '') + '" style="--event-color:' + color + '">' +
@@ -2090,11 +2506,14 @@
       '<div class="ip-card-title">' +
         (s.module ? '<span class="ip-card-modn">' + modNum(s.module) + '</span>' : '') +
         esc(title) + '</div>' +
-      '<div class="ip-card-sub">' + esc(sessionLabel(s) + ' · ' + dayShort(s.date) + ' ' + shortDate(s.date)) + '</div>' +
+      '<div class="ip-card-sub">' + esc(sessionLabel(s, sp) + ' · ' + dayShort(s.date) + ' ' + shortDate(s.date)) + '</div>' +
       '<div class="ip-card-body">' + body + '</div>' +
       '<div class="ip-card-actions">' +
-        (s.module ? '<button class="sch-btn sch-btn-primary sch-btn-xs" data-ipmod="' + esc(s.course) + '|' + esc(s.module) + '">' +
-          '<i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> ' + T('ادرس الوحدة', 'Study the module') + '</button>' : '') +
+        (s.module ? [s.module].concat(s.also || []).map(function (id, i) {
+          return '<button class="sch-btn ' + (i ? 'sch-btn-secondary' : 'sch-btn-primary') + ' sch-btn-xs" data-ipmod="' + esc(s.course) + '|' + esc(id) + '">' +
+            '<i class="fa-solid fa-book-open-reader" aria-hidden="true"></i> ' + (s.also && s.also.length ? T('ادرس الوحدة ' + modNum(id), 'Study module ' + modNum(id)) : T('ادرس الوحدة', 'Study the module')) + '</button>';
+        }).join('') : '') +
+        (s.kind === 'buffer' ? reviewPageBtn(s, sp) : '') +
         '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-ipdone="' + esc(s.id) + '">' +
           (s.done ? T('تراجع', 'Undo') : '<i class="fa-solid fa-check" aria-hidden="true"></i> ' + T('أتممتُها', 'Done')) + '</button>' +
         '<button class="sch-btn sch-btn-secondary sch-btn-xs" data-ipedit="' + esc(s.id) + '">' + T('اليوم والوقت', 'Day & time') + '</button>' +
@@ -2140,6 +2559,9 @@
     box.querySelectorAll('[data-ipmod]').forEach(function (b) {
       b.addEventListener('click', function () { var q = this.getAttribute('data-ipmod').split('|'); openModule(q[0], q[1]); });
     });
+    box.querySelectorAll('[data-ippage]').forEach(function (b) {
+      b.addEventListener('click', function () { var q = this.getAttribute('data-ippage').split('|'); openCoursePage(q[0], q[1]); });
+    });
     box.querySelectorAll('[data-ipdet]').forEach(function (b) {
       b.addEventListener('click', function () { var q = this.getAttribute('data-ipdet').split('|'); openModuleDetails(q[0], q[1]); });
     });
@@ -2158,8 +2580,7 @@
     slot.className = 'ip-sheet-brief';
     body.appendChild(slot);
     if (s && s.kind === 'buffer') {
-      slot.innerHTML = '<p class="sch-editor-hint">' + T('مرّ على وحدات المادة كلِّها: رؤوسُ الأقلام، وما أخطأتَ فيه، وأسئلةُ الاختبارات السابقة.',
-        'Go over every module of the course: headlines, what you got wrong, past exam questions.') + '</p>';
+      slot.innerHTML = '<p class="sch-editor-hint">' + esc(reviewHint(s, store().plans[t])) + '</p>';
       return;
     }
     if (!ev.module) return;
@@ -2172,6 +2593,24 @@
   }
 
   /*@3.SCPJ.104*/
+  /*@3.SCPJ.135*/
+  function reviewPageBtn(s, p) {
+    var t = findPlanOf(s.id) || activeTab;
+    var kind = t === 'final' ? 'final' : 'midterm';
+    var file = kind + (s.review === 'practice' ? '-quiz' : '-review') + '.html';
+    var lab = s.review === 'practice'
+      ? T(kind === 'final' ? 'اختبار الفاينل التجريبيّ' : 'اختبار الميد التجريبيّ', kind === 'final' ? 'Final practice test' : 'Midterm practice test')
+      : T(kind === 'final' ? 'مراجعة الفاينل' : 'مراجعة الميد', kind === 'final' ? 'Final review' : 'Midterm review');
+    return '<button class="sch-btn sch-btn-primary sch-btn-xs" data-ippage="' + esc(s.course) + '|' + file + '">' +
+      '<i class="fa-solid ' + (s.review === 'practice' ? 'fa-pen-to-square' : 'fa-book-open-reader') + '" aria-hidden="true"></i> ' + lab + '</button>';
+  }
+  function openCoursePage(code, file) {
+    var cat = S.catalog();
+    var c = (cat && cat.courses ? cat.courses : []).filter(function (x) { return x.code === code; })[0];
+    if (!c || !c.path) { alert(T('لا صفحة لهذه المادة.', 'No page for this course.')); return; }
+    window.location.href = '../' + c.path + file;
+  }
+
   function openModule(code, mid) {
     var cat = S.catalog();
     var c = (cat && cat.courses ? cat.courses : []).filter(function (x) { return x.code === code; })[0];

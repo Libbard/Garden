@@ -3,7 +3,8 @@
 ;(function () {
   'use strict';
 
-  var CODE = (new URLSearchParams(location.search).get('code') || '').toUpperCase();
+  var QS = new URLSearchParams(location.search);
+  var CODE = (QS.get('code') || QS.get('c') || '').toUpperCase();
 
   var S = {
     info: null, meta: null, stats: null, sched: null,
@@ -341,11 +342,48 @@
 
   /*@3.COUJ.21*/
 
-  function evLabel(kind) {
+  function evLabel(kind, r) {
     if (kind === 'midterm') return L('الاختبار النصفي', 'Midterm');
     if (kind === 'final') return L('الاختبار النهائي', 'Final');
-    if (kind === 'cards') return L('بطاقاتُك (استبقاء)', 'Your cards (retention)');
+    if (kind === 'cards') {
+      var u = r && r.cards && r.cards.upto;
+      return u > 1 ? L('بطاقاتُك · الوحدات ⁦1–' + u + '⁩', 'Your cards · modules 1–' + u)
+           : u === 1 ? L('بطاقاتُك · الوحدة 1', 'Your cards · module 1')
+           : L('بطاقاتُك', 'Your cards');
+    }
     return L('الوحدة ' + kind, 'Module ' + kind);
+  }
+
+  function scopeLine(sc) {
+    if (!sc || !sc.total) return '';
+    var r = function (n) { return '<bdi dir="ltr">1–' + n + '</bdi>'; };
+    var t;
+    if (sc.phase === 'mid') {
+      t = esc(L('قبل النصفيّ تُحسب بطاقاتُ وحداته وحدَها: ', 'Before the midterm, only its modules’ cards count: ')) + r(sc.upto) +
+        esc(sc.midSet ? L(' — كما حدّدتَها.', ' — as you set it.')
+          : sc.midFrom === 'course' ? L(' — كما يحدّدها منهجُ المادّة، فغيّرْها إن اختلف أستاذك.', ' — as the course plan sets it; change it if your instructor differs.')
+          : L(' — قدّرناها من موعده، فغيّرْها إن اختلفت مادّتك.', ' — estimated from its date; change it if your course differs.'));
+    } else if (sc.phase === 'paced') {
+      t = esc(L('بعد النصفيّ تُحسب الوحداتُ التي حان وقتُها بتوزيع الفصل حتى النهائيّ: ',
+                'After the midterm, the modules due by now — the term spread evenly up to the final — count: ')) + r(sc.upto) + '.';
+    } else if (sc.phase === 'nodates') {
+      t = esc(L('لا نعرف تواريخ فصلك، فتُحسب بطاقاتُ وحدات النصفيّ: ', 'We don’t know your term dates, so the midterm modules’ cards count: ')) + r(sc.upto) +
+        esc(L(' — أضفْ بدايةَ الفصل وموعدَ النصفيّ في الجدول ليتقدّم النطاقُ وحدَه.', ' — add the term start and midterm date in your schedule and the range moves by itself.'));
+    } else {
+      return '<p class="crs-scope">' + esc(L('انتهى الفصل: تُحسب بطاقاتُ الوحدات كلِّها.', 'The term is over: cards from every module count.')) + '</p>';
+    }
+    var btn = function (d, ico, ar, en) {
+      return '<button class="crs-btn crs-btn--ico" type="button" data-act="mid-step" data-d="' + d + '"' +
+        (d < 0 ? (sc.mid <= 1 ? ' disabled' : '') : (sc.mid >= sc.total ? ' disabled' : '')) +
+        ' aria-label="' + esc(L(ar, en)) + '" data-ar-title="' + esc(ar) + '" data-en-title="' + esc(en) + '" title="' + esc(L(ar, en)) + '">' +
+        '<i class="fa-solid ' + ico + '" aria-hidden="true"></i></button>';
+    };
+    return '<div class="crs-scope"><i class="fa-solid fa-layer-group" aria-hidden="true"></i><p>' + t + '</p>' +
+      '<div class="crs-scope-mid"><span>' + esc(L('وحداتُ النصفيّ', 'Midterm modules')) + '</span>' +
+        btn(-1, 'fa-minus', 'وحدةٌ أقلّ', 'One fewer module') +
+        '<b>' + sc.mid + '</b>' +
+        btn(1, 'fa-plus', 'وحدةٌ أكثر', 'One more module') +
+      '</div></div>';
   }
 
   function renderPredict() {
@@ -453,13 +491,14 @@
     rows.forEach(function (r) {
       var tr = r.trend;
       h += '<tr>' +
-        '<td class="crs-ev-n">' + esc(evLabel(r.kind)) +
+        '<td class="crs-ev-n">' + esc(evLabel(r.kind, r)) +
           (r.legacy ? ' <span class="crs-ev-w">' + esc(L('(محفوظٌ قديماً)', '(legacy)')) + '</span>' : '') +
           '<div class="crs-ev-w">' + esc(L('وزنُه ', 'weight ')) + r.weight + '</div></td>' +
         '<td style="color:' + esc(GardenData.qualityColor01(r.score)) + ';font-weight:800">' +
           pctTxt(r.score) + '</td>' +
         '<td>' + (r.kind === 'cards'
-          ? '<span class="crs-ev-w">' + esc(r.cards.mastered + '/' + r.cards.total) + '</span>'
+          ? '<span class="crs-ev-w"><bdi dir="ltr">' + esc(r.cards.known + '/' + r.cards.total) + '</bdi> ' +
+              esc(L('تعرفها', 'known')) + '</span>'
           : r.attempts) + '</td>' +
         /*@3.COUJ.26*/
         '<td>' + (tr == null ? '<span class="crs-ev-w">—</span>'
@@ -468,6 +507,7 @@
       '</tr>';
     });
     h += '</tbody></table></div>';
+    h += scopeLine(p.scope);
 
     /*@3.COUJ.27*/
     h += '<details style="margin-top:.8rem">' +
@@ -482,6 +522,12 @@
               'and within a test the **latest attempt counts fully, the one before it half, then a quarter** — ' +
               'which is why a rising history beats a falling one with the same average. The result is then shrunk ' +
               'toward the pass mark in proportion to what we don’t know: the less measured, the closer to the middle and the wider the range.')) +
+      '</p>' +
+      '<p class="crs-sec-d" style="line-height:1.9">' +
+        esc(L('وبطاقاتُك تُقاس بآخر تقييمٍ لكلٍّ منها: «جيد» فما فوقه تُحسب لك، و«صعب» و«لم أتذكر» وما لم تراجعه بعدُ لا تُحسب — ' +
+              'لكن من وحدات النطاق وحدَها، فلا تُحاسَب على وحدةٍ لم يحِن وقتُها.',
+              'Your cards are measured by each card’s latest rating: “Good” or better counts; “Hard”, “Blackout” and cards not yet reviewed don’t — ' +
+              'but only from the modules in range, so you’re never judged on a module whose time hasn’t come.')) +
       '</p>' +
       /*@3.COUJ.28*/
       '<p class="crs-sec-d" style="line-height:1.9">' + '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> ' +
@@ -1230,6 +1276,13 @@
         return;
       }
       if (act === 'mod-wipe') { wipeMod(modOpen); return; }
+      if (act === 'mid-step') {
+        var sc = S.pred && S.pred.scope;
+        if (!sc) return;
+        GardenData.setMidtermModules(CODE, sc.mid + parseInt(a.getAttribute('data-d'), 10));
+        refresh();
+        return;
+      }
       if (act === 'due') {
         if (window.GardenDue) GardenDue.open({ code: CODE });
         return;
@@ -1375,6 +1428,14 @@
       }
 
       if (window.GardenCourseView) GardenCourseView.mount({ into: 'crs-rate', code: CODE });
+
+      fetch('../data/quiz/index.json').then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) {
+          var x = j && j.courses && j.courses[CODE];
+          if (!x || !GardenData.useCourseIndex) return;
+          GardenData.useCourseIndex(CODE, x);
+          refresh();
+        }).catch(function () {});
 
       /*@3.COUJ.61*/
       noteFromHash();

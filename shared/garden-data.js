@@ -302,9 +302,13 @@
     try {
       var data = JSON.parse(raw);
       if (!data || typeof data !== 'object') return [];
-      return Object.values(data).filter(function (c) {
-        return c && typeof c === 'object';
-      });
+      var ix = COURSE_IDX[String(code || '').toUpperCase()];
+      var deck = ix && Array.isArray(ix.fc) ? (ix.fc[moduleNum - 1] || 0) : 0;
+      return Object.keys(data).filter(function (k) {
+        var c = data[k];
+        if (!c || typeof c !== 'object') return false;
+        return !deck || !/^\d+$/.test(k) || +k < deck;
+      }).map(function (k) { return data[k]; });
     } catch (e) { return []; }
   }
 
@@ -438,23 +442,69 @@
     push('final', W_FINAL);
 
     /*@3.GADJ.32*/
-    var totalCards = 0, mastered = 0;
-    for (var k = 1; k <= out.modules; k++) {
-      moduleCards(code, k).forEach(function (c) {
-        totalCards++;
-        if (c.interval && c.interval >= 21) mastered++;
+    var scope = out.scope = forecastScope(code);
+    var decks = moduleDecks(code);
+    var totalCards = 0, known = 0, seen = 0;
+    for (var k = 1; k <= scope.upto; k++) {
+      var stored = moduleCards(code, k);
+      stored.forEach(function (c) {
+        var g = c.lastGrade != null ? parseFloat(c.lastGrade) : null;
+        if (g == null && !(c.n > 0)) return;
+        seen++;
+        if (g != null ? g >= 3 : c.n > 0) known++;
       });
+      totalCards += Math.max(stored.length, parseInt(decks[String(k)], 10) || 0);
     }
-    if (totalCards >= 10) {
+    if (totalCards >= 10 && seen) {
       out.rows.push({
         kind: 'cards', weight: W_CARDS, legacy: false, attempts: 0,
-        score: mastered / totalCards, best: mastered / totalCards,
+        score: known / totalCards, best: known / totalCards,
         first: null, last: null, at: null, trend: null,
-        cards: { total: totalCards, mastered: mastered }
+        cards: { total: totalCards, known: known, seen: seen, upto: scope.upto }
       });
       out.weight += W_CARDS;
     }
     return out;
+  }
+
+  function forecastScope(code, now) {
+    var total = moduleCount(code);
+    var out = { total: total, upto: total, mid: 0, midSet: false, paced: 0, phase: 'all' };
+    if (!total) return out;
+    var t = now ? new Date(now) : new Date();
+    t.setHours(0, 0, 0, 0);
+    var st = scheduleRaw().settings || {};
+    var fp = (st.focus_periods && st.focus_periods.midterm) || {};
+    var day = function (v) { return termDay(String(v || '').slice(0, 10)); };
+    var start = day(st.term_start_date || st.sx_term_start);
+    var fin = day(examDate(code, 'final') || st.semester_end_date);
+    var midD = day(examDate(code, 'midterm') || fp.start);
+    var clamp = function (n) { return Math.max(1, Math.min(total, n)); };
+    var per = (start && fin && fin > start) ? (fin - start) / total : 0;
+
+    if (per) out.paced = clamp(Math.ceil((t - start + 86400000) / per));
+    var set = parseInt(courseMeta(code).midterm_modules, 10);
+    var ixMid = (COURSE_IDX[String(code).toUpperCase()] || {}).mid;
+    if (set >= 1 && set <= total) { out.mid = set; out.midSet = true; }
+    else if (ixMid >= 1 && ixMid < total) { out.mid = ixMid; out.midFrom = 'course'; }
+    else if (per && midD && midD > start) out.mid = clamp(Math.round((midD - start) / per));
+    else out.mid = Math.ceil(total / 2);
+
+    if (fin && t > fin) return out;
+    var beforeMid = midD ? t <= midD : (per ? (t - start) < (fin - start) / 2 : null);
+    if (beforeMid === true) { out.phase = 'mid'; out.upto = out.mid; }
+    else if (beforeMid === false) { out.phase = 'paced'; out.upto = Math.max(out.mid, out.paced); }
+    else { out.phase = 'nodates'; out.upto = out.mid; }
+    return out;
+  }
+
+  function setMidtermModules(code, n) {
+    var m = courseMeta(code);
+    var total = moduleCount(code);
+    n = parseInt(n, 10);
+    if (n >= 1 && n <= total) m.midterm_modules = n;
+    else delete m.midterm_modules;
+    return saveCourseMeta(code, m);
   }
 
   /*@3.GADJ.33*/
@@ -470,7 +520,7 @@
       grade: null, threshold: PASS_RATIO, trend: null,
       attempts: ev.attempts, weight: ev.weight, covered: ev.covered,
       modules: ev.modules, coverage: ev.modules ? ev.covered / ev.modules : 0,
-      rows: ev.rows, hasLog: ev.hasLog, legacyOnly: false
+      rows: ev.rows, hasLog: ev.hasLog, legacyOnly: false, scope: ev.scope || null
     };
     if (!ev.rows.length) return out;
 
@@ -622,11 +672,12 @@
   /*@3.GADJ.45*/
 
   /*@3.GADJ.46*/
-  function finalExamDate(code) {
+  function finalExamDate(code) { return examDate(code, 'final'); }
+  function examDate(code, type) {
     var banner = null, any = null;
     (scheduleRaw().exams || []).forEach(function (e) {
       if (!e || e.course_code !== code || !e.date) return;
-      if (e.exam_type !== 'final') return;
+      if (e.exam_type !== type) return;
       var d = String(e.date);
       if (!any || d > any) any = d;
       if (e.sx_crn && (!banner || d > banner)) banner = d;
@@ -733,8 +784,20 @@
     return Math.min(1, core + PROG_W.visit * v * (1 - core));
   }
   function moduleDecks(code) {
-    if (!window.Garden || typeof Garden.moduleDecks !== 'function') return {};
-    try { return Garden.moduleDecks(code) || {}; } catch (e) { return {}; }
+    var out = {};
+    if (window.Garden && typeof Garden.moduleDecks === 'function') {
+      try { out = Garden.moduleDecks(code) || {}; } catch (e) { out = {}; }
+    }
+    var ix = COURSE_IDX[String(code || '').toUpperCase()];
+    if (ix && Array.isArray(ix.fc)) ix.fc.forEach(function (n, i) { if (n > 0) out[String(i + 1)] = n; });
+    return out;
+  }
+
+  var COURSE_IDX = {};
+  function useCourseIndex(code, entry) {
+    if (!code || !entry || typeof entry !== 'object') return;
+    COURSE_IDX[String(code).toUpperCase()] = { fc: entry.fc, mid: parseInt(entry.mid, 10) || 0 };
+    dropProgressCache();
   }
 
   /*@3.GADJ.180*/
@@ -2413,6 +2476,9 @@
     setProgressMode: setProgressMode,
     syncTermRange: syncTermRange,
     termWindow: termWindow,
+    forecastScope: forecastScope,
+    useCourseIndex: useCourseIndex,
+    setMidtermModules: setMidtermModules,
     clearTermWindow: clearTermWindow,
     semesterProgress: semesterProgress,
 

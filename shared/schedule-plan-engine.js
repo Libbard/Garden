@@ -7,6 +7,7 @@
   var SPACING_TIERS = ['full', 'lite', 'off'];
   var SPACING_OFFSETS = { full: [3, 7], lite: [3], off: [] };
   var MAX_SPD = 10;
+  var PRE_EXAM = 30, POST_EXAM = 30, EXAM_LEN = 120, WARM_MIN = 45;
 
   function pad(n) { return (n < 10 ? '0' : '') + n; }
   function toUTC(s) {
@@ -51,21 +52,31 @@
   /*@3.SCPEJ.3*/
   function moduleWeight(mod, known) {
     var topics = (mod && Array.isArray(mod.topics)) ? mod.topics : [];
-    var ex = 0, net = 0, mem = 0, unl = 0, n = 0;
+    var ex = 0, net = 0, mem = 0, unl = 0, abs = 0, n = 0;
     topics.forEach(function (t) {
       var d = dimsOf(t);
-      ex += num(d.exam_application, 1) / 2;
-      net += num(d.network_effect, 0.5);
-      mem += num(d.memory_load, 1) / 2;
+      ex += clamp(num(d.exam_application, 1) / 2, 0, 1);
+      net += clamp(num(d.network_effect, 0.5), 0, 1);
+      mem += clamp(num(d.memory_load, 1) / 2, 0, 1);
+      abs += clamp(num(d.conceptual_abstraction, 1.5) / 3, 0, 1);
       unl += listOf(t.unlocks).length;
       n++;
     });
     var diff = clamp(num(mod && mod.difficulty, 5) / 10, 0, 1);
     var need = 1 - clamp(known == null ? 0 : known, 0, 1);
-    if (!n) return { prio: round2(0.45 + 0.25 * diff + 0.3 * need - 0.15), mem: 0.5, diff: diff };
-    var p = 0.32 * (ex / n) + 0.18 * clamp(net / n, 0, 1) + 0.15 * clamp(unl / Math.max(1, n * 2), 0, 1) +
-            0.1 * diff + 0.25 * need;
-    return { prio: round2(p), mem: round2(mem / n), diff: diff };
+    var emph = mod && mod.emph != null ? clamp(num(mod.emph, 1) - 0.5, 0, 1) : null;
+    var p;
+    if (!n) p = 0.45 + 0.25 * diff + 0.3 * need - 0.15;
+    else if (emph == null) {
+      p = 0.32 * (ex / n) + 0.18 * (net / n) + 0.15 * clamp(unl / Math.max(1, n * 2), 0, 1) + 0.1 * diff + 0.25 * need;
+    } else {
+      p = 0.22 * (ex / n) + 0.22 * emph + 0.12 * (net / n) + 0.09 * clamp(unl / Math.max(1, n * 2), 0, 1) +
+          0.1 * diff + 0.25 * need;
+    }
+    var a = n ? abs / n : 0.5;
+    var mins = mod && num(mod.minutes, 0) > 0 ? num(mod.minutes, 0) : null;
+    var eff = mins == null ? null : Math.round(mins * (1 - 0.5 * clamp(known == null ? 0 : known, 0, 1)) * (0.9 + 0.3 * a));
+    return { prio: round2(p), mem: n ? round2(mem / n) : 0.5, diff: diff, abs: round2(a), eff: eff };
   }
   function round2(x) { return Math.round(x * 100) / 100; }
 
@@ -104,11 +115,15 @@
     var c = clone(cfg || {});
     c.courses = Array.isArray(c.courses) ? c.courses : [];
     c.exam_dates = c.exam_dates || {};
+    c.exam_times = c.exam_times || {};
+    c.exam_ends = c.exam_ends || {};
     c.modules = c.modules || {};
     c.rest_days = Array.isArray(c.rest_days) ? c.rest_days : [];
     c.sessions_per_day = clamp(parseInt(c.sessions_per_day, 10) || 2, 1, MAX_SPD);
     c.session_minutes = clamp(parseInt(c.session_minutes, 10) || 60, 15, 240);
     c.gap_min = c.gap_min == null ? GAP : clamp(parseInt(c.gap_min, 10) || 0, 0, 120);
+    c.pre_exam_min = c.pre_exam_min == null ? PRE_EXAM : clamp(parseInt(c.pre_exam_min, 10) || 0, 0, 240);
+    c.post_exam_min = c.post_exam_min == null ? POST_EXAM : clamp(parseInt(c.post_exam_min, 10) || 0, 0, 240);
     if (c.parts_mode !== 'auto') c.parts_mode = clamp(parseInt(c.parts_mode, 10) || 1, 1, 3);
     c.spacing = SPACING_OFFSETS[c.spacing] ? c.spacing : 'off';
     c.review_mode = (c.review_mode === 'always' || c.review_mode === 'off') ? c.review_mode : 'auto';
@@ -127,6 +142,24 @@
     if (e == null) e = (num(ctx.dayEndHour, 23)) * 60;
     if (e <= s) e = Math.min(24 * 60, s + 8 * 60);
     return { start: s, end: e };
+  }
+
+  /*@3.SCPEJ.23*/
+  function examBlock(cfg, code) {
+    var t = hm(cfg.exam_times[code], null);
+    if (t == null) return null;
+    var e = hm(cfg.exam_ends[code], null);
+    if (e == null || e <= t) e = t + EXAM_LEN;
+    return { s: t - cfg.pre_exam_min, e: e + cfg.post_exam_min, start: t, end: e, course: code };
+  }
+  function blocksOn(cfg, d) {
+    var out = [];
+    cfg.courses.forEach(function (c) {
+      if (cfg.exam_dates[c] !== d) return;
+      var b = examBlock(cfg, c);
+      if (b) out.push(b);
+    });
+    return out;
   }
 
   /*@3.SCPEJ.6*/
@@ -153,6 +186,7 @@
       dayEndHour: ctx.dayEndHour,
       known: ctx.known || function () { return null; },
       mastered: ctx.mastered || function () { return false; },
+      risk: ctx.risk || function () { return 0.5; },
       keep: Array.isArray(ctx.keep) ? ctx.keep : [],
       skip: Array.isArray(ctx.skip) ? ctx.skip : [],
       ids: ctx.ids || null,
@@ -170,7 +204,7 @@
   }
 
   /*@3.SCPEJ.7*/
-  function dayStartFor(d, win, X, cfg) {
+  function dayStartFor(d, win, X) {
     var s = win.start;
     if (d === X.today && X.nowMin != null) {
       var now = Math.ceil((X.nowMin + 10) / 15) * 15;
@@ -178,159 +212,257 @@
     }
     return s;
   }
-  function packCount(cfg, X, d, win, extraBusy) {
-    var start = dayStartFor(d, win, X, cfg), len = cfg.session_minutes;
-    if (win.end - start < len) return 0;
-    var busy = cfg.avoid_conflicts ? X.busy(d).slice() : [];
-    if (extraBusy) busy = busy.concat(extraBusy).sort(function (a, b) { return a.s - b.s; });
-    var n = 0, cur = start, guard = 0;
-    while (guard++ < 40) {
-      var at = cfg.avoid_conflicts ? firstFreeAt(busy, cur, len, win.end) : (cur + len <= win.end ? cur : null);
+  function packSlots(cfg, X, d, win, extra) {
+    var start = dayStartFor(d, win, X), len = cfg.session_minutes;
+    var busy = (cfg.avoid_conflicts ? X.busy(d).slice() : []).concat(blocksOn(cfg, d)).concat(extra || []);
+    busy.sort(function (a, b) { return a.s - b.s; });
+    var out = [], cur = start, guard = 0;
+    while (guard++ < 60) {
+      var at = firstFreeAt(busy, cur, len, win.end);
       if (at === null) break;
-      n++;
+      out.push({ s: at, e: at + len });
       cur = at + len + cfg.gap_min;
     }
-    return n;
+    return out;
   }
 
-  function buildDays(cfg, X, lastExam) {
+  /*@3.SCPEJ.28*/
+  function warmSlots(cfg, X, d, win, spans) {
+    if (cfg.review_mode === 'off') return [];
+    var len = Math.min(WARM_MIN, cfg.session_minutes);
+    var start = dayStartFor(d, win, X);
+    var busy = (cfg.avoid_conflicts ? X.busy(d).slice() : []).concat(spans);
+    var out = [];
+    cfg.courses.forEach(function (c) {
+      if (cfg.exam_dates[c] !== d) return;
+      var b = examBlock(cfg, c);
+      if (!b) return;
+      var s = b.s - len;
+      if (s < start || b.s > win.end + cfg.pre_exam_min) return;
+      var clash = busy.concat(blocksOn(cfg, d).filter(function (x) { return x !== b && x.start !== b.start; }))
+        .some(function (x) { return x.e > s && x.s < b.s; });
+      if (!clash) out.push({ s: s, e: b.s, warm: c });
+    });
+    return out;
+  }
+
+  function keptSpan(s, cfg) {
+    var t = hm(s.start_time, null);
+    return t == null ? null : { s: t, e: t + (s.minutes || cfg.session_minutes) };
+  }
+
+  /*@3.SCPEJ.24*/
+  function buildDays(cfg, X, lastExam, keptBy, needOf) {
     var win = windowOf(cfg, X);
-    var days = [];
-    if (!lastExam || cfg.start_date >= lastExam) return { days: days, win: win };
+    var days = [], slots = [];
+    if (!lastExam || cfg.start_date > lastExam) return { days: days, win: win, slots: slots };
     var d = cfg.start_date, guard = 0;
-    while (d < lastExam && guard++ < 400) {
+    while (d <= lastExam && guard++ < 400) {
       var over = cfg.day_caps[d];
+      var hasOver = over != null && over !== '';
       var rest = cfg.rest_days.indexOf(dayName(d)) !== -1;
-      var fit = packCount(cfg, X, d, win);
-      var want = (over != null && over !== '') ? clamp(parseInt(over, 10) || 0, 0, MAX_SPD)
-               : (rest ? 0 : cfg.sessions_per_day);
-      var cap = Math.min(fit, want);
-      days.push({ date: d, cap: cap, fit: fit, rest: rest && over == null, blocked: over === 0 || over === '0',
-                  items: [], hard: 0 });
+      var kept = keptBy[d] || [];
+      var spans = kept.map(function (s) { return keptSpan(s, cfg); }).filter(Boolean)
+        .map(function (x) { return { s: x.s - cfg.gap_min, e: x.e + cfg.gap_min }; });
+      var warm = warmSlots(cfg, X, d, win, spans);
+      var all = packSlots(cfg, X, d, win, spans.concat(warm.map(function (w) { return { s: w.s - cfg.gap_min, e: w.e }; })))
+        .concat(warm).sort(function (a, b) { return a.s - b.s; });
+      var want = hasOver ? clamp(parseInt(over, 10) || 0, 0, MAX_SPD) : (rest ? 0 : cfg.sessions_per_day);
+      var free = Math.max(0, want - kept.length);
+      var bl = blocksOn(cfg, d).sort(function (a, b) { return a.s - b.s; });
+      all.forEach(function (x) {
+        var nb = bl.filter(function (b) { return b.s >= x.e; })[0];
+        x.only = nb ? nb.course : null;
+      });
+      var pick = all.slice();
+      if (bl.length) {
+        var mine = {}, held = [], open = [];
+        all.filter(function (x) { return x.warm; }).forEach(function (x) { mine[x.only] = (mine[x.only] || 0) + 1; held.push(x); });
+        all.filter(function (x) { return !x.warm && x.only; }).reverse().forEach(function (x) {
+          if ((mine[x.only] || 0) < needOf(x.only)) { mine[x.only] = (mine[x.only] || 0) + 1; held.push(x); }
+        });
+        all.forEach(function (x) { if (held.indexOf(x) === -1) { x.only = null; open.push(x); } });
+        pick = held.concat(open);
+      }
+      pick = pick.slice(0, free).sort(function (a, b) { return a.s - b.s; });
+      var day = { date: d, want: want, cap: pick.length + kept.length, fit: all.length + kept.length,
+                  rest: rest && !hasOver, blocked: hasOver && !want, kept: kept, slots: [] };
+      pick.forEach(function (x) { day.slots.push({ date: d, s: x.s, e: x.e, item: null, day: day, warm: x.warm || null, only: x.only || null }); });
+      days.push(day);
       d = addDays(d, 1);
     }
-    return { days: days, win: win };
+    days.forEach(function (dy) { dy.slots.forEach(function (sl) { sl.idx = slots.length; slots.push(sl); }); });
+    return { days: days, win: win, slots: slots };
   }
 
   /*@3.SCPEJ.8*/
-  function partsFor(mod, cfg, known) {
+  function partsFor(mod, cfg, known, w) {
     if (cfg.parts_mode !== 'auto') return cfg.parts_mode;
+    if (w && w.eff != null) return clamp(Math.ceil(w.eff / (cfg.session_minutes * 1.1)), 1, 3);
     var need = Math.ceil((num(mod.hours, 2) * 60) / cfg.session_minutes);
     if (known != null && known >= 0.6) need--;
     return clamp(need, 1, 3);
   }
 
-  function buildUnits(cfg, mods, X) {
+  /*@3.SCPEJ.29*/
+  function buildUnits(cfg, mods, X, exclude) {
     var units = [], skipped = [];
     cfg.courses.forEach(function (code) {
       var sel = cfg.modules[code] || [];
       var list = (mods[code] || []).filter(function (m) { return sel.indexOf(m.id) !== -1; });
+      var risk = clamp(num(X.risk(code), 0.5), 0, 1);
+      var mult = 0.85 + 0.3 * risk;
+      var open = null;
       prereqOrder(code, list).forEach(function (m, idx) {
-        if (X.mastered(code, m.id)) { skipped.push({ course: code, module: m.id }); return; }
+        if (X.mastered(code, m.id)) { skipped.push({ course: code, module: m.id }); open = null; return; }
+        if (exclude && exclude(code, m.id)) { open = null; return; }
         var known = X.known(code, m.id);
         var w = moduleWeight(m, known);
-        var p = partsFor(m, cfg, known);
-        for (var i = 1; i <= p; i++) {
-          units.push({ course: code, module: m.id, part: i, total_parts: p, seq: idx,
-                       difficulty: num(m.difficulty, 5), prio: w.prio, mem: w.mem, kind: 'study' });
+        var p = partsFor(m, cfg, known, w);
+        var v = round2(w.prio * mult);
+        if (p === 1 && w.eff != null && open && open.eff + w.eff <= cfg.session_minutes && open.also.length < 2) {
+          open.also.push(m.id);
+          open.eff += w.eff;
+          open.value = round2(open.value + v * 0.9);
+          open.prio = Math.max(open.prio, w.prio);
+          open.difficulty = Math.max(open.difficulty, num(m.difficulty, 5));
+          return;
         }
+        for (var i = 1; i <= p; i++) {
+          var u = { course: code, module: m.id, part: i, total_parts: p, seq: idx, also: [], eff: w.eff == null ? cfg.session_minutes : Math.round(w.eff / p),
+                    difficulty: num(m.difficulty, 5), prio: w.prio, mem: w.mem, kind: 'study', value: v, risk: risk };
+          units.push(u);
+        }
+        open = (p === 1 && w.eff != null) ? units[units.length - 1] : null;
       });
     });
     return { units: units, skipped: skipped };
   }
 
-  function unitKey(u) { return u.course + '/' + u.module + '/' + (u.kind || 'study') + '/' + (u.part || 1); }
+  function unitKey(u) {
+    var k = u.kind || 'study';
+    if (k === 'buffer') k += ':' + (u.review || 'final');
+    return u.course + '/' + u.module + '/' + k + '/' + (u.part || 1);
+  }
 
   /*@3.SCPEJ.9*/
-  function applyKeep(days, units, X) {
-    var byDate = {};
-    days.forEach(function (d) { byDate[d.date] = d; });
-    var kept = [];
-    var used = {};
+  function splitKeep(X, from) {
+    var kept = [], by = {}, used = {};
     X.keep.forEach(function (s) {
       if (!s || !isDate(s.date)) return;
       var k = unitKey(s);
       if (used[k]) return;
       used[k] = 1;
+      (Array.isArray(s.also) ? s.also : []).forEach(function (m) { used[s.course + '/' + m + '/study/1'] = 1; });
       kept.push(s);
-      var day = byDate[s.date];
-      if (day) { day.items.push(s); if (num(s.difficulty, 0) >= 7) day.hard++; }
+      if (s.date >= from) (by[s.date] = by[s.date] || []).push(s);
     });
-    var rest = units.filter(function (u) { return !used[unitKey(u)]; });
-    return { kept: kept, units: rest };
+    return { kept: kept, by: by, used: used };
   }
 
-  function freeOn(day) { return day.cap - day.items.length; }
-  function courseOn(day, code) { var n = 0; day.items.forEach(function (x) { if (x.course === code) n++; }); return n; }
-  function moduleOn(day, code, mid) {
-    return day.items.some(function (x) { return x.course === code && x.module === mid; });
+  function warmOk(it, sl) {
+    return !sl.warm || (it.course === sl.warm && it.kind === 'buffer' && (it.review || 'final') === 'final');
+  }
+
+  function sameModuleOn(day, code, mid) {
+    if (!mid) return false;
+    return day.slots.some(function (sl) { return sl.item && sl.item.course === code && sl.item.module === mid; }) ||
+      day.kept.some(function (s) { return s.course === code && s.module === mid; });
+  }
+  function courseStudyOn(day, code) {
+    var n = 0;
+    day.slots.forEach(function (sl) { if (sl.item && sl.item.course === code && sl.item.kind === 'study') n++; });
+    day.kept.forEach(function (s) { if (s.course === code && (s.kind || 'study') === 'study') n++; });
+    return n;
+  }
+  function courseOn(day, code) {
+    var n = 0;
+    day.slots.forEach(function (sl) { if (sl.item && sl.item.course === code) n++; });
+    day.kept.forEach(function (s) { if (s.course === code) n++; });
+    return n;
   }
 
   /*@3.SCPEJ.10*/
-  function triage(cfg, days, units, buffersFirst) {
+  function triage(cfg, items, slots, days, dlOf) {
     var dropped = [];
-    var exams = cfg.courses.filter(function (c) { return cfg.exam_dates[c]; })
-      .map(function (c) { return cfg.exam_dates[c]; }).sort();
-    var uniq = exams.filter(function (d, i) { return exams.indexOf(d) === i; });
-    function capBefore(D) {
-      var n = 0;
-      days.forEach(function (d) { if (d.date < D) n += Math.max(0, freeOn(d)); });
+    function capTo(L, pool) {
+      var n = 0, res = {}, warm = {};
+      for (var k = 0; k <= L && k < slots.length; k++) {
+        var sl = slots[k];
+        if (sl.warm) warm[sl.warm] = (warm[sl.warm] || 0) + 1;
+        else if (sl.only) res[sl.only] = (res[sl.only] || 0) + 1;
+        else n++;
+      }
+      var have = {}, fin = {};
+      pool.forEach(function (u) {
+        if (u.kind === 'buffer' && (u.review || 'final') === 'final' && warm[u.course]) fin[u.course] = (fin[u.course] || 0) + 1;
+        else have[u.course] = (have[u.course] || 0) + 1;
+      });
+      Object.keys(warm).forEach(function (c) { n += Math.min(warm[c], fin[c] || 0); });
+      Object.keys(res).forEach(function (c) { n += Math.min(res[c], have[c] || 0); });
       return n;
     }
-    function inScope(u, D) { return (cfg.exam_dates[u.course] || '9999') <= D; }
-    function shrinkOne(pool) {
-      var multi = pool.filter(function (u) { return u.total_parts > 1 && u.part === u.total_parts; });
+    function remove(it) { items.splice(items.indexOf(it), 1); }
+    function shrinkOne(pool, L) {
+      var multi = pool.filter(function (u) { return u.kind === 'study' && u.total_parts > 1 && u.part === u.total_parts; });
       if (multi.length) {
-        multi.sort(function (a, b) { return a.prio - b.prio || b.seq - a.seq; });
+        multi.sort(function (a, b) { return a.value - b.value || b.seq - a.seq; });
         var v = multi[0];
-        units.splice(units.indexOf(v), 1);
-        units.forEach(function (u) {
-          if (u.course === v.course && u.module === v.module) u.total_parts = v.total_parts - 1;
+        remove(v);
+        items.forEach(function (u) {
+          if (u.kind === 'study' && u.course === v.course && u.module === v.module) u.total_parts = v.total_parts - 1;
         });
         return { course: v.course, module: v.module, part: v.part, total: v.total_parts, reason: 'shrunk', prio: v.prio };
       }
-      var ones = pool.slice().sort(function (a, b) { return a.prio - b.prio || b.seq - a.seq; });
+      var deficit = pool.length - capTo(L, pool);
+      var costly = pool.filter(function (u) {
+        var rest = pool.filter(function (x) { return x !== u; });
+        return rest.length - capTo(L, rest) < deficit;
+      });
+      var ones = (costly.length ? costly : pool).slice().sort(function (a, b) {
+        return a.value - b.value || dlOf[b.course] - dlOf[a.course] || (b.seq || 0) - (a.seq || 0);
+      });
       var w = ones[0];
       if (!w) return null;
-      units.splice(units.indexOf(w), 1);
-      return { course: w.course, module: w.module, part: 1, total: 1, reason: 'no_time', prio: w.prio };
+      remove(w);
+      return { course: w.course, module: w.module, part: 1, total: 1, reason: w.kind === 'buffer' ? 'review' : 'no_time', prio: w.prio, also: w.also };
     }
-    uniq.forEach(function (D) {
+    var Ls = [];
+    items.forEach(function (it) { var L = dlOf[it.course]; if (Ls.indexOf(L) === -1) Ls.push(L); });
+    Ls.sort(function (a, b) { return a - b; });
+    Ls.forEach(function (L) {
       var guard = 0;
       while (guard++ < 500) {
-        var pool = units.filter(function (u) { return inScope(u, D); });
-        var need = pool.length + buffersFirst.filter(function (b) { return cfg.exam_dates[b] <= D; }).length;
-        if (need <= capBefore(D) || !pool.length) break;
-        var x = shrinkOne(pool);
+        var pool = items.filter(function (u) { return dlOf[u.course] <= L; });
+        if (pool.length <= capTo(L, pool) || !pool.length) break;
+        var x = shrinkOne(pool, L);
         if (!x) break;
         if (x.reason !== 'shrunk') dropped.push(x);
       }
     });
-    cfg.courses.forEach(function (code) {
-      var ex = cfg.exam_dates[code];
-      if (!ex) return;
-      var cap = 0;
-      days.forEach(function (d) {
-        var lim = cfg.max_course_day > 0 ? cfg.max_course_day : cfg.sessions_per_day;
-        if (d.date < ex) cap += Math.max(0, Math.min(freeOn(d), lim - courseOn(d, code)));
+    if (cfg.max_course_day > 0) {
+      cfg.courses.forEach(function (code) {
+        var cap = 0;
+        days.forEach(function (d) {
+          var room = d.slots.filter(function (sl) { return sl.idx <= dlOf[code] && (!sl.warm || sl.warm === code); }).length;
+          cap += Math.max(0, Math.min(room, cfg.max_course_day - courseOn(d, code)));
+        });
+        var guard = 0;
+        while (guard++ < 500) {
+          var pool = items.filter(function (u) { return u.course === code; });
+          if (pool.length <= cap || !pool.length) break;
+          var x = shrinkOne(pool, slots.length - 1);
+          if (!x) break;
+          if (x.reason !== 'shrunk') dropped.push(x);
+        }
       });
-      if (buffersFirst.indexOf(code) !== -1) cap--;
-      var guard = 0;
-      while (guard++ < 500) {
-        var pool = units.filter(function (u) { return u.course === code; });
-        if (pool.length <= cap || !pool.length) break;
-        var x = shrinkOne(pool);
-        if (!x) break;
-        if (x.reason !== 'shrunk') dropped.push(x);
-      }
-    });
+    }
     return dropped;
   }
 
-  function maxPerCourseDay(cfg, date) {
-    if (cfg.max_course_day > 0) return cfg.max_course_day;
+  function autoCourseCap(cfg, date) {
     var n = 0;
-    cfg.courses.forEach(function (c) { if (!date || (cfg.exam_dates[c] || '') > date) n++; });
+    cfg.courses.forEach(function (c) { if ((cfg.exam_dates[c] || '') > date) n++; });
     n = Math.max(1, n);
     return Math.max(1, Math.ceil(cfg.sessions_per_day / Math.min(n, cfg.sessions_per_day)));
   }
@@ -354,215 +486,246 @@
     return last;
   }
 
+  function courseOrder(items, code) {
+    return items.filter(function (u) { return u.course === code; }).sort(function (a, b) {
+      var ka = a.kind === 'buffer' ? 1 : 0, kb = b.kind === 'buffer' ? 1 : 0;
+      return ka - kb || (a.seq || 0) - (b.seq || 0) || (a.part || 1) - (b.part || 1);
+    });
+  }
+
+  /*@3.SCPEJ.25*/
+  function latestSlots(cfg, items, slots, dlOf) {
+    var tails = {}, codes = [];
+    cfg.courses.forEach(function (c) {
+      var list = courseOrder(items, c);
+      if (list.length) { tails[c] = list; codes.push(c); }
+    });
+    var dayMods = {}, dayCnt = {}, taken = [];
+    codes.slice().sort(function (a, b) { return dlOf[a] - dlOf[b]; }).forEach(function (c) {
+      var t = tails[c][tails[c].length - 1];
+      if (t.kind !== 'buffer') return;
+      for (var j = dlOf[c]; j >= 0; j--) {
+        if (taken[j] || !warmOk(t, slots[j])) continue;
+        if (cfg.max_course_day > 0 && courseOn(slots[j].day, c) >= cfg.max_course_day) continue;
+        tails[c].pop();
+        t.L = j;
+        taken[j] = t;
+        dayCnt[slots[j].date + '|' + c] = 1;
+        return;
+      }
+    });
+    for (var k = slots.length - 1; k >= 0; k--) {
+      var sl = slots[k];
+      if (taken[k]) continue;
+      var cands = codes.filter(function (c) {
+        if (!tails[c].length || k > dlOf[c]) return false;
+        if (!warmOk(tails[c][tails[c].length - 1], sl)) return false;
+        if (cfg.max_course_day > 0 && (dayCnt[sl.date + '|' + c] || 0) + courseOn(sl.day, c) >= cfg.max_course_day) return false;
+        return true;
+      });
+      if (!cands.length) continue;
+      var fresh = cands.filter(function (c) {
+        var it = tails[c][tails[c].length - 1];
+        return !(it.module && dayMods[sl.date + '|' + c + '|' + it.module]);
+      });
+      if (fresh.length) cands = fresh;
+      cands.sort(function (a, b) {
+        var ta = tails[a][tails[a].length - 1], tb = tails[b][tails[b].length - 1];
+        return (cfg.exam_dates[b] === sl.date) - (cfg.exam_dates[a] === sl.date) || dlOf[b] - dlOf[a] || (tb.kind === 'buffer') - (ta.kind === 'buffer') || tb.value - ta.value || (a < b ? -1 : 1);
+      });
+      var c = cands[0];
+      var it = tails[c].pop();
+      it.L = k;
+      if (it.module) dayMods[sl.date + '|' + c + '|' + it.module] = 1;
+      dayCnt[sl.date + '|' + c] = (dayCnt[sl.date + '|' + c] || 0) + 1;
+    }
+    var left = [];
+    codes.forEach(function (c) { tails[c].forEach(function (u) { left.push(u); }); });
+    return left;
+  }
+
+  function earliestSlots(cfg, items, slots, dlOf) {
+    var heads = {}, codes = [];
+    cfg.courses.forEach(function (c) {
+      var list = courseOrder(items, c).filter(function (u) { return u.L != null; });
+      if (list.length) { heads[c] = list; codes.push(c); }
+    });
+    for (var k = 0; k < slots.length; k++) {
+      var best = null;
+      codes.forEach(function (c) {
+        if (!heads[c].length || k > dlOf[c]) return;
+        if (!best || dlOf[c] < dlOf[best] || (dlOf[c] === dlOf[best] && heads[c][0].value > heads[best][0].value)) best = c;
+      });
+      if (best) heads[best].shift().E = k;
+    }
+  }
+
   /*@3.SCPEJ.12*/
-  function place(cfg, days, units, mode) {
-    var idx = {};
-    days.forEach(function (d, i) { idx[d.date] = i; });
-    var byCourse = {};
-    units.forEach(function (u) { (byCourse[u.course] = byCourse[u.course] || []).push(u); });
-    Object.keys(byCourse).forEach(function (code) {
-      var list = byCourse[code];
-      list.sort(function (a, b) { return a.seq - b.seq || a.part - b.part; });
-      var ex = cfg.exam_dates[code];
-      var end = paceEnd(cfg, mode, ex, cfg.start_date);
-      var avail = days.filter(function (d) { return d.date < ex && d.date <= end && d.cap > 0; });
-      if (!avail.length) avail = days.filter(function (d) { return d.date < ex && d.cap > 0; });
-      var L = avail.length;
-      var perday = Math.ceil(list.length / Math.max(1, L));
-      list.forEach(function (u, k) {
-        u.target = L ? avail[Math.min(L - 1, Math.floor(k * L / list.length))].date : cfg.start_date;
-        u.exam = ex;
+  function setTargets(cfg, items, slots, days, dlOf, mode) {
+    var wide = mode === 'relaxed' || mode === 'balanced';
+    cfg.courses.forEach(function (c) {
+      var list = courseOrder(items, c).filter(function (u) { return u.L != null; });
+      list.filter(function (u) { return u.kind === 'buffer'; }).forEach(function (r) { r.target = slots[r.L].date; });
+      var us = list.filter(function (u) { return u.kind === 'study'; });
+      if (!us.length) return;
+      var lastL = 0;
+      us.forEach(function (u) { if (u.L > lastL) lastL = u.L; });
+      var from = wide ? cfg.start_date : slots[us[0].E != null ? us[0].E : us[0].L].date;
+      var to = slots[lastL].date;
+      var pe = paceEnd(cfg, mode, cfg.exam_dates[c], cfg.start_date);
+      if (pe >= from && pe < to) to = pe;
+      var win = days.filter(function (d) {
+        return d.date >= from && d.date <= to && d.slots.some(function (sl) { return sl.idx <= dlOf[c]; });
+      });
+      if (!win.length) win = [slots[us[0].L].day];
+      var W = win.length, n = us.length;
+      var perday = Math.ceil(n / W);
+      us.forEach(function (u, k) {
+        var t = win[Math.min(W - 1, Math.floor(k * W / n))].date;
+        var Ld = slots[u.L].date;
+        u.target = t < Ld ? t : Ld;
         u.perday = perday;
       });
     });
-    var lastDate = {}, lastPart = {};
-    var unplaced = [];
-    var pending = units.slice();
-    var deadlines = units.map(function (u) { return u.exam; })
-      .filter(function (d, i, a) { return d && a.indexOf(d) === i; }).sort();
+  }
 
-    /*@3.SCPEJ.22*/
-    var reserve = {};
-    if (cfg.review_mode === 'auto' && (mode === 'relaxed' || mode === 'balanced')) {
-      cfg.courses.forEach(function (c) {
-        var ex = cfg.exam_dates[c];
-        var cand = days.filter(function (d) { return d.date < ex && d.cap > 0; });
-        if (cand.length) { var ld = cand[cand.length - 1].date; (reserve[ld] = reserve[ld] || []).push(c); }
-      });
-    }
-    function safe(day, u) {
-      for (var k = 0; k < deadlines.length; k++) {
-        var D = deadlines[k];
-        if (D <= day.date || u.exam <= D) continue;
-        var free = 0;
-        days.forEach(function (d) { if (d.date < D) free += Math.max(0, freeOn(d)); });
-        var need = 0;
-        pending.forEach(function (p) { if (p !== u && p.exam <= D) need++; });
-        if (free - 1 < need) return false;
-      }
-      return true;
-    }
-    function ok(day, u, strict) {
-      if (!day || day.date >= u.exam) return false;
-      if (freeOn(day) <= 0) return false;
-      if (moduleOn(day, u.course, u.module)) return false;
-      if (strict && courseOn(day, u.course) >= Math.max(maxPerCourseDay(cfg, day.date), cfg.max_course_day > 0 ? 0 : (u.perday || 1))) return false;
-      if (reserve[day.date]) {
-        var held = reserve[day.date].filter(function (c) { return c !== u.course; }).length;
-        if (freeOn(day) - held <= 0) return false;
-      }
-      if (!safe(day, u)) return false;
-      return true;
-    }
-    function put(day, u) {
-      var pi = pending.indexOf(u);
-      if (pi !== -1) pending.splice(pi, 1);
-      day.items.push(u);
-      if (u.difficulty >= 7) day.hard++;
-      lastDate[u.course] = day.date;
-      lastPart[u.course + '/' + u.module] = day.date;
-    }
-
-    var queues = {};
-    Object.keys(byCourse).forEach(function (c) { queues[c] = byCourse[c].slice(); });
-    var codes = Object.keys(queues);
-    function eligible(u, day, late) {
-      if (day.date >= u.exam) return false;
-      if (late ? u.target >= day.date : u.target > day.date) return false;
-      var pp = lastPart[u.course + '/' + u.module];
-      return !(u.part > 1 && pp && pp >= day.date);
-    }
-    function rank(a, b) {
-      return (a.exam < b.exam ? -1 : a.exam > b.exam ? 1 : 0) ||
-        (a.target < b.target ? -1 : a.target > b.target ? 1 : 0) || (b.prio - a.prio) ||
-        (a.course < b.course ? -1 : a.course > b.course ? 1 : 0);
-    }
-    function fill(day, strict) {
-      var guard = 0;
-      while (freeOn(day) > 0 && guard++ < 60) {
-        var cands = codes.map(function (c) { return queues[c][0]; })
-          .filter(function (u) { return u && eligible(u, day, !strict) && ok(day, u, strict); });
-        if (!cands.length) return;
-        cands.sort(rank);
-        var u = cands[0];
-        if (u.difficulty >= 7 && day.hard > 0) {
-          var easy = cands.filter(function (x) { return x.difficulty < 7 && x.exam === u.exam; })[0];
-          if (easy) u = easy;
-        }
-        put(day, u);
-        queues[u.course].shift();
-      }
+  /*@3.SCPEJ.26*/
+  function placeForward(cfg, items, slots, days, dlOf) {
+    var owner = [];
+    var queues = {}, codes = [];
+    items.forEach(function (it) { if (it.L != null) owner[it.L] = it; });
+    cfg.courses.forEach(function (c) {
+      var list = courseOrder(items, c).filter(function (u) { return u.L != null; });
+      if (list.length) { queues[c] = list; codes.push(c); }
+    });
+    function put(sl, it) { sl.item = it; it.placed = true; it.at = sl.idx; }
+    function next(c) {
+      var q = queues[c];
+      while (q.length && q[0].placed) q.shift();
+      return q[0] || null;
     }
     days.forEach(function (day) {
-      fill(day, true);
-      if (!(cfg.max_course_day > 0)) fill(day, false);
+      day.slots.forEach(function (sl) {
+        var own = owner[sl.idx];
+        if (own && !own.placed) { put(sl, own); return; }
+        var cands = [];
+        codes.forEach(function (c) {
+          var it = next(c);
+          if (!it || sl.idx > dlOf[c] || it.target > sl.date || !warmOk(it, sl)) return;
+          if (sameModuleOn(day, c, it.module)) return;
+          if (cfg.max_course_day > 0 && courseOn(day, c) >= cfg.max_course_day) return;
+          if (it.kind === 'study') {
+            var lim = Math.max(it.perday || 1, cfg.max_course_day > 0 ? 0 : 1);
+            if (courseStudyOn(day, c) >= lim) return;
+          }
+          cands.push(it);
+        });
+        if (!cands.length) return;
+        cands.sort(function (a, b) {
+          return dlOf[a.course] - dlOf[b.course] || (a.target < b.target ? -1 : a.target > b.target ? 1 : 0) ||
+            b.value - a.value || (a.course < b.course ? -1 : 1);
+        });
+        var u = cands[0];
+        if (u.difficulty >= 7 && day.slots.some(function (x) { return x.item && x.item.difficulty >= 7; })) {
+          var easy = cands.filter(function (x) { return x.difficulty < 7 && dlOf[x.course] === dlOf[u.course]; })[0];
+          if (easy) u = easy;
+        }
+        put(sl, u);
+      });
     });
-    codes.forEach(function (c) { queues[c].forEach(function (u) { unplaced.push(u); }); });
+  }
 
-    /*@3.SCPEJ.13*/
+  /*@3.SCPEJ.13*/
+  function placeLeftovers(cfg, left, slots, dlOf) {
     var still = [];
-    unplaced.forEach(function (u) {
-      var pp = lastPart[u.course + '/' + u.module];
-      var lo = (u.part > 1 && pp) ? addDays(pp, 1) : cfg.start_date;
+    left.forEach(function (u) {
       var hit = null;
-      for (var i = 0; i < days.length; i++) {
-        if (days[i].date < lo) continue;
-        if (ok(days[i], u, false)) { hit = days[i]; break; }
+      for (var k = 0; k <= dlOf[u.course] && k < slots.length; k++) {
+        var sl = slots[k];
+        if (sl.item || !warmOk(u, sl) || (sl.only && sl.only !== u.course) || sameModuleOn(sl.day, u.course, u.module)) continue;
+        if (cfg.max_course_day > 0 && courseOn(sl.day, u.course) >= cfg.max_course_day) continue;
+        hit = sl; break;
       }
-      if (hit) { put(hit, u); u.out_of_order = true; }
+      if (hit) { hit.item = u; u.placed = true; u.out_of_order = u.kind === 'study'; }
       else still.push(u);
     });
     return still;
   }
 
   /*@3.SCPEJ.14*/
-  function placeBuffers(cfg, days, mode, forced) {
-    var placed = [], missed = [];
-    cfg.courses.forEach(function (code) {
-      var ex = cfg.exam_dates[code];
-      if (!ex) return;
-      var cand = days.filter(function (d) { return d.date < ex && d.cap > 0; });
-      if (!cand.length) { missed.push(code); return; }
-      var want = (mode === 'relaxed' && !forced) ? 2 : 1;
-      var got = 0;
-      for (var i = cand.length - 1; i >= 0 && got < want && i >= cand.length - 3; i--) {
-        var d = cand[i];
-        if (freeOn(d) <= 0 || moduleOn(d, code, null)) continue;
-        if (d.items.some(function (x) { return x.course === code && x.kind === 'buffer'; })) continue;
-        d.items.push({ course: code, module: null, part: 1, total_parts: 1, kind: 'buffer', difficulty: 0, prio: 1 });
-        got++;
+  function addPractice(cfg, slots, dlOf) {
+    if (cfg.review_mode !== 'auto') return 0;
+    var n = 0;
+    cfg.courses.forEach(function (c) {
+      var ex = cfg.exam_dates[c];
+      var hasFinal = slots.some(function (sl) { return sl.item && sl.item.course === c && sl.item.kind === 'buffer'; });
+      if (!hasFinal) return;
+      var tries = [addDays(ex, -2), addDays(ex, -3)];
+      for (var t = 0; t < tries.length; t++) {
+        var hit = null;
+        for (var k = 0; k <= dlOf[c] && k < slots.length; k++) {
+          var sl = slots[k];
+          if (sl.date !== tries[t] || sl.item || sl.warm || (sl.only && sl.only !== c)) continue;
+          if (sl.day.slots.some(function (x) { return x.item && x.item.course === c && x.item.kind === 'buffer'; })) continue;
+          hit = sl; break;
+        }
+        if (hit) {
+          hit.item = { course: c, module: null, part: 1, total_parts: 1, kind: 'buffer', review: 'practice', difficulty: 0, prio: 1, value: 0.2 };
+          n++;
+          return;
+        }
       }
-      if (got) placed.push(code); else missed.push(code);
     });
-    return { placed: placed, missed: missed };
-  }
-
-  function reserveBuffers(cfg, days) {
-    var codes = [];
-    cfg.courses.forEach(function (code) {
-      var ex = cfg.exam_dates[code];
-      if (!ex) return;
-      var cand = days.filter(function (d) { return d.date < ex && freeOn(d) > 0; });
-      if (!cand.length) return;
-      cand[cand.length - 1].items.push({ course: code, module: null, part: 1, total_parts: 1, kind: 'buffer', difficulty: 0, prio: 1 });
-      codes.push(code);
-    });
-    return codes;
+    return n;
   }
 
   /*@3.SCPEJ.15*/
-  function applySpacing(cfg, days, tier) {
+  function applySpacing(cfg, slots, dlOf, tier) {
     var offsets = SPACING_OFFSETS[tier] || [];
     if (!offsets.length) return { ok: true, n: 0 };
     var finals = [];
-    days.forEach(function (d) {
-      d.items.forEach(function (x) {
-        if (x.kind === 'study' && x.part === x.total_parts) finals.push({ x: x, date: d.date });
-      });
+    slots.forEach(function (sl) {
+      var x = sl.item;
+      if (x && x.kind === 'study' && x.part === x.total_parts) finals.push({ x: x, date: sl.date });
     });
     var added = [];
     for (var i = 0; i < finals.length; i++) {
-      var f = finals[i], ex = cfg.exam_dates[f.x.course];
+      var f = finals[i];
       for (var o = 0; o < offsets.length; o++) {
         var target = addDays(f.date, offsets[o]);
         var hit = null;
-        for (var k = 0; k < days.length; k++) {
-          var d = days[k];
-          if (d.date < target) continue;
-          if (ex && d.date >= ex) break;
-          if (freeOn(d) <= 0 || moduleOn(d, f.x.course, f.x.module)) continue;
-          hit = d; break;
+        for (var k = 0; k <= dlOf[f.x.course] && k < slots.length; k++) {
+          var sl = slots[k];
+          if (sl.date < target || sl.item || sl.warm || (sl.only && sl.only !== f.x.course) || sameModuleOn(sl.day, f.x.course, f.x.module)) continue;
+          hit = sl; break;
         }
         if (!hit) {
-          added.forEach(function (a) { a.day.items.splice(a.day.items.indexOf(a.it), 1); });
+          added.forEach(function (a) { a.item = null; });
           return { ok: false, n: 0 };
         }
-        var it = { course: f.x.course, module: f.x.module, part: 1, total_parts: 1, kind: 'spaced',
-                   difficulty: Math.max(0, f.x.difficulty - 3), prio: f.x.prio };
-        hit.items.push(it);
-        added.push({ day: hit, it: it });
+        hit.item = { course: f.x.course, module: f.x.module, part: 1, total_parts: 1, kind: 'spaced',
+                     difficulty: Math.max(0, f.x.difficulty - 3), prio: f.x.prio };
+        added.push(hit);
       }
     }
     return { ok: true, n: added.length };
   }
 
-  function applyExtraReviews(cfg, days) {
+  function applyExtraReviews(cfg, slots, dlOf) {
     var placed = 0, failed = 0;
-    var byDate = {};
-    days.forEach(function (d) { byDate[d.date] = d; });
     cfg.extra_reviews.forEach(function (r) {
       var mods = r.modules || [];
       if (!mods.length || !isDate(r.from) || !isDate(r.to)) return;
-      var win = days.filter(function (d) { return d.date >= r.from && d.date <= r.to && d.cap > 0; });
+      var win = slots.filter(function (sl) { return sl.date >= r.from && sl.date <= r.to && sl.idx <= (dlOf[r.course] == null ? -1 : dlOf[r.course]); });
       if (!win.length) { failed += mods.length; return; }
       mods.forEach(function (mid, i) {
         var start = Math.floor(i * win.length / mods.length), hit = null;
         for (var k = 0; k < win.length; k++) {
-          var d = win[(start + k) % win.length];
-          if (freeOn(d) > 0 && !moduleOn(d, r.course, mid)) { hit = d; break; }
+          var sl = win[(start + k) % win.length];
+          if (!sl.item && !sl.warm && !(sl.only && sl.only !== r.course) && !sameModuleOn(sl.day, r.course, mid)) { hit = sl; break; }
         }
         if (!hit) { failed++; return; }
-        hit.items.push({ course: r.course, module: mid, part: 1, total_parts: 1, kind: 'spaced', difficulty: 3, prio: 0.5, custom: true });
+        hit.item = { course: r.course, module: mid, part: 1, total_parts: 1, kind: 'spaced', difficulty: 3, prio: 0.5, custom: true };
         placed++;
       });
     });
@@ -570,7 +733,7 @@
   }
 
   /*@3.SCPEJ.16*/
-  function dayOrder(items) {
+  function dayOrder(items, cfg) {
     var study = items.filter(function (x) { return x.kind === 'study'; })
       .sort(function (a, b) { return b.difficulty - a.difficulty || b.prio - a.prio; });
     var out = [], lo = study.length - 1, hi = 0, flip = true;
@@ -578,17 +741,45 @@
       out.push(flip ? study[hi++] : study[lo--]);
       flip = !flip;
     }
-    var slots = {};
-    out.forEach(function (x, i) { (slots[x.course] = slots[x.course] || []).push(i); });
-    Object.keys(slots).forEach(function (c) {
-      var pos = slots[c];
-      var mine = pos.map(function (i) { return out[i]; })
-        .sort(function (a, b) { return (a.seq - b.seq) || (a.part - b.part); });
-      pos.forEach(function (i, k) { out[i] = mine[k]; });
+    var pos = {};
+    out.forEach(function (x, i) { (pos[x.course] = pos[x.course] || []).push(i); });
+    Object.keys(pos).forEach(function (c) {
+      var mine = pos[c].map(function (i) { return out[i]; })
+        .sort(function (a, b) { return ((a.seq || 0) - (b.seq || 0)) || (a.part - b.part); });
+      pos[c].forEach(function (i, k) { out[i] = mine[k]; });
     });
     var rev = items.filter(function (x) { return x.kind === 'spaced'; });
-    var buf = items.filter(function (x) { return x.kind === 'buffer'; });
+    var buf = items.filter(function (x) { return x.kind === 'buffer'; }).sort(function (a, b) {
+      var ea = cfg.exam_dates[a.course] || '', eb = cfg.exam_dates[b.course] || '';
+      return (eb < ea ? -1 : eb > ea ? 1 : 0) || (a.review === 'final') - (b.review === 'final');
+    });
     return rev.concat(out).concat(buf);
+  }
+
+  /*@3.SCPEJ.27*/
+  function arrangeDay(day, cfg, allowed) {
+    var its = [];
+    day.slots.forEach(function (sl) { if (sl.item) its.push(sl.item); sl.item = null; });
+    if (!its.length) return;
+    var tight = its.filter(function (it) { return cfg.exam_dates[it.course] === day.date; })
+      .sort(function (a, b) {
+        var ka = a.kind === 'buffer' ? (a.review === 'final' ? 2 : 1) : 0, kb = b.kind === 'buffer' ? (b.review === 'final' ? 2 : 1) : 0;
+        return ka - kb || (a.seq || 0) - (b.seq || 0) || (a.part || 1) - (b.part || 1);
+      });
+    var rest = its.filter(function (it) { return tight.indexOf(it) === -1; });
+    var desc = day.slots.slice().reverse();
+    for (var i = tight.length - 1; i >= 0; i--) {
+      var it = tight[i];
+      var sl = desc.filter(function (x) { return !x.item && allowed(it.course, x) && warmOk(it, x); })[0] ||
+               desc.filter(function (x) { return !x.item && allowed(it.course, x); })[0] ||
+               desc.filter(function (x) { return !x.item; })[0];
+      sl.item = it;
+    }
+    dayOrder(rest, cfg).forEach(function (it) {
+      var sl = day.slots.filter(function (x) { return !x.item && warmOk(it, x); })[0] ||
+               day.slots.filter(function (x) { return !x.item; })[0];
+      sl.item = it;
+    });
   }
 
   function layTimes(cfg, X, win, sessions, fixed) {
@@ -597,7 +788,7 @@
     var moved = 0;
     Object.keys(byDate).forEach(function (d) {
       var list = byDate[d];
-      var busy = cfg.avoid_conflicts ? X.busy(d).slice() : [];
+      var busy = (cfg.avoid_conflicts ? X.busy(d).slice() : []).concat(blocksOn(cfg, d));
       list.concat((fixed || []).filter(function (f) { return f.date === d && list.indexOf(f) === -1; }))
         .forEach(function (s) {
         if ((s.time_locked || list.indexOf(s) === -1) && s.start_time) {
@@ -606,12 +797,12 @@
         }
       });
       busy.sort(function (a, b) { return a.s - b.s; });
-      var cur = dayStartFor(d, win, X, cfg);
+      var cur = dayStartFor(d, win, X);
       list.filter(function (s) { return !(s.time_locked && s.start_time); })
         .sort(function (a, b) { return a.order - b.order; })
         .forEach(function (s) {
           var len = s.minutes || cfg.session_minutes;
-          var at = cfg.avoid_conflicts ? firstFreeAt(busy, cur, len, Math.max(win.end, cur + len)) : cur;
+          var at = firstFreeAt(busy, cur, len, Math.max(win.end, cur + len));
           if (at === null) at = cur;
           if (at !== cur) moved++;
           s.start_time = toHM(at);
@@ -635,12 +826,17 @@
     opts = opts || {};
     var cfg = normCfg(cfgIn);
     var X = makeCtx(ctxIn);
-    var diag = { per_course: {}, passed: [], advice: [], notes: [] };
+    var diag = { per_course: {}, passed: [], advice: [], notes: [], today_no_time: [] };
 
     cfg.courses = cfg.courses.filter(function (c) {
       var ex = cfg.exam_dates[c];
       if (!isDate(ex)) { diag.notes.push({ k: 'no_exam', course: c }); return false; }
       if (ex < cfg.start_date) { diag.passed.push(c); return false; }
+      if (ex === cfg.start_date) {
+        var b = examBlock(cfg, c);
+        if (!b) { diag.today_no_time.push(c); return false; }
+        if (ex === X.today && X.nowMin != null && X.nowMin >= b.start) { diag.passed.push(c); return false; }
+      }
       return true;
     });
     var lastExam = '';
@@ -650,35 +846,81 @@
       return { ok: false, sessions: [], unplaced: [], diagnostics: diag, spacing: 'off' };
     }
 
-    var built = buildDays(cfg, X, lastExam);
-    var days = built.days, win = built.win;
-    var bu = buildUnits(cfg, mods || {}, X);
-    var keep = applyKeep(days, bu.units, X);
+    var keep = splitKeep(X, cfg.start_date);
     var skipSet = {};
     X.skip.forEach(function (k) { if (k && k.course) skipSet[k.course + '/' + k.module] = 1; });
     var manual = [];
-    var units = keep.units.filter(function (u) {
-      if (!skipSet[u.course + '/' + u.module]) return true;
-      if (u.part === 1) manual.push({ course: u.course, module: u.module, part: 1, total: 1, reason: 'manual', prio: u.prio });
+    var bu = buildUnits(cfg, mods || {}, X, function (code, mid) {
+      if (skipSet[code + '/' + mid]) { manual.push({ course: code, module: mid, part: 1, total: 1, reason: 'manual', prio: 0.5 }); return true; }
       return false;
     });
+    var units = bu.units.filter(function (u) {
+      u.also = u.also.filter(function (m) { return !keep.used[u.course + '/' + m + '/study/1']; });
+      return !keep.used[unitKey(u)];
+    });
+    function needOf(c) {
+      var n = cfg.review_mode === 'off' ? 0 : 1;
+      units.forEach(function (u) { if (u.course === c) n++; });
+      return n;
+    }
+    var built = buildDays(cfg, X, lastExam, keep.by, needOf);
+    var days = built.days, slots = built.slots, win = built.win;
+    function allowed(c, sl) {
+      if (sl.only && sl.only !== c) return false;
+      var D = cfg.exam_dates[c];
+      if (sl.date < D) return true;
+      if (sl.date > D) return false;
+      var b = examBlock(cfg, c);
+      return !!b && sl.e <= b.s;
+    }
+    var dlOf = {};
+    cfg.courses.forEach(function (c) {
+      var L = -1;
+      slots.forEach(function (sl) { if (allowed(c, sl)) L = sl.idx; });
+      dlOf[c] = L;
+    });
+
     diag.mastered_skipped = bu.skipped.length;
 
-    var capacity = 0;
-    days.forEach(function (d) { capacity += Math.max(0, freeOn(d)); });
+    /*@3.SCPEJ.22*/
+    var reviews = [];
+    if (cfg.review_mode !== 'off') {
+      cfg.courses.forEach(function (c) {
+        var r = { course: c, module: null, part: 1, total_parts: 1, kind: 'buffer', review: 'final', difficulty: 0, prio: 1, seq: 999 };
+        if (keep.used[unitKey(r)]) return;
+        var mine = units.some(function (u) { return u.course === c; });
+        r.value = cfg.review_mode === 'always' ? 2 : round2((mine ? 0.3 : 1) * (0.85 + 0.3 * clamp(num(X.risk(c), 0.5), 0, 1)));
+        reviews.push(r);
+      });
+    }
+
+    var lost = [];
+    units = units.filter(function (u) {
+      if (dlOf[u.course] >= 0) return true;
+      if (u.part === 1) lost.push({ course: u.course, module: u.module, part: 1, total: 1, reason: 'no_time', prio: u.prio, also: u.also });
+      return false;
+    });
+    var missedReview = [];
+    reviews = reviews.filter(function (r) {
+      if (dlOf[r.course] >= 0) return true;
+      missedReview.push(r.course);
+      return false;
+    });
+
+    var capacity = slots.length;
     var demand = units.length;
     diag.capacity = capacity;
     diag.demand = demand;
     diag.units = units.length + keep.kept.length;
     diag.ratio = demand ? round2(capacity / demand) : 9;
     var worst = demand ? capacity / demand : 9;
-    cfg.courses.map(function (c) { return cfg.exam_dates[c]; }).forEach(function (D) {
-      var need = units.filter(function (u) { return (cfg.exam_dates[u.course] || '') <= D; }).length;
-      if (!need) return;
-      var cap = 0;
-      days.forEach(function (d) { if (d.date < D) cap += Math.max(0, freeOn(d)); });
-      worst = Math.min(worst, cap / need);
+    var Ls = [];
+    units.forEach(function (u) { if (Ls.indexOf(dlOf[u.course]) === -1) Ls.push(dlOf[u.course]); });
+    Ls.forEach(function (L) {
+      var need = units.filter(function (u) { return dlOf[u.course] <= L; }).length;
+      if (need) worst = Math.min(worst, (L + 1) / need);
     });
+    if (lost.length) worst = Math.min(worst, 0.5);
     var mode = modeOf(worst);
     diag.mode = mode;
     diag.window = win;
@@ -686,81 +928,102 @@
     diag.days_open = days.filter(function (d) { return d.cap > 0; }).length;
     diag.days_rest = days.filter(function (d) { return d.rest; }).length;
     diag.days_full = days.filter(function (d) { return !d.rest && d.cap === 0; }).length;
+    var near = '';
+    cfg.courses.forEach(function (c) { if (!near || cfg.exam_dates[c] < near) near = cfg.exam_dates[c]; });
+    diag.urgent = near ? diffDays(cfg.start_date, near) <= 1 : false;
 
     cfg.courses.forEach(function (code) {
-      var ex = cfg.exam_dates[code];
-      var cap = 0;
-      days.forEach(function (d) { if (d.date < ex) cap += Math.max(0, freeOn(d)); });
       diag.per_course[code] = {
-        exam: ex, need: units.filter(function (u) { return u.course === code; }).length,
-        cap: cap, days: diffDays(cfg.start_date, ex)
+        exam: cfg.exam_dates[code], exam_time: cfg.exam_times[code] || '', no_time: !examBlock(cfg, code),
+        need: units.filter(function (u) { return u.course === code; }).length,
+        cap: dlOf[code] + 1, days: diffDays(cfg.start_date, cfg.exam_dates[code])
       };
     });
 
-    var forced = cfg.review_mode === 'always' ? reserveBuffers(cfg, days) : [];
-    var dropped = triage(cfg, days, units, []);
-    var conflict = place(cfg, days, units, mode);
+    var items = units.concat(reviews);
+    var dropped = triage(cfg, items, slots, days, dlOf);
+    var left = latestSlots(cfg, items, slots, dlOf);
+    earliestSlots(cfg, items, slots, dlOf);
+    setTargets(cfg, items, slots, days, dlOf, mode);
+    placeForward(cfg, items, slots, days, dlOf);
+    var conflict = placeLeftovers(cfg, left, slots, dlOf);
 
-    var buf = { placed: forced.slice(), missed: [] };
-    if (cfg.review_mode === 'auto') buf = placeBuffers(cfg, days, mode, false);
-    diag.buffers = buf;
-
+    diag.practice = addPractice(cfg, slots, dlOf);
     var chosen = 'off';
     var tierIdx = Math.max(0, SPACING_TIERS.indexOf(cfg.spacing));
     for (var t = tierIdx; t < SPACING_TIERS.length; t++) {
-      if (applySpacing(cfg, days, SPACING_TIERS[t]).ok) { chosen = SPACING_TIERS[t]; break; }
+      if (applySpacing(cfg, slots, dlOf, SPACING_TIERS[t]).ok) { chosen = SPACING_TIERS[t]; break; }
     }
     diag.spacing_applied = chosen;
     diag.spacing_wanted = cfg.spacing;
-    var xr = applyExtraReviews(cfg, days);
+    var xr = applyExtraReviews(cfg, slots, dlOf);
     diag.extra_reviews_placed = xr.placed;
     diag.extra_reviews_failed = xr.failed;
+    days.forEach(function (d) { arrangeDay(d, cfg, allowed); });
 
     /*@3.SCPEJ.18*/
     var sessions = [];
-    var keptIds = {};
-    keep.kept.forEach(function (s) { keptIds[s.id] = 1; });
     days.forEach(function (d) {
-      var fresh = d.items.filter(function (x) { return !keptIds[x.id]; });
-      var keptHere = d.items.filter(function (x) { return keptIds[x.id]; });
-      var ordered = dayOrder(fresh);
-      var base = keptHere.length;
-      keptHere.forEach(function (s) { sessions.push(s); });
-      ordered.forEach(function (u, i) {
+      var fresh = d.slots.filter(function (sl) { return sl.item; });
+      var base = d.kept.length;
+      fresh.forEach(function (sl, i) {
+        var u = sl.item;
         sessions.push({
           id: newId(d.date, base + i, X),
           date: d.date, order: base + i, course: u.course, module: u.module || null,
           part: u.part || 1, total_parts: u.total_parts || 1, kind: u.kind || 'study',
-          start_time: '', minutes: cfg.session_minutes, done: false, note: '',
+          review: u.kind === 'buffer' ? (u.review || 'final') : undefined,
+          start_time: toHM(sl.s), minutes: sl.e - sl.s, done: false, note: '',
           prio: u.prio != null ? u.prio : 0.5, difficulty: u.difficulty || 0,
-          custom: u.custom ? true : undefined, out_of_order: u.out_of_order ? true : undefined
+          custom: u.custom ? true : undefined, out_of_order: u.out_of_order ? true : undefined,
+          also: u.also && u.also.length ? u.also.slice() : undefined
         });
       });
     });
-    keep.kept.forEach(function (s) {
-      if (!days.some(function (d) { return d.date === s.date; })) sessions.push(s);
+    keep.kept.forEach(function (s) { sessions.push(s); });
+    sessions.sort(function (a, b) {
+      return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.start_time || '').localeCompare(b.start_time || '') || a.order - b.order;
     });
-    sessions.sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : a.order - b.order; });
-    var fresh = sessions.filter(function (s) { return !keptIds[s.id]; });
-    diag.moved = layTimes(cfg, X, win, fresh, keep.kept);
+    diag.moved = 0;
     markKey(sessions);
 
-    var unplaced = manual.concat(dropped).concat(conflict.map(function (u) {
-      return { course: u.course, module: u.module, part: u.part, total: u.total_parts, reason: 'conflict', prio: u.prio };
-    }));
+    var unplaced = manual.concat(lost).concat(dropped.filter(function (x) { return x.reason !== 'review'; }))
+      .concat(conflict.filter(function (u) { return u.kind === 'study'; }).map(function (u) {
+        return { course: u.course, module: u.module, part: u.part, total: u.total_parts, reason: 'conflict', prio: u.prio, also: u.also };
+      }));
+    unplaced = expandAlso(unplaced);
     diag.dropped = unplaced.length;
     diag.kept_units = units.length - conflict.length;
+    var bufPlaced = [], bufMissed = missedReview.slice();
     cfg.courses.forEach(function (code) {
       var pc = diag.per_course[code];
       pc.placed = sessions.filter(function (s) { return s.course === code && s.kind === 'study'; }).length;
       pc.dropped = unplaced.filter(function (u) { return u.course === code; }).length;
-      pc.buffer = sessions.some(function (s) { return s.course === code && s.kind === 'buffer'; });
+      var fin = sessions.filter(function (s) { return s.course === code && s.kind === 'buffer'; });
+      pc.buffer = fin.length > 0;
+      if (fin.length) {
+        var last = fin[fin.length - 1];
+        pc.review_at = { date: last.date, time: last.start_time };
+        bufPlaced.push(code);
+      } else if (cfg.review_mode !== 'off' && bufMissed.indexOf(code) === -1) bufMissed.push(code);
     });
+    diag.buffers = { placed: bufPlaced, missed: cfg.review_mode === 'off' ? [] : bufMissed };
 
     var auto = unplaced.length - manual.length;
     if (auto > 0 && !opts.noAdvice) diag.advice = buildAdvice(cfgIn, mods, ctxIn, auto);
 
     return { ok: true, sessions: sessions, unplaced: unplaced, diagnostics: diag, spacing: chosen, cfg: cfg };
+  }
+
+  function expandAlso(list) {
+    var out = [];
+    list.forEach(function (u) {
+      var a = u.also;
+      delete u.also;
+      out.push(u);
+      (a || []).forEach(function (m) { out.push({ course: u.course, module: m, part: 1, total: 1, reason: u.reason, prio: u.prio }); });
+    });
+    return out;
   }
 
   /*@3.SCPEJ.19*/
@@ -844,6 +1107,7 @@
     checkMove: checkMove,
     moduleWeight: moduleWeight,
     prereqOrder: prereqOrder,
+    examBlock: function (cfg, code) { return examBlock(normCfg(cfg), code); },
     addDays: addDays, diffDays: diffDays, dayName: dayName, modNum: modNum,
     MAX_SPD: MAX_SPD,
     _modeOf: modeOf

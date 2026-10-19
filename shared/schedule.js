@@ -785,7 +785,7 @@
     if (ev.kind === 'exam') return L(EXAM_KIND[ev.sub] || EXAM_KIND.exam);
     if (ev.kind === 'intensive') {
       /*@3.SCHJ.70*/
-      if (ev.sub === 'buffer') return (isAr() ? 'مراجعة ما قبل الاختبار' : 'Pre-exam review');
+      if (ev.sub === 'buffer') return (ev.raw && ev.raw.review === 'practice') ? (isAr() ? 'اختبارٌ تجريبيّ' : 'Practice test') : (isAr() ? 'مراجعة ما قبل الاختبار' : 'Pre-exam review');
       var parts = [courseShort(ev.course_code)];
       if (ev.sub === 'spaced') parts.push(isAr() ? 'مراجعة متباعدة' : 'Spaced review');
       if (ev.module) parts.push((isAr() ? 'وحدة ' : 'M') + String(ev.module).replace(/^M/, ''));
@@ -1235,7 +1235,7 @@
       return;
     }
     if (k === 'course' && ev && ev.course_code) {
-      location.href = 'course.html?c=' + encodeURIComponent(ev.course_code);
+      location.href = 'course.html?code=' + encodeURIComponent(ev.course_code);
       return;
     }
     if (k === 'onlyday' && at) {

@@ -401,7 +401,7 @@
     /*@3.DASJ.18*/
     if (e.kind === 'intensive') {
       var num = parseInt(String(e.module || '').replace('M', ''), 10);
-      var what = e.sub === 'buffer' ? tx('مراجعة ما قبل الاختبار', 'Pre-exam review')
+      var what = e.sub === 'buffer' ? ((e.raw && e.raw.review === 'practice') ? tx('اختبارٌ تجريبيّ', 'Practice test') : tx('مراجعة ما قبل الاختبار', 'Pre-exam review'))
                : e.sub === 'spaced' ? tx('مراجعة متباعدة', 'Spaced review')
                : (tx('الوحدة ', 'Module ') + (num || '—') +
                   (e.total_parts > 1 ? ' (' + e.part + '/' + e.total_parts + ')' : ''));

@@ -74,6 +74,11 @@
         <template class="content-en">Static vs Dynamic Scope</template>
         <span class="content-target">النطاق الثابت مقابل النطاق الديناميكي</span>
       </a>
+      <a href="#scope-vs-lifetime" class="toc-link" data-bilingual>
+        <template class="content-ar">النطاق مقابل دورة الحياة</template>
+        <template class="content-en">Scope vs. Lifetime</template>
+        <span class="content-target">النطاق مقابل دورة الحياة</span>
+      </a>
       <a href="#blocks-and-let" class="toc-link" data-bilingual>
         <template class="content-ar">الكتل البرمجية وبنية LET</template>
         <template class="content-en">Blocks and LET Construct</template>
@@ -179,12 +184,12 @@
     <template class="content-ar">
       <span class="tag">النطاق</span>
       <span class="tag">الروابط</span>
-      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> ساعة و25 دقيقة</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> ساعة و35 دقيقة</span>
     </template>
     <template class="content-en">
       <span class="tag">Scope</span>
       <span class="tag">Bindings</span>
-      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 1 h 25 min</span>
+      <span class="tag tag--accent"><i class="fa-regular fa-clock"></i> 1 h 35 min</span>
     </template>
     <div class="content-target"></div>
   </div>
@@ -329,10 +334,65 @@
   </details>
 </section>
 
+<section id="scope-vs-lifetime" class="concept-card glass-card fade-up" data-study-s="371">
+  <div class="concept-header" data-bilingual>
+    <template class="content-ar"><h2><span class="concept-number">2</span> النطاق مقابل دورة الحياة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">2</span> Scope vs. Lifetime</h2></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="depth-tabs">
+    <button class="depth-tab active" data-layer="flash"><i class="fa-solid fa-bolt" aria-hidden="true"></i> <span data-i18n="layer.flash">سريع</span></button>
+    <button class="depth-tab" data-layer="full"><i class="fa-solid fa-book-open" aria-hidden="true"></i> <span data-i18n="layer.full">كامل</span></button>
+    <button class="depth-tab" data-layer="deep"><i class="fa-solid fa-microscope" aria-hidden="true"></i> <span data-i18n="layer.deep">عميق</span></button>
+  </div>
+
+  <div class="depth-layer active" data-layer="flash" data-bilingual>
+    <template class="content-ar"><p>النطاق (Scope) ودورة الحياة (Lifetime) مفهومان مختلفان؛ فالنطاق يحدد <b>أين</b> يمكن استخدام المتغير في الكود، بينما دورة الحياة تحدد <b>متى</b> يكون المتغير موجوداً في الذاكرة.</p></template>
+    <template class="content-en"><p>Scope and lifetime are distinct concepts; scope determines <b>where</b> a variable can be used in the code, while lifetime determines <b>when</b> the variable exists in memory.</p></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="full" data-bilingual>
+    <template class="content-ar"><p>رغم ارتباطهما الوثيق في كثير من الأحيان، إلا أن النطاق مكاني (يعتمد على النص البرمجي) ودورة الحياة زمانية (تعتمد على وقت التنفيذ).</p><p>أفضل مثال لتوضيح هذا الاختلاف هو <b><span class="smart-term" data-term-en="Static Variable" data-ar="المتغير الثابت" data-en-def="A variable whose lifetime is the entire execution of the program, regardless of its scope.">المتغير الثابت<span class="smart-term-tooltip"></span></span> (static) داخل دالة في لغتي C أو C++</b>:</p><ul><li><b>النطاق:</b> محلي (Local). لا يمكن الوصول إلى هذا المتغير أو رؤيته إلا من خلال العبارات البرمجية الموجودة داخل تلك الدالة فقط.</li><li><b><span class="smart-term" data-term-en="Lifetime" data-ar="دورة الحياة" data-en-def="The time during which a variable is bound to a specific memory location.">دورة الحياة<span class="smart-term-tooltip"></span></span>:</b> تمتد طوال فترة تشغيل البرنامج. يتم تخصيص الذاكرة له مرة واحدة قبل بدء التنفيذ، ويحتفظ بقيمته بين الاستدعاءات المتتالية للدالة.</li></ul></template>
+    <template class="content-en"><p>Although often closely related, scope is spatial (textual) and <span class="smart-term" data-term-en="Lifetime" data-ar="دورة الحياة" data-en-def="The time during which a variable is bound to a specific memory location.">lifetime<span class="smart-term-tooltip"></span></span> is temporal (execution time).</p><p>The best example to illustrate this difference is a <b><code>static</code> variable inside a C or C++ function</b>:</p><ul><li><b>Scope:</b> Local. The variable can only be accessed and is only visible to the statements within that specific function.</li><li><b>Lifetime:</b> The entire execution of the program. It is bound to memory once before execution begins and retains its value between consecutive calls to the function.</li></ul></template>
+    <div class="content-target"></div>
+  </div>
+  <div class="depth-layer" data-layer="deep" data-bilingual>
+    <template class="content-ar"><p>الخلط بين هذين المفهومين هو خطأ شائع. يعتقد البعض أن المتغير بمجرد خروجه من نطاقه (Scope) يتم تدميره من الذاكرة، وهذا صحيح للمتغيرات المحلية العادية (Stack-dynamic)، لكنه غير صحيح للمتغيرات الثابتة أو تلك المخصصة ديناميكيًا في الكومة (Heap).</p><p>تصميم المتغيرات الثابتة المحلية يسمح للدوال بالاحتفاظ بحالة (State) خاصة بها دون تلويث النطاق العام (Global Scope) بمتغيرات يمكن لأي جزء آخر من البرنامج تعديلها عن طريق الخطأ.</p></template>
+    <template class="content-en"><p>Confusing these two concepts is a common mistake. Many assume that once a variable goes out of scope, it is destroyed in memory. While true for regular local variables (stack-dynamic), it is false for <span class="smart-term" data-term-en="Static Variable" data-ar="المتغير الثابت" data-en-def="A variable whose lifetime is the entire execution of the program, regardless of its scope.">static variables<span class="smart-term-tooltip"></span></span> or those dynamically allocated on the heap.</p><p>The design of local static variables allows functions to maintain their internal state across calls without polluting the global scope with variables that other parts of the program could accidentally modify.</p></template>
+    <div class="content-target"></div>
+  </div>
+
+  <div class="code-block">
+    <div class="code-block-header">
+      <span>C++</span>
+      <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
+    </div>
+    <pre><code>void counter() {
+    // Scope: local to counter(). Lifetime: entire program.
+    static int count = 0; 
+    count++;
+}</code></pre>
+  </div>
+
+  <details class="thinking-question">
+    <summary data-bilingual>
+      <template class="content-ar">إذا قمنا بتخصيص ذاكرة ديناميكيًا (باستخدام `new` في C++) داخل دالة ولم نقم بتحريرها، فما هو نطاق ودورة حياة المؤشر (Pointer) مقابل الذاكرة المخصصة؟</template>
+      <template class="content-en">If we dynamically allocate memory (using `new` in C++) inside a function and do not free it, what is the scope and lifetime of the pointer vs. the allocated memory?</template>
+      <span class="content-target"></span>
+    </summary>
+    <div data-bilingual>
+      <template class="content-ar"><p>نطاق المؤشر محلي ودورة حياته تنتهي بانتهاء الدالة. أما الذاكرة المخصصة فنطاقها غير مباشر (عبر المؤشر) ودورة حياتها تستمر حتى يتم تحريرها صراحةً أو ينتهي البرنامج (مما يسبب تسرب الذاكرة).</p></template>
+      <template class="content-en"><p>The pointer's scope is local and its lifetime ends with the function. The allocated memory has no direct scope (accessed via pointer) and its lifetime continues until explicitly freed or the program ends (causing a memory leak).</p></template>
+      <div class="content-target"></div>
+    </div>
+  </details>
+</section>
+
 <section id="blocks-and-let" class="concept-card glass-card fade-up" data-study-s="493">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">2</span> الكتل البرمجية وبنية LET</h2></template>
-    <template class="content-en"><h2><span class="concept-number">2</span> Blocks and LET Construct</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">3</span> الكتل البرمجية وبنية LET</h2></template>
+    <template class="content-en"><h2><span class="concept-number">3</span> Blocks and LET Construct</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -413,8 +473,8 @@ end;</code></pre>
 
 <section id="referencing-environments" class="concept-card glass-card fade-up" data-study-s="174">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">3</span> بيئات المرجعية</h2></template>
-    <template class="content-en"><h2><span class="concept-number">3</span> Referencing Environments</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">4</span> بيئات المرجعية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">4</span> Referencing Environments</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -456,8 +516,8 @@ end;</code></pre>
 
 <section id="named-constants" class="concept-card glass-card fade-up" data-study-s="179">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">4</span> الثوابت المسماة</h2></template>
-    <template class="content-en"><h2><span class="concept-number">4</span> Named Constants</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">5</span> الثوابت المسماة</h2></template>
+    <template class="content-en"><h2><span class="concept-number">5</span> Named Constants</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -499,8 +559,8 @@ end;</code></pre>
 
 <section id="data-types-definition" class="concept-card glass-card fade-up" data-study-s="357">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">5</span> مفهوم أنواع البيانات</h2></template>
-    <template class="content-en"><h2><span class="concept-number">5</span> Concept of Data Types</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">6</span> مفهوم أنواع البيانات</h2></template>
+    <template class="content-en"><h2><span class="concept-number">6</span> Concept of Data Types</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -542,8 +602,8 @@ end;</code></pre>
 
 <section id="primitive-data-types" class="concept-card glass-card fade-up" data-study-s="399">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">6</span> أنواع البيانات الأساسية</h2></template>
-    <template class="content-en"><h2><span class="concept-number">6</span> Primitive Data Types</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">7</span> أنواع البيانات الأساسية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">7</span> Primitive Data Types</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -731,8 +791,8 @@ my_complex = (7 + 3j) # 7 is real, 3 is imaginary</code></pre>
 
 <section id="character-string-types" class="concept-card glass-card fade-up" data-study-s="452">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">7</span> أنواع السلاسل النصية</h2></template>
-    <template class="content-en"><h2><span class="concept-number">7</span> Character String Types</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">8</span> أنواع السلاسل النصية</h2></template>
+    <template class="content-en"><h2><span class="concept-number">8</span> Character String Types</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -919,8 +979,8 @@ my_complex = (7 + 3j) # 7 is real, 3 is imaginary</code></pre>
 
 <section id="enumeration-types" class="concept-card glass-card fade-up" data-study-s="194">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">8</span> الأنواع المسرودة (Enumeration)</h2></template>
-    <template class="content-en"><h2><span class="concept-number">8</span> Enumeration Types</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">9</span> الأنواع المسرودة (Enumeration)</h2></template>
+    <template class="content-en"><h2><span class="concept-number">9</span> Enumeration Types</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -962,8 +1022,8 @@ my_complex = (7 + 3j) # 7 is real, 3 is imaginary</code></pre>
 
 <section id="variable-declarations-and-global-scope" class="concept-card glass-card fade-up" data-study-s="324">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">9</span> إعلانات المتغيرات والنطاق العام</h2></template>
-    <template class="content-en"><h2><span class="concept-number">9</span> Variable Declarations and Global Scope</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">10</span> إعلانات المتغيرات والنطاق العام</h2></template>
+    <template class="content-en"><h2><span class="concept-number">10</span> Variable Declarations and Global Scope</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -1015,8 +1075,8 @@ my_complex = (7 + 3j) # 7 is real, 3 is imaginary</code></pre>
 
 <section id="character-string-operations" class="concept-card glass-card fade-up" data-study-s="205">
   <div class="concept-header" data-bilingual>
-    <template class="content-ar"><h2><span class="concept-number">10</span> عمليات السلاسل النصية وتنفيذها</h2></template>
-    <template class="content-en"><h2><span class="concept-number">10</span> Character String Operations and Implementation</h2></template>
+    <template class="content-ar"><h2><span class="concept-number">11</span> عمليات السلاسل النصية وتنفيذها</h2></template>
+    <template class="content-en"><h2><span class="concept-number">11</span> Character String Operations and Implementation</h2></template>
     <div class="content-target"></div>
   </div>
 
@@ -1308,6 +1368,24 @@ my_complex = (7 + 3j) # 7 is real, 3 is imaginary</code></pre>
         <div class="accordion-body-inner" data-bilingual>
           <template class="content-ar"><p>نوع البيانات هو المخطط أو التعريف الذي يحدد مجموعة القيم الصالحة والعمليات المسموح بها. أما الكائن فهو نسخة ملموسة ومحددة (Instance) من نوع البيانات هذا، والتي يتم إنشاؤها وتوجد فعليًا في الذاكرة أثناء تشغيل البرنامج.</p></template>
           <template class="content-en"><p>A data type is the blueprint that defines a collection of valid values and operations. An object is a specific, concrete instance of a user-defined data type that is created and actually exists in memory during program execution.</p></template>
+          <div class="content-target"></div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="accordion-item">
+      <button class="accordion-trigger">
+        <span data-bilingual>
+          <template class="content-ar">لماذا يعتبر من المفيد أن يكون للمتغير نطاق محلي ولكن دورة حياة تمتد طوال البرنامج، مثل المتغير الثابت في C؟</template>
+          <template class="content-en">Why is it useful for a variable to have a local scope but a program-wide lifetime, like a static variable in C?</template>
+          <span class="content-target">لماذا يعتبر من المفيد أن يكون للمتغير نطاق محلي ولكن دورة حياة تمتد طوال البرنامج، مثل المتغير الثابت في C؟</span>
+        </span>
+        <i class="fa-solid fa-chevron-down chevron"></i>
+      </button>
+      <div class="accordion-body">
+        <div class="accordion-body-inner" data-bilingual>
+          <template class="content-ar"><p>هذا التصميم يسمح للدالة بالاحتفاظ بحالتها (مثل عداد أو ذاكرة تخزين مؤقت) عبر استدعاءات متعددة دون تعريض هذا المتغير لباقي البرنامج. هذا يحميه من التعديلات غير المقصودة ويدعم مبدأ التغليف (Encapsulation).</p></template>
+          <template class="content-en"><p>This design allows a function to retain its state (like a counter or cache) across multiple calls without exposing that variable to the rest of the program. This protects it from unintended modifications and supports the principle of encapsulation.</p></template>
           <div class="content-target"></div>
         </div>
       </div>
@@ -1686,7 +1764,7 @@ my_complex = (7 + 3j) # 7 is real, 3 is imaginary</code></pre>
   <div class="quiz-progress"><div class="quiz-progress-fill" id="quiz-progress-fill"></div></div>
   <div id="quiz-content" class="quiz-card glass-card">
     <div class="quiz-header">
-      <span id="quiz-counter">1 / 18</span>
+      <span id="quiz-counter">1 / 20</span>
       <span><i class="fa-solid fa-bullseye" aria-hidden="true"></i> <span data-i18n="quiz.score">نتيجتك</span>: <span id="quiz-score-live">0</span></span>
     </div>
     <div class="quiz-question" id="quiz-question-text"></div>
@@ -1702,7 +1780,7 @@ my_complex = (7 + 3j) # 7 is real, 3 is imaginary</code></pre>
   </div>
   <div id="quiz-results" class="quiz-results glass-card hidden">
     <div class="score-emoji" id="quiz-score-emoji"><i class="fa-solid fa-trophy" aria-hidden="true"></i></div>
-    <div class="score-display" id="quiz-score-display">0 / 18</div>
+    <div class="score-display" id="quiz-score-display">0 / 20</div>
     <button class="nav-btn" onclick="Garden.retryQuiz()" data-i18n="quiz.retry">إعادة الاختبار</button>
   </div>
 </section>
@@ -2283,6 +2361,70 @@ my_complex = (7 + 3j) # 7 is real, 3 is imaginary</code></pre>
       "en": "Think of the word 'order'."
     },
     "difficulty": "easy"
+  },
+  {
+    "conceptId": "data-types-definition",
+    "question": {
+      "ar": "ما الذي يحدده نوع البيانات (Data Type) بشكل أساسي في لغة البرمجة؟",
+      "en": "What exactly does a data type define in a programming language?"
+    },
+    "options": {
+      "ar": [
+        "مجموعة من كائنات البيانات ومجموعة من العمليات المحددة مسبقًا عليها",
+        "مقدار الذاكرة المطلوبة لتخزين القيمة فقط",
+        "عنوان الذاكرة الفعلي حيث يتم تخزين المتغير",
+        "دورة حياة المتغير ونطاقه داخل البرنامج"
+      ],
+      "en": [
+        "A collection of data objects and a set of predefined operations on those objects",
+        "Only the amount of memory required to store a value",
+        "The physical memory address where a variable is stored",
+        "The lifetime and scope of a variable within the program"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "نوع البيانات لا يقتصر على القيم فقط، بل يشمل دائمًا العمليات المسموح بإجرائها على هذه القيم (مثل الجمع للأرقام أو الدمج للسلاسل).",
+      "en": "A data type is not just about values; it always includes the permissible operations on those values (like addition for numbers or catenation for strings)."
+    },
+    "hint": {
+      "ar": "تذكر أن النوع يجيب على سؤالين: ما هي القيم؟ وماذا يمكننا أن نفعل بها؟",
+      "en": "Remember that a type answers two questions: what are the values, and what can we do with them?"
+    },
+    "difficulty": "easy",
+    "id": 19
+  },
+  {
+    "conceptId": "scope-vs-lifetime",
+    "question": {
+      "ar": "أي من الحالات التالية توضح بشكل أفضل الاختلاف بين النطاق (Scope) ودورة الحياة (Lifetime)؟",
+      "en": "Which of the following cases best illustrates the difference between scope and lifetime?"
+    },
+    "options": {
+      "ar": [
+        "متغير ثابت (static) داخل دالة في لغة C",
+        "متغير عام (global) في نص برمجي بلغة Python",
+        "متغير محلي داخل حلقة for في لغة Java",
+        "سلسلة نصية مخصصة ديناميكيًا في لغة C++"
+      ],
+      "en": [
+        "A static variable inside a C function",
+        "A global variable in a Python script",
+        "A local variable inside a Java for-loop",
+        "A dynamically allocated string in C++"
+      ]
+    },
+    "correctIndex": 0,
+    "explanation": {
+      "ar": "المتغير الثابت في C له نطاق محلي (مرئي فقط داخل الدالة) ولكن دورة حياته تمتد طوال فترة تشغيل البرنامج، مما يبرز بوضوح انفصال المفهومين.",
+      "en": "A static variable in C has a local scope (visible only inside the function) but a lifetime that spans the entire program execution, clearly highlighting the separation of the two concepts."
+    },
+    "hint": {
+      "ar": "ابحث عن حالة يكون فيها المتغير مخفيًا عن باقي البرنامج ولكنه يظل موجودًا في الذاكرة دائمًا.",
+      "en": "Look for a case where the variable is hidden from the rest of the program but always exists in memory."
+    },
+    "difficulty": "medium",
+    "id": 20
   }
 ]
 </script>

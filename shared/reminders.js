@@ -482,9 +482,12 @@
       }
       if (fireAt > horizon) return;
       var mn = parseInt(String(ss.module || '').replace(/^M/i, ''), 10) || 0;
-      var what = ss.kind === 'buffer' ? tx('مراجعة ما قبل الاختبار', 'Pre-exam review')
+      var what = ss.kind === 'buffer' ? (ss.review === 'practice' ? tx('اختبارٌ تجريبيّ', 'Practice test') : tx('مراجعة ما قبل الاختبار', 'Pre-exam review'))
         : ss.kind === 'spaced' ? tx('مراجعة الوحدة ' + mn, 'Review of module ' + mn)
-        : tx('الوحدة ' + mn, 'Module ' + mn) + (ss.total_parts > 1 ? ' (' + ss.part + '/' + ss.total_parts + ')' : '');
+        : (Array.isArray(ss.also) && ss.also.length
+          ? tx('الوحدات ' + [mn].concat(ss.also.map(function (x) { return parseInt(String(x).replace(/^M/i, ''), 10) || 0; })).join(' و'),
+               'Modules ' + [mn].concat(ss.also.map(function (x) { return parseInt(String(x).replace(/^M/i, ''), 10) || 0; })).join(' + '))
+          : tx('الوحدة ' + mn, 'Module ' + mn)) + (ss.total_parts > 1 ? ' (' + ss.part + '/' + ss.total_parts + ')' : '');
       var mt = tx(ss.title || '', ss.title_en || ss.title || '');
       var tip = tx(ss.tip || '', ss.tip_en || ss.tip || '');
       var body = (mt && ss.kind !== 'buffer' ? mt + ' — ' : '') +
