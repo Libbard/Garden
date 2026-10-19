@@ -610,6 +610,7 @@
 
     /*@3.GARJ.24*/
     if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+      guardPrices(document.body);
       MathJax.typesetPromise().catch((err) => console.log('MathJax Error:', err));
     }
     /*@3.GARJ.25*/
@@ -991,16 +992,94 @@
     });
   }
 
+  /*@3.GARJ.712*/
+  const _PG_AR = /[؀-ۿ]/, _PG_TEX = /[\\^_{}=<>|]/, _PG_W = /[A-Za-z]{2,}/g, _PG_D = /[\d٠-٩]/;
+  const _PG_ARW = /[؀-ۿ]{2}/, _PG_CMD = /[\\^_{}]/, _PG_SP = ' \t\r\n  ';
+  const _PG_LIT = { '(': ')', "'": "'", '"': '"', '«': '»', '‘': '’' };
+  const _PG_SKIP = 'script,style,textarea,code,pre,mjx-container,.mathjax_ignore,[contenteditable]';
+  function _pgProse(t) {
+    if (_PG_ARW.test(t) && !_PG_CMD.test(t)) return true;
+    return !_PG_TEX.test(t) && (_PG_AR.test(t) || (t.match(_PG_W) || []).length >= 2);
+  }
+  function _pgLiteral(s, i) { return (_PG_LIT[s[i - 1]] !== undefined && _PG_LIT[s[i - 1]] === s[i + 1]) || /^_[A-Z]{2}/.test(s.slice(i + 1, i + 4)); }
+  function _pgOpener(s, i) { return (i === 0 || (_PG_SP + '([{«').indexOf(s[i - 1]) >= 0) && i + 1 < s.length && _PG_SP.indexOf(s[i + 1]) < 0; }
+  function _pgCloser(s, i) { return i > 0 && _PG_SP.indexOf(s[i - 1]) < 0 && (i + 1 === s.length || !/[\p{L}\p{N}]/u.test(s[i + 1])); }
+  function _pgPrice(s, i) {
+    const a = s.slice(i + 1, i + 3).replace(/^[\s ]+/, ''), b = s.slice(Math.max(0, i - 2), i).replace(/[\s ]+$/, '');
+    return _PG_D.test(a.charAt(0)) || _PG_D.test(b.charAt(b.length - 1));
+  }
+  function _pgHits(s) {
+    const all = [];
+    for (let i = 0; i < s.length; i++) {
+      if (s[i] !== '$') continue;
+      if (s[i + 1] === '$') { i++; continue; }
+      if (i && s[i - 1] === '\\') continue;
+      all.push(i);
+    }
+    const gone = new Set(all.filter((x) => _pgLiteral(s, x)));
+    let priced = false;
+    for (let k = 0; k < 40; k++) {
+      const pos = all.filter((x) => !gone.has(x));
+      let hit = null;
+      for (let j = 0; j + 1 < pos.length; j += 2) {
+        const a = pos[j], b = pos[j + 1];
+        const rng = _pgPrice(s, a) && _pgPrice(s, b) && (_PG_D.test(s.charAt(b + 1)) || _PG_D.test(s.charAt(a - 1)));
+        if (!_pgProse(s.slice(a + 1, b)) && !rng) continue;
+        hit = [a, b].filter((x) => _pgPrice(s, x));
+        if (!hit.length && (!_pgCloser(s, b) || !_pgOpener(s, a))) hit = [a];
+        if (hit.length) break;
+      }
+      if (!hit || !hit.length) break;
+      priced = priced || hit.some((x) => _pgPrice(s, x));
+      hit.forEach((x) => gone.add(x));
+    }
+    if (priced) all.forEach((x) => { if (_pgPrice(s, x)) gone.add(x); });
+    return [...gone].sort((x, y) => x - y);
+  }
+  function guardPrices(root) {
+    if (!root || (root.textContent || '').indexOf('$') < 0) return;
+    const doc = root.ownerDocument || document, list = [];
+    const w = doc.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => n.data.indexOf('$') !== n.data.lastIndexOf('$') && !(n.parentElement && n.parentElement.closest(_PG_SKIP)) ? 1 : 3
+    });
+    let n;
+    while ((n = w.nextNode())) list.push(n);
+    list.forEach((t) => {
+      const hits = _pgHits(t.data);
+      if (!hits.length) return;
+      const frag = doc.createDocumentFragment();
+      let last = 0;
+      hits.forEach((x) => {
+        frag.appendChild(doc.createTextNode(t.data.slice(last, x)));
+        const svg = t.parentNode.namespaceURI === 'http://www.w3.org/2000/svg';
+        const sp = svg ? doc.createElementNS(t.parentNode.namespaceURI, 'tspan') : doc.createElement('span');
+        sp.setAttribute('class', 'mathjax_ignore');
+        sp.textContent = '$';
+        frag.appendChild(sp);
+        last = x + 1;
+      });
+      frag.appendChild(doc.createTextNode(t.data.slice(last)));
+      t.parentNode.replaceChild(frag, t);
+    });
+  }
+  function _mathLeft(el) {
+    if (!el.querySelector('.mathjax_ignore')) return MATH_RE.test(el.textContent || '');
+    const c = el.cloneNode(true);
+    c.querySelectorAll('.mathjax_ignore').forEach((s) => s.remove());
+    return MATH_RE.test(c.textContent || '');
+  }
+
   if (window.MathJax && typeof MathJax.typesetPromise !== 'function' && typeof MathJax === 'object') {
     const st = MathJax.startup = MathJax.startup || {};
-    if (!st.ready) st.ready = () => { MathJax.startup.defaultReady(); mathArabic(); };
+    if (!st.ready) st.ready = () => { guardPrices(document.body); MathJax.startup.defaultReady(); mathArabic(); };
   } else mathArabic();
 
   let _mathLoading = null;
   function typesetMath(el) {
     if (!el) return;
     enhanceMath(el);
-    if (!MATH_RE.test(el.textContent || '')) return;
+    guardPrices(el);
+    if (!_mathLeft(el)) return;
     if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
       mathArabic();
       MathJax.typesetPromise([el]).catch(() => { });
@@ -1011,7 +1090,7 @@
         tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
         chtml: { displayAlign: 'left' },
         options: { enableMenu: false },
-        startup: { ready: () => { MathJax.startup.defaultReady(); mathArabic(); } }
+        startup: { ready: () => { guardPrices(document.body); MathJax.startup.defaultReady(); mathArabic(); } }
       };
       _mathLoading = new Promise((res) => {
         /*@3.GARJ.573*/
@@ -1058,7 +1137,7 @@
       .map((id) => document.getElementById(id)).filter(Boolean);
     if (!boxes.length) return;
     const due = new Set(); let timer = 0;
-    const own = (n) => n && n.nodeType === 1 && (n.nodeName.indexOf('MJX') === 0 || !!(n.closest && n.closest('mjx-container')));
+    const own = (n) => n && n.nodeType === 1 && (n.nodeName.indexOf('MJX') === 0 || !!(n.closest && n.closest('mjx-container, .mathjax_ignore')));
     const flush = () => { timer = 0; due.forEach(typesetMath); due.clear(); };
     const mo = new MutationObserver((list) => {
       for (const m of list) {
@@ -6628,6 +6707,7 @@ ${baseRules}`) + regenSuffix;
 
     function typesetIn(el) {
       if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+        guardPrices(el);
         MathJax.typesetPromise([el]).catch(() => { });
       }
     }
@@ -7199,6 +7279,7 @@ ${baseRules}`) + regenSuffix;
     if (!bodyEl) return;
     bodyEl.innerHTML = html;
     if (window.MathJax && typeof MathJax.typesetPromise === 'function') {
+      guardPrices(bodyEl);
       MathJax.typesetPromise([bodyEl]).catch(() => { });
     }
   }

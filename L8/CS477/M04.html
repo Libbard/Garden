@@ -776,8 +776,8 @@
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="full" data-bilingual>
-    <template class="content-ar"><p>لبناء AST باستخدام أدوات التحليل النحوي، نتبع الخطوات التالية:</p><ol><li><strong>تعريف الهياكل:</strong> في ملف <code>tree.h</code>، نقوم بتعريف هياكل العقد (structs) وأنواعها (enums) واتحاداتها (unions) لتخزين القيم المختلفة (مثل الأرقام أو السلاسل النصية أو المؤشرات لعقد أخرى).</li><li><strong>دوال البناء (Constructors):</strong> في ملف <code>tree.c</code>، نكتب دوال مثل <code>makeEXP_intLiteral</code> التي تقوم بحجز الذاكرة (malloc) وتهيئة حقول العقدة.</li><li><strong>توسيع Bison:</strong> في ملف <code>tiny.y</code>، نستخدم <code>%union</code> لتعريف أنواع القيم الدلالية. ثم نربط هذه الأنواع بالرموز الطرفية وغير الطرفية باستخدام <code>%token</code> و <code>%type</code>.</li><li><strong>الإجراءات الدلالية:</strong> نضيف كود C داخل قواعد Bison لإنشاء العقد، مثل: <code>$$ = makeEXP_plus(<span class="mathjax_ignore">$</span>1, <span class="mathjax_ignore">$</span>3);</code>.</li></ol></template>
-    <template class="content-en"><p>To construct an AST using parsing tools, we follow these steps:</p><ol><li><strong>Define Structures:</strong> In <code>tree.h</code>, define the node structs, enums for kinds, and unions to store different values (integers, strings, or pointers to other nodes).</li><li><strong>Constructors:</strong> In <code>tree.c</code>, write factory functions like <code>makeEXP_intLiteral</code> that allocate memory (malloc) and initialize the node's fields.</li><li><strong>Extend Bison:</strong> In <code>tiny.y</code>, use the <code>%union</code> directive to define semantic value types. Associate these types with tokens and non-terminals using <code>%token</code> and <code>%type</code>.</li><li><strong>Semantic Actions:</strong> Add C code inside Bison rules to create nodes, e.g., <code>$$ = makeEXP_plus(<span class="mathjax_ignore">$</span>1, <span class="mathjax_ignore">$</span>3);</code>.</li></ol></template>
+    <template class="content-ar"><p>لبناء AST باستخدام أدوات التحليل النحوي، نتبع الخطوات التالية:</p><ol><li><strong>تعريف الهياكل:</strong> في ملف <code>tree.h</code>، نقوم بتعريف هياكل العقد (structs) وأنواعها (enums) واتحاداتها (unions) لتخزين القيم المختلفة (مثل الأرقام أو السلاسل النصية أو المؤشرات لعقد أخرى).</li><li><strong>دوال البناء (Constructors):</strong> في ملف <code>tree.c</code>، نكتب دوال مثل <code>makeEXP_intLiteral</code> التي تقوم بحجز الذاكرة (malloc) وتهيئة حقول العقدة.</li><li><strong>توسيع Bison:</strong> في ملف <code>tiny.y</code>، نستخدم <code>%union</code> لتعريف أنواع القيم الدلالية. ثم نربط هذه الأنواع بالرموز الطرفية وغير الطرفية باستخدام <code>%token</code> و <code>%type</code>.</li><li><strong>الإجراءات الدلالية:</strong> نضيف كود C داخل قواعد Bison لإنشاء العقد، مثل: <code>$$ = makeEXP_plus($1, $3);</code>.</li></ol></template>
+    <template class="content-en"><p>To construct an AST using parsing tools, we follow these steps:</p><ol><li><strong>Define Structures:</strong> In <code>tree.h</code>, define the node structs, enums for kinds, and unions to store different values (integers, strings, or pointers to other nodes).</li><li><strong>Constructors:</strong> In <code>tree.c</code>, write factory functions like <code>makeEXP_intLiteral</code> that allocate memory (malloc) and initialize the node's fields.</li><li><strong>Extend Bison:</strong> In <code>tiny.y</code>, use the <code>%union</code> directive to define semantic value types. Associate these types with tokens and non-terminals using <code>%token</code> and <code>%type</code>.</li><li><strong>Semantic Actions:</strong> Add C code inside Bison rules to create nodes, e.g., <code>$$ = makeEXP_plus($1, $3);</code>.</li></ol></template>
     <div class="content-target"></div>
   </div>
   <div class="depth-layer" data-layer="deep" data-bilingual>
@@ -791,8 +791,8 @@
       <span>c</span>
       <button class="copy-btn"><i class="fa-regular fa-copy" aria-hidden="true"></i> Copy</button>
     </div>
-    <pre><code>exp : tINTVAL { $$ = makeEXP_intLiteral(<span class="mathjax_ignore">$</span>1); }
-    | exp '+' exp { $$ = makeEXP_plus(<span class="mathjax_ignore">$</span>1, <span class="mathjax_ignore">$</span>3); }</code></pre>
+    <pre><code>exp : tINTVAL { $$ = makeEXP_intLiteral($1); }
+    | exp '+' exp { $$ = makeEXP_plus($1, $3); }</code></pre>
   </div>
 
   <details class="thinking-question">
@@ -1313,8 +1313,8 @@ struct param_list {
         "en": "By using right-recursive rules, where the left element represents one declaration and the right represents the rest of the list."
       },
       "example": {
-        "ar": "<code>decl_list : decl decl_list { $$ = <span class=\"mathjax_ignore\">$</span>1; <span class=\"mathjax_ignore\">$</span>1->next = <span class=\"mathjax_ignore\">$</span>2; }</code>",
-        "en": "<code>decl_list : decl decl_list { $$ = <span class=\"mathjax_ignore\">$</span>1; <span class=\"mathjax_ignore\">$</span>1->next = <span class=\"mathjax_ignore\">$</span>2; }</code>"
+        "ar": "<code>decl_list : decl decl_list { $$ = $1; $1->next = $2; }</code>",
+        "en": "<code>decl_list : decl decl_list { $$ = $1; $1->next = $2; }</code>"
       }
     }
   },
@@ -1364,8 +1364,8 @@ struct param_list {
         "en": "C code written inside Bison grammar rules that executes when a rule matches, typically used to create AST nodes."
       },
       "example": {
-        "ar": "<code>{ $$ = makeEXP_plus(<span class=\"mathjax_ignore\">$</span>1, <span class=\"mathjax_ignore\">$</span>3); }</code>",
-        "en": "<code>{ $$ = makeEXP_plus(<span class=\"mathjax_ignore\">$</span>1, <span class=\"mathjax_ignore\">$</span>3); }</code>"
+        "ar": "<code>{ $$ = makeEXP_plus($1, $3); }</code>",
+        "en": "<code>{ $$ = makeEXP_plus($1, $3); }</code>"
       }
     }
   },
