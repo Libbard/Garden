@@ -879,6 +879,7 @@
       self.ocrInto(n, td);
       s.td = td;
       s.el.insertBefore(td, s.lay || null);
+      fitRtl(tl, two[1], vp.scale);
       s.tbusy = 0;
       if (self.o.onText) self.o.onText(n, td);
       /*@3.NOPJ3.33*/
@@ -899,6 +900,31 @@
       if (it.dir === 'rtl' || Math.abs(tr[1] || 0) > 0.01 || Math.abs(tr[2] || 0) > 0.01) continue;
       sp.__pg = page; sp.__fn = it.fontName; sp.__w = it.width; sp.__fs = Math.abs(tr[3] || tr[0] || 0); sp.__pw = pw;
     }
+  }
+
+  function fitRtl(tl, items, scale) {
+    var divs = tl && tl.textDivs, strs = tl && tl.textContentItemsStr;
+    if (!divs || !items || !strs || !(scale > 0)) return;
+    var todo = [];
+    for (var i = 0, j = 0; i < strs.length && j < items.length; i++, j++) {
+      while (j < items.length && items[j].str !== strs[i]) j++;
+      var it = items[j], sp = divs[i], tr = (it && it.transform) || [];
+      if (!it || !sp || it.dir !== 'rtl' || !(it.width > 0)) continue;
+      if (Math.abs(tr[1] || 0) > 0.01 || Math.abs(tr[2] || 0) > 0.01) continue;
+      todo.push([sp, it.width * scale]);
+    }
+    var got = todo.map(function (x) { return x[0].getBoundingClientRect().width; });
+    var z = todo.length ? todo[0][0].closest('.gpv-page') : null;
+    var zr = z ? z.getBoundingClientRect().width / (z.offsetWidth || 1) : 1;
+    todo.forEach(function (x, k) {
+      var w = got[k] / (zr || 1);
+      if (!(w > 0)) return;
+      var f = x[1] / w;
+      if (Math.abs(f - 1) < 0.02) return;
+      var m = /scaleX\(([-0-9.e]+)\)/.exec(x[0].style.transform || '');
+      var sx = m ? parseFloat(m[1]) : 1;
+      x[0].style.transform = (x[0].style.transform || '').replace(/scaleX\([^)]*\)/, '') + ' scaleX(' + (sx * f).toFixed(5) + ')';
+    });
   }
 
   function invOf(f) {

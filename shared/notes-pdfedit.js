@@ -859,7 +859,7 @@
           if (f instanceof P.PDFArray) f = f.size() === 1 ? f.get(0) : null;
           var fl = nm(f), px;
           if (fl === 'DCTDecode') {
-            px = createImageBitmap(new Blob([o.contents], { type: 'image/jpeg' }), { colorSpaceConversion: 'none' });
+            px = createImageBitmap(new Blob([o.contents], { type: 'image/jpeg' }), { colorSpaceConversion: 'none', imageOrientation: 'none' });
           } else if (fl === 'FlateDecode') {
             var dp = look(dc.get(N('DecodeParms')));
             if (dp instanceof P.PDFArray) dp = look(dp.get(0));

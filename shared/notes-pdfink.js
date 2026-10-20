@@ -3094,6 +3094,7 @@
       p.elCtx = pgEl;
       pgEl.addEventListener('contextmenu', function (e) {
         if (e.defaultPrevented) return;
+        if (self.o.sysCtx && self.o.sysCtx(e)) return;
         if (e.target.closest && e.target.closest('[data-bid]')) return;
         e.preventDefault();
         self.holdDrop();
@@ -3114,6 +3115,7 @@
         }
         return;
       }
+      if (self.o.sysCtx && self.o.sysCtx(e)) return;
       e.preventDefault();
       self.holdDrop();
       if (self.paperMenu(p, e.clientX, e.clientY)) e.gpiMenu = 1;

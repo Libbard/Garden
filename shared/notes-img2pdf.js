@@ -326,7 +326,7 @@
     var go = dlg.querySelector('[data-a="go"]');
     var loading = items.some(function (x) { return x.st === 'wait' || x.st === 'load'; });
     go.disabled = !n || loading || !!busy;
-    go.innerHTML = '<i class="fa-solid fa-file-pdf" aria-hidden="true"></i> ' + esc(loading ? L('أقرأ الصور…', 'Reading images…') : L('أنشئْ الملفّ', 'Create the file'));
+    go.innerHTML = '<i class="fa-solid fa-file-lines" aria-hidden="true"></i> ' + esc(loading ? L('أقرأ الصور…', 'Reading images…') : L('أنشئْ الملفّ', 'Create the file'));
     paintPrev();
   }
   function note(t, bad) {

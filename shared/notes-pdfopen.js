@@ -871,6 +871,7 @@
         onNote: function (m) { if (o.onInkNote) o.onInkNote(m); },
         onShapeBox: function (n, x, y, w, h, W, stage) { return o.onShapeBox ? o.onShapeBox(n, x, y, w, h, W, stage) : false; },
         onFileMenu: function (x, y) { if (o.onFileMenu) o.onFileMenu(x, y); },
+        sysCtx: function (e) { return !!(o.sysCtx && o.sysCtx(e)); },
         hearAt: function (x, y) { return o.hearAt ? o.hearAt(x, y) : null; },
         onHistEdge: function (dir) { return o.onHistEdge ? o.onHistEdge(dir) : false; },
         /*@3.NOPJ5.23*/

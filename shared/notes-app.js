@@ -6113,9 +6113,11 @@
     var box = els.docBody;
     if (!box || box.__pdfctx) return;
     box.__pdfctx = 1;
+    bindPsel();
     box.addEventListener('contextmenu', function (e) {
       if (!pdfOn()) return;
       if (e.target.closest && e.target.closest('.na-ctx, .ndl, dialog[open]')) return;
+      if (pselSys(e)) return;
       /*@3.NOAJ.304*/
       if (e.gpiMenu) return;
       e.preventDefault();
@@ -6152,6 +6154,74 @@
     box.addEventListener('scroll', function () {
       if (hold) { clearTimeout(hold); hold = null; }
     }, { passive: true });
+  }
+
+  var pselAt = 0, pselDown = false, pselT = 0, pselEl = null;
+  function pselRange() {
+    var s = window.getSelection ? window.getSelection() : null;
+    if (!s || s.isCollapsed || !s.rangeCount || !String(s).trim()) return null;
+    var v = pdfUi && pdfUi.view ? pdfUi.view() : null;
+    if (!v || !v.wrap || !s.anchorNode || !v.wrap.contains(s.anchorNode)) return null;
+    return s.getRangeAt(0);
+  }
+  function pselTouch(e) {
+    return e && e.pointerType ? e.pointerType !== 'mouse' : Date.now() - pselAt < 1500;
+  }
+  function pselSys(e) {
+    if (!pdfOn() || !pselTouch(e)) return false;
+    return !!pselRange() || !!(e.target && e.target.closest && e.target.closest('.gpv-text span'));
+  }
+  function pselHide() { if (pselEl) pselEl.hidden = true; }
+  function pselSoon(ms) {
+    clearTimeout(pselT);
+    pselT = setTimeout(pselShow, ms || 450);
+  }
+  function pselShow() {
+    if (pselDown) { pselSoon(300); return; }
+    var rg = pselRange();
+    if (!rg || Date.now() - pselAt > 60000 || !pdfOn() || document.querySelector('.gsf-rmenu')) { pselHide(); return; }
+    var rs = rg.getClientRects();
+    if (!rs.length) { pselHide(); return; }
+    if (!pselEl) {
+      pselEl = document.createElement('button');
+      pselEl.type = 'button';
+      pselEl.className = 'gsf-btn gsf-btn--sm na-psel';
+      pselEl.addEventListener('pointerdown', function (e) { e.preventDefault(); });
+      pselEl.addEventListener('click', function () {
+        var r = pselEl.getBoundingClientRect();
+        pselHide();
+        pdfMenu(r.left + r.width / 2, r.top + r.height / 2);
+      });
+      document.body.appendChild(pselEl);
+    }
+    var t = L('أدواتُ النصّ', 'Text tools');
+    pselEl.innerHTML = '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i> ' + esc(t);
+    pselEl.setAttribute('aria-label', t);
+    pselEl.hidden = false;
+    var last = rs[rs.length - 1], first = rs[0];
+    var w = pselEl.offsetWidth, h = pselEl.offsetHeight, vw = window.innerWidth, vh = window.innerHeight;
+    var top = last.bottom + 44;
+    if (top + h > vh - 12) top = Math.max(12, first.top - 44 - h);
+    var x = Math.max(12, Math.min(vw - w - 12, (last.left + last.right) / 2 - w / 2));
+    pselEl.style.insetBlockStart = Math.round(top) + 'px';
+    pselEl.style.insetInlineStart = Math.round(document.documentElement.dir === 'rtl' ? vw - x - w : x) + 'px';
+  }
+  function bindPsel() {
+    if (bindPsel.on) return;
+    bindPsel.on = 1;
+    document.addEventListener('touchstart', function (e) {
+      pselAt = Date.now(); pselDown = true;
+      if (pselEl && !pselEl.hidden && !pselEl.contains(e.target)) pselHide();
+    }, { passive: true, capture: true });
+    ['touchend', 'touchcancel'].forEach(function (k) {
+      document.addEventListener(k, function () { pselDown = false; pselAt = Date.now(); if (pdfOn()) pselSoon(); }, { passive: true, capture: true });
+    });
+    document.addEventListener('selectionchange', function () {
+      if (Date.now() - pselAt > 60000 || !pdfOn()) return;
+      pselHide();
+      pselSoon();
+    });
+    window.addEventListener('scroll', function () { if (pselEl && !pselEl.hidden) { pselHide(); pselSoon(); } }, { passive: true, capture: true });
   }
 
   function pdfPenBusy() {
@@ -6963,6 +7033,7 @@
       var s = src[0];
       if (!s) return;
       return (s.pg > 0 ? Promise.resolve(s.pg) : pgCount(s)).then(function (n) {
+        if (!(n > 0)) { toast(L('تعذّرت قراءةُ صفحاتِ الملفِّ على هذا الجهاز — افتحْه أوّلاً ثمّ أعدِ المحاولة.', 'Could not read the file’s pages on this device — open it first, then try again.')); return; }
         var rot = {};
         for (var i = 1; i <= n; i++) rot[i] = deg;
         saveState('saving', L('تُدوَّر الصفحات…', 'Rotating the pages…'));
@@ -6980,6 +7051,7 @@
     }).then(function (src) {
       var s = src[0];
       if (!s) { toast(L('اخترْ ملفَّ PDF واحداً لتدوِّرَه.', 'Pick one PDF file to rotate.')); return; }
+      if (!(s.pg > 0)) { toast(L('تعذّرت قراءةُ صفحاتِ الملفِّ على هذا الجهاز — افتحْه أوّلاً ثمّ أعدِ المحاولة.', 'Could not read the file’s pages on this device — open it first, then try again.')); return; }
       var n = s.pg, ang = 90, on = {};
       if (page >= 1 && page <= n) on[page] = 1; else for (var q = 1; q <= n; q++) on[q] = 1;
       var picked = function () { return Object.keys(on).filter(function (p) { return on[p]; }).map(Number).sort(function (a, b) { return a - b; }); };
@@ -7178,7 +7250,7 @@
         canOcr: function () { return vault; },
         born: function (file) {
           return new Promise(function (ok, no) {
-            var t = setTimeout(function () { no(new Error(L('لم يُفتح الملفّ', 'the file did not open'))); }, 60000);
+            var t = setTimeout(function () { no(new Error(L('لم يُفتح الملفّ', 'the file did not open'))); }, 600000);
             adoptPdf(file, null, function (id) { clearTimeout(t); ok(id || edId); });
           });
         },
@@ -7195,23 +7267,40 @@
       return JSON.parse(localStorage.getItem(OCR_KEY) || '[]') || [];
     } catch (e) { return v || []; }
   }
+  var ocrSending = {};
   function ocrStart(file, nid, title, sh) {
     var F = window.GardenFiles;
-    if (!F || !F.ocrPdf) return;
+    if (!F || !F.ocrPdf || ocrSending[nid]) return;
+    ocrSending[nid] = 1;
     F.ocrPdf(file, { nid: nid, title: title }).then(function (st) {
+      delete ocrSending[nid];
       var list = ocrJobs().filter(function (j) { return j.nid !== nid; });
       list.push({ h: st.h, sh: sh || st.h, nid: nid, t: title, at: Date.now() });
       ocrJobs(list);
       ocrWatch(4000);
     })['catch'](function (e) {
-      toast(L('تعذّر إرسالُ الملفِّ لقراءة نصّه: ', 'Could not send the file for text reading: ') + ((e && (e.error || e.message)) || ''));
+      delete ocrSending[nid];
+      var why = e && (e.error || e.message);
+      toast(why === 'too_large'
+        ? L('«' + title + '» أكبرُ من 300 م.ب، وهو حدُّ قراءة النصّ — اضغطْه أوّلاً ثمّ أعدِ المحاولة.', '“' + title + '” is over 300 MB, the text-reading limit — compress it first, then try again.')
+        : why === 'rate_limited'
+          ? L('بلغتَ حدَّ قراءة النصّ اليوم (40 ملفّاً) — أعدِ المحاولة غداً.', 'You reached today’s text-reading limit (40 files) — try again tomorrow.')
+          : L('تعذّر إرسالُ «' + title + '» لقراءة نصّه — تحقّقْ من الاتّصال وأعدِ المحاولة.', 'Could not send “' + title + '” for text reading — check your connection and try again.'));
     });
   }
   function pdfOcrAsk(id) {
+    if (ocrSending[id]) { toast(L('ما زال الملفُّ يُرسَل لقراءة نصّه…', 'The file is still being sent for text reading…')); return; }
     var mine = ocrJobs().filter(function (j) { return j.nid === id; })[0];
     if (mine) {
-      toast(mine.pages ? L('نصُّ «' + mine.t + '» يُقرأ: ' + (mine.done || 0) + ' من ' + mine.pages + ' صفحة — يصلك تنبيهٌ حين يجهز.', '“' + mine.t + '” is being read: ' + (mine.done || 0) + ' of ' + mine.pages + ' pages — you will be notified.')
-        : L('«' + mine.t + '» في الطابور — يصلك تنبيهٌ حين يجهز.', '“' + mine.t + '” is in the queue — you will be notified.'));
+      var F0 = window.GardenFiles;
+      (F0 && F0.ocrPdfState ? F0.ocrPdfState(mine.h)['catch'](function () { return null; }) : Promise.resolve(null)).then(function (st) {
+        if (st && (st.state === 'done' || st.state === 'failed' || st.state === 'none')) { ocrWatch(50); return; }
+        if (st) { mine.st = st.state; mine.done = st.done || 0; mine.pages = st.pages || 0; mine.ahead = st.ahead || 0; }
+        var tail = L(' — يُضاف النصُّ إلى الملفِّ دفعةً واحدةً حين تُقرأ صفحاتُه كلُّها، ويصلك تنبيه.', ' — the text is added to the file in one go once every page is read, and you will be notified.');
+        toast((mine.st === 'queued' && mine.ahead ? L('«' + mine.t + '» في الطابور وقبله ' + mine.ahead + ' ملفّ', '“' + mine.t + '” is queued with ' + mine.ahead + ' file(s) ahead')
+          : mine.pages ? L('نصُّ «' + mine.t + '» يُقرأ: ' + (mine.done || 0) + ' من ' + mine.pages + ' صفحة', '“' + mine.t + '” is being read: ' + (mine.done || 0) + ' of ' + mine.pages + ' pages')
+          : L('«' + mine.t + '» في الطابور', '“' + mine.t + '” is in the queue')) + tail);
+      });
       return;
     }
     var G = window.GardenSync;
@@ -7221,7 +7310,7 @@
       if (!r[1] || !window.GardenFiles || !GardenFiles.ocrPdf) { toast(L('قراءةُ النصّ تحتاج تفعيلَ المزامنة في الإعدادات.', 'Reading the text needs sync turned on in Settings.')); return; }
       return pdfBytesAny(s.spec).then(function (f) {
         ocrStart(f, id, s.t, s.spec.h);
-        toast(L('أُرسل «' + s.t + '» لقراءة نصّه — يجهز في الخلفيّة ويصلك تنبيه' + (s.pg > 80 ? '؛ والملفُّ الطويلُ يأخذ ساعات.' : '.'), '“' + s.t + '” was sent for text reading — it runs in the background and you will be notified' + (s.pg > 80 ? '; a long file takes hours.' : '.')));
+        toast(L('يُرسَل «' + s.t + '» لقراءة نصّه — يجهز في الخلفيّة ويصلك تنبيه' + (s.pg > 80 ? '؛ والملفُّ الطويلُ يأخذ ساعات.' : '.'), '“' + s.t + '” is being sent for text reading — it runs in the background and you will be notified' + (s.pg > 80 ? '; a long file takes hours.' : '.')));
       });
     })['catch'](function (e) { toast(ptWhy(e, '')); });
   }
@@ -7230,21 +7319,35 @@
     if (!ocrJobs().length) { ocrT = 0; return; }
     ocrT = setTimeout(ocrTick, ms || 30000);
   }
+  var ocrBusy = 0;
+  function ocrKey(j) { return j.nid + '|' + j.h; }
+  function ocrDrop(j) { ocrJobs(ocrJobs().filter(function (x) { return ocrKey(x) !== ocrKey(j); })); }
   function ocrTick() {
     ocrT = 0;
     var F = window.GardenFiles, list = ocrJobs();
     if (!F || !F.ocrPdfState || !list.length) return;
+    if (ocrBusy) { ocrWatch(3000); return; }
+    ocrBusy = 1;
     list.reduce(function (ch, j) {
       return ch.then(function () {
         return F.ocrPdfState(j.h).then(function (st) {
           if (!st) return;
           j.st = st.state; j.done = st.done || 0; j.pages = st.pages || 0; j.ahead = st.ahead || 0;
-          if (st.state === 'done') return F.ocrPdfGet(st).then(function (blob) { return ocrApply(j, blob, st); }).then(function () { j.gone = 1; });
+          if (st.state === 'done') {
+            if (!ocrJobs().some(function (x) { return ocrKey(x) === ocrKey(j); })) { j.gone = 1; return; }
+            return F.ocrPdfGet(st).then(function (blob) { return ocrApply(j, blob, st); }).then(function () { j.gone = 1; ocrDrop(j); });
+          }
+          if (st.state === 'failed') toast(st.err === 'already' ? L('«' + j.t + '» قابلٌ للبحث أصلاً — قُرئ نصُّه من قبل.', '“' + j.t + '” is already searchable — its text was read before.')
+            : L('تعذّرت قراءةُ نصِّ «' + j.t + '» — جرّبْ «اقرأْ نصَّه» مرّةً أخرى.', 'Could not read the text of “' + j.t + '” — try “Read its text” again.'));
           if (st.state === 'failed' || st.state === 'none' || Date.now() - j.at > 14 * 864e5) j.gone = 1;
         })['catch'](function () {});
       });
     }, Promise.resolve()).then(function () {
-      ocrJobs(list.filter(function (j) { return !j.gone; }));
+      var by = {};
+      list.forEach(function (j) { by[ocrKey(j)] = j; });
+      ocrJobs(ocrJobs().filter(function (x) { var j = by[ocrKey(x)]; return !(j && j.gone); })
+        .map(function (x) { return by[ocrKey(x)] || x; }));
+      ocrBusy = 0;
       ocrWatch(30000);
     });
   }
@@ -7253,6 +7356,7 @@
     if (!St) return Promise.resolve();
     return St.getDoc(j.nid).then(function (row) {
       var d = row && row.doc, rec = idxFind(j.nid);
+      if (!d || !rec || (d.pdf && d.pdf.h === st.sha256)) return;
       var res = { blob: blob, pages: st.pages || 0, map: identMap(st.pages || 0) };
       if (d && rec && d.kind === 'pdf' && d.pdf && d.pdf.h === (j.sh || j.h)) {
         return rotCtx({ id: j.nid, spec: d.pdf }).then(function (k) { return editApply(k.c, res); }).then(function () {
@@ -7410,6 +7514,7 @@
       },
       onShapeBox: function (n, x, y, w, h, W, stage) { return shapeFromBox('pdf', n, x, y, w, h, W, stage); },
       onFileMenu: function (x, y) { pdfMenu(x, y); },
+      sysCtx: function (e) { return pselSys(e); },
       hearAt: function (x, y) {
         var mo = pdfMoment(x, y);
         return mo ? { label: hearLabel(mo), go: function () { hearGo(mo); } } : null;

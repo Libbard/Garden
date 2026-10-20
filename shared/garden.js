@@ -3489,7 +3489,7 @@
     t.textContent = msg;
     document.body.appendChild(t);
     requestAnimationFrame(() => t.classList.add('show'));
-    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, 1900);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 250); }, Math.min(9000, Math.max(1900, String(msg).length * 70)));
   }
 
   /*@3.GARJ.168*/
