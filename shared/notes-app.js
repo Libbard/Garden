@@ -5509,7 +5509,12 @@
         { a: 'pfit', i: 'fa-expand', t: L('لائمِ الصفحةَ كاملةً', 'Fit whole page') }] },
       { sep: 1 },
       { a: 'porg', i: 'fa-table-cells-large', t: L('نظِّمْ صفحاتِ الملفّ…', 'Organise the file’s pages…') },
-      { a: 'protpg', i: 'fa-rotate-right', t: L('دوِّرْ هذه الصفحة', 'Rotate this page') });
+      { a: 'g:rot', i: 'fa-rotate-right', t: L('دوِّرِ الصفحات', 'Rotate pages'), sub: [
+        { a: 'protpg', i: 'fa-rotate-right', t: L('هذه الصفحة', 'This page') },
+        { a: 'protall', i: 'fa-rotate-right', t: L('كلُّ الصفحات', 'All pages') },
+        { a: 'protpick', i: 'fa-list-check', t: L('صفحاتٌ أختارها…', 'Pages I pick…') }] },
+      { a: 'pzip', i: 'fa-compress', t: L('اضغطِ الملفّ…', 'Compress the file…') },
+      { a: 'pocr', i: 'fa-magnifying-glass', t: L('اقرأْ نصَّه ليُبحث فيه في أيِّ برنامج', 'Read its text so any app can search it') });
     var ec = edsCount(liveDoc);
     if (ec.u) items.push({ a: 'pundo', i: 'fa-rotate-left', t: L('تراجعْ عن آخر تعديلٍ للصفحات', 'Undo the last page edit') });
     if (ec.r) items.push({ a: 'predo', i: 'fa-rotate-right', t: L('أعِدْ تعديلَ الصفحات', 'Redo the page edit') });
@@ -5744,6 +5749,16 @@
       else pdfQuickEdit(pnE, act === 'pdelpg' ? 'del' : 'rot');
       return;
     }
+    if (act === 'protall' || act === 'protpick') {
+      var pgR = snapPage(snapAt);
+      var pnR = pgR ? (Number(pgR.getAttribute('data-p')) || 0) : (pdfUi ? pdfUi.page() : 0);
+      if (!edId) return;
+      if (act === 'protall') pdfRotateAll(edId, 90); else pdfRotate(edId, pnR);
+      return;
+    }
+    if (act === 'pzip') { if (edId) pdfCompress(edId); return; }
+    if (act === 'pocr') { if (edId) pdfOcrAsk(edId); return; }
+    if (act === 'pmraw') { if (edId) pdfDownload([edId], 'raw'); return; }
     if (act === 'pundo') { pdfStep(-1); return; }
     if (act === 'predo') { pdfStep(1); return; }
     if (act === 'porig') { pdfStep(-1, true); return; }
@@ -5892,13 +5907,14 @@
   function pdfMarksItems(flat) {
     var g = { a: 'pmgather', i: 'fa-quote-right', t: L('اجمعْ ما ظلّلتُه وعلّقتُ عليه في ملاحظة', 'Gather my highlights and comments into a note') };
     var save = [
+      { a: 'pmraw', i: 'fa-file-arrow-down', t: L('نزِّلِ الملفَّ كما هو — بلا تعليقاتٍ ولا رسم', 'Download the file as it is — no annotations or drawings') },
       { a: 'pmpdf', i: 'fa-file-export', t: L('احفظِ الملفَّ بتعليقاته (PDF)', 'Save the file with its annotations (PDF)') },
       { a: 'pmprint', i: 'fa-print', t: L('اطبعِ الملفَّ بتعليقاته', 'Print with annotations'), kb: 'Ctrl P' },
       { sep: 1 },
       { a: 'pmexp', i: 'fa-file-arrow-down', t: L('صدِّرِ التعليقاتِ وحدَها (JSON)', 'Export annotations only (JSON)') },
       { a: 'pmimp', i: 'fa-file-arrow-up', t: L('استوردْ تعليقاتٍ (JSON)', 'Import annotations (JSON)') }];
     return flat ? [g, { sep: 1 }].concat(save)
-      : [g, { a: 'g:marks', i: 'fa-file-export', t: L('احفظْ أو صدِّرْ بتعليقاته', 'Save or export with annotations'), sub: save }];
+      : [g, { a: 'g:marks', i: 'fa-file-export', t: L('نزِّلْ أو صدِّرْ — بتعليقاته أو بدونها', 'Download or export — with or without annotations'), sub: save }];
   }
 
   var _hlCtx = null;
@@ -6381,10 +6397,13 @@
   }
 
   function editApply(c, res) {
-    var ik = pdfUi && pdfUi.ink ? pdfUi.ink() : null;
+    var here = c.id === edId;
+    var ik = c.ik !== undefined ? c.ik : (pdfUi && pdfUi.ink ? pdfUi.ink() : null);
     var oldSpec = c.doc.pdf, h1 = oldSpec.h;
-    if (marksT) { clearTimeout(marksT); marksT = 0; }
-    marksFor = null;
+    if (here) {
+      if (marksT) { clearTimeout(marksT); marksT = 0; }
+      marksFor = null;
+    }
     return Promise.resolve(ik && ik.bundle ? ik.bundle() : null).then(function (mk) {
       mk = mk || c.doc.marks || null;
       return editBorn(res, oldSpec.n).then(function (nb) {
@@ -6396,7 +6415,7 @@
           eds.push({ from: oldSpec, mk: mk, at: Date.now() });
           edsTrim(eds, true);
           delete d.rdo;
-          histKeep(c.id, h1);
+          if (here) histKeep(c.id, h1);
           if (h1 !== h2) d.was = (d.was || []).filter(function (x) { return x !== h1; }).concat([h1]);
           d.pdf = spec;
           d.marks = remapMarks(mk, res.map);
@@ -6408,7 +6427,7 @@
             pos.f = to ? pos.f : 0;
             pdfPos(c.id, pos);
           }
-          persist(c.id, d, false);
+          persist(c.id, d, !here);
           editHost(h1, spec, nb.file);
           if (edId === c.id) openPdf(c.id, d);
           return spec;
@@ -6836,6 +6855,416 @@
       };
       ptShow(dlg);
       try { inp.focus(); } catch (e0) {}
+    });
+  }
+
+  /*@3.NOAJ.532*/
+  function pdfSave(blob, name) {
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 8000);
+  }
+  function pdfName(t, tail) {
+    return String(t || 'file').replace(/[\\/:*?"<>|]+/g, '-').trim().slice(0, 80) + (tail || '') + '.pdf';
+  }
+  function sizeTxt(b) {
+    if (!(b > 0)) return '';
+    if (b < 1048576) return Math.max(1, Math.round(b / 1024)) + L(' ك.ب', ' KB');
+    return (b / 1048576).toFixed(b < 10485760 ? 1 : 0) + L(' م.ب', ' MB');
+  }
+  function identMap(n) { var m = {}; for (var i = 1; i <= n; i++) m[i] = i; return m; }
+  function marksRows(s, hd) {
+    var Ik = window.GardenPdfInk, ns = s.id + '|' + s.spec.h, mp = (s.marks && s.marks.pages) || {};
+    return Promise.resolve(Ik && Ik.pagesOf ? Ik.pagesOf(ns) : []).then(function (list) {
+      var keys = {}, out = {};
+      list.forEach(function (n) { keys[n] = 1; });
+      Object.keys(mp).forEach(function (n) { if (+n > 0) keys[+n] = 1; });
+      return Object.keys(keys).map(Number).reduce(function (ch, n) {
+        return ch.then(function () { return Ik && Ik.read ? Ik.read(ns, n) : null; }).then(function (row) {
+          var doc = mp[String(n)] || null;
+          var r = (row && doc) ? (((doc.t || 0) > (row.t || 0)) ? doc : row) : (row || doc);
+          if (!r || r.x) return;
+          var els = (r.els || []).slice();
+          if (!(r.fdoc && r.fdoc.blocks && r.fdoc.blocks.length && Ik.fieldsTx)) { if (els.length) out[n] = els; return; }
+          return hd.doc.getPage(n).then(function (pg) {
+            els = els.concat(Ik.fieldsTx(r.fdoc, pg));
+            if (els.length) out[n] = els;
+          }, function () { if (els.length) out[n] = els; });
+        });
+      }, Promise.resolve()).then(function () { return out; });
+    });
+  }
+  function withMarks(s, f) {
+    var A = window.GardenPdfAnnot, V = window.GardenPdfView;
+    var ik = (pdfUi && pdfUi.ink) ? pdfUi.ink() : null, v = pdfUi ? pdfUi.view() : null;
+    if (!A) return Promise.reject(new Error('no_annot'));
+    if (edId === s.id && ik && ik.dump && v && v.h) {
+      return ik.dump().then(function (data) { return A.build(v.h, (data && data.pages) || {}); });
+    }
+    if (!V) return Promise.reject(new Error('no_view'));
+    return f.arrayBuffer().then(function (buf) { return V.load(new Uint8Array(buf)); }).then(function (o) {
+      var hd = { doc: o.doc }, end = function () { try { o.doc.destroy(); } catch (e) {} };
+      return marksRows(s, hd).then(function (pages) { return A.build(hd, pages); })
+        .then(function (r) { end(); return r; }, function (e) { end(); throw e; });
+    });
+  }
+  function pdfDownload(ids, how) {
+    pdfSrcs(ids || []).then(function (src) {
+      if (!src.length) { toast(L('اخترْ ملفَّ PDF أوّلاً.', 'Pick a PDF file first.')); return; }
+      var made = 0, bare = 0;
+      saveState('saving', L(how === 'marks' ? 'يُكتب الملفُّ بتعليقاته…' : 'يُجهَّز الملفّ…', how === 'marks' ? 'Writing the file with its annotations…' : 'Preparing the file…'));
+      return src.reduce(function (ch, s, k) {
+        return ch.then(function () {
+          return pdfBytesAny(s.spec)['catch'](function (e) { e.t = s.t; throw e; });
+        }).then(function (f) {
+          if (how !== 'marks') { pdfSave(f, pdfName(s.t)); made++; return; }
+          return withMarks(s, f).then(function (r) {
+            if (!r.count) bare++;
+            pdfSave(new Blob([r.bytes], { type: 'application/pdf' }), pdfName(s.t, L(' — بتعليقاتي', ' — annotated')));
+            made++;
+          });
+        }).then(function () { if (k < src.length - 1) return new Promise(function (ok) { setTimeout(ok, 450); }); });
+      }, Promise.resolve()).then(function () {
+        saveState('', '');
+        toast(made === 1
+          ? (bare ? L('نُزِّل الملفّ — ولا تعليقَ ولا رسمَ فيه بعد.', 'Downloaded — it has no annotations yet.') : L('نُزِّل الملفّ.', 'Downloaded.'))
+          : L('نُزِّلت ' + made + ' ملفّات.', made + ' files downloaded.'));
+      })['catch'](function (e) {
+        saveState('', '');
+        toast((made ? L('نُزِّل ' + made + ' ثمّ توقّف: ', made + ' downloaded, then stopped: ') : '') + ptWhy(e, (e && e.t) || ''));
+      });
+    });
+  }
+
+  /*@3.NOAJ.533*/
+  function rotCtx(s) {
+    if (edId === s.id) {
+      var c = editCtx();
+      if (c) return editPrep(c).then(function (k) { return { c: c, E: k.E, bytes: k.bytes }; });
+    }
+    var St = window.GardenNotesStore;
+    return Promise.all([St ? St.getDoc(s.id) : null, pdfBytesAny(s.spec), needEdit()]).then(function (r) {
+      var d = r[0] && r[0].doc;
+      if (!d || !d.pdf) { var e = new Error('no_bytes'); e.code = 'no_bytes'; throw e; }
+      return { c: { id: s.id, doc: d, h: d.pdf.h, ik: null }, E: r[2], bytes: r[1] };
+    });
+  }
+  function pdfRotateRun(s, rot) {
+    return rotCtx(s).then(function (k) {
+      return k.E.turn(k.bytes, rot).then(function (res) { return editApply(k.c, res); });
+    }).then(function () { if (edId !== s.id) reload({ keepOpen: true }); });
+  }
+  function pdfRotateAll(id, deg) {
+    pdfSrcs([id]).then(function (src) {
+      var s = src[0];
+      if (!s) return;
+      return (s.pg > 0 ? Promise.resolve(s.pg) : pgCount(s)).then(function (n) {
+        var rot = {};
+        for (var i = 1; i <= n; i++) rot[i] = deg;
+        saveState('saving', L('تُدوَّر الصفحات…', 'Rotating the pages…'));
+        return pdfRotateRun(s, rot).then(function () {
+          saveState('', '');
+          toast(L('دُوِّرت ' + pgTxt(n) + ' — و«تراجعْ عن آخر تعديلٍ للصفحات» يعيدها.', pgTxt(n) + ' rotated — “Undo the last page edit” brings them back.'));
+        });
+      });
+    })['catch'](function (e) { saveState('', ''); toast(ptWhy(e, '')); });
+  }
+  function pdfRotate(id, page) {
+    pdfSrcs([id]).then(function (src) {
+      var s0 = src[0];
+      return (s0 && !(s0.pg > 0)) ? pgCount(s0).then(function (n) { s0.pg = n; return src; }) : src;
+    }).then(function (src) {
+      var s = src[0];
+      if (!s) { toast(L('اخترْ ملفَّ PDF واحداً لتدوِّرَه.', 'Pick one PDF file to rotate.')); return; }
+      var n = s.pg, ang = 90, on = {};
+      if (page >= 1 && page <= n) on[page] = 1; else for (var q = 1; q <= n; q++) on[q] = 1;
+      var picked = function () { return Object.keys(on).filter(function (p) { return on[p]; }).map(Number).sort(function (a, b) { return a - b; }); };
+      var goTxt = function (k) { return '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i> ' + esc(k ? L('دوِّرْ ', 'Rotate ') + pgTxt(k) : L('دوِّرْ', 'Rotate')); };
+      var strip = '';
+      if (n <= STRIP_MAX) {
+        strip = '<div class="na-pt-strip na-pr-strip" role="group" aria-label="' + esc(L('الصفحات — اضغطْ صفحةً لتختارها', 'Pages — press a page to pick it')) + '">';
+        for (var p = 1; p <= n; p++) strip += '<button type="button" class="na-pt-pp na-pr-pp" data-p="' + p + '" aria-pressed="false" aria-label="' + esc(L('الصفحة ' + p, 'Page ' + p)) + '"><span class="na-pt-th" aria-hidden="true"></span><span class="na-pr-n">' + p + '</span></button>';
+        strip += '</div>';
+      }
+      var dlg = ptDlg('na-prot', L('دوِّرْ صفحاتِ «', 'Rotate pages of “') + s.t + L('»', '”') + (n ? ' · ' + pgTxt(n) : ''),
+        L('تدور الصفحاتُ في الملفِّ نفسِه ومعها حبرُها. و«تراجعْ عن آخر تعديلٍ للصفحات» في قائمة الملفّ يعيدها.', 'The pages turn in the file itself, with their ink. “Undo the last page edit” in the file’s menu turns them back.'),
+        '<div class="gsf-chips na-pr-ang" role="radiogroup" aria-label="' + esc(L('الاتّجاه', 'Direction')) + '">' +
+          '<button type="button" class="gsf-chip" role="radio" data-ang="90"><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> ' + esc(L('ربعُ دورةٍ يميناً', 'Quarter turn right')) + '</button>' +
+          '<button type="button" class="gsf-chip" role="radio" data-ang="-90"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i> ' + esc(L('ربعُ دورةٍ يساراً', 'Quarter turn left')) + '</button>' +
+          '<button type="button" class="gsf-chip" role="radio" data-ang="180"><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i> ' + esc(L('نصفُ دورة', 'Half turn')) + '</button></div>' +
+        '<div class="gsf-chips na-pt-quick">' +
+          '<button type="button" class="gsf-chip" data-pk="all">' + esc(L('كلُّ الصفحات', 'All pages')) + '</button>' +
+          (n > 1 ? '<button type="button" class="gsf-chip" data-pk="odd">' + esc(L('الفرديّة', 'Odd')) + '</button>' +
+                   '<button type="button" class="gsf-chip" data-pk="even">' + esc(L('الزوجيّة', 'Even')) + '</button>' : '') +
+          '<button type="button" class="gsf-chip" data-pk="none">' + esc(L('لا شيء', 'None')) + '</button></div>' +
+        strip +
+        '<label class="na-cdlg-l" for="na-pr-pages">' + esc(L('الصفحات — مثل 1-3، 7', 'Pages — e.g. 1-3, 7')) + '</label>' +
+        '<input class="gsf-in" id="na-pr-pages" type="text" dir="ltr" autocomplete="off" spellcheck="false" placeholder="1-3, 7">' +
+        '<div class="na-pt-prev" aria-live="polite"></div>', goTxt(0));
+      var inp = dlg.querySelector('#na-pr-pages'), prev = dlg.querySelector('.na-pt-prev'), go = dlg.querySelector('[data-pt="go"]');
+      function paint(fromInput) {
+        var pk = picked();
+        if (!fromInput) inp.value = rangesOf(pk);
+        dlg.style.setProperty('--na-rot', ang + 'deg');
+        dlg.querySelectorAll('[data-ang]').forEach(function (b) { var y = +b.getAttribute('data-ang') === ang; b.classList.toggle('on', y); b.setAttribute('aria-checked', y ? 'true' : 'false'); });
+        dlg.querySelectorAll('.na-pr-pp').forEach(function (b) { b.setAttribute('aria-pressed', on[+b.getAttribute('data-p')] ? 'true' : 'false'); });
+        go.innerHTML = goTxt(pk.length);
+        go.disabled = !pk.length || !!prev.querySelector('.na-pt-bad');
+      }
+      function rangesOf(pk) {
+        var out = [], i = 0;
+        while (i < pk.length) { var a = pk[i], b = a; while (i + 1 < pk.length && pk[i + 1] === b + 1) { b = pk[++i]; } out.push(a + (b > a ? '-' + b : '')); i++; }
+        return out.join(', ');
+      }
+      inp.addEventListener('input', function () {
+        var g = splitGroups(inp.value, n);
+        on = {};
+        g.groups.forEach(function (x) { for (var p2 = x.a; p2 <= x.b; p2++) on[p2] = 1; });
+        prev.innerHTML = g.bad.length ? '<p class="na-pt-bad">' + esc(L('لا أفهم: ', 'Not understood: ') + g.bad.join('، ') + L(' — الصفحاتُ من 1 إلى ' + n, ' — pages run 1 to ' + n)) + '</p>' : '';
+        paint(true);
+      });
+      dlg.querySelector('.na-pr-ang').onclick = function (e) { var b = e.target.closest('[data-ang]'); if (b) { ang = +b.getAttribute('data-ang'); paint(true); } };
+      dlg.querySelector('.na-pt-quick').onclick = function (e) {
+        var b = e.target.closest('[data-pk]');
+        if (!b) return;
+        var m = b.getAttribute('data-pk');
+        on = {};
+        for (var p3 = 1; p3 <= n; p3++) if (m === 'all' || (m === 'odd' && p3 % 2) || (m === 'even' && !(p3 % 2))) on[p3] = 1;
+        prev.innerHTML = '';
+        paint(false);
+      };
+      var st = dlg.querySelector('.na-pr-strip');
+      if (st) {
+        st.onclick = function (e) {
+          var b = e.target.closest('.na-pr-pp');
+          if (!b) return;
+          var p4 = +b.getAttribute('data-p');
+          if (on[p4]) delete on[p4]; else on[p4] = 1;
+          prev.innerHTML = '';
+          paint(false);
+        };
+        stripThumbs(dlg, s);
+      }
+      paint(false);
+      go.onclick = function () {
+        var pk = picked(), rot = {};
+        if (!pk.length) return;
+        pk.forEach(function (p5) { rot[p5] = ang; });
+        ptBusy(dlg, true, L('أكتب الملفّ…', 'Writing the file…'));
+        pdfRotateRun(s, rot).then(function () {
+          dlg.__busy = 0;
+          dlg.close();
+          clearPicked();
+          toast(L('دُوِّرت ' + pgTxt(pk.length) + ' في «' + s.t + '».', pgTxt(pk.length) + ' rotated in “' + s.t + '”.'));
+        })['catch'](function (e) { ptBad(dlg, ptWhy(e, s.t)); });
+      };
+      ptShow(dlg);
+    });
+  }
+
+  /*@3.NOAJ.534*/
+  function pdfCompress(id) {
+    pdfSrcs([id]).then(function (src) {
+      var s = src[0];
+      if (!s) { toast(L('اخترْ ملفَّ PDF واحداً لتضغطَه.', 'Pick one PDF file to compress.')); return; }
+      var lvl = 'mid', out = null, sz0 = +s.spec.sz || 0;
+      var LV = [
+        { k: 'lite', i: 'fa-feather', t: L('خفيف', 'Light'), d: L('لا يمسُّ الصور — أصغرُ قليلاً', 'Leaves images alone — a little smaller') },
+        { k: 'mid', i: 'fa-scale-balanced', t: L('متوازن', 'Balanced'), d: L('صورٌ أخفّ تبقى واضحةً على الشاشة', 'Lighter images that stay sharp on screen') },
+        { k: 'max', i: 'fa-compress', t: L('أقصى', 'Strongest'), d: L('أصغرُ حجم — قد تبهت الصورُ الدقيقة', 'Smallest — fine images may soften') }];
+      var dlg = ptDlg('na-pzip', L('اضغطْ «', 'Compress “') + s.t + L('»', '”'),
+        (sz0 ? L('حجمُه الآن ', 'It is ') + sizeTxt(sz0) + L('. ', ' now. ') : '') + L('النصُّ والفهرسُ والحبرُ لا تُمسّ — الصورُ وحدَها تخفّ.', 'Text, contents and ink stay as they are — only the images get lighter.'),
+        '<div class="gsf-opts gsf-opts--3 gsf-opts--wrap na-pz-lv" role="radiogroup" aria-label="' + esc(L('المستوى', 'Level')) + '">' + LV.map(function (v) {
+          return '<button type="button" class="gsf-opt" role="radio" data-lv="' + v.k + '"><i class="fa-solid ' + v.i + '" aria-hidden="true"></i><span class="gsf-opt-t">' + esc(v.t) + '</span><span class="gsf-opt-s">' + esc(v.d) + '</span></button>';
+        }).join('') + '</div>' +
+        '<div class="na-pz-out" hidden><p class="na-pz-r"></p><div class="gsf-acts na-pz-acts">' +
+          '<button type="button" class="gsf-btn gsf-btn--ghost" data-pz="dl"><i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i> ' + esc(L('نزِّلْه', 'Download it')) + '</button>' +
+          '<button type="button" class="gsf-btn gsf-btn--ghost" data-pz="new"><i class="fa-solid fa-copy" aria-hidden="true"></i> ' + esc(L('احفظْه ملفّاً بجانبه', 'Keep it as a new file')) + '</button>' +
+          '<button type="button" class="gsf-btn gsf-btn--go" data-pz="swap"><i class="fa-solid fa-right-left" aria-hidden="true"></i> ' + esc(L('ضعْه مكانَ الأصل', 'Replace the original')) + '</button></div></div>',
+        '<i class="fa-solid fa-compress" aria-hidden="true"></i> ' + esc(L('اضغطْ', 'Compress')));
+      var go = dlg.querySelector('[data-pt="go"]'), box = dlg.querySelector('.na-pz-out'), res = dlg.querySelector('.na-pz-r');
+      function paint() {
+        dlg.querySelectorAll('[data-lv]').forEach(function (b) { var y = b.getAttribute('data-lv') === lvl; b.classList.toggle('on', y); b.setAttribute('aria-checked', y ? 'true' : 'false'); });
+      }
+      dlg.querySelector('.na-pz-lv').onclick = function (e) {
+        var b = e.target.closest('[data-lv]');
+        if (!b || dlg.__busy) return;
+        lvl = b.getAttribute('data-lv');
+        out = null;
+        box.hidden = true;
+        go.hidden = false;
+        paint();
+      };
+      paint();
+      go.onclick = function () {
+        ptBusy(dlg, true, L('أجلب الملفّ…', 'Fetching the file…'));
+        Promise.all([pdfBytesAny(s.spec), needEdit()]).then(function (r) {
+          sz0 = r[0].size || sz0;
+          return r[1].compress(r[0], lvl, function (i, n) {
+            ptBusy(dlg, true, L('أخفّف الصور: ' + i + ' من ' + n + '…', 'Lightening images: ' + i + ' of ' + n + '…'));
+          });
+        }).then(function (o) {
+          ptBusy(dlg, false, '');
+          var sz1 = o.bytes.length, cut = sz0 ? Math.round((1 - sz1 / sz0) * 100) : 0;
+          box.hidden = false;
+          if (!sz0 || sz1 >= sz0 * 0.97) {
+            out = null;
+            res.textContent = lvl === 'max' ? L('لم يصغرِ الملفّ — هو مضغوطٌ أصلاً، أو صورُه من نوعٍ لا يُخفَّف دون أن يتغيّر لونُه.', 'The file did not get smaller — it is already compact, or its images cannot be lightened without changing their colours.')
+              : L('لم يصغرِ الملفّ بهذا المستوى — جرِّبْ مستوًى أقوى.', 'The file did not get smaller at this level — try a stronger one.');
+            box.querySelector('.na-pz-acts').hidden = true;
+            return;
+          }
+          out = { blob: new Blob([o.bytes], { type: 'application/pdf' }), pages: o.pages, map: identMap(o.pages) };
+          res.innerHTML = '<bdi>' + esc(sizeTxt(sz0)) + '</bdi> <i class="fa-solid ' + (isAr() ? 'fa-arrow-left' : 'fa-arrow-right') + '" aria-hidden="true"></i> <b><bdi>' + esc(sizeTxt(sz1)) + '</bdi></b> <span class="na-pz-cut">' + esc(L('أخفُّ بـ' + cut + '٪', cut + '% lighter')) + '</span>';
+          box.querySelector('.na-pz-acts').hidden = false;
+          go.hidden = true;
+        })['catch'](function (e) { ptBad(dlg, ptWhy(e, s.t)); });
+      };
+      box.onclick = function (e) {
+        var b = e.target.closest('[data-pz]');
+        if (!b || !out || dlg.__busy) return;
+        var a = b.getAttribute('data-pz');
+        if (a === 'dl') { pdfSave(out.blob, pdfName(s.t, L(' — مضغوط', ' — compressed'))); return; }
+        ptBusy(dlg, true, L('أحفظ…', 'Saving…'));
+        var job = a === 'new'
+          ? ptBorn(out, pdfName(s.t, L(' — مضغوط', ' — compressed')), s.place, s.t + L(' — مضغوط', ' — compressed'), [{ src: s, map: out.map }])
+          : rotCtx(s).then(function (k) { return editApply(k.c, out); });
+        job.then(function () {
+          dlg.__busy = 0;
+          dlg.close();
+          clearPicked();
+          reload({ keepOpen: true });
+          toast(a === 'new' ? L('صُنع «' + s.t + ' — مضغوط» بجانبه.', 'Made “' + s.t + ' — compressed” beside it.')
+            : L('صار «' + s.t + '» أخفّ — و«تراجعْ عن آخر تعديلٍ للصفحات» يعيد الأصل.', '“' + s.t + '” is lighter now — “Undo the last page edit” brings back the original.'));
+        })['catch'](function (e) { ptBad(dlg, ptWhy(e, s.t)); });
+      };
+      ptShow(dlg);
+    });
+  }
+
+  /*@3.NOAJ.535*/
+  var imgP = null;
+  function needImgPdf() {
+    if (window.GardenImgPdf) return Promise.resolve(window.GardenImgPdf);
+    if (imgP) return imgP;
+    var me = document.querySelector('script[src*="notes-app.js"]');
+    var src = me ? me.getAttribute('src') : '../shared/notes-app.js';
+    var base = src.replace(/notes-app[.]js.*$/, ''), q = (/[?]v=[^&]+/.exec(src) || [''])[0];
+    imgP = new Promise(function (ok, no) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet'; l.href = base + 'notes-img2pdf.css' + q;
+      document.head.appendChild(l);
+      var sc = document.createElement('script');
+      sc.src = base + 'notes-img2pdf.js' + q;
+      sc.onload = function () { if (window.GardenImgPdf) ok(window.GardenImgPdf); else no(new Error('img_missing')); };
+      sc.onerror = function () { no(new Error('img_load')); };
+      document.head.appendChild(sc);
+    })['catch'](function (e) { imgP = null; throw e; });
+    return imgP;
+  }
+  function imgPdfOpen(files) {
+    var me = document.querySelector('script[src*="notes-app.js"]');
+    var src = me ? me.getAttribute('src') : '../shared/notes-app.js';
+    var G = window.GardenSync;
+    Promise.all([needImgPdf(), G && G.vaultId ? Promise.resolve(G.vaultId())['catch'](function () { return null; }) : null]).then(function (r) {
+      var vault = !!r[1] && !!(window.GardenFiles && GardenFiles.ocrPdf);
+      r[0].open({
+        L: L, esc: esc, isAr: isAr, toast: toast, needEdit: needEdit,
+        base: src.replace(/notes-app[.]js.*$/, ''), q: (/[?]v=[^&]+/.exec(src) || [''])[0],
+        canOcr: function () { return vault; },
+        born: function (file) {
+          return new Promise(function (ok, no) {
+            var t = setTimeout(function () { no(new Error(L('لم يُفتح الملفّ', 'the file did not open'))); }, 60000);
+            adoptPdf(file, null, function (id) { clearTimeout(t); ok(id || edId); });
+          });
+        },
+        ocr: function (file, nid, title) { ocrStart(file, nid, title); }
+      }, files);
+    }, function () { toast(L('تعذّر تحميلُ صانع الملفّات — تحقّقْ من الاتّصال.', 'Could not load the file maker — check your connection.')); });
+  }
+
+  /*@3.NOAJ.536*/
+  var OCR_KEY = 'garden_ocr_jobs', ocrT = 0;
+  function ocrJobs(v) {
+    try {
+      if (v) { localStorage.setItem(OCR_KEY, JSON.stringify(v)); return v; }
+      return JSON.parse(localStorage.getItem(OCR_KEY) || '[]') || [];
+    } catch (e) { return v || []; }
+  }
+  function ocrStart(file, nid, title, sh) {
+    var F = window.GardenFiles;
+    if (!F || !F.ocrPdf) return;
+    F.ocrPdf(file, { nid: nid, title: title }).then(function (st) {
+      var list = ocrJobs().filter(function (j) { return j.nid !== nid; });
+      list.push({ h: st.h, sh: sh || st.h, nid: nid, t: title, at: Date.now() });
+      ocrJobs(list);
+      ocrWatch(4000);
+    })['catch'](function (e) {
+      toast(L('تعذّر إرسالُ الملفِّ لقراءة نصّه: ', 'Could not send the file for text reading: ') + ((e && (e.error || e.message)) || ''));
+    });
+  }
+  function pdfOcrAsk(id) {
+    var mine = ocrJobs().filter(function (j) { return j.nid === id; })[0];
+    if (mine) {
+      toast(mine.pages ? L('نصُّ «' + mine.t + '» يُقرأ: ' + (mine.done || 0) + ' من ' + mine.pages + ' صفحة — يصلك تنبيهٌ حين يجهز.', '“' + mine.t + '” is being read: ' + (mine.done || 0) + ' of ' + mine.pages + ' pages — you will be notified.')
+        : L('«' + mine.t + '» في الطابور — يصلك تنبيهٌ حين يجهز.', '“' + mine.t + '” is in the queue — you will be notified.'));
+      return;
+    }
+    var G = window.GardenSync;
+    Promise.all([pdfSrcs([id]), G && G.vaultId ? Promise.resolve(G.vaultId())['catch'](function () { return null; }) : null]).then(function (r) {
+      var s = r[0][0];
+      if (!s) return;
+      if (!r[1] || !window.GardenFiles || !GardenFiles.ocrPdf) { toast(L('قراءةُ النصّ تحتاج تفعيلَ المزامنة في الإعدادات.', 'Reading the text needs sync turned on in Settings.')); return; }
+      return pdfBytesAny(s.spec).then(function (f) {
+        ocrStart(f, id, s.t, s.spec.h);
+        toast(L('أُرسل «' + s.t + '» لقراءة نصّه — يجهز في الخلفيّة ويصلك تنبيه' + (s.pg > 80 ? '؛ والملفُّ الطويلُ يأخذ ساعات.' : '.'), '“' + s.t + '” was sent for text reading — it runs in the background and you will be notified' + (s.pg > 80 ? '; a long file takes hours.' : '.')));
+      });
+    })['catch'](function (e) { toast(ptWhy(e, '')); });
+  }
+  function ocrWatch(ms) {
+    if (ocrT) clearTimeout(ocrT);
+    if (!ocrJobs().length) { ocrT = 0; return; }
+    ocrT = setTimeout(ocrTick, ms || 30000);
+  }
+  function ocrTick() {
+    ocrT = 0;
+    var F = window.GardenFiles, list = ocrJobs();
+    if (!F || !F.ocrPdfState || !list.length) return;
+    list.reduce(function (ch, j) {
+      return ch.then(function () {
+        return F.ocrPdfState(j.h).then(function (st) {
+          if (!st) return;
+          j.st = st.state; j.done = st.done || 0; j.pages = st.pages || 0; j.ahead = st.ahead || 0;
+          if (st.state === 'done') return F.ocrPdfGet(st).then(function (blob) { return ocrApply(j, blob, st); }).then(function () { j.gone = 1; });
+          if (st.state === 'failed' || st.state === 'none' || Date.now() - j.at > 14 * 864e5) j.gone = 1;
+        })['catch'](function () {});
+      });
+    }, Promise.resolve()).then(function () {
+      ocrJobs(list.filter(function (j) { return !j.gone; }));
+      ocrWatch(30000);
+    });
+  }
+  function ocrApply(j, blob, st) {
+    var St = window.GardenNotesStore;
+    if (!St) return Promise.resolve();
+    return St.getDoc(j.nid).then(function (row) {
+      var d = row && row.doc, rec = idxFind(j.nid);
+      var res = { blob: blob, pages: st.pages || 0, map: identMap(st.pages || 0) };
+      if (d && rec && d.kind === 'pdf' && d.pdf && d.pdf.h === (j.sh || j.h)) {
+        return rotCtx({ id: j.nid, spec: d.pdf }).then(function (k) { return editApply(k.c, res); }).then(function () {
+          if (edId !== j.nid) reload({ keepOpen: true });
+          toast(L('صار «' + j.t + '» قابلاً للبحث والنسخ.', '“' + j.t + '” is now searchable.'));
+        });
+      }
+      var place = rec ? { f: rec.f || null, c: (rec.o && rec.o.c) || null, g: null } : viewPlace();
+      return ptBorn(res, pdfName(j.t, L(' — قابلٌ للبحث', ' — searchable')), place, j.t + L(' — قابلٌ للبحث', ' — searchable'), []).then(function () {
+        reload({ keepOpen: true });
+        toast(L('عدّلتَ «' + j.t + '» قبل أن يجهز نصُّه، فوُضعت النسخةُ القابلةُ للبحث بجانبه.', 'You changed “' + j.t + '” before its text was ready, so the searchable copy was placed beside it.'));
+      });
     });
   }
 
@@ -7514,7 +7943,7 @@
           pdfPre = { id: id, pre: res.pre };
           reload({ keepOpen: true });
           openNote(id);
-          if (after) setTimeout(after, 900);
+          if (after) setTimeout(function () { after(id); }, 900);
         });
       }, function (e) {
         O.drop(null);
@@ -7610,6 +8039,7 @@
     { k: 'board', icon: 'fa-pen-to-square', ar: 'لوحُ رسم', en: 'Whiteboard' },
     { k: 'pdf',   icon: 'fa-file-import', ar: 'افتحْ ملفَّ PDF', en: 'Open a PDF' },
     { k: 'office', icon: 'fa-file-powerpoint', ar: 'باوربوينت · وورد · إكسل', en: 'PowerPoint · Word · Excel' },
+    { k: 'imgs',  icon: 'fa-images', ar: 'PDF من صور', en: 'PDF from images' },
     { k: 'ai',    icon: 'fa-wand-magic-sparkles', ar: 'استوردْ من الذكاء', en: 'Import from AI' },
     { k: 'md',    icon: 'fa-file-code', ar: 'استوردْ ماركداون', en: 'Import Markdown' },
     { k: 'json',  icon: 'fa-file-arrow-down', ar: 'استوردْ JSON', en: 'Import JSON' }
@@ -7660,6 +8090,7 @@
       else if (k === 'board') createNote('board');
       else if (k === 'pdf') createPdf();
       else if (k === 'office') createPdf('office');
+      else if (k === 'imgs') imgPdfOpen();
       else if (k === 'slides') slidesPick(anchor);
       else if (k === 'ai') importAi();
       else askFile(k);
@@ -11770,6 +12201,11 @@
       linkCourse: function (uids) { courseAsk(recsOf(uids).map(function (x) { return x.id; })); },
       pdfMerge: function (uids) { pdfMerge(recsOf(uids).filter(function (x) { return x.kind === 'pdf'; }).map(function (x) { return x.id; })); },
       pdfSplit: function (uid) { var r = recsOf([uid])[0]; if (r && r.kind === 'pdf') pdfSplit(r.id); },
+      pdfDownload: function (uids, how) { pdfDownload(recsOf(uids).filter(function (x) { return x.kind === 'pdf'; }).map(function (x) { return x.id; }), how); },
+      pdfRotate: function (uid) { var r = recsOf([uid])[0]; if (r && r.kind === 'pdf') pdfRotate(r.id, 0); },
+      imgPdf: function (files) { imgPdfOpen(files); },
+      pdfOcr: function (uid) { var r = recsOf([uid])[0]; if (r && r.kind === 'pdf') pdfOcrAsk(r.id); },
+      pdfCompress: function (uid) { var r = recsOf([uid])[0]; if (r && r.kind === 'pdf') pdfCompress(r.id); },
       folderSib: function (fid, dir) { return sibMove(fid, dir); },
       driveOn: driveOn,
       importDrive: function () { bulkOpen([], true); },
@@ -11779,6 +12215,7 @@
         else if (k === 'board') createNote('board');
         else if (k === 'pdf') createPdf();
         else if (k === 'office') createPdf('office');
+        else if (k === 'imgs') imgPdfOpen();
         else if (k === 'ai') importAi();
         else askFile(k);
       },
@@ -12382,6 +12819,7 @@
     if (!els.app) return;
     setTimeout(fzFill, 3000);
     setTimeout(gdAutoMaybe, 45000);
+    ocrWatch(8000);
     /*@3.NOAJ.98*/
     if (window.GardenTint && GardenTint.fontSheet) { try { GardenTint.fontSheet(); } catch (eF) {} }
     warmSheetFont(0);

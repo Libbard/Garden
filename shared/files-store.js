@@ -361,6 +361,44 @@
     });
   }
 
+  /*@3.FISJ2.5*/
+  var OCR_MAX = 300 * 1024 * 1024;
+  function ocrPdf(file, opts) {
+    var o = opts || {};
+    var stage = function (st, extra) { if (o.onStage) { try { o.onStage(st, extra || {}); } catch (e) {} } };
+    if (!file || file.size > OCR_MAX) return Promise.reject(Object.assign(new Error('too_large'), { error: 'too_large', max: OCR_MAX }));
+    return vaultId().then(function (id) {
+      if (!id) throw Object.assign(new Error('no_vault'), { error: 'no_vault' });
+      stage('hash', { at: 0, of: file.size });
+      return hashOf(file, function (at, of) { stage('hash', { at: at, of: of }); }).then(function (hr) {
+        var body = { h: hr.hash, bytes: file.size, name: String(o.title || file.name || '').slice(0, 120), nid: String(o.nid || '').slice(0, 60) };
+        var fail = function (r) { return Object.assign(new Error((r.body && r.body.error) || ('http_' + r.status)), r.body || {}, { status: r.status }); };
+        return jreq('POST', base(id) + '/ocrpdf', id, body).then(function (r) {
+          if (!r.ok) throw fail(r);
+          if (r.body.state !== 'upload') return r.body;
+          stage('upload', { at: 0, of: file.size });
+          return xhrPut(r.body.put, file, function (at, of) { stage('upload', { at: at, of: of }); }, o.signal)
+            .then(function () { return jreq('POST', base(id) + '/ocrpdf/start', id, body); })
+            .then(function (r2) { if (!r2.ok) throw fail(r2); return r2.body; });
+        }).then(function (st) { return Object.assign({ h: hr.hash }, st); });
+      });
+    });
+  }
+  function ocrPdfState(h) {
+    return vaultId().then(function (id) {
+      if (!id) return null;
+      return jreq('GET', base(id) + '/ocrpdf/' + h, id).then(function (r) { return r.ok ? r.body : (r.status === 404 ? { state: 'none' } : null); });
+    });
+  }
+  function ocrPdfGet(d) {
+    return pull(d.url, function () {}).then(function (blob) {
+      return hashOf(blob).then(function (got) {
+        if (got.hash !== d.sha256) throw Object.assign(new Error('hash_mismatch'), { error: 'hash_mismatch' });
+        return blob;
+      });
+    });
+  }
+
   function addSlides(code, m) {
     return vaultId().then(function (id) {
       if (!id) return null;
@@ -463,6 +501,9 @@
     remove: remove,
     addSlides: addSlides,
     convert: convert,
+    ocrPdf: ocrPdf,
+    ocrPdfState: ocrPdfState,
+    ocrPdfGet: ocrPdfGet,
     isOffice: isOffice,
     officeKind: officeKind,
     officeAccept: OFFICE_ACCEPT,

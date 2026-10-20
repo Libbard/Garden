@@ -2,6 +2,7 @@
   'use strict';
 
   var LOAD = 4;
+  var SLICE_MS = 12;
   var SEG = typeof WeakMap === 'function' ? new WeakMap() : null;
   var RTL_RE = /[\u0590-\u08FF\uFB1D-\uFDFD\uFE70-\uFEFC]/;
 
@@ -199,9 +200,16 @@
       return ot[i];
     }
 
+    function once(kind, i) {
+      if (st.seenTok !== st.tok) { st.seen = {}; st.seenTok = st.tok; }
+      if (st.seen[kind + i]) return false;
+      st.seen[kind + i] = 1;
+      return true;
+    }
+
     function ocrPage(i) {
       var d = ocrOf(i);
-      if (!d) return;
+      if (!d || !once('o', i)) return;
       var q = st.q, at = 0, guard = 0;
       while (guard++ < 5000) {
         var j = d.f.indexOf(q, at);
@@ -219,9 +227,20 @@
       if (data && data.p) { oc = data.p; ot = {}; }
       if (st.q && oc) {
         st.hits = st.hits.filter(function (x) { return !x.o; });
-        for (var k in oc) if (oc.hasOwnProperty(k) && +k >= 1 && +k <= n) ocrPage(+k);
-        sortHits();
-        repaintAll();
+        once('t', 0);
+        Object.keys(st.seen).forEach(function (key) { if (key.charAt(0) === 'o') delete st.seen[key]; });
+        var ks = Object.keys(oc).map(Number).filter(function (x) { return x >= 1 && x <= n; }), at = 0, tok = st.tok;
+        var step = function () {
+          if (st.dead || tok !== st.tok) return;
+          var t0 = Date.now();
+          while (at < ks.length && Date.now() - t0 < SLICE_MS) ocrPage(ks[at++]);
+          sortHits();
+          repaintAll();
+          tell();
+          if (at < ks.length) setTimeout(step, 0);
+        };
+        step();
+        return;
       }
       tell();
     }
@@ -230,7 +249,7 @@
       var d = pg[i];
       if (!st.q) return;
       ocrPage(i);
-      if (!d) return;
+      if (!d || !once('t', i)) return;
       var q = st.q, at = 0, guard = 0;
       while (guard++ < 5000) {
         var j = d.f.indexOf(q, at);
@@ -249,14 +268,27 @@
       st.q = q;
       st.hits = [];
       st.cur = -1;
-      if (q) {
-        for (var i = 1; i <= n; i++) if (pg[i] || (oc && oc[i])) addPage(i);
+      var tok = st.tok = (st.tok || 0) + 1;
+      /*@3.NOPJ7.12*/
+      var from = Math.max(1, Math.min(n, view ? view.mid() : 1)), k = 0, ret = -1;
+      var step = function () {
+        if (st.dead || tok !== st.tok || !q) return;
+        var t0 = Date.now();
+        while (k < n && Date.now() - t0 < SLICE_MS) {
+          var i = ((from - 1 + k) % n) + 1;
+          if (pg[i] || (oc && oc[i])) addPage(i);
+          k++;
+        }
         sortHits();
-      }
-      repaintAll();
-      tell();
-      if (q && !st.scanning && st.done < n) scan(view ? view.mid() : 1);
-      return st.hits.length;
+        if (ret === 0 && st.hits.length && st.cur < 0) { ret = st.hits.length; jump(nearest(1)); }
+        else { repaintAll(); tell(); }
+        if (k < n) setTimeout(step, 0);
+      };
+      if (q) step();
+      else { repaintAll(); tell(); }
+      if (q && !st.scanning && st.done < n) scan(from);
+      ret = st.hits.length;
+      return ret;
     }
 
     function nearest(dir) {

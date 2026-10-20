@@ -3765,6 +3765,7 @@
     write: write,
     pagesOf: pagesOf,
     wipe: wipe,
+    fieldsTx: function (d, page) { return page ? Ink.prototype.fieldsAsTx.call(null, d, page, frame(page, 1).w) : []; },
     inkRows: inkRows,
     inkDump: inkDump,
     inkRestore: inkRestore,

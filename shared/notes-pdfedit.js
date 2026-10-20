@@ -767,9 +767,161 @@
     });
   }
 
+  function turn(bytes, rot) {
+    return lib().then(function (P) {
+      return Promise.resolve(bytes && bytes.arrayBuffer ? bytes.arrayBuffer() : bytes).then(function (buf) {
+        return P.PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
+      }).then(function (d) {
+        if (d.isEncrypted) { var e = new Error('encrypted'); e.code = 'encrypted'; throw e; }
+        var pages = d.getPages(), map = {}, i;
+        for (i = 0; i < pages.length; i++) {
+          map[i + 1] = i + 1;
+          var r = rot[i + 1];
+          if (r) pages[i].setRotation(P.degrees((((rotOf(pages[i]) + r) % 360) + 360) % 360));
+        }
+        return d.save({ useObjectStreams: true }).then(function (out) {
+          return { blob: new Blob([out], { type: 'application/pdf' }), map: map, pages: pages.length };
+        });
+      });
+    });
+  }
+
+  /*@3.NOPJ13.7*/
+  var SQZ = { lite: null, mid: { cap: 2000, q: 0.72 }, max: { cap: 1300, q: 0.55 } };
+  function inflate(u8) {
+    if (typeof DecompressionStream !== 'function') return Promise.reject(new Error('no_inflate'));
+    return new Response(new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate'))).arrayBuffer()
+      .then(function (b) { return new Uint8Array(b); });
+  }
+  function unpredict(raw, cols, comps, rows) {
+    var bpr = cols * comps, out = new Uint8Array(bpr * rows), r, x;
+    if (raw.length < (bpr + 1) * rows) return null;
+    for (r = 0; r < rows; r++) {
+      var t = raw[r * (bpr + 1)], src = r * (bpr + 1) + 1, at = r * bpr, up = at - bpr;
+      for (x = 0; x < bpr; x++) {
+        var v = raw[src + x], a = x >= comps ? out[at + x - comps] : 0, b = r ? out[up + x] : 0, c = (r && x >= comps) ? out[up + x - comps] : 0;
+        if (t === 1) v += a;
+        else if (t === 2) v += b;
+        else if (t === 3) v += (a + b) >> 1;
+        else if (t === 4) { var p = a + b - c, pa = Math.abs(p - a), pb = Math.abs(p - b), pc = Math.abs(p - c); v += (pa <= pb && pa <= pc) ? a : (pb <= pc ? b : c); }
+        else if (t !== 0) return null;
+        out[at + x] = v & 255;
+      }
+    }
+    return out;
+  }
+  function canvasOf(w, h) {
+    if (typeof OffscreenCanvas === 'function') return new OffscreenCanvas(w, h);
+    var c = document.createElement('canvas');
+    c.width = w; c.height = h;
+    return c;
+  }
+  function jpegOf(cv, q) {
+    if (cv.convertToBlob) return cv.convertToBlob({ type: 'image/jpeg', quality: q });
+    return new Promise(function (ok, no) { cv.toBlob(function (b) { b ? ok(b) : no(new Error('jpeg')); }, 'image/jpeg', q); });
+  }
+  function compress(bytes, level, onStep) {
+    var cfg = SQZ[level] || null;
+    return lib().then(function (P) {
+      var N = P.PDFName.of;
+      return Promise.resolve(bytes && bytes.arrayBuffer ? bytes.arrayBuffer() : bytes).then(function (buf) {
+        return P.PDFDocument.load(buf, { ignoreEncryption: true, updateMetadata: false });
+      }).then(function (d) {
+        if (d.isEncrypted) { var e = new Error('encrypted'); e.code = 'encrypted'; throw e; }
+        var ctx = d.context, all = cfg ? ctx.enumerateIndirectObjects() : [], imgs = [], masks = {}, done = 0, saved = 0;
+        var look = function (v) { return v instanceof P.PDFRef ? ctx.lookup(v) : v; };
+        var nm = function (v) { v = look(v); return v instanceof P.PDFName ? v.asString().replace(/^[/]/, '') : ''; };
+        var nb = function (v) { v = look(v); return v instanceof P.PDFNumber ? v.asNumber() : 0; };
+        all.forEach(function (pair) {
+          var o = pair[1];
+          if (!(o instanceof P.PDFRawStream) || nm(o.dict.get(N('Subtype'))) !== 'Image') return;
+          var sm = o.dict.get(N('SMask'));
+          if (sm instanceof P.PDFRef) masks[sm.toString()] = 1;
+          imgs.push(pair);
+        });
+        /*@3.NOPJ13.8*/
+        function comps(cs) {
+          var v = look(cs);
+          if (v instanceof P.PDFName) { var s = nm(v); return s === 'DeviceRGB' ? 3 : (s === 'DeviceGray' ? 1 : 0); }
+          if (v instanceof P.PDFArray && v.size() === 2 && nm(v.get(0)) === 'ICCBased') {
+            var st = look(v.get(1)), n = st && st.dict ? nb(st.dict.get(N('N'))) : 0;
+            return (n === 3 || n === 1) ? n : 0;
+          }
+          return 0;
+        }
+        function one(pair) {
+          var ref = pair[0], o = pair[1], dc = o.dict;
+          if (masks[ref.toString()]) return Promise.resolve();
+          if (dc.get(N('ImageMask')) || dc.get(N('Decode')) || look(dc.get(N('Mask'))) instanceof P.PDFArray) return Promise.resolve();
+          var W = nb(dc.get(N('Width'))), H = nb(dc.get(N('Height'))), k = comps(dc.get(N('ColorSpace')));
+          if (!k || W * H < 4096 || nb(dc.get(N('BitsPerComponent'))) !== 8) return Promise.resolve();
+          var f = look(dc.get(N('Filter')));
+          if (f instanceof P.PDFArray) f = f.size() === 1 ? f.get(0) : null;
+          var fl = nm(f), px;
+          if (fl === 'DCTDecode') {
+            px = createImageBitmap(new Blob([o.contents], { type: 'image/jpeg' }), { colorSpaceConversion: 'none' });
+          } else if (fl === 'FlateDecode') {
+            var dp = look(dc.get(N('DecodeParms')));
+            if (dp instanceof P.PDFArray) dp = look(dp.get(0));
+            var pred = dp && dp.get ? nb(dp.get(N('Predictor'))) : 0;
+            if (pred > 1 && pred < 10) return Promise.resolve();
+            px = inflate(o.contents).then(function (raw) {
+              var u = pred >= 10 ? unpredict(raw, W, k, H) : raw;
+              if (!u || u.length < W * H * k) throw new Error('short');
+              var id = new ImageData(W, H), a = id.data, i, j;
+              for (i = 0, j = 0; i < W * H; i++, j += k) {
+                a[i * 4] = u[j]; a[i * 4 + 1] = u[j + (k === 3 ? 1 : 0)]; a[i * 4 + 2] = u[j + (k === 3 ? 2 : 0)]; a[i * 4 + 3] = 255;
+              }
+              return createImageBitmap(id);
+            });
+          } else return Promise.resolve();
+          return px.then(function (bmp) {
+            var s = Math.min(1, cfg.cap / Math.max(W, H)), w = Math.max(1, Math.round(W * s)), h = Math.max(1, Math.round(H * s));
+            var cv = canvasOf(w, h), g = cv.getContext('2d');
+            g.fillStyle = '#fff'; g.fillRect(0, 0, w, h);
+            g.imageSmoothingQuality = 'high';
+            g.drawImage(bmp, 0, 0, w, h);
+            if (bmp.close) bmp.close();
+            return jpegOf(cv, cfg.q);
+          }).then(function (blob) { return blob.arrayBuffer(); }).then(function (ab) {
+            var nu = new Uint8Array(ab);
+            if (nu.length >= o.contents.length * 0.92) return;
+            var nd = ctx.obj({});
+            dc.entries().forEach(function (en) {
+              var key = en[0].asString().replace(/^[/]/, '');
+              if (/^(Filter|DecodeParms|Length|Width|Height|BitsPerComponent|ColorSpace)$/.test(key)) return;
+              nd.set(en[0], en[1]);
+            });
+            var sz = Math.min(1, cfg.cap / Math.max(W, H));
+            nd.set(N('Width'), P.PDFNumber.of(Math.max(1, Math.round(W * sz))));
+            nd.set(N('Height'), P.PDFNumber.of(Math.max(1, Math.round(H * sz))));
+            nd.set(N('BitsPerComponent'), P.PDFNumber.of(8));
+            nd.set(N('ColorSpace'), k === 3 ? dc.get(N('ColorSpace')) : N('DeviceRGB'));
+            nd.set(N('Filter'), N('DCTDecode'));
+            nd.set(N('Length'), P.PDFNumber.of(nu.length));
+            ctx.assign(ref, P.PDFRawStream.of(nd, nu));
+            saved += o.contents.length - nu.length;
+          })['catch'](function () {});
+        }
+        return imgs.reduce(function (ch, pair) {
+          return ch.then(function () { return one(pair); }).then(function () {
+            done++;
+            if (onStep) { try { onStep(done, imgs.length); } catch (e0) {} }
+          });
+        }, Promise.resolve()).then(function () {
+          return d.save({ useObjectStreams: true });
+        }).then(function (out) {
+          return { bytes: out, imgs: imgs.length, saved: saved, pages: d.getPageCount() };
+        });
+      });
+    });
+  }
+
   window.GardenPdfEdit = {
     open: open,
     quick: quick,
+    turn: turn,
+    compress: compress,
     build: build,
     parseRange: parseRange,
     mapOf: mapOf,

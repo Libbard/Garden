@@ -446,6 +446,9 @@
       var allPdf = pk.length === n && pk.every(function (x) { return kindOf(x) === 'pdf'; });
       if (allPdf && n >= 2 && A.pdfMerge) h += b('pmerge', 'fa-object-group', 'ادمجْ', 'Merge');
       if (allPdf && n === 1 && A.pdfSplit) h += b('psplit', 'fa-scissors', 'قسِّمْ', 'Split');
+      if (allPdf && A.pdfDownload) h += b('pdl', 'fa-file-arrow-down', 'نزِّلْ', 'Download');
+      if (allPdf && n === 1 && A.pdfRotate) h += b('prot', 'fa-rotate-right', 'دوِّرْ', 'Rotate');
+      if (allPdf && n === 1 && A.pdfCompress) h += b('pzip', 'fa-compress', 'اضغطْ', 'Compress');
       h += A.view().k === 'archive'
         ? b('unarch', 'fa-box-archive', 'أعِدْ من الأرشيف', 'Unarchive')
         : b('arch', 'fa-box-archive', 'أرشِفْ', 'Archive');
@@ -1209,7 +1212,8 @@
     var gd = A.importDrive && A.driveOn && A.driveOn();
     var sl = A.slidesCourses ? A.slidesCourses() : [];
     return [
-      { a: 'import', i: 'fa-laptop', t: L('ملفّاتٌ من جهازي…', 'Files from my device…') }].concat(gd ? [
+      { a: 'import', i: 'fa-laptop', t: L('ملفّاتٌ من جهازي…', 'Files from my device…') },
+      { a: 'imgpdf', i: 'fa-images', t: L('PDF من صور…', 'PDF from images…') }].concat(gd ? [
       { a: 'importgd', i: 'fa-cloud-arrow-down', t: L('ملفّاتٌ من درايف…', 'Files from Drive…') }] : []).concat(sl.length ? [
       { a: 'g:sl', i: 'fa-chalkboard', t: L('السلايداتُ الأصليّة لمادّة', 'A course’s original slides'),
         sub: sl.map(function (c) { return { a: 'slc:' + c.code, i: 'fa-graduation-cap', t: c.label }; }) }] : []).concat([
@@ -1234,6 +1238,7 @@
     if (act === 'nfolder') A.newFolder();
     else if (act === 'nnote') A.newNote();
     else if (act === 'import') pickFiles();
+    else if (act === 'imgpdf' && A.imgPdf) A.imgPdf();
     else if (act === 'importgd' && A.importDrive) A.importDrive();
     else if (act.indexOf('slc:') === 0 && A.slidesOpen) A.slidesOpen(act.slice(4));
     else if (act === 'paste') A.paste();
@@ -1290,6 +1295,12 @@
     if (recs.length === n && recs.every(function (r) { return kindOf(r) === 'pdf'; })) {
       if (n >= 2 && A.pdfMerge) items.push({ a: 'pmerge', i: 'fa-object-group', t: L('ادمجْها في ملفٍّ واحد…', 'Merge into one file…') });
       if (n === 1 && A.pdfSplit) items.push({ a: 'psplit', i: 'fa-scissors', t: L('قسِّمْه إلى ملفّات…', 'Split into files…') });
+      if (A.pdfDownload) items.push({ a: 'g:pdl', i: 'fa-file-arrow-down', t: L('نزِّلْ PDF', 'Download PDF'), sub: [
+        { a: 'pdl', i: 'fa-file-arrow-down', t: L('كما هو — بلا تعليقاتٍ ولا رسم', 'As it is — no annotations or drawings') },
+        { a: 'pdlm', i: 'fa-file-pen', t: L('بتعليقاتي ورسمي', 'With my annotations and drawings') }] });
+      if (n === 1 && A.pdfRotate) items.push({ a: 'prot', i: 'fa-rotate-right', t: L('دوِّرْ صفحاتِه…', 'Rotate its pages…') });
+      if (n === 1 && A.pdfCompress) items.push({ a: 'pzip', i: 'fa-compress', t: L('اضغطْه…', 'Compress it…') });
+      if (n === 1 && A.pdfOcr) items.push({ a: 'pocr', i: 'fa-magnifying-glass', t: L('اقرأْ نصَّه للبحث في أيِّ برنامج', 'Read its text for search in any app') });
     }
     var link = n === 1 && A.shareLink ? A.shareLink(it.id) : '';
     if (link) {
@@ -1308,6 +1319,10 @@
       else if (act === 'export') A.exportIds(ids);
       else if (act === 'pmerge') A.pdfMerge(ids);
       else if (act === 'psplit') A.pdfSplit(ids[0]);
+      else if (act === 'pdl' || act === 'pdlm') A.pdfDownload(ids, act === 'pdlm' ? 'marks' : 'raw');
+      else if (act === 'prot') A.pdfRotate(ids[0]);
+      else if (act === 'pzip') A.pdfCompress(ids[0]);
+      else if (act === 'pocr') A.pdfOcr(ids[0]);
       else if (act === 'pin' || act === 'unpin') A.pin(ids, act === 'pin');
       else if (act === 'arch' || act === 'unarch') A.archive(ids, act === 'arch');
       else if (act === 'copy' || act === 'cut') A.act(act, uid);
@@ -1514,6 +1529,9 @@
       case 'export': A.exportIds(ids); return;
       case 'pmerge': A.pdfMerge(ids); return;
       case 'psplit': A.pdfSplit(ids[0]); return;
+      case 'pdl': A.pdfDownload(ids, 'raw'); return;
+      case 'prot': A.pdfRotate(ids[0]); return;
+      case 'pzip': A.pdfCompress(ids[0]); return;
       case 'arch': A.archive(ids, true); return;
       case 'unarch': A.archive(ids, false); return;
       case 'trash': A.trash(ids); return;
