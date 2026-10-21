@@ -889,6 +889,7 @@
       shareSay('', L('يُرسَل…', 'Sending…'));
       var snap = { v: 1, kind: 'pdf', pdf: { h: p.h, n: p.n || '', sz: p.sz || 0, pg: p.pg || 0 },
                    marks: doc.marks || null, blocks: [] };
+      if (rec && rec.o && rec.o.sl) snap.pdf.sl = rec.o.sl;
       return Sy.shareSet(want, snap, (rec && rec.t) || p.n || '', mode || (shareCur && shareCur.mode) || 'view');
     }).then(function (r) {
       if (mk) mk.disabled = false;
@@ -1402,6 +1403,16 @@
       noteId: 'share:' + sid,
       stamp: function (n, of) { return isAr() ? (n + ' من ' + of) : (n + ' of ' + of); },
       share: function (onPct) {
+        var sl = slideTagOf(r.doc.pdf);
+        if (!sl) return own(onPct);
+        return fetchSlides(sl.c, sl.m, onPct).then(function (file) {
+          if (file.h && r.doc.pdf.h && file.h !== r.doc.pdf.h) return own(onPct);
+          guestShare.file = file;
+          return file;
+        }, function () { return own(onPct); });
+      }
+    });
+    function own(onPct) {
         return Sy.shareFile(sid).then(function (f) {
           if (!f.ok) {
             if (f.status === 404) return null;
@@ -1429,8 +1440,7 @@
             return pump();
           });
         });
-      }
-    });
+    }
     saveState('', '');
   }
 
@@ -8510,7 +8520,36 @@
     if (!O || !api) { toast(L('تعذّر فتحُ السلايدات الآن', 'Could not open the slides right now')); return; }
     var say = function (msg) { saveState('saving', msg); openingSay(msg); };
     say(L('يُجلب ملفُّ الجامعة الأصليّ…', 'Fetching the original university file…'));
-    fetch(api + '/v1/slides/' + encodeURIComponent(code) + '/' + m).then(function (r) {
+    fetchSlides(code, m, function (pct) {
+      say(L('يُجلب ملفُّ الجامعة الأصليّ… ', 'Fetching the original university file… ') + pct + '%');
+    }).then(function (file) {
+      return O.adopt(file).then(function (res) {
+        var title = L(code + ' · الوحدة ' + m + ' — السلايدات الأصليّة', code + ' · Module ' + m + ' — original slides');
+        return pdfNote(res, file, { c: code, m: m }, null, title).then(function (id) {
+          var rec = idxFind(id);
+          if (rec) { rec.o = Object.assign({}, rec.o, { sl: tag }); idxPut(rec); }
+          var F = window.GardenFiles;
+          if (F && F.addSlides) F.addSlides(code, m)['catch'](function () {});
+          return id;
+        });
+      });
+    }).then(function (id) {
+      saveState('', '');
+      reload();
+      openNote(id);
+    }, function (e) {
+      saveState('', '');
+      var why = String((e && e.message) || '');
+      toast(why === 'no_slides'
+        ? L('لا ملفَّ أصليّاً لهذه الوحدة بعد', 'No original file for this module yet')
+        : L('تعذّر جلبُ السلايدات — تحقّقْ من الاتّصال وأعِدِ المحاولة', 'Could not fetch the slides — check your connection and try again'));
+    });
+  }
+
+  function fetchSlides(code, m, onPct) {
+    var E = window.GardenEndpoints, api = (E && E.sync) || '';
+    if (!api) return Promise.reject(new Error('no_endpoint'));
+    return fetch(api + '/v1/slides/' + encodeURIComponent(code) + '/' + m).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
         if (!r.ok || !j.url) throw new Error(j.error || ('http_' + r.status));
         return j;
@@ -8525,39 +8564,28 @@
           return reader.read().then(function (s) {
             if (s.done) return new Blob(parts, { type: 'application/pdf' });
             parts.push(s.value); got += s.value.length;
-            say(L('يُجلب ملفُّ الجامعة الأصليّ… ', 'Fetching the original university file… ') + Math.round(got * 100 / total) + '%');
+            if (onPct) onPct(Math.round(got * 100 / total));
             return pump();
           });
         };
         return pump();
       }).then(function (blob) {
-        var file = new File([blob], j.name || (tag + '.pdf'), { type: 'application/pdf' });
+        var file = new File([blob], j.name || (code + '-' + m + '.pdf'), { type: 'application/pdf' });
         var D = window.GardenPdfDoc;
-        var pre = (j.sha256 && D && D.hash) ? D.hash(file).then(function (r) {
+        if (!j.sha256 || !D || !D.hash) return file;
+        return D.hash(file).then(function (r) {
           if (r && r.hash && r.hash !== j.sha256) throw new Error('hash_mismatch');
-        }) : Promise.resolve();
-        return pre.then(function () { return O.adopt(file); }).then(function (res) {
-          var title = L(code + ' · الوحدة ' + m + ' — السلايدات الأصليّة', code + ' · Module ' + m + ' — original slides');
-          return pdfNote(res, file, { c: code, m: m }, null, title).then(function (id) {
-            var rec = idxFind(id);
-            if (rec) { rec.o = Object.assign({}, rec.o, { sl: tag }); idxPut(rec); }
-            var F = window.GardenFiles;
-            if (F && F.addSlides) F.addSlides(code, m)['catch'](function () {});
-            return id;
-          });
+          file.h = j.sha256;
+          return file;
         });
       });
-    }).then(function (id) {
-      saveState('', '');
-      reload();
-      openNote(id);
-    }, function (e) {
-      saveState('', '');
-      var why = String((e && e.message) || '');
-      toast(why === 'no_slides'
-        ? L('لا ملفَّ أصليّاً لهذه الوحدة بعد', 'No original file for this module yet')
-        : L('تعذّر جلبُ السلايدات — تحقّقْ من الاتّصال وأعِدِ المحاولة', 'Could not fetch the slides — check your connection and try again'));
     });
+  }
+  /*@3.NOAJ.538*/
+  function slideTagOf(pdf) {
+    var sl = /^([A-Za-z]{2,8}[0-9]{3})-([0-9]{1,2})$/.exec(String((pdf && pdf.sl) || ''));
+    if (!sl) sl = /^([A-Za-z]{2,8}[0-9]{3})\s*M([0-9]{1,2})\b/.exec(String((pdf && pdf.n) || ''));
+    return sl ? { c: sl[1].toUpperCase(), m: Number(sl[2]) } : null;
   }
 
   function adoptQuick(qid) {
