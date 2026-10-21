@@ -19,7 +19,9 @@
     /*@3.GARJ.710*/
     { code: 'CS360', map: { 6: 7, 8: 11, 11: 12, 12: 13 }, retire: [5, 7, 9, 10], notesTo: { 7: 8, 9: 11, 10: 11 } },
     { code: 'IT351', map: { 6: 7, 8: 11, 11: 12, 12: 13 }, retire: [5, 7, 9, 10], notesTo: { 7: 8, 9: 11, 10: 11 } },
-    { code: 'DS360', map: { 6: 7, 8: 11, 11: 12, 12: 13 }, retire: [5, 7, 9, 10], notesTo: { 7: 8, 9: 11, 10: 11 } }
+    { code: 'DS360', map: { 6: 7, 8: 11, 11: 12, 12: 13 }, retire: [5, 7, 9, 10], notesTo: { 7: 8, 9: 11, 10: 11 } },
+    /*@3.GARJ.713*/
+    { code: 'DS472', map: { 5: 7, 11: 10, 6: 20, 7: 21, 9: 22, 10: 23, 12: 24, 13: 25 }, retire: [4, 8], notesTo: { 4: 5, 8: 8 } }
   ];
   var TS = '__syncT_', T0_KEY = 'garden_unit_slots_t0', VISITS = 'garden_module_visits';
   var EMPTY = { fc: '{}', notes: '[]', quiz: '' };
