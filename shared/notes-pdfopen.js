@@ -2,6 +2,7 @@
   'use strict';
 
   var MAX_PAGES = 9000;
+  var SCAN_LAZY = 300;
   var SOFT_BYTES = 150 * 1024 * 1024;
   var HARD_BYTES = 500 * 1024 * 1024;
 
@@ -55,7 +56,7 @@
     var V = window.GardenPdfView;
     if (!V) return Promise.reject(new Error('no-view'));
     var url = URL.createObjectURL(file);
-    return V.load(url, pass ? { password: pass } : null).then(function (h) {
+    return V.load(url, { password: pass || '', blob: file }).then(function (h) {
       return { handle: h, url: url, pages: h.pages };
     }, function (e) {
       try { URL.revokeObjectURL(url); } catch (e2) {}
@@ -889,7 +890,8 @@
         view: st.view,
         onState: function (s2) { if (o.onFind) o.onFind(s2); }
       });
-      st.find.scan(st.page);
+      /*@3.NOPJ5.41*/
+      if (!(st.h.pages > SCAN_LAZY)) st.find.scan(st.page);
       var C = window.GardenPdfCloud, fh = sp && sp.h, fd = st.find;
       if (C && C.ocr && fh) C.ocr(fh).then(function (r) {
         if (r && st.find === fd && !st.dead) fd.setOcr(r.data || null, r.state);

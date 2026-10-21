@@ -335,7 +335,9 @@
 
     /*@3.NOPJ7.5*/
     function rectsOf(i, td, hit) {
-      var spans = td.querySelectorAll('span');
+      /*@3.NOPJ7.13*/
+      var tl = view && view.slots && view.slots[i] && view.slots[i].tl;
+      var spans = tl && tl.textDivs && tl.textDivs.length && tl.textDivs[0].parentNode === td ? tl.textDivs : td.querySelectorAll('span');
       var list = [];
       var parts = runs(i, hit.s, hit.e);
       var cv = view && view.slots && view.slots[i] ? view.slots[i].cv : null;

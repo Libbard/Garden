@@ -7274,6 +7274,7 @@
     ocrSending[nid] = 1;
     F.ocrPdf(file, { nid: nid, title: title }).then(function (st) {
       delete ocrSending[nid];
+      if (st.state === 'already') { ocrMade(st.h); toast(ocrAlready(title)); return; }
       var list = ocrJobs().filter(function (j) { return j.nid !== nid; });
       list.push({ h: st.h, sh: sh || st.h, nid: nid, t: title, at: Date.now() });
       ocrJobs(list);
@@ -7308,11 +7309,64 @@
       var s = r[0][0];
       if (!s) return;
       if (!r[1] || !window.GardenFiles || !GardenFiles.ocrPdf) { toast(L('قراءةُ النصّ تحتاج تفعيلَ المزامنة في الإعدادات.', 'Reading the text needs sync turned on in Settings.')); return; }
-      return pdfBytesAny(s.spec).then(function (f) {
-        ocrStart(f, id, s.t, s.spec.h);
-        toast(L('يُرسَل «' + s.t + '» لقراءة نصّه — يجهز في الخلفيّة ويصلك تنبيه' + (s.pg > 80 ? '؛ والملفُّ الطويلُ يأخذ ساعات.' : '.'), '“' + s.t + '” is being sent for text reading — it runs in the background and you will be notified' + (s.pg > 80 ? '; a long file takes hours.' : '.')));
+      if (ocrMade().indexOf(s.spec.h + ':' + OCR_V) > -1) { toast(ocrAlready(s.t)); return; }
+      var send = function () {
+        return pdfBytesAny(s.spec).then(function (f) {
+          ocrStart(f, id, s.t, s.spec.h);
+          toast(L('يُرسَل «' + s.t + '» لقراءة نصّه — يجهز في الخلفيّة ويصلك تنبيه.', '“' + s.t + '” is being sent for text reading — it runs in the background and you will be notified.'));
+        })['catch'](function (e) { toast(ptWhy(e, s.t)); });
+      };
+      return GardenFiles.ocrPdfState(s.spec.h)['catch'](function () { return null; }).then(function (st) {
+        if (st && (st.state === 'already' || st.state === 'done' && st.sha256 === s.spec.h)) { ocrMade(s.spec.h); toast(ocrAlready(s.t)); return; }
+        if (st && (st.state === 'queued' || st.state === 'working' || st.state === 'done')) {
+          var list = ocrJobs().filter(function (j) { return j.nid !== id; });
+          list.push({ h: s.spec.h, sh: s.spec.h, nid: id, t: s.t, at: Date.now() });
+          ocrJobs(list);
+          ocrWatch(50);
+          if (st.state !== 'done') toast(L('«' + s.t + '» في الطابور من قبل — لا يُرسَل ثانيةً، ويصلك تنبيه حين يجهز.', '“' + s.t + '” is already in the queue — it is not sent again; you will be notified when it is ready.'));
+          return;
+        }
+        ocrConsent(s, send);
       });
     })['catch'](function (e) { toast(ptWhy(e, '')); });
+  }
+  /*@3.NOAJ.537*/
+  var OCR_DONE = 'garden_ocr_done', OCR_V = '3';
+  function ocrMade(h) {
+    var a = [];
+    try { a = JSON.parse(localStorage.getItem(OCR_DONE) || '[]') || []; } catch (e) {}
+    if (h && a.indexOf(h + ':' + OCR_V) < 0) {
+      a.push(h + ':' + OCR_V);
+      try { localStorage.setItem(OCR_DONE, JSON.stringify(a.slice(-200))); } catch (e) {}
+    }
+    return a;
+  }
+  function ocrAlready(t) {
+    return L('نصُّ «' + t + '» مقروءٌ أصلاً — تبحث فيه وتحدّد وتنسخ، ولا حاجة لإرساله ثانيةً.', 'The text of “' + t + '” has already been read — you can search, select and copy it; no need to send it again.');
+  }
+  function ocrConsent(s, go) {
+    var dlg = document.getElementById('na-confirm');
+    if (!dlg) { go(); return; }
+    pendDelete = null; pendMany = null; pendFolder = null; pendMake = null; pendAud = null;
+    pendFn = go;
+    var m = Math.max(1, Math.round((s.pg || 0) * 0.1)), dAr = '', dEn = '';
+    if (s.pg) {
+      dAr = '؛ ولـ' + s.pg + ' صفحة نحو ' + (m < 60 ? m + ' دقيقة' : Math.round(m / 60) + ' ساعة') + ' إن كان الطابورُ فارغاً';
+      dEn = '; for ' + s.pg + ' pages about ' + (m < 60 ? m + ' min' : Math.round(m / 60) + ' h') + ' if the queue is empty';
+    }
+    confirmTitle('اقرأْ نصَّ هذا الملفّ؟', 'Read the text of this file?');
+    confirmSub('يُرفع الملفُّ إلى خادمنا وتُقرأ صفحاتُه صفحةً صفحة بخدمة القراءة من Microsoft Azure (‏أو بقارئ خادمنا إن لم تُتَح أو نفدت حصّتُها الشهريّة)، ثمّ يعود إليك بطبقة نصٍّ خفيّةٍ تحت الصفحات: يبقى شكلُه كما هو، وتبحث فيه وتحدّد وتنسخ وتظلّل. ' +
+               'يجري في الخلفيّة ويصلك تنبيهٌ حين يجهز' + dAr + '. يُحذف الأصلُ من الخادم بعد القراءة، والناتجُ بعد ستّة أيّام. ' +
+               'والقراءةُ الآليّةُ تخطئ في الخطوط المزخرفة والنصِّ المكتوب فوق الصور.',
+               'The file is uploaded to our server and read page by page with Microsoft Azure’s reading service (or our server’s own reader when it is unavailable or its monthly quota runs out), then comes back with a hidden text layer under the pages: it looks the same, and you can search, select, copy and highlight it. ' +
+               'It runs in the background and you are notified when it is ready' + dEn + '. The original is deleted from the server after reading, the result after six days. ' +
+               'Automatic reading makes mistakes on decorative fonts and text written over pictures.');
+    confirmOkLabel('أرسلْه للقراءة', 'Send it for reading');
+    var ok = dlg.querySelector('[data-role="ok"]');
+    if (ok) { ok.classList.remove('gsf-btn--danger'); ok.classList.add('gsf-btn--go'); }
+    var w = dlg.querySelector('[data-role="what"]');
+    if (w) w.textContent = s.t;
+    try { dlg.showModal(); } catch (e) {}
   }
   function ocrWatch(ms) {
     if (ocrT) clearTimeout(ocrT);
@@ -7360,6 +7414,7 @@
       var res = { blob: blob, pages: st.pages || 0, map: identMap(st.pages || 0) };
       if (d && rec && d.kind === 'pdf' && d.pdf && d.pdf.h === (j.sh || j.h)) {
         return rotCtx({ id: j.nid, spec: d.pdf }).then(function (k) { return editApply(k.c, res); }).then(function () {
+          ocrMade(st.sha256);
           if (edId !== j.nid) reload({ keepOpen: true });
           toast(L('صار «' + j.t + '» قابلاً للبحث والنسخ.', '“' + j.t + '” is now searchable.'));
         });
@@ -8570,7 +8625,7 @@
   var pendMany = null;
   var pendFolder = null;
   var pendAud = null;
-  var pendMake = null;
+  var pendMake = null, pendFn = null;
 
   function confirmDelete(id, title) {
     var dlg = document.getElementById('na-confirm');
@@ -11610,6 +11665,7 @@
     var dlg = document.getElementById('na-confirm');
     var b = dlg && dlg.querySelector('[data-role="ok"]');
     if (!b) return;
+    b.classList.remove('gsf-btn--go'); b.classList.add('gsf-btn--danger');
     b.textContent = L(ar, en);
     b.setAttribute('data-ar', ar);
     b.setAttribute('data-en', en);
@@ -13435,13 +13491,15 @@
         var many = pendMany;
         var fid = pendFolder;
         var mk = pendMake;
-        var aud = pendAud;
+        var aud = pendAud, fn = pendFn;
+        pendFn = null;
         pendDelete = null;
         pendMany = null;
         pendFolder = null;
         pendMake = null;
         pendAud = null;
         try { cDlg.close(); } catch (e) {}
+        if (fn) { resetConfirm(); fn(); return; }
         if (aud && aud.length && window.GardenNotesAudio && GardenNotesAudio.eraseRecs) {
           GardenNotesAudio.eraseRecs(aud).then(function () {
             if (S.view && S.view.k === 'space' && window.GardenNotesExplorer && GardenNotesExplorer.spaceStale) GardenNotesExplorer.spaceStale();
@@ -13478,9 +13536,9 @@
         }
         if (id) doDelete(id);
       });
-      cDlg.addEventListener('cancel', function () { pendDelete = null; pendMany = null; pendFolder = null; pendMake = null; pendAud = null; resetConfirm(); });
+      cDlg.addEventListener('cancel', function () { pendDelete = null; pendMany = null; pendFolder = null; pendMake = null; pendAud = null; pendFn = null; resetConfirm(); });
       cDlg.addEventListener('click', function (e) {
-        if (e.target.closest('form[method="dialog"]')) { pendDelete = null; pendMany = null; pendAud = null; }
+        if (e.target.closest('form[method="dialog"]')) { pendDelete = null; pendMany = null; pendAud = null; pendFn = null; }
       });
     }
     var fDlg = document.getElementById('na-folder');
