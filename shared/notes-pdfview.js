@@ -1341,33 +1341,47 @@
     if (this.dead || !this.wrap) return;
     var r = this.pick();
     for (var k in this.slots) {
-      var s = this.slots[k];
-      if (!s.sel) continue;
-      s.sel.remove(); s.sel = null;
-    }
-    if (!r) return;
-    for (var k2 in this.slots) {
-      var sl = this.slots[k2];
-      if (!sl.td) continue;
-      var sub = r.cloneRange();
-      try {
-        if (!r.intersectsNode(sl.td)) continue;
-        var box = document.createRange();
-        box.selectNodeContents(sl.td);
-        if (r.compareBoundaryPoints(Range.START_TO_START, box) < 0) sub.setStart(box.startContainer, box.startOffset);
-        if (r.compareBoundaryPoints(Range.END_TO_END, box) > 0) sub.setEnd(box.endContainer, box.endOffset);
-      } catch (e) { continue; }
-      var rects = sub.getClientRects();
-      if (!rects.length) continue;
-      var base = sl.el.getBoundingClientRect();
-      var boxes = merge(rects, base.left, base.top);
-      var host = document.createElement('div');
-      host.className = 'gpv-selpaint';
-      sl.el.insertBefore(host, sl.td);
-      sl.sel = host;
-      paintBoxes(host, boxes, 'gpv-selbox');
+      var sl = this.slots[k], boxes = null;
+      if (r && sl.td) {
+        try {
+          if (r.intersectsNode(sl.td)) {
+            var sub = r.cloneRange(), box = document.createRange();
+            box.selectNodeContents(sl.td);
+            if (r.compareBoundaryPoints(Range.START_TO_START, box) < 0) sub.setStart(box.startContainer, box.startOffset);
+            if (r.compareBoundaryPoints(Range.END_TO_END, box) > 0) sub.setEnd(box.endContainer, box.endOffset);
+            var rects = sub.getClientRects();
+            if (rects.length) { var base = sl.el.getBoundingClientRect(); boxes = merge(rects, base.left, base.top); }
+          }
+        } catch (e) { boxes = null; }
+      }
+      if (!boxes || !boxes.length) { if (sl.sel) { sl.sel.remove(); sl.sel = null; } continue; }
+      /*@3.NOPJ3.86*/
+      var sig = '';
+      for (var j = 0; j < boxes.length; j++) sig += Math.round(boxes[j].x) + ',' + Math.round(boxes[j].y) + ',' + Math.round(boxes[j].w) + ',' + Math.round(boxes[j].h) + ';';
+      if (sl.sel && sl.sel.__sig === sig) continue;
+      if (!sl.sel) {
+        var host = document.createElement('div');
+        host.className = 'gpv-selpaint';
+        sl.el.insertBefore(host, sl.td);
+        sl.sel = host;
+      }
+      reuseBoxes(sl.sel, boxes, 'gpv-selbox');
+      sl.sel.__sig = sig;
     }
   };
+
+  function reuseBoxes(host, boxes, cls) {
+    var kids = host.children, i;
+    for (i = 0; i < boxes.length; i++) {
+      var b = boxes[i], el = kids[i];
+      if (!el) { el = document.createElement('div'); el.className = cls; host.appendChild(el); }
+      el.style.insetInlineStart = b.x.toFixed(2) + 'px';
+      el.style.insetBlockStart = b.y.toFixed(2) + 'px';
+      el.style.inlineSize = b.w.toFixed(2) + 'px';
+      el.style.blockSize = b.h.toFixed(2) + 'px';
+    }
+    while (host.children.length > boxes.length) host.removeChild(host.lastChild);
+  }
 
   /*@3.NOPJ3.30*/
   View.prototype.selText = function () {

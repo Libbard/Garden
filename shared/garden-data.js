@@ -113,6 +113,12 @@
     { hex: '#ef4444', ar: 'أحمر',     en: 'Red' },
     { hex: '#f43f5e', ar: 'ورديّ',     en: 'Rose' },
     { hex: '#e11d6a', ar: 'توتيّ',     en: 'Magenta' },
+    { hex: '#e9a07a', ar: 'ذهبٌ ورديّ', en: 'Rose gold' },
+    { hex: '#34c79a', ar: 'يَشْم',      en: 'Jade' },
+    { hex: '#b39dff', ar: 'ليلكيّ',    en: 'Lilac' },
+    { hex: '#6cc5f0', ar: 'سماءٌ ثلجيّة', en: 'Glacier' },
+    { hex: '#ff8a7a', ar: 'مرجانيّ',   en: 'Coral' },
+    { hex: '#d8b46a', ar: 'رمليّ',     en: 'Sand' },
     { hex: '#64748b', ar: 'رماديّ',    en: 'Slate' }
   ];
 

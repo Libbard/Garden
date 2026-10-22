@@ -94,11 +94,11 @@
       .then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (j) {
           if (r.ok && j && typeof j.out === 'string') {
-            var v = { o: j.out, t: Array.isArray(j.terms) ? j.terms.slice(0, 8) : [] };
+            var v = { o: j.out, t: Array.isArray(j.terms) ? j.terms.slice(0, 8) : [], s: String(j.sl || '') };
             keep(k, v); return v;
           }
           var c = (j && j.error) || ('http_' + r.status);
-          throw fail(c === 'daily_cap' ? 'cap' : c === 'month_cap' || c === 'quota' ? 'capm' : c === 'rate_limited' ? 'busy' : 'down');
+          throw fail(c === 'daily_cap' || c === 'ip_day' ? 'cap' : c === 'month_cap' || c === 'quota' ? 'capm' : c === 'rate_limited' ? 'busy' : 'down');
         });
       }, function () { throw fail(navigator.onLine === false ? 'offline' : 'down'); })
       .then(function (v) { clearTimeout(t); return v; }, function (e) { clearTimeout(t); throw e; });
@@ -125,7 +125,7 @@
     var ls = lines(src);
     var all = squash(ls.map(function (x) { return x.body; }).join(' '));
     if (!all) return Promise.reject(fail('empty'));
-    to = to || toFor(all);
+    to = 'ar';
     var left = MAX_ALL, cut = false, jobs = [];
     ls.forEach(function (x) {
       if (cut) return;
@@ -139,11 +139,11 @@
       left -= body.length;
       if (body) jobs.push({ pre: x.pre, list: parts(body).list });
     });
-    var outL = [], terms = [], seen = {}, j = 0;
+    var outL = [], terms = [], seen = {}, j = 0, sl = '';
     function line() {
       if (j >= jobs.length) {
         while (outL.length && !outL[outL.length - 1]) outL.pop();
-        return { out: outL.join('\n'), to: to, cut: cut, terms: terms };
+        return { out: outL.join('\n'), to: to, cut: cut, terms: terms, sl: sl };
       }
       var jb = jobs[j++], acc = [], i = 0;
       if (!jb.list.length) { outL.push(''); return line(); }
@@ -151,6 +151,7 @@
         if (i >= jb.list.length) { outL.push(jb.pre + acc.join(' ')); return line(); }
         return one(jb.list[i++], to).then(function (v) {
           acc.push(typeof v === 'string' ? v : v.o);
+          if (!sl && v && v.s) sl = v.s;
           (v && v.t || []).forEach(function (t) {
             if (!t || !t.en || seen[t.en]) return;
             seen[t.en] = 1; terms.push(t);
@@ -173,7 +174,7 @@
   }
 
   /*@3.GATJ2.8*/
-  var cur = null;
+  var cur = null, pinXY = null;
 
   function close() {
     if (!cur) return;
@@ -195,6 +196,15 @@
     b.lastChild.textContent = label;
     return b;
   }
+  function ib(icon, ar, en) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'gtr-ib';
+    b.innerHTML = '<i class="fa-solid ' + icon + '" aria-hidden="true"></i>';
+    b.setAttribute('aria-label', L(ar, en)); b.title = L(ar, en);
+    b.setAttribute('data-ar-title', ar); b.setAttribute('data-en-title', en);
+    return b;
+  }
 
   function grab() {
     try {
@@ -206,8 +216,6 @@
   /*@3.GATJ2.9*/
   function place(el, at) {
     var vw = window.innerWidth, vh = window.innerHeight, pad = 8, gap = 8;
-    if (vw <= 640) { el.classList.add('gtr--sheet'); el.style.left = el.style.top = ''; return; }
-    el.classList.remove('gtr--sheet');
     var r = at || { left: vw / 2, right: vw / 2, top: vh / 3, bottom: vh / 3 };
     var w = el.offsetWidth, h = el.offsetHeight;
     var top = r.bottom + gap;
@@ -228,8 +236,9 @@
     el.setAttribute('role', 'dialog');
     el.setAttribute('aria-label', L('ترجمةُ النصِّ المحدَّد', 'Translation of the selected text'));
     el.setAttribute('dir', isAr() ? 'rtl' : 'ltr');
+    /*@3.GATJ2.13*/
     el.innerHTML =
-      '<div class="gtr-grip" aria-hidden="true"></div>' +
+      '<div class="gtr-head"><span class="gtr-lang"><i class="fa-solid fa-language" aria-hidden="true"></i><span></span></span><span class="gtr-hacts"></span></div>' +
       '<div class="gtr-src" dir="auto"></div>' +
       '<div class="gtr-out" dir="auto" aria-live="polite"></div>' +
       '<div class="gtr-terms" hidden></div>' +
@@ -242,35 +251,50 @@
     el.querySelector('.gtr-foot').textContent = L('ترجمةٌ آليّة — قد تخطئ في المصطلح.', 'Machine translation — terms may be off.');
     srcEl.textContent = src.length > 140 ? src.slice(0, 140) + '…' : src;
 
-    var bCopy = btn('gsf-btn--go', 'fa-copy', L('نسخ', 'Copy'));
-    var bSwap = btn('', 'fa-right-left', '');
-    var bX = btn('gtr-x', 'fa-xmark', '');
-    bX.setAttribute('aria-label', L('إغلاق', 'Close'));
-    bX.setAttribute('data-ar-title', 'إغلاق'); bX.setAttribute('data-en-title', 'Close');
-    acts.appendChild(bCopy); acts.appendChild(bSwap); acts.appendChild(bX);
+    var bCopy = btn('gsf-btn--go', 'fa-copy', L('انسخِ الترجمة', 'Copy translation'));
+    var bPin = ib('fa-thumbtack', 'ثبِّتْها في مكانها — أو اسحبْها من رأسها', 'Pin it in place — or drag it by its header');
+    var bX = ib('fa-xmark', 'أغلقْ', 'Close');
+    bPin.setAttribute('aria-pressed', 'false');
+    acts.appendChild(bCopy);
+    el.querySelector('.gtr-hacts').appendChild(bPin);
+    el.querySelector('.gtr-hacts').appendChild(bX);
+    var langEl = el.querySelector('.gtr-lang > span');
 
-    var to = opts.to || toFor(src), done = '', gen = 0;
+    var to = 'ar', done = '', gen = 0;
     var autoEl = el.querySelector('.gtr-auto');
     if (autoEl) {
-      autoEl.lastChild.textContent = L('ترجمْ تلقائيّاً كلّما حدّدتُ نصّاً إنجليزيّاً', 'Translate automatically whenever I select English text');
+      autoEl.lastChild.textContent = L('ترجمْ تلقائيّاً كلّما حدّدتُ نصّاً بغير العربيّة', 'Translate automatically whenever I select non-Arabic text');
       autoEl.firstChild.checked = auto();
       autoEl.firstChild.addEventListener('change', function () { auto(autoEl.firstChild.checked); });
     }
-    function swapLabel() {
-      bSwap.lastChild.textContent = to === 'ar' ? L('إلى الإنجليزيّة', 'To English') : L('إلى العربيّة', 'To Arabic');
+    function langName(c) {
+      var n = '';
+      try { n = c && window.Intl && Intl.DisplayNames ? new Intl.DisplayNames([isAr() ? 'ar' : 'en'], { type: 'language' }).of(c) : ''; } catch (e) { n = ''; }
+      return n && n !== c ? n : '';
+    }
+    function setLang(c) {
+      var n = langName(c);
+      langEl.textContent = n ? L('من ' + n + ' إلى العربيّة', n + ' → Arabic') : L('إلى العربيّة', 'To Arabic');
     }
     function run() {
       var my = ++gen;
       done = '';
-      el.setAttribute('aria-busy', 'true');
+      setLang('');
       el.classList.remove('is-err');
+      termsEl.hidden = true;
+      if (toFor(squash(raw)) === 'en') {
+        el.classList.add('is-err');
+        outEl.textContent = L('النصُّ بالعربيّة أصلاً — لا حاجةَ لترجمته.', 'This text is already in Arabic — nothing to translate.');
+        bCopy.disabled = true;
+        return;
+      }
+      el.setAttribute('aria-busy', 'true');
       outEl.textContent = L('جارٍ الترجمة…', 'Translating…');
       bCopy.disabled = true;
-      swapLabel();
-      termsEl.hidden = true;
       text(raw, to).then(function (r) {
         if (my !== gen || cur !== state) return;
         done = r.out;
+        setLang(r.sl);
         outEl.textContent = r.out;
         outEl.setAttribute('lang', r.to);
         /*@3.GATJ2.12*/
@@ -292,7 +316,7 @@
         outEl.textContent = why(e && e.code);
       }).then(function () {
         if (my === gen) el.removeAttribute('aria-busy');
-        if (cur === state) place(el, at);
+        if (cur === state) follow();
       });
     }
 
@@ -301,7 +325,6 @@
       var ok = function () { bCopy.lastChild.textContent = L('نُسخت', 'Copied'); };
       try { navigator.clipboard.writeText(done).then(ok, function () {}); } catch (e) {}
     });
-    bSwap.addEventListener('click', function () { to = to === 'ar' ? 'en' : 'ar'; run(); });
     bX.addEventListener('click', close);
 
     var range = grab(), pinned = false, raf = 0, tap = null;
@@ -312,35 +335,45 @@
     }
     function follow() {
       raf = 0;
-      if (cur !== state || el.classList.contains('gtr--sheet')) return;
+      if (cur !== state) return;
       if (pinned) { keepIn(); return; }
       var r = null;
       try { r = range && range.getBoundingClientRect(); } catch (e) { r = null; }
       if (r && (r.width || r.height) && r.bottom > 0 && r.top < window.innerHeight) at = r;
       place(el, at);
     }
-    var grip = el.querySelector('.gtr-grip');
-    grip.addEventListener('pointerdown', function (e) {
-      if (el.classList.contains('gtr--sheet') || e.button > 0) return;
+    /*@3.GATJ2.14*/
+    function setPin(on) {
+      pinned = !!on;
+      el.classList.toggle('is-pin', pinned);
+      bPin.setAttribute('aria-pressed', pinned ? 'true' : 'false');
+      if (pinned) { keepIn(); pinXY = { l: parseFloat(el.style.left) || 0, t: parseFloat(el.style.top) || 0 }; }
+      else { pinXY = null; follow(); }
+    }
+    bPin.addEventListener('click', function () { setPin(!pinned); });
+    var head = el.querySelector('.gtr-head');
+    head.addEventListener('pointerdown', function (e) {
+      if (e.button > 0 || (e.target.closest && e.target.closest('button'))) return;
       e.preventDefault();
       var x0 = e.clientX, y0 = e.clientY, l0 = parseFloat(el.style.left) || 0, t0 = parseFloat(el.style.top) || 0;
-      try { grip.setPointerCapture(e.pointerId); } catch (x) {}
+      try { head.setPointerCapture(e.pointerId); } catch (x) {}
       el.classList.add('is-drag');
       function mv(ev) {
-        pinned = true;
+        if (!pinned) setPin(true);
         el.style.left = (l0 + ev.clientX - x0) + 'px';
         el.style.top = (t0 + ev.clientY - y0) + 'px';
         keepIn();
       }
       function up() {
         el.classList.remove('is-drag');
-        grip.removeEventListener('pointermove', mv);
-        grip.removeEventListener('pointerup', up);
-        grip.removeEventListener('pointercancel', up);
+        if (pinned) pinXY = { l: parseFloat(el.style.left) || 0, t: parseFloat(el.style.top) || 0 };
+        head.removeEventListener('pointermove', mv);
+        head.removeEventListener('pointerup', up);
+        head.removeEventListener('pointercancel', up);
       }
-      grip.addEventListener('pointermove', mv);
-      grip.addEventListener('pointerup', up);
-      grip.addEventListener('pointercancel', up);
+      head.addEventListener('pointermove', mv);
+      head.addEventListener('pointerup', up);
+      head.addEventListener('pointercancel', up);
     });
 
     var state = {
@@ -349,7 +382,7 @@
       down: function (e) { tap = el.contains(e.target) ? null : { x: e.clientX, y: e.clientY, t: Date.now() }; },
       up: function (e) {
         var t = tap; tap = null;
-        if (!t || el.contains(e.target)) return;
+        if (!t || pinned || el.contains(e.target)) return;
         if (Math.abs(e.clientX - t.x) + Math.abs(e.clientY - t.y) < 10 && Date.now() - t.t < 600) close();
       },
       key: function (e) { if (e.key === 'Escape') { e.stopPropagation(); close(); } },
@@ -360,7 +393,7 @@
     };
     cur = state;
     (document.fullscreenElement || document.body).appendChild(el);
-    place(el, at);
+    if (pinXY) { el.style.left = pinXY.l + 'px'; el.style.top = pinXY.t + 'px'; setPin(true); } else place(el, at);
     setTimeout(function () {
       if (cur !== state) return;
       document.addEventListener('pointerdown', state.down, true);

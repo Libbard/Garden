@@ -16,7 +16,7 @@
   function mount(o) {
     var api = o.api, host = o.host, body = o.body, src = o.src || null;
     var st = { tab: o.tab === 'toc' ? 'toc' : 'pages', cur: 0, dead: false, cache: {}, order: [], q: [], busy: 0,
-               outline: null, toc: [], userScroll: 0, n: 0 };
+               outline: null, toc: [], userScroll: 0, n: 0, vis: {}, tasks: {}, moving: 0, wait: 0 };
     var el = document.createElement('aside');
     el.className = 'nps';
     if (src) el.setAttribute('data-src', 'note');
@@ -62,13 +62,18 @@
       list.innerHTML = h;
       goIn.max = String(n);
       if (st.io) st.io.disconnect();
+      st.vis = {};
+      /*@3.NOPJ16.4*/
       st.io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
-        es.forEach(function (en) { if (en.isIntersecting) want(Number(en.target.getAttribute('data-p'))); });
-      }, { root: list, rootMargin: '400px 0px' }) : null;
+        es.forEach(function (en) {
+          var p = Number(en.target.getAttribute('data-p'));
+          if (en.isIntersecting) { st.vis[p] = 1; want(p); } else { delete st.vis[p]; drop(p); }
+        });
+      }, { root: list, rootMargin: '160px 0px' }) : null;
       var ths = list.children;
       for (var j = 0; j < ths.length; j++) {
-        if (j < FIRST) want(j + 1);
-        else if (st.io) st.io.observe(ths[j]);
+        if (st.io) st.io.observe(ths[j]);
+        else if (j < FIRST) want(j + 1);
       }
     }
 
@@ -78,14 +83,39 @@
       pump();
     }
 
+    function drop(p) {
+      var i = st.q.indexOf(p);
+      if (i >= 0) st.q.splice(i, 1);
+      var t = st.tasks[p];
+      if (t && t.cancel) { try { t.cancel(); } catch (e) {} }
+    }
+
     function pump() {
       var doc = src || (api.doc && api.doc());
-      while (!st.dead && doc && st.busy < BUSY && st.q.length) {
+      if (st.dead || !doc) return;
+      var calm = Date.now() - st.moving;
+      if (calm < 140) {
+        if (!st.wait) st.wait = setTimeout(function () { st.wait = 0; pump(); }, 150 - calm);
+        return;
+      }
+      while (st.busy < BUSY && st.q.length) {
         var p = st.q.shift();
+        if (st.io && !st.vis[p]) continue;
         st.busy++;
         render(doc, p).then(done, done);
       }
       function done() { st.busy--; if (!st.dead) pump(); }
+    }
+
+    function fromView(p) {
+      var V = api.view && api.view(), s = V && V.slots && V.slots[p], cv = s && s.cv;
+      if (!cv || s.busy || s.stale || !(cv.width > 0)) return null;
+      var w = Math.round(THUMB_W * Math.min(2, window.devicePixelRatio || 1)), k = w / cv.width;
+      if (!(k > 0) || k > 1) return null;
+      var c = document.createElement('canvas');
+      c.width = w; c.height = Math.max(1, Math.round(cv.height * k));
+      c.getContext('2d').drawImage(cv, 0, 0, c.width, c.height);
+      return c;
     }
 
     function keep(p, v) {
@@ -110,16 +140,22 @@
         if (v && !st.dead) keep(p, v);
         return Promise.resolve();
       }
+      var mine = fromView(p);
+      if (mine) { keep(p, mine); return Promise.resolve(); }
       return doc.getPage(p).then(function (pg) {
+        if (st.dead || (st.io && !st.vis[p])) return;
         var v1 = pg.getViewport({ scale: 1 });
         var s = THUMB_W / v1.width * Math.min(2, window.devicePixelRatio || 1);
         var vp = pg.getViewport({ scale: s });
         var cv = document.createElement('canvas');
         cv.width = Math.ceil(vp.width); cv.height = Math.ceil(vp.height);
-        return pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise.then(function () {
+        var task = pg.render({ canvasContext: cv.getContext('2d'), viewport: vp, intent: 'display' });
+        st.tasks[p] = task;
+        return task.promise.then(function () {
+          delete st.tasks[p];
           if (st.dead) return;
           keep(p, cv);
-        });
+        }, function () { delete st.tasks[p]; });
       });
     }
 
@@ -300,6 +336,7 @@
       if (e.key === 'Escape' && o.onClose) { e.preventDefault(); e.stopPropagation(); o.onClose(); }
     });
     var markUser = function () { st.userScroll = Date.now(); };
+    list.addEventListener('scroll', function () { st.moving = Date.now(); }, { passive: true });
     list.addEventListener('wheel', markUser, { passive: true });
     list.addEventListener('touchmove', markUser, { passive: true });
     tocEl.addEventListener('wheel', markUser, { passive: true });
@@ -334,6 +371,8 @@
       destroy: function () {
         st.dead = true;
         if (st.io) st.io.disconnect();
+        for (var k in st.tasks) { try { st.tasks[k].cancel(); } catch (e) {} }
+        clearTimeout(st.wait);
         st.cache = {};
         if (el.parentNode) el.parentNode.removeChild(el);
       }

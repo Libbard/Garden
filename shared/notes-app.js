@@ -6186,35 +6186,61 @@
     clearTimeout(pselT);
     pselT = setTimeout(pselShow, ms || 450);
   }
+  /*@3.NOAJ.539*/
+  var PSEL_OFF = 'garden_psel_off', pselMute = null, pselHides = 0, pselSaved = null, pselTap = null;
+  function pselOff() { try { return sessionStorage.getItem(PSEL_OFF) === '1'; } catch (e) { return false; } }
+  function pselSig(rg) { return rg ? { a: rg.startContainer, i: rg.startOffset, b: rg.endContainer, j: rg.endOffset } : null; }
+  function pselSame(m, rg) { return !!(m && rg && m.a === rg.startContainer && m.i === rg.startOffset && m.b === rg.endContainer && m.j === rg.endOffset); }
   function pselShow() {
     if (pselDown) { pselSoon(300); return; }
     var rg = pselRange();
-    if (!rg || Date.now() - pselAt > 60000 || !pdfOn() || document.querySelector('.gsf-rmenu')) { pselHide(); return; }
-    var rs = rg.getClientRects();
-    if (!rs.length) { pselHide(); return; }
+    if (!rg || pselOff() || Date.now() - pselAt > 60000 || !pdfOn() || document.querySelector('.gsf-rmenu')) { pselHide(); return; }
+    if (pselSame(pselMute, rg)) { pselHide(); return; }
+    pselMute = null;
     if (!pselEl) {
-      pselEl = document.createElement('button');
-      pselEl.type = 'button';
-      pselEl.className = 'gsf-btn gsf-btn--sm na-psel';
+      pselEl = document.createElement('div');
+      pselEl.className = 'na-psel';
+      pselEl.setAttribute('role', 'group');
+      pselEl.innerHTML = '<button type="button" class="na-psel-go" data-psel="go"><i class="fa-solid fa-ellipsis" aria-hidden="true"></i><span></span></button>' +
+        '<button type="button" class="na-psel-x" data-psel="x"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>';
       pselEl.addEventListener('pointerdown', function (e) { e.preventDefault(); });
-      pselEl.addEventListener('click', function () {
+      pselEl.querySelector('[data-psel="go"]').addEventListener('click', function () {
         var r = pselEl.getBoundingClientRect();
         pselHide();
-        pdfMenu(r.left + r.width / 2, r.top + r.height / 2);
+        pdfMenu(r.left + r.width / 2, r.top);
+      });
+      pselEl.querySelector('[data-psel="x"]').addEventListener('click', function () {
+        pselMute = pselSig(pselRange());
+        pselHide();
+        if (++pselHides >= 2) pselAskOff();
       });
       document.body.appendChild(pselEl);
     }
-    var t = L('أدواتُ النصّ', 'Text tools');
-    pselEl.innerHTML = '<i class="fa-solid fa-ellipsis" aria-hidden="true"></i> ' + esc(t);
+    var t = L('أدواتُ النصّ', 'Text tools'), x = L('أخفِ أدواتِ النصّ', 'Hide text tools');
+    pselEl.querySelector('span').textContent = t;
+    pselEl.querySelector('[data-psel="go"]').setAttribute('aria-label', t);
+    var xb = pselEl.querySelector('[data-psel="x"]');
+    xb.setAttribute('aria-label', x); xb.setAttribute('title', x);
     pselEl.setAttribute('aria-label', t);
     pselEl.hidden = false;
-    var last = rs[rs.length - 1], first = rs[0];
-    var w = pselEl.offsetWidth, h = pselEl.offsetHeight, vw = window.innerWidth, vh = window.innerHeight;
-    var top = last.bottom + 44;
-    if (top + h > vh - 12) top = Math.max(12, first.top - 44 - h);
-    var x = Math.max(12, Math.min(vw - w - 12, (last.left + last.right) / 2 - w / 2));
-    pselEl.style.insetBlockStart = Math.round(top) + 'px';
-    pselEl.style.insetInlineStart = Math.round(document.documentElement.dir === 'rtl' ? vw - x - w : x) + 'px';
+  }
+  function pselAskOff() {
+    var dlg = document.getElementById('na-confirm');
+    if (!dlg) return;
+    pendDelete = null; pendMany = null; pendFolder = null; pendMake = null; pendAud = null;
+    pendFn = function () {
+      try { sessionStorage.setItem(PSEL_OFF, '1'); } catch (e) {}
+      toast(L('أُخفيت أدواتُ النصّ في هذه الجلسة — حدِّدْ ثمّ المسْ مكاناً فارغاً لتظهر.', 'Text tools are hidden for this session — select, then tap an empty spot to show them.'));
+    };
+    confirmTitle('أخفِ أدواتِ النصّ في هذه الجلسة؟', 'Hide text tools for this session?');
+    confirmSub('لن يظهر الزرُّ بعد كلِّ تحديد، فتمدّ التحديدَ كما تشاء. وحين تحتاج الأدوات: حدِّدِ النصَّ ثمّ المسْ مكاناً فارغاً من الصفحة — لا نصّاً — فتظهر القائمة. ويعود الزرُّ حين تفتح الموقعَ من جديد.',
+               'The button will stop appearing after each selection, so you can extend it freely. When you need the tools, select text and then tap an empty spot on the page — not text — and the menu opens. The button returns next time you open the site.');
+    confirmOkLabel('أخفِه في هذه الجلسة', 'Hide for this session');
+    var ok = dlg.querySelector('[data-role="ok"]');
+    if (ok) { ok.classList.remove('gsf-btn--danger'); ok.classList.add('gsf-btn--go'); }
+    var w = dlg.querySelector('[data-role="what"]');
+    if (w) w.textContent = '';
+    try { dlg.showModal(); } catch (e) {}
   }
   function bindPsel() {
     if (bindPsel.on) return;
@@ -6222,9 +6248,28 @@
     document.addEventListener('touchstart', function (e) {
       pselAt = Date.now(); pselDown = true;
       if (pselEl && !pselEl.hidden && !pselEl.contains(e.target)) pselHide();
+      var p = e.touches && e.touches[0], rg = pselOff() && pdfOn() ? pselRange() : null;
+      pselSaved = rg ? rg.cloneRange() : null;
+      pselTap = p ? { x: p.clientX, y: p.clientY, t: Date.now(), text: !!(e.target && e.target.closest && e.target.closest('.gpv-text span')),
+                      page: !!(e.target && e.target.closest && e.target.closest('.gpv-page')) } : null;
     }, { passive: true, capture: true });
     ['touchend', 'touchcancel'].forEach(function (k) {
-      document.addEventListener(k, function () { pselDown = false; pselAt = Date.now(); if (pdfOn()) pselSoon(); }, { passive: true, capture: true });
+      document.addEventListener(k, function (e) {
+        pselDown = false; pselAt = Date.now();
+        var p = e.changedTouches && e.changedTouches[0], tp = pselTap, sv = pselSaved;
+        pselSaved = null; pselTap = null;
+        /*@3.NOAJ.540*/
+        if (k === 'touchend' && sv && tp && p && tp.page && !tp.text && Date.now() - tp.t < 400 &&
+            Math.abs(p.clientX - tp.x) < 10 && Math.abs(p.clientY - tp.y) < 10) {
+          setTimeout(function () {
+            var s = window.getSelection();
+            try { s.removeAllRanges(); s.addRange(sv); } catch (e2) { return; }
+            pdfMenu(tp.x, tp.y);
+          }, 30);
+          return;
+        }
+        if (pdfOn()) pselSoon();
+      }, { passive: true, capture: true });
     });
     document.addEventListener('selectionchange', function () {
       if (Date.now() - pselAt > 60000 || !pdfOn()) return;
