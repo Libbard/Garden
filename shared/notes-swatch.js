@@ -513,16 +513,17 @@
     var h = '<div class="nsw-pl" data-plkind="' + esc(kind) + '">';
     h += '<div class="nsw-pl-cur"><div class="nsw-pl-h"><b>' + esc(L('لوحتُك الأساسيّة', 'Your main palette')) + '</b>' +
       '<span>' + esc(digits(P.cur + 1) + ' · ' + plName(kind, P.cur, list)) + '</span></div>' +
-      '<div class="nsw-pl-row">' + list.map(function (t, i) {
-        return '<span class="nsw-pl-cell"><button type="button" class="nsw-pl-sw" data-pled="' + i + '" style="--t:' + esc(hx(t)) + '"' +
-          ' aria-label="' + esc(L('غيّرْ ', 'Change ') + toneName(t)) + '" title="' + esc(L('غيّرْ ', 'Change ') + toneName(t)) + '"></button>' +
+      '<div class="nsw-pl-row" data-plrow="1">' + list.map(function (t, i) {
+        var tip = L('غيّرْ ', 'Change ') + toneName(t) + L(' — أو اسحبْه لترتيبه', ' — or drag it to reorder');
+        return (i === PL_RING ? plCut() : '') + '<span class="nsw-pl-cell"' + (i < PL_RING ? ' data-ring="1"' : '') + '><button type="button" class="nsw-pl-sw" data-pled="' + i + '" style="--t:' + esc(hx(t)) + '"' +
+          ' aria-label="' + esc(tip) + '" title="' + esc(tip) + '"></button>' +
           (list.length > 1 ? '<button type="button" class="nsw-pl-x" data-pldel="' + i + '" aria-label="' + esc(L('أزِلْ ', 'Remove ') + toneName(t)) + '">' +
             '<i class="fa-solid fa-xmark" aria-hidden="true"></i></button>' : '') + '</span>';
       }).join('') +
       (list.length < PL_MAX ? '<button type="button" class="nsw-pl-add" data-pladd="1" aria-label="' + esc(L('أضِفْ لوناً', 'Add a colour')) + '" title="' +
         esc(L('أضِفْ لوناً', 'Add a colour')) + '"><i class="fa-solid fa-plus" aria-hidden="true"></i></button>' : '') + '</div>' +
-      '<p class="nsw-pl-note">' + esc(L('المسْ لوناً لتغييره، أو اخترْ لوحةً جاهزةً أدناه لتصير أساسيّتَك.',
-                                         'Tap a colour to change it, or pick a ready palette below to make it your main one.')) + '</p></div>';
+      '<p class="nsw-pl-note">' + esc(L('اسحبْ لوناً لترتيبه — أوّلُ ستّةٍ هي التي تظهر في الدائرة حول القلم. والمسْه لتغييره، أو اخترْ لوحةً جاهزةً أدناه.',
+                                         'Drag a colour to reorder it — the first six are the ones around the pen. Tap one to change it, or pick a ready palette below.')) + '</p></div>';
     h += '<details class="nsw-more"' + (o.open ? ' open' : '') + '><summary>' + esc(L('لوحاتٌ جاهزة', 'Ready palettes')) + ' <span>' + esc(digits(P.lists.length)) + '</span></summary>';
     h += '<ul class="nip-pals">' + P.lists.map(function (l, i) {
       var on = P.rot === 'all' || P.pin.indexOf(i) >= 0;
@@ -574,6 +575,95 @@
     }, { presets: pre });
     return true;
   }
+
+  var PL_RING = 6;
+  function plCut() {
+    return '<span class="nsw-pl-cut" aria-hidden="true" title="' + esc(L('ما بعد هذا الخطّ لا يظهر في الدائرة', 'Colours after this line are not shown around the pen')) + '"></span>';
+  }
+  function plRenumber(row) {
+    var cells = row.querySelectorAll('.nsw-pl-cell'), cut = row.querySelector('.nsw-pl-cut'), i;
+    for (i = 0; i < cells.length; i++) {
+      var sw = cells[i].querySelector('[data-pled]'), x = cells[i].querySelector('[data-pldel]');
+      if (sw) sw.setAttribute('data-pled', String(i));
+      if (x) x.setAttribute('data-pldel', String(i));
+      if (i < PL_RING) cells[i].setAttribute('data-ring', '1'); else cells[i].removeAttribute('data-ring');
+    }
+    if (cells.length > PL_RING) {
+      if (!cut) { var tmp = document.createElement('span'); tmp.innerHTML = plCut(); cut = tmp.firstChild; }
+      row.insertBefore(cut, cells[PL_RING]);
+    } else if (cut) cut.remove();
+  }
+  function plMoveTo(row, kind, from, to) {
+    var d = plRead(), P = d[kind], list = P && P.lists[P.cur] && P.lists[P.cur].c;
+    if (!list || from === to || !(from >= 0) || !(to >= 0) || from >= list.length || to >= list.length) return false;
+    list.splice(to, 0, list.splice(from, 1)[0]);
+    plWrite(d);
+    return true;
+  }
+  var plDrag = null;
+  function plDown(e) {
+    if (e.button > 0 || plDrag) return;
+    var sw = e.target && e.target.closest ? e.target.closest('.nsw-pl-sw[data-pled]') : null;
+    var row = sw && sw.closest('[data-plrow]'), pl = row && row.closest('[data-plkind]');
+    if (!sw || !pl) return;
+    plDrag = { id: e.pointerId, x: e.clientX, y: e.clientY, sw: sw, cell: sw.parentNode, row: row,
+               kind: pl.getAttribute('data-plkind'), from: +sw.getAttribute('data-pled'), on: false };
+  }
+  function plMove(e) {
+    var g = plDrag;
+    if (!g || e.pointerId !== g.id) return;
+    if (!g.on) {
+      if (Math.abs(e.clientX - g.x) + Math.abs(e.clientY - g.y) < 7) return;
+      g.on = true;
+      try { g.sw.setPointerCapture(e.pointerId); } catch (eC) {}
+      g.cell.setAttribute('data-lift', '1');
+      g.row.setAttribute('data-sorting', '1');
+    }
+    e.preventDefault();
+    var cells = [].slice.call(g.row.querySelectorAll('.nsw-pl-cell')), best = null, bd = 1e9;
+    cells.forEach(function (c) {
+      var r = c.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2);
+      var dd = dx * dx + dy * dy * 2;
+      if (dd < bd) { bd = dd; best = c; }
+    });
+    if (!best || best === g.cell) return;
+    var at = cells.indexOf(best), me = cells.indexOf(g.cell);
+    if (at > me) g.row.insertBefore(g.cell, best.nextSibling); else g.row.insertBefore(g.cell, best);
+    plRenumber(g.row);
+  }
+  function plUp(e) {
+    var g = plDrag;
+    if (!g || e.pointerId !== g.id) return;
+    plDrag = null;
+    if (!g.on) return;
+    try { g.sw.releasePointerCapture(e.pointerId); } catch (eR) {}
+    g.cell.removeAttribute('data-lift');
+    g.row.removeAttribute('data-sorting');
+    var to = [].slice.call(g.row.querySelectorAll('.nsw-pl-cell')).indexOf(g.cell);
+    var eat = function (ev) { ev.stopPropagation(); ev.preventDefault(); };
+    document.addEventListener('click', eat, true);
+    setTimeout(function () { document.removeEventListener('click', eat, true); }, 0);
+    if (e.type === 'pointercancel' || to < 0 || !plMoveTo(g.row, g.kind, g.from, to)) plRenumber(g.row);
+  }
+  function plKey(e) {
+    if (!e.altKey || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+    var sw = e.target && e.target.closest ? e.target.closest('.nsw-pl-sw[data-pled]') : null;
+    var row = sw && sw.closest('[data-plrow]'), pl = row && row.closest('[data-plkind]');
+    if (!sw || !pl) return;
+    e.preventDefault();
+    var rtl = getComputedStyle(row).direction === 'rtl', fwd = (e.key === 'ArrowRight') !== rtl;
+    var cells = [].slice.call(row.querySelectorAll('.nsw-pl-cell')), me = cells.indexOf(sw.parentNode), to = me + (fwd ? 1 : -1);
+    if (to < 0 || to >= cells.length) return;
+    if (fwd) row.insertBefore(sw.parentNode, cells[to].nextSibling); else row.insertBefore(sw.parentNode, cells[to]);
+    plRenumber(row);
+    plMoveTo(row, pl.getAttribute('data-plkind'), me, to);
+    sw.focus();
+  }
+  document.addEventListener('pointerdown', plDown, true);
+  document.addEventListener('pointermove', plMove, { capture: true, passive: false });
+  document.addEventListener('pointerup', plUp, true);
+  document.addEventListener('pointercancel', plUp, true);
+  document.addEventListener('keydown', plKey, true);
 
   window.GardenSwatch = {
     ready: CSS_READY,

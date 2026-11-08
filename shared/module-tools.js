@@ -1213,7 +1213,12 @@
           else { try { localStorage.setItem('garden_peek_off', '1'); } catch (eP2) {} if (window.GardenModPeek) GardenModPeek.hideAll(); toast(L('أُخفيت نوافذُ الملاحظات', 'Note windows hidden')); }
           return;
         }
-        if (a === 'm-slides') { go(slidesHref()); return; }
+        if (a === 'm-slides') {
+          var sw = null;
+          try { sw = window.open(slidesHref(), '_blank'); } catch (eW) {}
+          if (sw) { try { sw.opener = null; } catch (eO) {} } else go(slidesHref());
+          return;
+        }
         if (a === 'm-quiz') {
           var html = document.documentElement;
           go(ROOT + 'hub/quiz.html?c=' + encodeURIComponent(html.getAttribute('data-subject') || '') + '&m=' + encodeURIComponent(html.getAttribute('data-module') || ''));

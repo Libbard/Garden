@@ -827,6 +827,7 @@
 
   function setDrawing(on) {
     if (!S.ov) return;
+    if (S.ov.dial && S.ov.dial.untuck) S.ov.dial.untuck();
     S.drawing = !!on;
     S.ov.toggle(S.drawing);
     if (S.fab) {
@@ -1152,7 +1153,10 @@
         onErased: onErased,
         onChange: function () { split(); }
       });
-      if (S.ov.dial) S.ov.dial.onExit = function () { setDrawing(false); };
+      if (S.ov.dial) {
+        S.ov.dial.onExit = function () { setDrawing(false); };
+        S.ov.dial.onResume = function () { setDrawing(true); };
+      }
       S.ov.show();
       S.on = true;
       keptSoon(0);

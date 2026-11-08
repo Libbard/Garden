@@ -64,6 +64,7 @@
       this.dial = GardenNotesDial.mount({
         canvas: function () { return self.cv; },
         onExit: function () { self.toggle(false); },
+        onResume: function () { self.toggle(true); },
         favHost: this.favHost || null,
         surface: this.surface || ''
       });

@@ -2260,6 +2260,7 @@
   function slidesBar() {
     var v = S.view || {};
     if ((v.k !== 'course' && v.k !== 'module') || !v.code) return '';
+    if (slBulk && slBulk.code === v.code) return bulkHtml();
     var G = window.Garden, total = (G && G.slidesOf) ? G.slidesOf(v.code) : 0;
     if (!total || slidesHid()[v.code]) return '';
     var have = {};
@@ -2274,12 +2275,18 @@
       return '<button type="button" class="na-sweep-go" data-role="slide" data-m="' + m + '">' +
         esc(v.k === 'module' ? L('أضِفْها وافتحْها', 'Add and open') : ('M' + (m < 10 ? '0' : '') + m)) + '</button>';
     }).join('');
+    if (v.k === 'course' && want.length > 1) {
+      chips = '<button type="button" class="na-sweep-go na-sweep-all" data-role="slides-all">' +
+        '<i class="fa-solid fa-cloud-arrow-down" aria-hidden="true"></i> ' +
+        esc(want.length === total ? L('أضِفْها كلَّها', 'Add them all') : L('أضِفِ الباقيةَ', 'Add the rest')) +
+        ' <span class="na-sweep-n">' + want.length + '</span></button>' + chips;
+    }
     return '<div class="na-sweep na-sweep--offer" role="group" aria-label="' +
       esc(L('السلايدات الأصليّة', 'Original slides')) + '">' +
       '<i class="fa-solid fa-chalkboard" aria-hidden="true"></i>' +
       '<span>' + esc(v.k === 'module'
         ? L('ملفُّ الجامعة الأصليّ لهذه الوحدة متاحٌ لك.', 'The university’s original file for this module is available.')
-        : L('ملفّاتُ الجامعة الأصليّة متاحةٌ لهذه المادّة — اختر وحدة:', 'The university’s original files are available for this course — pick a module:')) +
+        : L('ملفّاتُ الجامعة الأصليّة متاحةٌ لهذه المادّة — أضِفْها كلَّها أو اخترْ وحدة:', 'The university’s original files are available for this course — add them all or pick a module:')) +
       '</span>' + chips +
       '<button type="button" class="na-sweep-x" data-role="slides-x" aria-label="إخفاء" ' +
       'data-ar-title="إخفاء" data-en-title="Dismiss">' +
@@ -2287,10 +2294,15 @@
   }
 
   function slidesClick(e) {
-    var sl = e.target.closest && e.target.closest('[data-role="slide"],[data-role="slides-x"]');
+    var sl = e.target.closest && e.target.closest('[data-role="slide"],[data-role="slides-x"],[data-role="slides-all"],[data-role="slides-stop"]');
     if (!sl || !S.view || !S.view.code) return false;
     e.preventDefault();
-    if (sl.getAttribute('data-role') === 'slide') openSlides(S.view.code + '-' + sl.getAttribute('data-m'));
+    var role = sl.getAttribute('data-role');
+    if (role === 'slides-all') slidesAll(S.view.code);
+    else if (role === 'slides-stop') {
+      if (slBulk) { slBulk.stop = true; if (slBulk.ac) { try { slBulk.ac.abort(); } catch (eA) {} } }
+    }
+    else if (role === 'slide') openSlides(S.view.code + '-' + sl.getAttribute('data-m'));
     else {
       var hid = slidesHid();
       hid[S.view.code] = 1;
@@ -5099,6 +5111,15 @@
             try { ed.openCtx(ed.root, cx, cy, at); } catch (e6) {}
           }
         });
+      }
+      if (overlay && overlay.dial) {
+        overlay.dial.onExit = function () {
+          if (!overlay || !overlay.on) return;
+          try { overlay.toggle(false); } catch (eX) {}
+          if (ribbon) ribbon.setDrawing(false);
+          paintDrawBtn();
+        };
+        overlay.dial.onResume = function () { if (overlay && !overlay.on) penToggle(); };
       }
       if (overlay && overlay.show) { try { overlay.show(); } catch (e3) {} }
       if (overlay && overlay.host && !overlay.host.__selCtx) {
@@ -8552,22 +8573,22 @@
 
   /*@3.NOAJ.113*/
   /*@3.NOAJ.500*/
-  function openSlides(want) {
-    var mm = /^([A-Za-z]{2,8}[0-9]{3})-([0-9]{1,2})$/.exec(String(want || ''));
-    if (!mm) return;
-    var code = mm[1].toUpperCase(), m = Number(mm[2]), tag = code + '-' + m;
-    var had = idxRead().filter(function (r) {
+  function slideHad(tag) {
+    return idxRead().filter(function (r) {
       return r && r.k === 'pdf' && r.o && r.o.sl === tag && typeof r.d !== 'number';
-    })[0];
-    if (had) { openNote(had.id); return; }
-    var O = window.GardenPdfOpen, E = window.GardenEndpoints;
-    var api = (E && E.sync) || '';
-    if (!O || !api) { toast(L('تعذّر فتحُ السلايدات الآن', 'Could not open the slides right now')); return; }
-    var say = function (msg) { saveState('saving', msg); openingSay(msg); };
-    say(L('يُجلب ملفُّ الجامعة الأصليّ…', 'Fetching the original university file…'));
-    fetchSlides(code, m, function (pct) {
-      say(L('يُجلب ملفُّ الجامعة الأصليّ… ', 'Fetching the original university file… ') + pct + '%');
-    }).then(function (file) {
+    })[0] || null;
+  }
+
+  function importSlide(code, m, onStep, signal) {
+    var O = window.GardenPdfOpen, E = window.GardenEndpoints, tag = code + '-' + m;
+    var had = slideHad(tag);
+    if (had) return Promise.resolve(had.id);
+    if (!O || !(E && E.sync)) return Promise.reject(new Error('no_endpoint'));
+    var step = onStep || function () {};
+    step('net');
+    return fetchSlides(code, m, function (pct, got, total) { step('get', pct, got, total); }, signal).then(function (file) {
+      if (signal && signal.aborted) throw new Error('aborted');
+      step('prep');
       return O.adopt(file).then(function (res) {
         var title = L(code + ' · الوحدة ' + m + ' — السلايدات الأصليّة', code + ' · Module ' + m + ' — original slides');
         return pdfNote(res, file, { c: code, m: m }, null, title).then(function (id) {
@@ -8578,38 +8599,210 @@
           return id;
         });
       });
-    }).then(function (id) {
-      saveState('', '');
-      reload();
-      openNote(id);
-    }, function (e) {
-      saveState('', '');
-      var why = String((e && e.message) || '');
-      toast(why === 'no_slides'
-        ? L('لا ملفَّ أصليّاً لهذه الوحدة بعد', 'No original file for this module yet')
-        : L('تعذّر جلبُ السلايدات — تحقّقْ من الاتّصال وأعِدِ المحاولة', 'Could not fetch the slides — check your connection and try again'));
     });
   }
 
-  function fetchSlides(code, m, onPct) {
+  function slideWhy(e) {
+    var why = String((e && e.message) || '');
+    if (why === 'aborted' || (e && e.name === 'AbortError')) return '';
+    if (why === 'no_slides') return L('لا ملفَّ أصليّاً لهذه الوحدة بعد', 'No original file for this module yet');
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) return L('أنت دون اتّصال — اتّصلْ ثمّ أعِدِ المحاولة', 'You are offline — connect, then try again');
+    return L('تعذّر جلبُ السلايدات — تحقّقْ من الاتّصال وأعِدِ المحاولة', 'Could not fetch the slides — check your connection and try again');
+  }
+
+  var slw = null;
+  function slwEl() {
+    var el = document.getElementById('na-slwait');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'na-slwait';
+      el.className = 'na-slwait';
+      el.hidden = true;
+      el.setAttribute('role', 'status');
+      el.setAttribute('aria-live', 'polite');
+      document.body.appendChild(el);
+    }
+    if (!el.querySelector('.na-slw-card') || el.getAttribute('data-built') !== '1') {
+      el.innerHTML = '<div class="na-slw-card">' +
+        '<span class="na-slw-ic" aria-hidden="true"><i class="fa-solid fa-chalkboard"></i></span>' +
+        '<b class="na-slw-t"></b><span class="na-slw-s"></span>' +
+        '<div class="na-slw-bar" data-ind="1"><i></i></div>' +
+        '<p class="na-slw-msg"></p><p class="na-slw-hint" hidden></p>' +
+        '<div class="na-slw-acts">' +
+        '<button type="button" class="gsf-btn gsf-btn--go" data-slw="retry" hidden></button>' +
+        '<button type="button" class="gsf-btn gsf-btn--ghost" data-slw="cancel"></button></div></div>';
+      el.setAttribute('data-built', '1');
+      el.addEventListener('click', function (e) {
+        var b = e.target.closest && e.target.closest('[data-slw]');
+        if (!b || !slw) return;
+        if (b.getAttribute('data-slw') === 'retry') { var w = slw.want; slwHide(); openSlides(w); return; }
+        if (slw.ac) { try { slw.ac.abort(); } catch (eA) {} }
+        slw.gone = true;
+        slwHide();
+      });
+    }
+    return el;
+  }
+  function slwSet(k, pct, got, total) {
+    if (!slw) return;
+    var el = slwEl(), msg = '', ind = true;
+    slw.t = Date.now();
+    if (k === 'net') msg = L('يتّصل بخادم الحديقة…', 'Reaching the Garden server…');
+    else if (k === 'get') {
+      ind = !(total > 0);
+      msg = L('يُنزَّل ملفُّ الجامعة', 'Downloading the university file') +
+        (total > 0 ? ' · ' + pct + '%' : '…');
+      el.querySelector('.na-slw-bar > i').style.inlineSize = (total > 0 ? pct : 0) + '%';
+      var sz = (got > 0 && total > 0) ? sizeTxt(got) + L(' من ', ' of ') + sizeTxt(total) : '';
+      el.querySelector('.na-slw-s').textContent = sz || L('السلايداتُ الأصليّة', 'Original slides');
+    } else if (k === 'prep') msg = L('تُجهَّز الصفحات…', 'Preparing the pages…');
+    else if (k === 'boot') msg = L('يُجهَّز دفترُك…', 'Getting your notebook ready…');
+    el.querySelector('.na-slw-bar').setAttribute('data-ind', ind ? '1' : '0');
+    el.querySelector('.na-slw-msg').textContent = msg;
+  }
+  function slwShow(want, code, m) {
+    slw = { want: want, ac: (typeof AbortController === 'function') ? new AbortController() : null, t: Date.now(), gone: false };
+    var el = slwEl();
+    el.querySelector('.na-slw-t').textContent = code + ' · ' + L('الوحدة ', 'Module ') + m;
+    el.querySelector('.na-slw-s').textContent = L('السلايداتُ الأصليّة', 'Original slides');
+    el.querySelector('.na-slw-bar > i').style.inlineSize = '0%';
+    el.querySelector('.na-slw-hint').hidden = true;
+    el.removeAttribute('data-fail');
+    el.removeAttribute('data-x');
+    var rt = el.querySelector('[data-slw="retry"]'), cx = el.querySelector('[data-slw="cancel"]');
+    rt.hidden = true; rt.textContent = L('أعِدِ المحاولة', 'Try again');
+    cx.textContent = L('ألغِ', 'Cancel');
+    el.hidden = false;
+    document.documentElement.classList.add('na-slw-on');
+    clearInterval(slwShow._t);
+    slwShow._t = setInterval(function () {
+      if (!slw || el.hidden) { clearInterval(slwShow._t); return; }
+      var slow = Date.now() - slw.t > 6000, h = el.querySelector('.na-slw-hint');
+      if (slow && h.hidden && !el.hasAttribute('data-fail')) {
+        h.textContent = L('الاتّصالُ بطيء — ما زال الجلبُ جارياً، ابقَ هنا.', 'Slow connection — still fetching, please stay on this page.');
+        h.hidden = false;
+      } else if (!slow && !h.hidden) h.hidden = true;
+    }, 1000);
+    return slw;
+  }
+  function slwFail(text) {
+    if (!slw) return;
+    var el = slwEl();
+    el.setAttribute('data-fail', '1');
+    el.querySelector('.na-slw-msg').textContent = text;
+    el.querySelector('.na-slw-hint').hidden = true;
+    el.querySelector('.na-slw-bar').setAttribute('data-ind', '0');
+    el.querySelector('[data-slw="retry"]').hidden = false;
+    el.querySelector('[data-slw="cancel"]').textContent = L('أغلِقْ', 'Close');
+  }
+  function slwHide() {
+    var el = document.getElementById('na-slwait');
+    if (el) el.hidden = true;
+    document.documentElement.classList.remove('na-slw-on');
+    clearInterval(slwShow._t);
+    slw = null;
+  }
+
+  function openSlides(want) {
+    var mm = /^([A-Za-z]{2,8}[0-9]{3})-([0-9]{1,2})$/.exec(String(want || ''));
+    if (!mm) { slwHide(); return; }
+    var code = mm[1].toUpperCase(), m = Number(mm[2]), tag = code + '-' + m;
+    var had = slideHad(tag);
+    if (had) { slwHide(); openNote(had.id); return; }
+    var job = slwShow(want, code, m);
+    importSlide(code, m, function (k, pct, got, total) {
+      if (job !== slw) return;
+      slwSet(k, pct, got, total);
+      if (k === 'get' && total > 0) saveState('saving', L('يُجلب ملفُّ الجامعة الأصليّ… ', 'Fetching the original university file… ') + pct + '%');
+    }, job.ac && job.ac.signal).then(function (id) {
+      saveState('', '');
+      if (job.gone) { reload(); return; }
+      reload();
+      openNote(id);
+      if (job === slw) slwHide();
+    }, function (e) {
+      saveState('', '');
+      if (job.gone || job !== slw) return;
+      var why = slideWhy(e);
+      if (!why) { slwHide(); return; }
+      slwFail(why);
+    });
+  }
+
+  var slBulk = null;
+  function slidesAll(code) {
+    if (slBulk) return;
+    var G = window.Garden, total = (G && G.slidesOf) ? G.slidesOf(code) : 0, want = [], i;
+    for (i = 1; i <= total; i++) if (!slideHad(code + '-' + i)) want.push(i);
+    if (!want.length) return;
+    slBulk = { code: code, list: want, at: 0, ok: 0, bad: [], pct: 0, ac: (typeof AbortController === 'function') ? new AbortController() : null };
+    var job = slBulk;
+    renderList();
+    var next = function () {
+      if (job.stop || job.at >= job.list.length) return Promise.resolve();
+      var m = job.list[job.at];
+      job.pct = 0; job.step = 'net';
+      bulkPaint();
+      return importSlide(code, m, function (k, pct) {
+        job.step = k; job.pct = (k === 'get' && pct >= 0) ? pct : job.pct;
+        bulkPaint();
+      }, job.ac && job.ac.signal).then(function () { job.ok++; }, function (e) {
+        if (slideWhy(e)) job.bad.push(m); else job.stop = true;
+      }).then(function () { job.at++; return next(); });
+    };
+    next().then(function () {
+      slBulk = null;
+      reload();
+      var msg = job.ok
+        ? L('أُضيفت ' + job.ok + ' من سلايدات ' + code + ' إلى ملاحظاتك', job.ok + ' ' + code + ' slide files added to your notes')
+        : '';
+      if (job.bad.length) msg += (msg ? ' · ' : '') + L('تعذّر ' + job.bad.length + ' — أعِدِ المحاولة لاحقاً', job.bad.length + ' failed — try again later');
+      if (job.stop && !job.ok) msg = L('أُوقف الجلب', 'Stopped');
+      if (msg) toast(msg);
+    });
+  }
+  function bulkPaint() {
+    var job = slBulk;
+    if (!job) return;
+    var bar = els.items && els.items.querySelector('[data-bulk]');
+    if (!bar) return;
+    var m = job.list[Math.min(job.at, job.list.length - 1)];
+    var n = job.at + 1, N = job.list.length;
+    var whole = Math.round(((job.at + (job.step === 'prep' ? 1 : job.pct / 100)) / N) * 100);
+    var t = bar.querySelector('.na-bulk-t'), p = bar.querySelector('.na-bulk-bar > i');
+    if (t) t.textContent = L('يُضاف M' + (m < 10 ? '0' : '') + m + ' — ' + n + ' من ' + N, 'Adding M' + (m < 10 ? '0' : '') + m + ' — ' + n + ' of ' + N) +
+      (job.step === 'get' && job.pct ? ' · ' + job.pct + '%' : job.step === 'prep' ? L(' · تُجهَّز', ' · preparing') : '');
+    if (p) p.style.inlineSize = Math.max(2, Math.min(100, whole)) + '%';
+  }
+  function bulkHtml() {
+    return '<div class="na-sweep na-sweep--offer na-bulk" data-bulk="1" role="status" aria-live="polite">' +
+      '<i class="fa-solid fa-cloud-arrow-down" aria-hidden="true"></i>' +
+      '<span class="na-bulk-t">' + esc(L('يبدأ الجلب…', 'Starting…')) + '</span>' +
+      '<span class="na-bulk-bar" aria-hidden="true"><i></i></span>' +
+      '<button type="button" class="na-sweep-go" data-role="slides-stop">' + esc(L('أوقِفْ', 'Stop')) + '</button></div>';
+  }
+
+  function fetchSlides(code, m, onPct, signal) {
     var E = window.GardenEndpoints, api = (E && E.sync) || '';
     if (!api) return Promise.reject(new Error('no_endpoint'));
-    return fetch(api + '/v1/slides/' + encodeURIComponent(code) + '/' + m).then(function (r) {
+    var opt = signal ? { signal: signal } : undefined;
+    return fetch(api + '/v1/slides/' + encodeURIComponent(code) + '/' + m, opt).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (j) {
         if (!r.ok || !j.url) throw new Error(j.error || ('http_' + r.status));
         return j;
       });
     }).then(function (j) {
-      return fetch(j.url).then(function (r) {
+      return fetch(j.url, opt).then(function (r) {
         if (!r.ok) throw new Error('download_' + r.status);
         var total = Number(r.headers.get('content-length') || j.bytes || 0);
+        if (onPct) onPct(0, 0, total);
         if (!r.body || !total) return r.blob();
         var reader = r.body.getReader(), parts = [], got = 0;
         var pump = function () {
           return reader.read().then(function (s) {
             if (s.done) return new Blob(parts, { type: 'application/pdf' });
             parts.push(s.value); got += s.value.length;
-            if (onPct) onPct(Math.round(got * 100 / total));
+            if (onPct) onPct(Math.min(100, Math.round(got * 100 / total)), got, total);
             return pump();
           });
         };
@@ -10371,6 +10564,7 @@
 /*@3.NOAJ.291*/
   function penToggle() {
     if (!overlay) return false;
+    if (overlay.dial && overlay.dial.untuck) overlay.dial.untuck();
     /*@3.NOAJ.64*/
     if (inkHidden()) { uiSet('inkOff', 0); applyInkHidden(); }
     if (overlay.pick) {
@@ -10703,6 +10897,7 @@
   /*@3.NOAJ.234*/
   function pdfDraw(on) {
     if (!pdfOn() || !pdfUi.ink()) return false;
+    if (pdfDial && pdfDial.untuck) pdfDial.untuck();
     var arm = pdfUi.draw(on);
     /*@3.NOAJ.513*/
     if (arm && inkHidden()) { uiSet('inkOff', 0); applyInkHidden(); }
@@ -10712,6 +10907,7 @@
           return (pdfUi && pdfUi.ink()) ? pdfUi.ink().bar() : null;
         },
         onExit: function () { pdfDraw(false); },
+        onResume: function () { pdfDraw(true); },
         favHost: document.getElementById('na-favs'),
         surface: 'pdf',
         onTextAtom: function (act) { return textAtomField(act); }
@@ -13804,7 +14000,8 @@
         embBoot(qs);
       } else if (qs.get('slides')) {
         navHome();
-        openSlides(qs.get('slides'));
+        var slx = document.getElementById('na-slwait');
+        if (!(slx && slx.hasAttribute('data-x'))) openSlides(qs.get('slides'));
       } else if (wanted && idxFind(wanted)) {
         if (qs.get('p')) wantPage(wanted, qs.get('p'));
         openNote(wanted);

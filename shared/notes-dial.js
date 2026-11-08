@@ -321,6 +321,9 @@
       '<span class="ndl-cs" aria-hidden="true"></span>' +
       chinBtn('redo', '<i class="fa-solid fa-rotate-right" aria-hidden="true"></i>',
         'إعادة — اضغطْ مطوّلاً للمزيد', 'Redo — hold for more') +
+      '<span class="ndl-cs ndl-cs--tuck" aria-hidden="true"></span>' +
+      chinBtn('tuck', '<i class="fa-solid fa-eye-slash" aria-hidden="true"></i>',
+        'أخفِ اللوحة — يعود القلمُ لتحديد النصّ ونسخه وترجمته والتمرير', 'Hide the palette — the pen goes back to selecting, copying, translating and scrolling') +
       '</div>';
   }
 
@@ -580,6 +583,7 @@
     this.o = o;
     this.getCv = o.canvas || function () { return null; };
     this.onExit = o.onExit || function () {};
+    this.onResume = o.onResume || null;
     this.favHost = o.favHost || null;
     /*@3.NODJ.90*/
     SURFACE = o.surface || SURFACE || '';
@@ -2524,6 +2528,8 @@
     });
     this._themeObs.observe(document.documentElement,
       { attributes: true, attributeFilter: ['data-theme', 'data-mod-theme', 'data-tinted'] });
+    this._onPal = function () { if (self.el.hidden) return; self.paintHalo(); self.paintColors(); };
+    document.addEventListener('garden:palettes', this._onPal);
   };
 
   /*@3.NODJ.2*/
@@ -2857,6 +2863,7 @@
       e.preventDefault();
       stop();
       var k = b.getAttribute('data-ck');
+      if (k === 'tuck') return;
       run = { k: k, b: b, id: e.pointerId, t: 0, gap: REP_MS, held: false };
       try { b.setPointerCapture(e.pointerId); } catch (e2) {}
       if (k === 'era') {
@@ -2885,8 +2892,55 @@
     c.addEventListener('pointercancel', end);
     c.addEventListener('click', function (e) {
       var b = e.target.closest ? e.target.closest('[data-ck]') : null;
+      if (b && b.getAttribute('data-ck') === 'tuck') { self.tuck(); return; }
       if (b && e.detail === 0 && !b.disabled) self.chinAct(b.getAttribute('data-ck'));
     });
+  };
+
+  Dial.prototype.tuck = function () {
+    this.setOpen(false);
+    if (this.panel && this.panel.open) this.panel.toggle(false);
+    if (!this.onResume) { this.onExit(); return; }
+    this._tucked = true;
+    this._tucking = true;
+    try { this.onExit(); } finally { this._tucking = false; }
+    this.paintPeek(this._tucked && this.el.hidden);
+  };
+
+  Dial.prototype.untuck = function () {
+    if (this._tucking) return;
+    this._tucked = false;
+    this.paintPeek(false);
+  };
+
+  Dial.prototype.paintPeek = function (on) {
+    var w = this.peek;
+    if (!on) { if (w) w.hidden = true; return; }
+    var self = this;
+    if (!w) {
+      w = document.createElement('div');
+      w.className = 'ndl ndl--peek';
+      w.hidden = true;
+      w.innerHTML = '<button type="button" class="ndl-peek" data-ar-title="أظهِرِ اللوحة — ارسمْ وظلّلْ من جديد"' +
+        ' data-en-title="Show the palette — draw and highlight again">' +
+        '<i class="fa-solid fa-pen" aria-hidden="true"></i><span class="ndl-peek-eye" aria-hidden="true"><i class="fa-solid fa-eye"></i></span></button>';
+      document.body.appendChild(w);
+      w.firstChild.addEventListener('click', function (e) {
+        e.preventDefault(); e.stopPropagation();
+        self._tucked = false;
+        w.hidden = true;
+        if (self.onResume) self.onResume();
+      });
+      this.peek = w;
+    }
+    var b = w.firstChild, cv = this.getCv(), hi = !!(cv && cv.tool === 'hi');
+    b.setAttribute('aria-label', L('أظهِرِ اللوحة — ارسمْ وظلّلْ من جديد', 'Show the palette — draw and highlight again'));
+    b.title = b.getAttribute('aria-label');
+    b.style.setProperty('--t', curHex(cv));
+    b.firstChild.className = 'fa-solid ' + (hi ? 'fa-highlighter' : (cv && cv.tool === 'era') ? 'fa-eraser' : 'fa-pen');
+    w.style.left = this.el.style.left;
+    w.style.top = this.el.style.top;
+    w.hidden = false;
   };
 
   Dial.prototype.syncChin = function (s) {
@@ -2898,7 +2952,7 @@
       var k = q[i].getAttribute('data-ck');
       if (k === 'undo') q[i].disabled = !s.canUndo;
       else if (k === 'redo') q[i].disabled = !s.canRedo;
-      else q[i].setAttribute('aria-pressed', s.tool === 'era' ? 'true' : 'false');
+      else if (k === 'era') q[i].setAttribute('aria-pressed', s.tool === 'era' ? 'true' : 'false');
     }
   };
 
@@ -3307,6 +3361,8 @@
   /*@3.NODJ.71*/
   Dial.prototype.show = function (on, drawing, keepDock) {
     this.el.hidden = !on;
+    if (on) this._tucked = false;
+    this.paintPeek(!on && !!this._tucked);
     this.el.setAttribute('data-drawing', drawing ? '1' : '0');
     /*@3.NODJ.88*/
     var live = on || keepDock;
@@ -3337,6 +3393,7 @@
 
   Dial.prototype.destroy = function () {
     if (this._themeObs) { try { this._themeObs.disconnect(); } catch (e) {} }
+    if (this._onPal) document.removeEventListener('garden:palettes', this._onPal);
     document.removeEventListener('keydown', this._onKey);
     /*@3.NODJ.28*/
     if (this._keys) this._keys();
@@ -3348,6 +3405,7 @@
     document.removeEventListener('garden:languageChanged', this._onLang);
     if (this._onSync) window.removeEventListener('garden:syncCompleted', this._onSync);
     if (this.el && this.el.parentNode) this.el.remove();
+    if (this.peek && this.peek.parentNode) this.peek.remove();
     if (this.dock && this.dock.parentNode) this.dock.remove();
     else if (this.favBar && this.favBar.parentNode) this.favBar.remove();
     var ix = DIALS.indexOf(this);

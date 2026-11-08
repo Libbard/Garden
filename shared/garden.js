@@ -3532,6 +3532,8 @@
     a.className = 'sidebar-notes-btn';
     a.id = 'sidebar-slides-btn';
     a.href = ROOT + 'hub/notes.html?slides=' + encodeURIComponent(code + '-' + m);
+    a.target = '_blank';
+    a.rel = 'noopener';
     const tipAr = 'يفتح ملفَّ الجامعة الأصليّ لهذه الوحدة في ملاحظاتك — للمراجعة متى شئت';
     const tipEn = 'Opens the university’s original file for this module in your notes';
     a.setAttribute('data-ar-title', tipAr);
