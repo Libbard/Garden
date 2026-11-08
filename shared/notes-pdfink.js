@@ -196,6 +196,7 @@
         qs.push(map ? map(xx, yy) : { x: xx * k, y: yy * k });
       }
       if (!qs.length) return;
+      if (K.settleHi && qs.length > 2) qs = K.settleHi(qs, Math.max(1, (el.w || 2) * k));
       g.save();
       g.globalAlpha = 1;
       g.strokeStyle = hex;
@@ -1025,9 +1026,16 @@
     if (L.tmark) {
       if (s.n !== L.n) return;
       L.b = { x: s.x, y: s.y };
-      L.rects = this.markRects(L.n, L.a, L.b, L.mode);
-      if (!L.rects || !L.rects.length) { L.rects = null; this.clearPreview(L.n); return; }
-      this.previewMark(L.n, L.rects, L.c, L.u);
+      L.rects = null;
+      if (L.raf) return;
+      var selfT = this;
+      L.raf = requestAnimationFrame(function () {
+        L.raf = 0;
+        if (selfT.live !== L) return;
+        L.rects = selfT.markRects(L.n, L.a, L.b, L.mode, L);
+        if (!L.rects || !L.rects.length) { L.rects = null; selfT.clearPreview(L.n); return; }
+        selfT.previewMark(L.n, L.rects, L.c, L.u);
+      });
       return;
     }
     if (L.shp) {
@@ -1070,16 +1078,19 @@
     var p = this.pages[L.n];
     /*@3.NOPJ8.85*/
     if (L.tmark) {
+      if (L.raf) { cancelAnimationFrame(L.raf); L.raf = 0; }
       this.clearPreview(L.n);
-      var rr = L.rects || this.markRects(L.n, L.a, L.b, L.mode);
+      var rr = L.rects || this.markRects(L.n, L.a, L.b, L.mode, L);
+      if (L.lift) { L.lift.el.style.pointerEvents = L.lift.was; L.lift = null; }
       /*@3.NOPJ8.86*/
       if (!rr || !rr.length) {
         /*@3.NOPJ8.200*/
         var now = Date.now(), pv = this._tap;
-        this._tap = { n: L.n, x: L.a.x, y: L.a.y, t: now };
-        if (!(pv && pv.n === L.n && now - pv.t < 450 && Math.abs(pv.x - L.a.x) < 8 && Math.abs(pv.y - L.a.y) < 8)) { this.beat(); return false; }
-        this._tap = null;
-        rr = this.wordRects(L.n, L.a, L.mode);
+        var near = pv && pv.n === L.n && now - pv.t < 500 && Math.abs(pv.x - L.a.x) < 12 && Math.abs(pv.y - L.a.y) < 12;
+        this._tap = { n: L.n, x: L.a.x, y: L.a.y, t: now, k: near ? pv.k + 1 : 1 };
+        if (!near) { this.beat(); return false; }
+        rr = this.wordRects(L.n, L.a, this._tap.k >= 3 ? 'line' : 'text');
+        if (this._tap.k >= 3) this._tap = null;
       }
       if (keep && rr && rr.length) {
         if (this.face) {
@@ -2791,7 +2802,7 @@
   };
 
   /*@3.NOPJ8.56*/
-  Ink.prototype.markRects = function (n, a, b, mode) {
+  Ink.prototype.markRects = function (n, a, b, mode, memo) {
     /*@3.NOPJ8.106*/
     if (mode === 'line') return this.bandRects(n, a, b);
     var V = window.GardenPdfView;
@@ -2812,8 +2823,12 @@
     var ib = pickRun(runs, bx2, by2, ia);
     if (ib == null) ib = ia;
     var lift = this.grab, was = lift ? lift.style.pointerEvents : null;
-    if (lift) lift.style.pointerEvents = 'none';
-    var c1 = caretInRun(td, base, runs[ia], ax, ay);
+    if (memo && lift) {
+      if (!memo.lift) { memo.lift = { el: lift, was: was || '' }; lift.style.pointerEvents = 'none'; }
+      lift = null;
+    } else if (lift) lift.style.pointerEvents = 'none';
+    var c1 = (memo && memo.c1 && memo.c1ia === ia) ? memo.c1 : caretInRun(td, base, runs[ia], ax, ay);
+    if (memo && c1) { memo.c1 = c1; memo.c1ia = ia; }
     var c2 = caretInRun(td, base, runs[ib], bx2, by2);
     if (lift) lift.style.pointerEvents = was || '';
     if (!c1 || !c2) return null;
@@ -3614,26 +3629,40 @@
     var host = v.marks(n);
     if (!host) return;
     var old = host.querySelectorAll('.gpi-mkp'), q;
-    for (q = 0; q < old.length; q++) old[q].remove();
-    if (!rects || !rects.length) return;
+    if (!rects || !rects.length) {
+      for (q = 0; q < old.length; q++) old[q].remove();
+      host._mkSig = '';
+      return;
+    }
     var f = this.frameOf(p, p.scale);
-    var K = window.GardenCanvas;
     var hex = markHex({ c: colour, u: under ? 1 : 0 });
-    void K;
-    for (var i = 0; i < rects.length; i++) {
+    var boxes = [], i;
+    for (i = 0; i < rects.length; i++) {
       var r = under ? underRect(rects[i]) : rects[i];
       var a = f ? f.toPx(r.x, r.y) : { x: r.x, y: r.y };
       var b = f ? f.toPx(r.x + r.w, r.y + r.h) : { x: r.x + r.w, y: r.y + r.h };
-      var el = document.createElement('div');
-      el.className = 'gpi-mkp';
-      el.style.insetInlineStart = Math.min(a.x, b.x).toFixed(2) + 'px';
-      el.style.insetBlockStart = Math.min(a.y, b.y).toFixed(2) + 'px';
-      el.style.inlineSize = Math.abs(b.x - a.x).toFixed(2) + 'px';
-      el.style.blockSize = Math.max(1, Math.abs(b.y - a.y)).toFixed(2) + 'px';
-      el.style.background = hex;
-      if (under) el.style.opacity = '1';
-      host.appendChild(el);
+      boxes.push([Math.min(a.x, b.x).toFixed(1), Math.min(a.y, b.y).toFixed(1),
+                  Math.abs(b.x - a.x).toFixed(1), Math.max(1, Math.abs(b.y - a.y)).toFixed(1)]);
     }
+    var sig = hex + (under ? 'u' : '') + boxes.join(';');
+    if (sig === host._mkSig && old.length === boxes.length) return;
+    host._mkSig = sig;
+    for (i = 0; i < boxes.length; i++) {
+      var el = old[i];
+      if (!el) {
+        el = document.createElement('div');
+        el.className = 'gpi-mkp';
+        host.appendChild(el);
+      }
+      var bx = boxes[i], st = el.style;
+      if (st.insetInlineStart !== bx[0] + 'px') st.insetInlineStart = bx[0] + 'px';
+      if (st.insetBlockStart !== bx[1] + 'px') st.insetBlockStart = bx[1] + 'px';
+      if (st.inlineSize !== bx[2] + 'px') st.inlineSize = bx[2] + 'px';
+      if (st.blockSize !== bx[3] + 'px') st.blockSize = bx[3] + 'px';
+      if (el._hex !== hex) { st.background = hex; el._hex = hex; }
+      st.opacity = under ? '1' : '';
+    }
+    for (q = boxes.length; q < old.length; q++) old[q].remove();
   };
 
   Ink.prototype.clearPreview = function (n) {
@@ -3643,6 +3672,7 @@
     if (!host) return;
     var old = host.querySelectorAll('.gpi-mkp');
     for (var q = 0; q < old.length; q++) old[q].remove();
+    host._mkSig = '';
   };
 
   /*@3.NOPJ8.17*/

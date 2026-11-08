@@ -1149,6 +1149,24 @@
     return pts;
   }
 
+  function settleHi(pts, base) {
+    var gap = Math.max(0.6, base * 0.04), out = [pts[0]], i;
+    for (i = 1; i < pts.length; i++) {
+      var o = out[out.length - 1];
+      if (Math.hypot(pts[i].x - o.x, pts[i].y - o.y) >= gap) out.push(pts[i]);
+    }
+    var last = pts[pts.length - 1];
+    if (out[out.length - 1] !== last) {
+      if (out.length > 1 && Math.hypot(last.x - out[out.length - 1].x, last.y - out[out.length - 1].y) < gap) out[out.length - 1] = last;
+      else out.push(last);
+    }
+    var r = base * 0.3;
+    while (out.length > 2 && Math.hypot(out[1].x - out[0].x, out[1].y - out[0].y) < r) out.splice(1, 1);
+    var n = out.length;
+    while (n > 2 && Math.hypot(out[n - 2].x - out[n - 1].x, out[n - 2].y - out[n - 1].y) < r) { out.splice(n - 2, 1); n--; }
+    return out;
+  }
+
   /*@3.NOCJ.114*/
   function widthAt(base, nib, pr, ang, pt) {
     var w = base * nib.scale * (nib.min + nib.resp * pr);
@@ -1228,6 +1246,7 @@
       raw.push(r);
     }
     if (!raw.length) return null;
+    if (el.hi) { tilted = 0; raw = settleHi(raw, base); }
     if (tilted) fillTilt(raw);
     if (!el.hi && nib.resp) {
       var x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
@@ -1253,7 +1272,7 @@
     }
     /*@3.NOCJ.28*/
     /*@3.NOCJ.107*/
-    if (!nib.resp && !nib.chisel && !tilted) {
+    if (el.hi || (!nib.resp && !nib.chisel && !tilted)) {
       return { kind: 'line', alpha: alpha, grain: false, pts: pts,
                w: Math.max(0.5, widthAt(base, nib, 1, 0)) };
     }
@@ -3039,6 +3058,7 @@
     straighten: straighten,
     toSvg: toSvg,
     inkGeom: inkGeom,
+    settleHi: settleHi,
     inkEmit: inkEmit,
     isLight: isLight,
     setPaper: setPaper,
