@@ -467,6 +467,7 @@
               if (o.offLayer) o.offLayer(n, el);
             },
             onText: function (n, td) { if (st.find) st.find.paint(n, td); },
+            onPage: function (n) { if (o.onRender) o.onRender(n); },
             /*@3.NOPJ5.29*/
             annots: function (n, list) {
               var A = window.GardenPdfAnnot;

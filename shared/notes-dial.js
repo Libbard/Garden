@@ -19,6 +19,25 @@
   function hexOf(t) {
     return (window.GardenCanvas && GardenCanvas.hexOf) ? GardenCanvas.hexOf(t) : '#888';
   }
+  function lumRGB(r, g, b) {
+    var f = function (c) { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  }
+  function inkLow(hex, el) {
+    var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || '').trim());
+    if (!m || !el) return false;
+    var n = parseInt(m[1], 16);
+    var a = lumRGB(n >> 16 & 255, n >> 8 & 255, n & 255);
+    var bg = getComputedStyle(el).backgroundColor || '';
+    if (!/^(rgba?\(|color\(srgb )/.test(bg)) return false;
+    if (!/^(rgba?\(|color\(srgb )/.test(bg)) return false;
+    var v = bg.match(/[\d.]+/g);
+    if (!v || v.length < 3) return false;
+    var k = /^color\(/.test(bg) ? 255 : 1;
+    var b = lumRGB(+v[0] * k, +v[1] * k, +v[2] * k);
+    var hi = Math.max(a, b), lo = Math.min(a, b);
+    return (hi + 0.05) / (lo + 0.05) < 1.9;
+  }
 
   /*@3.NODJ.38*/
   var TONES = ['ink', 'red', 'orange', 'yellow', 'lime', 'emerald',
@@ -2527,7 +2546,7 @@
       self.sync();
     });
     this._themeObs.observe(document.documentElement,
-      { attributes: true, attributeFilter: ['data-theme', 'data-mod-theme', 'data-tinted'] });
+      { attributes: true, attributeFilter: ['data-theme', 'data-mod-theme', 'data-tinted', 'data-ink-inv'] });
     this._onPal = function () { if (self.el.hidden) return; self.paintHalo(); self.paintColors(); };
     document.addEventListener('garden:palettes', this._onPal);
   };
@@ -2937,6 +2956,7 @@
     b.setAttribute('aria-label', L('أظهِرِ اللوحة — ارسمْ وظلّلْ من جديد', 'Show the palette — draw and highlight again'));
     b.title = b.getAttribute('aria-label');
     b.style.setProperty('--t', curHex(cv));
+    w.setAttribute('data-ink-low', this.el.getAttribute('data-ink-low') || '0');
     b.firstChild.className = 'fa-solid ' + (hi ? 'fa-highlighter' : (cv && cv.tool === 'era') ? 'fa-eraser' : 'fa-pen');
     w.style.left = this.el.style.left;
     w.style.top = this.el.style.top;
@@ -3312,10 +3332,10 @@
     }
     /*@3.NODJ.53*/
     this.hub.style.color = hexOf(s.color);
-    var C0 = window.GardenCanvas;
-    var paper = (C0 && C0.paperHex) ? C0.paperHex() : null;
-    this.hub.style.setProperty('--ndl-paper', paper || '');
-    this.el.style.setProperty('--ndl-paper', paper || '');
+    /*@3.NODJ.142*/
+    var low = inkLow(hexOf(s.color), this.hub) ? '1' : '0';
+    this.el.setAttribute('data-ink-low', low);
+    if (this.peek) this.peek.setAttribute('data-ink-low', low);
 
     var z = this.zoomBtn;
     if (z) {

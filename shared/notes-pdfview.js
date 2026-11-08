@@ -375,6 +375,10 @@
       self.selTick = requestAnimationFrame(function () { self.selTick = 0; self.drawSel(); });
     };
     document.addEventListener('selectionchange', this.onSel);
+    this.onSelPt = function (e) { self.selDrag(e); };
+    this.host.addEventListener('pointerdown', this.onSelPt, true);
+    window.addEventListener('pointermove', this.onSelPt, true);
+    window.addEventListener('pointerup', this.onSelPt, true);
     /*@3.NOPJ3.21*/
     this.onCopy = function (e) { self.copy(e); };
     this.host.addEventListener('copy', this.onCopy);
@@ -1340,6 +1344,7 @@
   View.prototype.drawSel = function () {
     if (this.dead || !this.wrap) return;
     var r = this.pick();
+    if (r && this.sd && this.sd.moved) { var fr = this.fixRange(); if (fr) r = fr; }
     for (var k in this.slots) {
       var sl = this.slots[k], boxes = null;
       if (r && sl.td) {
@@ -1349,7 +1354,7 @@
             box.selectNodeContents(sl.td);
             if (r.compareBoundaryPoints(Range.START_TO_START, box) < 0) sub.setStart(box.startContainer, box.startOffset);
             if (r.compareBoundaryPoints(Range.END_TO_END, box) > 0) sub.setEnd(box.endContainer, box.endOffset);
-            var rects = sub.getClientRects();
+            var rects = glyphRects(sub) || sub.getClientRects();
             if (rects.length) { var base = sl.el.getBoundingClientRect(); boxes = merge(rects, base.left, base.top); }
           }
         } catch (e) { boxes = null; }
@@ -1368,6 +1373,95 @@
       reuseBoxes(sl.sel, boxes, 'gpv-selbox');
       sl.sel.__sig = sig;
     }
+  };
+
+  /*@3.NOPJ3.87*/
+  function glyphRects(rg) {
+    var nodes = [], n, out = [], any = false;
+    if (rg.startContainer === rg.endContainer && rg.startContainer.nodeType === 3) nodes.push(rg.startContainer);
+    else {
+      var root = rg.commonAncestorContainer;
+      if (root.nodeType === 3) root = root.parentNode;
+      var tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+      while ((n = tw.nextNode())) { try { if (rg.intersectsNode(n)) nodes.push(n); } catch (e) {} }
+    }
+    for (var i = 0; i < nodes.length; i++) {
+      var nd = nodes[i];
+      var a = nd === rg.startContainer ? rg.startOffset : 0, b = nd === rg.endContainer ? rg.endOffset : nd.length;
+      if (b <= a) continue;
+      var x0 = glyphX(nd, a), x1 = glyphX(nd, b);
+      if (x0 != null && x1 != null && x1 > x0) {
+        var sr = nd.parentNode.getBoundingClientRect();
+        out.push({ left: x0, top: sr.top, width: x1 - x0, height: sr.height });
+        any = true;
+      } else {
+        var r2 = document.createRange();
+        try { r2.setStart(nd, a); r2.setEnd(nd, b); } catch (e2) { continue; }
+        var cr = r2.getClientRects();
+        for (var j = 0; j < cr.length; j++) out.push(cr[j]);
+      }
+    }
+    return any ? out : null;
+  }
+  function nearGlyph(node, x, y) {
+    if (!node || node.nodeType !== 3) return null;
+    var sp = node.parentNode;
+    if (!sp || !sp.parentNode || !sp.parentNode.classList || !sp.parentNode.classList.contains('gpv-text')) return null;
+    var pre = advOf(sp), u = pre && unit(sp);
+    if (!u) return null;
+    var r = sp.getBoundingClientRect();
+    if (y < r.top - 4 || y > r.bottom + 4 || x < r.left - 8 || x > r.right + 8) return null;
+    var best = 0, bd = Infinity;
+    for (var k = 0; k < pre.length; k++) {
+      var d = Math.abs(r.left + pre[k] * u - x);
+      if (d < bd) { bd = d; best = k; }
+    }
+    return Math.min(best, node.length);
+  }
+  View.prototype.selDrag = function (e) {
+    if (e.type === 'pointerdown') {
+      this.sd = null;
+      var t = e.target;
+      if (e.button !== 0 || e.pointerType === 'touch' || !t || !t.closest || !t.closest('.gpv-text')) return;
+      this.sd = { ax: e.clientX, ay: e.clientY, x: e.clientX, y: e.clientY, moved: false };
+      return;
+    }
+    var d = this.sd;
+    if (!d) return;
+    d.x = e.clientX; d.y = e.clientY;
+    if (Math.abs(d.x - d.ax) + Math.abs(d.y - d.ay) > 3) d.moved = true;
+    if (e.type === 'pointerup') {
+      var me = this;
+      setTimeout(function () { if (me.sd === d) { me.fixSel(); me.sd = null; if (me.onSel) me.onSel(); } }, 0);
+    }
+  };
+  View.prototype.fixEnds = function () {
+    var d = this.sd, sel = window.getSelection && window.getSelection();
+    if (!d || !d.moved || !sel || !sel.rangeCount || sel.isCollapsed) return null;
+    var an = sel.anchorNode, fn = sel.focusNode;
+    if (!this.wrap || !this.wrap.contains(an) || !this.wrap.contains(fn)) return null;
+    var a = nearGlyph(an, d.ax, d.ay), f = nearGlyph(fn, d.x, d.y);
+    var ao = a == null ? sel.anchorOffset : a, fo = f == null ? sel.focusOffset : f;
+    if (ao === sel.anchorOffset && fo === sel.focusOffset) return null;
+    return { an: an, ao: ao, fn: fn, fo: fo };
+  };
+  View.prototype.fixRange = function () {
+    var e = this.fixEnds();
+    if (!e) return null;
+    try {
+      var r = document.createRange();
+      r.setStart(e.an, e.ao); r.collapse(true);
+      var q = document.createRange();
+      q.setStart(e.fn, e.fo); q.collapse(true);
+      if (r.compareBoundaryPoints(Range.START_TO_START, q) <= 0) { r.setEnd(e.fn, e.fo); return r; }
+      q.setEnd(e.an, e.ao);
+      return q;
+    } catch (err) { return null; }
+  };
+  View.prototype.fixSel = function () {
+    var e = this.fixEnds(), sel = window.getSelection && window.getSelection();
+    if (!e || !sel) return;
+    try { sel.setBaseAndExtent(e.an, e.ao, e.fn, e.fo); } catch (err) {}
   };
 
   function reuseBoxes(host, boxes, cls) {
@@ -1493,6 +1587,12 @@
       this.onPd = this.onPm = this.onPu = null;
     }
     if (this.onSel) { document.removeEventListener('selectionchange', this.onSel); this.onSel = null; }
+    if (this.onSelPt) {
+      this.host.removeEventListener('pointerdown', this.onSelPt, true);
+      window.removeEventListener('pointermove', this.onSelPt, true);
+      window.removeEventListener('pointerup', this.onSelPt, true);
+      this.onSelPt = null;
+    }
     if (this.onCopy) { this.host.removeEventListener('copy', this.onCopy); this.onCopy = null; }
     if (this.onDbl) { this.host.removeEventListener('dblclick', this.onDbl); this.onDbl = null; }
     if (this.onTap) { this.host.removeEventListener('pointerup', this.onTap); this.onTap = null; }

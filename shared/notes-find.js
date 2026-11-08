@@ -473,6 +473,10 @@
     }
     x = Math.max(pad, Math.min(hr.width - w - pad, x));
     y = Math.max(pad, Math.min(Math.max(pad, hr.height - h - pad), y));
+    var fv = document.getElementById('na-favs');
+    var fr = fv && !fv.classList.contains('na-favs--ghost') ? fv.getBoundingClientRect() : null;
+    if (fr && fr.height > 4 && fr.right > hr.left + x && fr.left < hr.left + x + w &&
+        hr.top + y < fr.bottom && hr.top + y + h > fr.top) y = fr.bottom - hr.top + 6;
     bar.style.left = Math.round(x) + 'px';
     bar.style.insetBlockStart = Math.round(y) + 'px';
   };
@@ -740,6 +744,7 @@
     isOpen: function () { return inst.open; },
     soil: function () { inst.onDocChange(); },
     relayout: function () { inst.onLayout(); },
+    place: function () { inst.place(); },
     search: function (q) { inst.ed = inst.getEd ? inst.getEd() : inst.ed; return inst.search(q); },
     replace: function (w, all) { inst.ed = inst.getEd ? inst.getEd() : inst.ed; var wi = inst.bar ? inst.bar.querySelector('[data-nf="with"]') : null; if (wi && w != null) wi.value = String(w); return all ? inst.replaceAll() : inst.replaceOne(); },
     tell: function () { inst.say(); },

@@ -260,11 +260,38 @@
     }, function () {});
   }
 
+  /*@3.NOEJ3.34*/
+  function nNotes(n) {
+    return A.isAr() ? (n === 1 ? 'ملاحظةٌ واحدة' : n === 2 ? 'ملاحظتان' : n + (n >= 3 && n <= 10 ? ' ملاحظات' : ' ملاحظةً')) : (n + (n === 1 ? ' note' : ' notes'));
+  }
+  function nPdfs(n) {
+    return A.isAr() ? (n === 1 ? 'ملفٌّ واحد' : n === 2 ? 'ملفّان' : n + (n >= 3 && n <= 10 ? ' ملفّات' : ' ملفّاً')) : (n + (n === 1 ? ' file' : ' files'));
+  }
+  function courseTile(f, tgt) {
+    var bits = [];
+    if (f.notes) bits.push(nNotes(f.notes));
+    if (f.pdf) bits.push(nPdfs(f.pdf));
+    if (!bits.length) bits.push(f.count ? nItems(f.count) : L('فارغ', 'Empty'));
+    var when = f.last && A.when ? A.when(f.last) : '';
+    return '<button type="button" class="nx-fold nx-crs"' + tgt + (f.tone ? ' style="--nx-tone:' + esc(f.tone) + '"' : '') +
+      ' aria-label="' + esc((f.course || '') + ' ' + (f.title || f.name) + ' — ' + bits.join(L('، ', ', '))) + '">' +
+      '<span class="nx-crs-top"><span class="nx-crs-i" aria-hidden="true">' + ic('fa-graduation-cap') + '</span>' +
+      '<bdi class="nx-crs-code">' + esc(f.course || '') + '</bdi></span>' +
+      '<span class="nx-crs-n" dir="auto">' + esc(f.title || f.name) + '</span>' +
+      '<span class="nx-crs-f"><span class="nx-crs-c">' + esc(bits.join(' · ')) + '</span>' +
+      '<span class="nx-crs-t">' + esc(when || '') + '</span></span></button>';
+  }
+
   function folderTiles(fs) {
     if (!fs.length) return '';
-    var h = '<section class="nx-folders" aria-label="' + esc(L('المجلّدات', 'Folders')) + '">';
+    var allCrs = fs.every(function (f) { return !!f.course; });
+    var h = '<section class="nx-folders' + (allCrs ? ' nx-folders--crs' : '') + '" aria-label="' + esc(allCrs ? L('المواد', 'Courses') : L('المجلّدات', 'Folders')) + '">';
     for (var i = 0; i < fs.length; i++) {
       var f = fs[i];
+      if (f.course) {
+        h += courseTile(f, ' data-x="view" data-v="' + esc(JSON.stringify(f.v)) + '" data-course="' + esc(f.course) + '"');
+        continue;
+      }
       var tgt = f.v ? ' data-x="view" data-v="' + esc(JSON.stringify(f.v)) + '"' + (f.course ? ' data-course="' + esc(f.course) + '"' : '') : ' data-x="folder" data-id="' + esc(f.id) + '"';
       h += '<button type="button" class="nx-fold"' + tgt + (f.tone ? ' style="--nx-tone:' + esc(f.tone) + '"' : '') + '>' +
         '<span class="nx-fold-i" aria-hidden="true">' + ic(f.icon || 'fa-folder') + '</span>' +

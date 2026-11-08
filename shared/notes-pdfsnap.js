@@ -91,6 +91,124 @@
     }
   }
 
+  /*@3.NOPJ14.2*/
+  var _boxes = typeof WeakMap === 'function' ? new WeakMap() : null;
+  function imgBoxes(page) {
+    if (_boxes && _boxes.has(page)) return _boxes.get(page);
+    var V = window.GardenPdfView;
+    var pr = Promise.all([V && V.ready ? V.ready() : null, page.getOperatorList()]).then(function (r) {
+      var O = r[0] && r[0].OPS, ol = r[1];
+      if (!O || !ol) return [];
+      var fn = ol.fnArray, ar = ol.argsArray, m = [1, 0, 0, 1, 0, 0], st = [], out = [];
+      var mul = function (A, B) {
+        return [A[0] * B[0] + A[2] * B[1], A[1] * B[0] + A[3] * B[1], A[0] * B[2] + A[2] * B[3],
+                A[1] * B[2] + A[3] * B[3], A[0] * B[4] + A[2] * B[5] + A[4], A[1] * B[4] + A[3] * B[5] + A[5]];
+      };
+      var pic = {};
+      [O.paintImageXObject, O.paintInlineImageXObject, O.paintInlineImageXObjectGroup].forEach(function (k) { if (k != null) pic[k] = 1; });
+      for (var i = 0; i < fn.length; i++) {
+        var f = fn[i], a = ar[i];
+        if (f === O.save) st.push(m.slice());
+        else if (f === O.restore) m = st.pop() || m;
+        else if (f === O.transform && a) m = mul(m, a);
+        else if (f === O.paintFormXObjectBegin) { st.push(m.slice()); if (a && a[0] && a[0].length === 6) m = mul(m, a[0]); }
+        else if (f === O.paintFormXObjectEnd) m = st.pop() || m;
+        else if (f === O.beginGroup) { st.push(m.slice()); if (a && a[0] && a[0].matrix) m = mul(m, a[0].matrix); }
+        else if (f === O.endGroup) m = st.pop() || m;
+        else if (pic[f]) {
+          var xs = [m[4], m[0] + m[4], m[2] + m[4], m[0] + m[2] + m[4]];
+          var ys = [m[5], m[1] + m[5], m[3] + m[5], m[1] + m[3] + m[5]];
+          out.push([Math.min.apply(0, xs), Math.min.apply(0, ys), Math.max.apply(0, xs), Math.max.apply(0, ys)]);
+        }
+      }
+      return out;
+    })['catch'](function () { return []; });
+    if (_boxes) _boxes.set(page, pr);
+    return pr;
+  }
+
+  /*@3.NOPJ14.3*/
+  function filterSteps(str) {
+    var out = [], re = /([a-z-]+)\(([^)]*)\)/g, x;
+    while ((x = re.exec(String(str || '')))) {
+      var raw = x[2].trim(), v = parseFloat(raw);
+      if (/%$/.test(raw)) v /= 100;
+      if (x[1] === 'hue-rotate') { v = parseFloat(raw); if (/rad/.test(raw)) v = v * 180 / Math.PI; else if (/turn/.test(raw)) v *= 360; }
+      if (isFinite(v)) out.push([x[1], v]);
+    }
+    return out;
+  }
+  function stepMat(k, v) {
+    if (k === 'hue-rotate') {
+      var a = v * Math.PI / 180, c = Math.cos(a), s = Math.sin(a);
+      return [0.213 + c * 0.787 - s * 0.213, 0.715 - c * 0.715 - s * 0.715, 0.072 - c * 0.072 + s * 0.928,
+              0.213 - c * 0.213 + s * 0.143, 0.715 + c * 0.285 + s * 0.140, 0.072 - c * 0.072 - s * 0.283,
+              0.213 - c * 0.213 - s * 0.787, 0.715 - c * 0.715 + s * 0.715, 0.072 + c * 0.928 + s * 0.072];
+    }
+    if (k === 'sepia') {
+      var t = 1 - Math.min(1, v);
+      return [0.393 + 0.607 * t, 0.769 - 0.769 * t, 0.189 - 0.189 * t,
+              0.349 - 0.349 * t, 0.686 + 0.314 * t, 0.168 - 0.168 * t,
+              0.272 - 0.272 * t, 0.534 - 0.534 * t, 0.131 + 0.869 * t];
+    }
+    return null;
+  }
+  function toneFn(str) {
+    var steps = filterSteps(str);
+    if (!steps.length) return null;
+    var cl = function (x) { return x < 0 ? 0 : (x > 1 ? 1 : x); };
+    var ops = steps.map(function (st) {
+      var k = st[0], v = st[1], M = stepMat(k, v);
+      if (M) return function (c) { return [cl(M[0] * c[0] + M[1] * c[1] + M[2] * c[2]), cl(M[3] * c[0] + M[4] * c[1] + M[5] * c[2]), cl(M[6] * c[0] + M[7] * c[1] + M[8] * c[2])]; };
+      if (k === 'invert') { var q = Math.min(1, v); return function (c) { return c.map(function (x) { return cl(x * (1 - 2 * q) + q); }); }; }
+      if (k === 'brightness') return function (c) { return c.map(function (x) { return cl(x * v); }); };
+      if (k === 'contrast') return function (c) { return c.map(function (x) { return cl((x - 0.5) * v + 0.5); }); };
+      return function (c) { return c; };
+    });
+    return function (c) { for (var i = 0; i < ops.length; i++) c = ops[i](c); return c; };
+  }
+  function toneCanvas(src, filter) {
+    var f = toneFn(filter);
+    if (!f || !src.width || !src.height) return src;
+    var c = document.createElement('canvas');
+    c.width = src.width; c.height = src.height;
+    var g = c.getContext('2d', { willReadFrequently: true });
+    g.drawImage(src, 0, 0);
+    var id;
+    try { id = g.getImageData(0, 0, c.width, c.height); } catch (e) { return src; }
+    var d = id.data, lut = new Map(), i;
+    for (i = 0; i < d.length; i += 4) {
+      var key = (d[i] << 16) | (d[i + 1] << 8) | d[i + 2], o = lut.get(key);
+      if (!o) {
+        var r = f([d[i] / 255, d[i + 1] / 255, d[i + 2] / 255]);
+        o = [Math.round(r[0] * 255), Math.round(r[1] * 255), Math.round(r[2] * 255)];
+        lut.set(key, o);
+      }
+      d[i] = o[0]; d[i + 1] = o[1]; d[i + 2] = o[2];
+    }
+    g.putImageData(id, 0, 0);
+    return c;
+  }
+  function toneColor(css, filter) {
+    var f = toneFn(filter), m = String(css || '').match(/[\d.]+/g);
+    if (!f || !m || m.length < 3) return css;
+    var r = f([m[0] / 255, m[1] / 255, m[2] / 255]);
+    return 'rgba(' + Math.round(r[0] * 255) + ',' + Math.round(r[1] * 255) + ',' + Math.round(r[2] * 255) + ',' + (m[3] != null ? m[3] : 1) + ')';
+  }
+  function tone(src, spec, keep) {
+    if (!spec || !spec.f) return src;
+    var c = document.createElement('canvas');
+    c.width = src.width; c.height = src.height;
+    var g = c.getContext('2d');
+    g.fillStyle = spec.bg || '#ffffff';
+    g.fillRect(0, 0, c.width, c.height);
+    g.globalCompositeOperation = spec.b === 'multiply' ? 'multiply' : (spec.b === 'screen' ? 'screen' : 'source-over');
+    g.drawImage(toneCanvas(src, spec.f), 0, 0);
+    g.globalCompositeOperation = 'source-over';
+    (keep || []).forEach(function (r) { try { g.drawImage(src, r[0], r[1], r[2], r[3], r[0], r[1], r[2], r[3]); } catch (e) {} });
+    return c;
+  }
+
   function compose(page, crop, base) {
     var pr = page.getBoundingClientRect();
     var c = crop || { left: pr.left, top: pr.top, width: pr.width, height: pr.height };
@@ -102,7 +220,8 @@
     cv.width = Math.round(w * k);
     cv.height = Math.round(h * k);
     var ctx = cv.getContext('2d');
-    ctx.fillStyle = '#ffffff';
+    var pbg = getComputedStyle(page).backgroundColor;
+    ctx.fillStyle = (pbg && !/rgba\([^)]*,\s*0\)$/.test(pbg) && pbg !== 'transparent') ? pbg : '#ffffff';
     ctx.fillRect(0, 0, cv.width, cv.height);
     ctx.scale(k, k);
     ctx.translate(-x0, -y0);
@@ -117,12 +236,14 @@
       ctx.globalAlpha = isFinite(op) ? op : 1;
       var blend = '', p = el;
       while (p && p !== page) { var mb = getComputedStyle(p).mixBlendMode; if (mb && mb !== 'normal') { blend = mb; break; } p = p.parentElement; }
-      if (blend === 'multiply') ctx.globalCompositeOperation = 'multiply';
+      if (blend === 'multiply' || blend === 'screen') ctx.globalCompositeOperation = blend;
+      var flt = (s.cs.filter && s.cs.filter !== 'none') ? s.cs.filter : '';
       if (isCv) {
         var src = (base && base.el === el && base.img) ? base.img : el;
+        if (flt) src = toneCanvas(src, flt);
         try { ctx.drawImage(src, s.r.left, s.r.top, s.r.width, s.r.height); } catch (e) {}
       } else {
-        var bg = s.cs.backgroundColor;
+        var bg = flt ? toneColor(s.cs.backgroundColor, flt) : s.cs.backgroundColor;
         if (bg && !/rgba\([^)]*,\s*0\)$/.test(bg) && bg !== 'transparent') {
           ctx.fillStyle = bg;
           ctx.fillRect(s.r.left, s.r.top, s.r.width, s.r.height);
@@ -320,6 +441,6 @@
     return b;
   }
 
-  window.GardenPdfSnap = { compose: compose, blob: blob, sharp: sharp, copy: copy, save: save, pick: pick, bar: bar, end: end,
+  window.GardenPdfSnap = { imgBoxes: imgBoxes, tone: tone, toneCanvas: toneCanvas, compose: compose, blob: blob, sharp: sharp, copy: copy, save: save, pick: pick, bar: bar, end: end,
                            active: function () { return !!cur; } };
 })();

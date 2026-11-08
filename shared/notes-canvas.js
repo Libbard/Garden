@@ -221,12 +221,21 @@
     return lum < 0.16 ? mixHex(hex, '#ffffff', (0.16 - lum) / 0.16 * 0.68) : hex;
   }
 
+  /*@3.NOCJ.148*/
+  var _penDark = null;
+  function setPenDark(on) {
+    var v = on ? true : null;
+    if (v === _penDark) return false;
+    _penDark = v;
+    return true;
+  }
+
   function hexOf(name) {
     if (typeof name === 'string' && name.charAt(0) === '#' && name.length === 7) {
       return name.toLowerCase();
     }
     var c = TONES[name] || TONES.ink;
-    return isLight() ? c.light : c.dark;
+    return (!_penDark && isLight()) ? c.light : c.dark;
   }
 
   function hiHexOf(name) {
@@ -3062,6 +3071,7 @@
     inkEmit: inkEmit,
     isLight: isLight,
     setPaper: setPaper,
+    setPenDark: setPenDark,
     setPalette: setPalette,
     paletteMode: paletteMode,
     /*@3.NOCJ.113*/

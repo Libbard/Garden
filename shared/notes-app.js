@@ -5282,6 +5282,8 @@
     if (!pdfUi) return;
     try { pdfUi.destroy(); } catch (e) {}
     pdfUi = null;
+    document.documentElement.removeAttribute('data-ink-inv');
+    if (window.GardenCanvas && GardenCanvas.setPenDark) GardenCanvas.setPenDark(false);
     updatePgNav();
     paintPdfBtns();
     syncTitleWord();
@@ -5290,16 +5292,198 @@
   /*@3.NOAJ.250*/
   var PDF_LONG = 520;
 
-  function pdfInverted() { return ui().pdfInv === 1; }
+  /*@3.NOAJ.543*/
+  var PDF_INV = 'invert(1) hue-rotate(180deg)';
+  var PDF_DARK = {
+    inv:  { ar: 'داكنٌ بلون الموقع (الافتراضيّ)', en: 'Dark, site colours (default)', bg: '', t: '' },
+    mid:  { ar: 'كحليّ', en: 'Navy', bg: '#0f172a', t: 'brightness(.93)' },
+    sep:  { ar: 'سيبيا', en: 'Sepia', bg: '#2a2118', t: 'sepia(.65) brightness(.9)' },
+    sol:  { ar: 'سولارايزد', en: 'Solarized', bg: '#002b36', t: 'brightness(.68) sepia(.3) hue-rotate(150deg)' },
+    oled: { ar: 'أسودُ خالص (OLED)', en: 'Pure black (OLED)', bg: '#000000', t: '' }
+  };
+  function pdfModeOk(m) { return !m || !!PDF_DARK[m] || m === 'w' || (m.indexOf('p:') === 0 && !!PAPER[m.slice(2)]); }
+  /*@3.NOAJ.544*/
+  function pdfModeAll() {
+    var u = ui(), m = u.pdfMode;
+    if (m === undefined) m = u.pdfInv === 1 ? 'inv' : '';
+    return pdfModeOk(m) ? (m || '') : '';
+  }
+  function pdfHash() { return edId || (pdfTone && pdfTone.h) || ''; }
+  function pdfModeOwn() {
+    var h = pdfHash(), map = ui().pdfModes;
+    if (!h || !map || typeof map !== 'object' || !(h in map)) return null;
+    return pdfModeOk(map[h]) ? (map[h] || '') : null;
+  }
+  function pdfMode() {
+    var own = pdfModeOwn();
+    return own !== null ? own : pdfModeAll();
+  }
+  function pdfKeepImg() { return ui().pdfKeepImg === 1; }
+  function pdfInverted() { return !!pdfMode(); }
+  function pdfLift() {
+    if (!pdfTone.dark) return '';
+    var k = Math.min(1.6, 0.5 / Math.max(0.3, 0.5 - pdfTone.lum));
+    return k > 1.01 ? 'contrast(' + k.toFixed(2) + ')' : '';
+  }
+  function pdfModeSpec(m) {
+    if (!m) return null;
+    if (PDF_DARK[m]) {
+      var D = PDF_DARK[m], inv = m === 'inv' ? true : !pdfTone.dark;
+      return { dark: m === 'inv' ? !pdfTone.dark : true, inv: inv, bg: D.bg, b: 'screen',
+               f: [m === 'inv' ? '' : pdfLift(), inv ? PDF_INV : '', D.t].join(' ').trim() || 'none' };
+    }
+    var bg = m === 'w' ? '#ffffff' : PAPER[m.slice(2)].light;
+    return { dark: false, inv: pdfTone.dark, bg: bg, b: 'multiply', f: pdfTone.dark ? pdfLift() + ' ' + PDF_INV : 'none' };
+  }
+  function setPdfMode(m, all) {
+    var o = ui(), h = pdfHash();
+    if (o.pdfMode === undefined) o.pdfMode = o.pdfInv === 1 ? 'inv' : '';
+    delete o.pdfInv;
+    var map = (o.pdfModes && typeof o.pdfModes === 'object') ? o.pdfModes : {};
+    if (all || !h) {
+      o.pdfMode = m || '';
+      if (h) delete map[h];
+    } else if ((m || '') === (o.pdfMode || '')) {
+      delete map[h];
+    } else {
+      map[h] = m || '';
+      var ks = Object.keys(map);
+      if (ks.length > 400) delete map[ks[0]];
+    }
+    o.pdfModes = map;
+    if (m) o.pdfModeLast = m;
+    writeJSON(LS_UI, o);
+    applyPdfInv();
+  }
+  function setPdfKeep(on) {
+    uiSet('pdfKeepImg', on ? 1 : 0);
+    applyPdfInv();
+  }
+  function pdfModeName(m) {
+    if (!m) return L('الأصل', 'Original');
+    if (PDF_DARK[m]) return L(PDF_DARK[m].ar, PDF_DARK[m].en);
+    if (m === 'w') return L('أبيض', 'White');
+    var P = PAPER[m.slice(2)];
+    return P ? L('ورقٌ ' + P.ar, P.en + ' paper') : '';
+  }
+  function pdfKeepAll() {
+    var v = pdfUi && pdfUi.view && pdfUi.view();
+    if (!v || !v.slots) return;
+    for (var n in v.slots) pdfKeep(+n);
+  }
+  function pdfKeep(n) {
+    var v = pdfUi && pdfUi.view && pdfUi.view(), s = v && v.slots && v.slots[n];
+    var old = s && s.el ? s.el.querySelector('canvas.gpv-keep') : null;
+    var on = pdfKeepImg() && !!pdfMode() && window.GardenPdfSnap && GardenPdfSnap.imgBoxes;
+    if (!on || !s || !s.cv || !s.page || !s.cv.width) { if (old) old.remove(); return; }
+    var cv = s.cv;
+    GardenPdfSnap.imgBoxes(s.page).then(function (bx) {
+      if (!s.cv || s.cv !== cv || !cv.parentNode) return;
+      var kc = s.el.querySelector('canvas.gpv-keep');
+      if (!bx.length || !(pdfKeepImg() && pdfMode())) { if (kc) kc.remove(); return; }
+      var vp = s.page.getViewport({ scale: v.scale || 1 }), k = cv.width / vp.width;
+      if (!kc) { kc = document.createElement('canvas'); kc.className = 'gpv-keep'; kc.setAttribute('aria-hidden', 'true'); }
+      if (kc.previousSibling !== cv) cv.parentNode.insertBefore(kc, cv.nextSibling);
+      kc.width = cv.width; kc.height = cv.height;
+      var g = kc.getContext('2d');
+      g.clearRect(0, 0, kc.width, kc.height);
+      bx.forEach(function (b) {
+        var r = vp.convertToViewportRectangle(b);
+        var x = Math.max(0, Math.floor(Math.min(r[0], r[2]) * k)), y = Math.max(0, Math.floor(Math.min(r[1], r[3]) * k));
+        var w = Math.min(cv.width - x, Math.ceil(Math.abs(r[2] - r[0]) * k)), h = Math.min(cv.height - y, Math.ceil(Math.abs(r[3] - r[1]) * k));
+        if (w > 6 && h > 6) { try { g.drawImage(cv, x, y, w, h, x, y, w, h); } catch (e) {} }
+      });
+    }, function () {});
+  }
+  function pdfModeItems() {
+    var cur = pdfMode(), out = [{ h: L('داكن — النصُّ فاتح', 'Dark — light text') }];
+    var own = pdfModeOwn(), all = pdfModeAll();
+    Object.keys(PDF_DARK).forEach(function (k) {
+      out.push({ a: 'pm:' + k, i: 'fa-moon', t: L(PDF_DARK[k].ar, PDF_DARK[k].en), ok: cur === k });
+    });
+    out.push({ h: L('فاتح — النصُّ داكن (للملفّ الغامق أيضاً)', 'Light — dark text (dark files too)') });
+    out.push({ a: 'pm:w', i: 'fa-sun', t: L('أبيض', 'White'), ok: cur === 'w' });
+    PAPER_KEYS.forEach(function (k) {
+      out.push({ a: 'pm:p:' + k, i: 'fa-sun', t: L('ورقٌ ' + PAPER[k].ar, PAPER[k].en + ' paper'), ok: cur === 'p:' + k });
+    });
+    out.push({ sep: 1 }, { a: 'pm:', i: 'fa-file', t: L('ألوانُ الملفّ الأصليّة', 'Original file colours'), ok: !cur });
+    out.push({ sep: 1 }, { a: 'pmkeep', i: 'fa-image', t: L('أبقِ ألوانَ الصور كما هي', 'Keep image colours as they are'),
+                          ok: pdfKeepImg(), why: L('النصُّ والأرضيّةُ يتبعان النمط، والصورُ بألوانها الأصليّة', 'Text and page follow the style; pictures keep their colours') });
+    out.push({ h: L('هذا الملفّ: ', 'This file: ') + pdfModeName(cur) + (own === null ? L(' (الافتراضيّ)', ' (default)') : '') +
+                  L(' · لكلِّ الملفّات: ', ' · All files: ') + pdfModeName(all) });
+    if (own !== null) {
+      out.push({ a: 'pmall', i: 'fa-layer-group', t: L('اجعلْ «' + pdfModeName(cur) + '» افتراضيّاً لكلِّ الملفّات', 'Make “' + pdfModeName(cur) + '” the default for all files') });
+      out.push({ a: 'pmown', i: 'fa-rotate-left', t: L('أعِدْ هذا الملفَّ إلى الافتراضيّ (' + pdfModeName(all) + ')', 'Return this file to the default (' + pdfModeName(all) + ')') });
+    }
+    return out;
+  }
+
+  /*@3.NOAJ.541*/
+  var pdfTone = { h: null, seen: {}, n: 0, dk: 0, dark: false, lum: 0 };
+
+  function pdfToneReset(h) {
+    pdfTone = { h: h || null, seen: {}, n: 0, dk: 0, dark: false, lum: 0 };
+  }
+
+  function pdfSense(n) {
+    var T = pdfTone;
+    if (!pdfUi || T.n >= 3 || T.seen[n]) return;
+    var cv = document.querySelector('.gpv-page[data-p="' + n + '"] > canvas.gpv-cv');
+    if (!cv || !cv.width || !cv.height) return;
+    var d;
+    try {
+      var t = document.createElement('canvas');
+      t.width = 24; t.height = 24;
+      var g = t.getContext('2d', { willReadFrequently: true });
+      g.drawImage(cv, 0, 0, 24, 24);
+      d = g.getImageData(0, 0, 24, 24).data;
+    } catch (e) { return; }
+    var L = [], i;
+    for (i = 0; i < d.length; i += 4) {
+      L.push((0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255);
+    }
+    L.sort(function (a, b) { return a - b; });
+    T.seen[n] = 1;
+    T.n++;
+    var md = L[L.length >> 1];
+    if (md < 0.2) { T.lum = (T.lum * T.dk + md) / (T.dk + 1); T.dk++; }
+    var was = T.dark;
+    T.dark = T.dk * 2 > T.n;
+    if (was !== T.dark) applyPdfInv();
+  }
 
   function applyPdfInv() {
     var wrap = document.querySelector('.gpv');
-    if (wrap) wrap.setAttribute('data-inv', pdfInverted() ? '1' : '0');
+    var m = pdfMode(), M = pdfModeSpec(m);
+    if (wrap) {
+      wrap.setAttribute('data-inv', M && M.inv ? '1' : '0');
+      if (M) {
+        wrap.setAttribute('data-pm', m);
+        wrap.style.setProperty('--gpv-pm-bg', M.bg || 'var(--gpv-inv-paper)');
+        wrap.style.setProperty('--gpv-pm-f', M.f);
+        wrap.style.setProperty('--gpv-pm-b', M.b);
+      } else {
+        wrap.removeAttribute('data-pm');
+        ['--gpv-pm-bg', '--gpv-pm-f', '--gpv-pm-b'].forEach(function (v) { wrap.style.removeProperty(v); });
+      }
+    }
+    var dk = !!(pdfUi && wrap) && (M ? M.dark : pdfTone.dark);
+    if (wrap) {
+      wrap.setAttribute('data-inkdark', dk ? '1' : '0');
+      wrap.setAttribute('data-fdark', pdfTone.dark ? '1' : '0');
+    }
+    var K = window.GardenCanvas;
+    if (K && K.setPenDark && K.setPenDark(dk)) {
+      var ik = pdfUi && pdfUi.ink ? pdfUi.ink() : null;
+      if (ik && ik.repaint) { try { ik.repaint(); } catch (eR) {} }
+    }
+    if (dk) document.documentElement.setAttribute('data-ink-inv', '1');
+    else document.documentElement.removeAttribute('data-ink-inv');
+    pdfKeepAll();
   }
 
   function togglePdfInv() {
-    uiSet('pdfInv', pdfInverted() ? 0 : 1);
-    applyPdfInv();
+    setPdfMode(pdfMode() ? '' : (ui().pdfModeLast || 'inv'));
   }
 
   function applyPdfInkOff() {
@@ -5536,6 +5720,7 @@
       { a: 'ppagex', i: 'fa-wand-magic-sparkles', t: L('انسخِ الصفحةَ واشرحها', 'Copy the page and explain it') },
       { a: 'g:view', i: 'fa-eye', t: L('العرض', 'View'), sub: [
         { a: 'pinv', i: pdfInverted() ? 'fa-sun' : 'fa-moon', t: pdfInverted() ? L('أعِدْ ألوانَ الملفّ', 'Restore file colours') : L('اقلبْ ألوانَ الملفّ', 'Invert file colours') },
+        { a: 'g:pmode', i: 'fa-palette', t: L('أنماطُ ألوان الملفّ…', 'File colour styles…'), sub: pdfModeItems() },
         { a: 'pink', i: inkHidden() ? 'fa-eye' : 'fa-eye-slash', t: inkHidden() ? L('أظهرِ الرسم', 'Show drawings') : L('أخفِ الرسم', 'Hide drawings') },
         { a: 'pfit', i: 'fa-expand', t: L('لائمِ الصفحةَ كاملةً', 'Fit whole page') }] },
       { sep: 1 },
@@ -5790,6 +5975,7 @@
     if (act === 'pzip') { if (edId) pdfCompress(edId); return; }
     if (act === 'pocr') { if (edId) pdfOcrAsk(edId); return; }
     if (act === 'pmraw') { if (edId) pdfDownload([edId], 'raw'); return; }
+    if (act === 'pmtone') { if (edId) pdfDownloadTone(edId); return; }
     if (act === 'pundo') { pdfStep(-1); return; }
     if (act === 'predo') { pdfStep(1); return; }
     if (act === 'porig') { pdfStep(-1, true); return; }
@@ -5844,6 +6030,10 @@
       return;
     }
     if (act === 'pinv') { togglePdfInv(); return; }
+    if (act.indexOf('pm:') === 0) { setPdfMode(act.slice(3)); return; }
+    if (act === 'pmkeep') { setPdfKeep(!pdfKeepImg()); return; }
+    if (act === 'pmall') { setPdfMode(pdfMode(), true); return; }
+    if (act === 'pmown') { setPdfMode(pdfModeAll()); return; }
     if (act === 'pink') { uiSet('inkOff', inkHidden() ? 0 : 1); applyInkHidden(); return; }
     if (act === 'ppen') { pdfDraw(!pdfUi.drawing()); return; }
     /*@3.NOAJ.254*/
@@ -5939,11 +6129,14 @@
     var g = { a: 'pmgather', i: 'fa-quote-right', t: L('اجمعْ ما ظلّلتُه وعلّقتُ عليه في ملاحظة', 'Gather my highlights and comments into a note') };
     var save = [
       { a: 'pmraw', i: 'fa-file-arrow-down', t: L('نزِّلِ الملفَّ كما هو — بلا تعليقاتٍ ولا رسم', 'Download the file as it is — no annotations or drawings') },
+      (pdfUi && pdfMode()) ? { a: 'pmtone', i: 'fa-palette', t: L('نزِّلْه بألوانه الحاليّة — ' + pdfModeName(pdfMode()), 'Download in its current colours — ' + pdfModeName(pdfMode())),
+                               why: L('نسخةٌ جديدةٌ بألوان العرض، ونصُّها يبقى قابلاً للبحث والتحديد', 'A new copy in the view colours; its text stays searchable') } : null,
       { a: 'pmpdf', i: 'fa-file-export', t: L('احفظِ الملفَّ بتعليقاته (PDF)', 'Save the file with its annotations (PDF)') },
       { a: 'pmprint', i: 'fa-print', t: L('اطبعِ الملفَّ بتعليقاته', 'Print with annotations'), kb: 'Ctrl P' },
       { sep: 1 },
       { a: 'pmexp', i: 'fa-file-arrow-down', t: L('صدِّرِ التعليقاتِ وحدَها (JSON)', 'Export annotations only (JSON)') },
       { a: 'pmimp', i: 'fa-file-arrow-up', t: L('استوردْ تعليقاتٍ (JSON)', 'Import annotations (JSON)') }];
+    save = save.filter(Boolean);
     return flat ? [g, { sep: 1 }].concat(save)
       : [g, { a: 'g:marks', i: 'fa-file-export', t: L('نزِّلْ أو صدِّرْ — بتعليقاته أو بدونها', 'Download or export — with or without annotations'), sub: save }];
   }
@@ -7058,6 +7251,79 @@
         .then(function (r) { end(); return r; }, function (e) { end(); throw e; });
     });
   }
+  /*@3.NOAJ.545*/
+  function pdfDownloadTone(id) {
+    var m = pdfMode(), spec = pdfModeSpec(m), keep = pdfKeepImg();
+    var V = window.GardenPdfView, S = window.GardenPdfSnap;
+    if (!spec || !V || !S || !S.tone) { pdfDownload([id], 'raw'); return; }
+    var name = pdfModeName(m), o = null;
+    pdfSrcs([id]).then(function (src) {
+      var s = src[0];
+      if (!s) return;
+      saveState('saving', L('تُلوَّن الصفحات…', 'Colouring the pages…'));
+      var PL;
+      return Promise.all([pdfBytesAny(s.spec), needEdit().then(function (E) { return E.lib(); })]).then(function (r) {
+        PL = r[1];
+        return r[0].arrayBuffer();
+      }).then(function (buf) {
+        var bytes = new Uint8Array(buf);
+        return Promise.all([V.load(bytes.slice()), PL.PDFDocument.load(bytes, { ignoreEncryption: true })]);
+      }).then(function (r) {
+        o = r[0];
+        var srcDoc = r[1], doc = o.doc, n = doc.numPages;
+        return PL.PDFDocument.create().then(function (out) {
+          return out.embedPages(srcDoc.getPages())['catch'](function () { return []; }).then(function (forms) {
+            var chain = Promise.resolve();
+            for (var i = 1; i <= n; i++) (function (i) {
+              chain = chain.then(function () {
+                saveState('saving', L('تُلوَّن الصفحة ' + i + ' من ' + n + '…', 'Colouring page ' + i + ' of ' + n + '…'));
+                return doc.getPage(i).then(function (pg) {
+                  var vp1 = pg.getViewport({ scale: 1 });
+                  var vp = pg.getViewport({ scale: Math.min(2.5, 2600 / Math.max(vp1.width, vp1.height)) });
+                  var c = document.createElement('canvas');
+                  c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+                  return pg.render({ canvasContext: c.getContext('2d'), viewport: vp, annotationMode: 0, background: '#ffffff' }).promise
+                    .then(function () { return keep ? S.imgBoxes(pg) : []; })
+                    .then(function (bx) {
+                      var kr = [];
+                      (bx || []).forEach(function (b) {
+                        var q = vp.convertToViewportRectangle(b);
+                        var x = Math.max(0, Math.floor(Math.min(q[0], q[2]))), y = Math.max(0, Math.floor(Math.min(q[1], q[3])));
+                        var w = Math.min(c.width - x, Math.ceil(Math.abs(q[2] - q[0]))), h = Math.min(c.height - y, Math.ceil(Math.abs(q[3] - q[1])));
+                        if (w > 6 && h > 6) kr.push([x, y, w, h]);
+                      });
+                      var t = S.tone(c, spec, kr);
+                      return new Promise(function (ok) { t.toBlob(ok, 'image/jpeg', 0.86); });
+                    }).then(function (b) { return b.arrayBuffer(); })
+                    .then(function (jb) { return out.embedJpg(jb); })
+                    .then(function (img) {
+                      var page = out.addPage([vp1.width, vp1.height]);
+                      page.drawImage(img, { x: 0, y: 0, width: vp1.width, height: vp1.height });
+                      var fm = forms[i - 1];
+                      if (fm && !(pg.rotate % 360)) {
+                        try { page.drawPage(fm, { x: 0, y: 0, width: vp1.width, height: vp1.height, opacity: 0 }); } catch (eT) {}
+                      }
+                      try { pg.cleanup(); } catch (eC) {}
+                    });
+                });
+              });
+            })(i);
+            return chain.then(function () { return out.save(); });
+          });
+        });
+      }).then(function (outBytes) {
+        if (o) { try { o.doc.destroy(); } catch (eD) {} }
+        saveState('', '');
+        pdfSave(new Blob([outBytes], { type: 'application/pdf' }), pdfName(s.t, ' — ' + name));
+        toast(L('نُزِّل الملفّ بألوان «' + name + '» — ونصُّه يُبحث ويُحدَّد. الأصلُ كما هو.', 'Downloaded in “' + name + '” colours — its text stays searchable. The original is unchanged.'));
+      })['catch'](function (e) {
+        if (o) { try { o.doc.destroy(); } catch (eD) {} }
+        saveState('', '');
+        toast(ptWhy(e, s.t));
+      });
+    });
+  }
+
   function pdfDownload(ids, how) {
     pdfSrcs(ids || []).then(function (src) {
       if (!src.length) { toast(L('اخترْ ملفَّ PDF أوّلاً.', 'Pick a PDF file first.')); return; }
@@ -7587,6 +7853,7 @@
     /*@3.NOAJ.219*/
     setPanel(false);
     var pos0 = pdfPos(id);
+    pdfToneReset(doc.pdf && doc.pdf.h);
     pdfUi = GardenPdfOpen.open(els.docBody, doc.pdf || null, {
       scroller: els.docBody,
       pos: pos0,
@@ -7654,6 +7921,7 @@
       holdFit: function () { var K0 = pdfUi && pdfUi.ink && pdfUi.ink(); return !!(K0 && K0._fpage); },
       onExpand: function () { toggleFull(); },
       onPage: function () { pgNavSoon(); },
+      onRender: function (n) { pdfSense(n); pdfKeep(n); },
       onZoom: function () { applyFs(); },
       onView: function () { applyFs(); },
       onHistEdge: function (dir) { if (edId === id) { pdfStep(dir); paintHist(); } },
@@ -12213,8 +12481,20 @@
     var v = S.view, par;
     if (v.k === 'courses' || v.k === 'archive') {
       var cc = courseCounts(v.k === 'archive');
+      /*@3.NOAJ.546*/
+      var st = {}, am = courseArchMap();
+      S.all.forEach(function (n) {
+        var c = n.origin && n.origin.course;
+        if (!c || n.archived || !cc[c] || (+am[c] > 0) !== (v.k === 'archive')) return;
+        var o = st[c] || (st[c] = { pdf: 0, notes: 0, last: null });
+        if ((n.kind || n.k) === 'pdf') o.pdf++; else o.notes++;
+        if (!o.last || (n.updated_at || 0) > (o.last.updated_at || 0)) o.last = n;
+      });
       return Object.keys(cc).sort().map(function (code) {
-        return { v: { k: 'course', code: code }, name: courseLabel(code), count: cc[code], icon: 'fa-graduation-cap', tone: courseTone(code), course: code };
+        var ci = info(code), o = st[code] || { pdf: 0, notes: cc[code], last: null };
+        return { v: { k: 'course', code: code }, name: courseLabel(code), count: cc[code], icon: 'fa-graduation-cap', tone: courseTone(code), course: code,
+                 title: ci ? (isAr() ? (ci.name_ar || ci.name_en || code) : (ci.name_en || ci.name_ar || code)) : '',
+                 pdf: o.pdf, notes: o.notes, last: o.last };
       });
     }
     if (v.k === 'folder') par = v.id;
@@ -13581,6 +13861,14 @@
       syncTitleWord();
     });
 
+    /*@3.NOAJ.542*/
+    (function () {
+      var nf = document.getElementById('na-find-bar'), fv = document.getElementById('na-favs');
+      if (!nf || !fv) return;
+      var dodge = function () { if (!nf.hidden && window.GardenNotesFind && GardenNotesFind.place) GardenNotesFind.place(); };
+      if (window.ResizeObserver) new ResizeObserver(dodge).observe(fv);
+      new MutationObserver(dodge).observe(fv, { attributes: true, attributeFilter: ['class'] });
+    })();
     var nw = document.getElementById('na-new');
     if (nw) nw.addEventListener('click', function (e) { e.stopPropagation(); newMenu(nw); });
     var nw2 = document.getElementById('na-new-2');
