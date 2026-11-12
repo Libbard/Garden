@@ -1275,7 +1275,7 @@
       if (!v.trim()) { msg(st, L('لا نصَّ هنا بعد.', 'There’s no text here yet.')); ta.focus(); return; }
       preview(pane, { text: v, name: '', pasted: 1 }, hooks);
     };
-    if (hooks && hooks.preset) { ta.value = String(hooks.preset); preview(pane, { text: ta.value, name: '', pasted: 1 }, hooks); return; }
+    if (hooks && hooks.preset) { ta.value = String(hooks.preset); preview(pane, { text: ta.value, name: '', pasted: 1 }, Object.assign({}, hooks, { preset: '' })); return; }
     try { ta.focus(); } catch (e) {}
   }
 
@@ -1300,8 +1300,10 @@
     var E = {
       unsupported: ['هذا ليس رابطَ مشاركةٍ من ChatGPT أو Gemini أو Claude أو DeepSeek أو Qwen أو Kimi أو Grok.',
                     'That isn’t a share link from ChatGPT, Gemini, Claude, DeepSeek, Qwen, Kimi or Grok.'],
-      export_only: [(n || 'هذه المنصّة') + ' لا تسمح بقراءة الرابط آليّاً. افتحِ المحادثة، ومن قائمة «⋯» اخترْ «تصدير» ثمّ Markdown، واستوردِ الملفَّ من «ملفّ Markdown».',
-                    (n || 'This platform') + ' doesn’t allow reading the link automatically. Open the chat, choose “Export” ▸ Markdown from the “⋯” menu, and import the file with “Markdown file”.'],
+      export_only: [(n || 'هذه المنصّة') + ' لا تسمح بقراءة الرابط آليّاً. افتحِ المحادثة واضغطْ «نسخ» تحت الجواب ثمّ «الصقْ ما نسختَه» — أو من «⋯» اخترْ «تصدير» ثمّ Markdown واستوردْه من «ملفّ Markdown».',
+                    (n || 'This platform') + ' doesn’t allow reading the link automatically. Open the chat, tap “Copy” under the answer, then “Paste what you copied” — or choose “Export” ▸ Markdown from the “⋯” menu and import it with “Markdown file”.'],
+      copy_only: [(n || 'هذه المنصّة') + ' لا تسمح بقراءة الرابط آليّاً — خطوتان فقط: افتحِ المحادثة واضغطْ «نسخ» تحت الردّ، ثمّ ارجعْ واضغطْ «الصقْ ما نسختَه».',
+                  (n || 'This platform') + ' doesn’t allow reading the link automatically — two steps: open the chat and tap “Copy” under the reply, then come back and tap “Paste what you copied”.'],
       private: ['المحادثةُ غيرُ عامّة. من «مشاركة» اجعلْها «عامّةً لمن معه الرابط»' + (p === 'claude' ? ' (‏في Claude لا تخترْ «خاصّ»)' : '') + '، ثمّ انسخِ الرابطَ من جديد.',
                 'The chat isn’t public. Under “Share”, make it “public to anyone with the link”' + (p === 'claude' ? ' (in Claude, not “Private”)' : '') + ', then copy the link again.'],
       not_found: ['لم نجد المحادثة — ربّما أُلغيت مشاركتُها أو حُذفت، أو الرابطُ ناقص.', 'Chat not found — sharing may have been turned off, it was deleted, or the link is incomplete.'],
@@ -1313,6 +1315,18 @@
     var e = E[code] || [(n || 'الموقعُ') + ' تأخّر في الردّ. أعِدِ المحاولة.', (n || 'The site') + ' was slow to answer. Try again.'];
     return L(e[0], e[1]);
   }
+  var SHARE_HOST = /^https?:\/\/(?:www\.)?(?:chatgpt\.com|chat\.openai\.com|claude\.ai|chat\.deepseek\.com|chat\.qwen\.ai|gemini\.google\.com|share\.gemini\.google|g\.co|kimi\.ai|kimi\.com|grok\.com|perplexity\.ai)\//i;
+  function pickUrl(raw) {
+    var s = String(raw || '').replace(/[\u200B-\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/g, '');
+    var all = s.match(/(?:https?:\/\/|(?:www\.)?(?:chatgpt\.com|chat\.openai\.com|claude\.ai|chat\.deepseek\.com|chat\.qwen\.ai|gemini\.google\.com|g\.co|kimi\.ai|kimi\.com|grok\.com|perplexity\.ai)\/)[^\s<>"'«»()\[\]{}\u0600-\u06FF]+/gi) || [];
+    var urls = all.map(function (u) {
+      u = u.replace(/[.,;:!?،؛…]+$/, '');
+      return /^https?:\/\//i.test(u) ? u : 'https://' + u;
+    });
+    for (var i = 0; i < urls.length; i++) if (SHARE_HOST.test(urls[i])) return urls[i];
+    return urls[0] || '';
+  }
+  function pickUrlOnly(t) { var u = pickUrl(t); return !!u && String(t).trim().length <= u.length + 4; }
   function linkFetch(url) {
     var ep = G.GardenEndpoints && G.GardenEndpoints.sync;
     if (!ep || !G.fetch) return Promise.reject({ code: 'off' });
@@ -1338,6 +1352,10 @@
       '</ol>' +
       '<p class="na-pg-hint na-imp-ais">ChatGPT · Gemini · Claude · DeepSeek · Qwen · Kimi · Grok</p>' +
       '<p class="na-pg-hint" data-imp-msg role="status" hidden></p>' +
+      '<div class="gsf-acts na-imp-acts" data-imp-fb hidden>' +
+        '<a class="gsf-btn gsf-btn--ghost" data-imp-open target="_blank" rel="noopener noreferrer" href="#"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i> ' + span('افتحِ المحادثة', 'Open the chat') + '</a>' +
+        '<button type="button" class="gsf-btn gsf-btn--go" data-imp-a="clip"><i class="fa-solid fa-paste" aria-hidden="true"></i> ' + span('الصقْ ما نسختَه', 'Paste what you copied') + '</button>' +
+      '</div>' +
       '<div class="gsf-acts na-imp-acts">' +
         '<button type="button" class="gsf-btn gsf-btn--ghost" data-imp-a="back">' + span('رجوع', 'Back') + '</button>' +
         '<button type="button" class="gsf-btn gsf-btn--ghost" data-imp-a="md"><i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i> ' + span('ملفّ Markdown', 'Markdown file') + '</button>' +
@@ -1346,9 +1364,9 @@
     var inp = st.querySelector('input'), got = null, busy = false;
     function run(act) {
       var raw = inp.value.trim();
-      var m = raw.match(/https?:\/\/[^\s<>"'«»]+/i);
-      if (!m) { msg(st, raw ? linkErr('unsupported') : L('الصقِ الرابطَ أوّلاً.', 'Paste the link first.')); inp.focus(); return; }
-      var url = m[0];
+      var url = pickUrl(raw);
+      if (!url) { msg(st, raw ? linkErr('unsupported') : L('الصقِ الرابطَ أوّلاً.', 'Paste the link first.')); inp.focus(); return; }
+      if (url !== raw) inp.value = url;
       var go = function (r) {
         got = { url: url, r: r };
         var md = linkMd(r), title = linkTitle(r);
@@ -1375,16 +1393,43 @@
       busy = true; st.setAttribute('aria-busy', 'true');
       msg(st, L('نقرأ المحادثة…', 'Reading the chat…'));
       linkFetch(url).then(function (r) { busy = false; st.removeAttribute('aria-busy'); msg(st, ''); go(r); },
-        function (e) { busy = false; st.removeAttribute('aria-busy'); msg(st, linkErr(e && e.code, e && e.platform)); });
+        function (e) { busy = false; st.removeAttribute('aria-busy'); msg(st, linkErr(e && e.code, e && e.platform)); fallback(e && e.code, url); });
+    }
+    var fb = st.querySelector('[data-imp-fb]'), opened = false;
+    function fallback(code, url) {
+      var on = code === 'copy_only' || code === 'export_only';
+      fb.hidden = !on;
+      if (on) fb.querySelector('[data-imp-open]').href = url;
+    }
+    fb.querySelector('[data-imp-open]').onclick = function () { opened = true; };
+    G.document.addEventListener('visibilitychange', function () {
+      if (opened && !G.document.hidden && st.isConnected && !fb.hidden) { opened = false; try { fb.querySelector('[data-imp-a="clip"]').focus(); } catch (e) {} }
+    });
+    function clip() {
+      var go = function (t) { paste(pane, Object.assign({}, hooks || {}, { preset: t || '' })); };
+      var c = G.navigator && G.navigator.clipboard;
+      if (!c || !c.readText) { paste(pane, hooks); return; }
+      c.readText().then(function (t) { if (t && t.trim() && !pickUrlOnly(t)) go(t); else { paste(pane, hooks); } }, function () { paste(pane, hooks); });
     }
     st.onclick = function (e) {
       var a = e.target.closest('[data-imp-a]');
       if (!a) return;
       var k = a.getAttribute('data-imp-a');
       if (k === 'back') { reset(pane); if (hooks && hooks.onBack) hooks.onBack(); return; }
+      if (k === 'clip') { clip(); return; }
       run(k);
     };
     inp.onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); run('next'); } };
+    inp.onpaste = function (e) {
+      var cd = e.clipboardData || G.clipboardData;
+      var txt = cd && cd.getData ? cd.getData('text') : '';
+      if (!txt) return;
+      e.preventDefault();
+      var url = pickUrl(txt);
+      inp.value = url || txt.replace(/\s+/g, ' ').trim();
+      if (url) run('next');
+      else msg(st, linkErr('unsupported'));
+    };
     if (hooks && hooks.preset) { inp.value = String(hooks.preset); run('next'); return; }
     try { inp.focus(); } catch (e) {}
   }
@@ -1583,7 +1628,7 @@
   }
 
   var api = { sniff: sniff, convert: convert, format: format, preview: preview, paste: paste, link: link, reset: reset,
-              formatPanel: formatPanel, defaults: defaults, modeOpts: modeOpts, letters: docLetters, ROLES: ROLES };
+              formatPanel: formatPanel, defaults: defaults, modeOpts: modeOpts, letters: docLetters, ROLES: ROLES, pickUrl: pickUrl };
   G.GardenNotesImport = api;
   if (typeof module === 'object' && module && module.exports) module.exports = api;
 })(typeof window !== 'undefined' ? window : globalThis);
